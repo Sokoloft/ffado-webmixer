@@ -1,0 +1,57 @@
+<?xml version='1.0' encoding='utf-8'?>
+<profile family="maudio_bebob" schema_version="1" source="maudio_bebob.py" status="extracted-reference">
+  <constants>
+    <constant name="hp_idx" value="0x0" />
+    <constant name="in_id" value="0x0" />
+    <constant name="in_id" value="0x0" />
+  </constants>
+  <controls>
+    <reference path="/Mixer/Feature_Volume_%d" context="module.MAudio_BeBoB.addInputTab" line="297" />
+    <reference path="/Mixer/Feature_Volume_%d" context="module.MAudio_BeBoB.addInputTab" line="302" />
+    <reference path="/Mixer/Feature_LRBalance_%d" context="module.MAudio_BeBoB.addInputTab" line="313" />
+    <reference path="/Mixer/Feature_LRBalance_%d" context="module.MAudio_BeBoB.addInputTab" line="317" />
+    <reference path="/Mixer/EnhancedMixer_%d" context="module.MAudio_BeBoB.addMixTab" line="364" />
+    <reference path="/Mixer/Feature_Volume_%d" context="module.MAudio_BeBoB.addAuxTab" line="427" />
+    <reference path="/Mixer/Feature_Volume_%d" context="module.MAudio_BeBoB.addAuxTab" line="432" />
+    <reference path="/Mixer/Feature_Volume_%d" context="module.MAudio_BeBoB.addAuxTab" line="462" />
+    <reference path="/Mixer/Feature_Volume_%d" context="module.MAudio_BeBoB.addAuxTab" line="467" />
+    <reference path="/Mixer/Feature_Volume_%d" context="module.MAudio_BeBoB.addOutputTab" line="513" />
+    <reference path="/Mixer/Feature_Volume_%d" context="module.MAudio_BeBoB.addOutputTab" line="518" />
+    <reference path="/Mixer/Selector_%d" context="module.MAudio_BeBoB.addOutputTab" line="524" />
+    <reference path="/Mixer/Feature_Volume_%d" context="module.MAudio_BeBoB.addOutputTab" line="553" />
+    <reference path="/Mixer/Feature_Volume_%d" context="module.MAudio_BeBoB.addOutputTab" line="558" />
+    <reference path="/Mixer/Selector_%d" context="module.MAudio_BeBoB.addOutputTab" line="568" />
+    <reference path="/Mixer/Selector_7" context="module.MAudio_BeBoB.read410HP" line="707" />
+    <reference path="/Mixer/EnhancedMixer_7" context="module.MAudio_BeBoB.read410HP" line="714" />
+    <reference path="/Mixer/Selector_7" context="module.MAudio_BeBoB.read410HP" line="727" />
+    <reference path="/Mixer/EnhancedMixer_7" context="module.MAudio_BeBoB.update410HP" line="735" />
+    <reference path="/Mixer/Selector_7" context="module.MAudio_BeBoB.update410HP" line="748" />
+  </controls>
+  <mappings />
+  <ui_files>
+    <ui file="maudio_bebob_output.ui" association="explicit">
+      <widgets>
+        <widget name="MAudio_BeBoB_Output_Widget" class="QWidget" />
+        <widget name="name" class="QLabel" />
+        <widget name="l_sld" class="QSlider" />
+        <widget name="r_sld" class="QSlider" />
+        <widget name="cmb_src" class="QComboBox" />
+        <widget name="mute" class="QToolButton" />
+        <widget name="link" class="QToolButton" />
+      </widgets>
+    </ui>
+    <ui file="maudio_bebob_input.ui" association="explicit">
+      <widgets>
+        <widget name="MAudio_BeBoB_Input_Widget" class="QWidget" />
+        <widget name="l_sld" class="QSlider" />
+        <widget name="name" class="QLabel" />
+        <widget name="r_sld" class="QSlider" />
+        <widget name="l_pan" class="QDial" />
+        <widget name="r_pan" class="QDial" />
+        <widget name="link" class="QToolButton" />
+        <widget name="mute" class="QToolButton" />
+      </widgets>
+    </ui>
+  </ui_files>
+  <notes>Static extraction from legacy FFADO Qt mixer sources. Paths and indexes are references, not validated live D-Bus capabilities. Runtime discovery and device-specific logic are still required. No vendor/model-to-family mapping is asserted unless source defines it.</notes>
+</profile>

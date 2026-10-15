@@ -1,0 +1,80 @@
+<?xml version='1.0' encoding='utf-8'?>
+<profile family="quatafire" schema_version="1" source="quatafire.py" status="extracted-reference">
+  <constants />
+  <controls>
+    <reference path="/Mixer/Feature_Volume_1" context="module.QuataFire.__init__" line="37" />
+    <reference path="/Mixer/Feature_Volume_1" context="module.QuataFire.__init__" line="38" />
+    <reference path="/Mixer/Feature_Volume_2" context="module.QuataFire.__init__" line="39" />
+    <reference path="/Mixer/Feature_Volume_3" context="module.QuataFire.__init__" line="40" />
+    <reference path="/Mixer/Feature_Volume_4" context="module.QuataFire.__init__" line="41" />
+    <reference path="/Mixer/Feature_Volume_4" context="module.QuataFire.__init__" line="42" />
+    <reference path="/Mixer/Feature_Volume_4" context="module.QuataFire.__init__" line="43" />
+    <reference path="/Mixer/Feature_Volume_4" context="module.QuataFire.__init__" line="44" />
+    <reference path="/Mixer/Feature_Volume_4" context="module.QuataFire.__init__" line="45" />
+    <reference path="/Mixer/Feature_Volume_4" context="module.QuataFire.__init__" line="46" />
+    <reference path="/Mixer/Feature_Volume_4" context="module.QuataFire.__init__" line="47" />
+    <reference path="/Mixer/Feature_Volume_4" context="module.QuataFire.__init__" line="48" />
+    <reference path="/Mixer/Feature_Volume_4" context="module.QuataFire.__init__" line="49" />
+    <reference path="/Mixer/Feature_Volume_2" context="module.QuataFire.__init__" line="54" />
+    <reference path="/Mixer/Feature_Volume_3" context="module.QuataFire.__init__" line="55" />
+  </controls>
+  <mappings>
+    <group name="VolumeControls" line="36">
+      <binding widget="self.sldCh1" path="/Mixer/Feature_Volume_1" arg0="1" />
+      <binding widget="self.sldCh2" path="/Mixer/Feature_Volume_1" arg0="2" />
+      <binding widget="self.sldCh34" path="/Mixer/Feature_Volume_2" arg0="0" />
+      <binding widget="self.sldCh56" path="/Mixer/Feature_Volume_3" arg0="0" />
+      <binding widget="self.sldDawAll" path="/Mixer/Feature_Volume_4" arg0="0" />
+      <binding widget="self.sldDawCH1" path="/Mixer/Feature_Volume_4" arg0="1" />
+      <binding widget="self.sldDawCH2" path="/Mixer/Feature_Volume_4" arg0="2" />
+      <binding widget="self.sldDawCH3" path="/Mixer/Feature_Volume_4" arg0="3" />
+      <binding widget="self.sldDawCH4" path="/Mixer/Feature_Volume_4" arg0="4" />
+      <binding widget="self.sldDawCH5" path="/Mixer/Feature_Volume_4" arg0="5" />
+      <binding widget="self.sldDawCH6" path="/Mixer/Feature_Volume_4" arg0="6" />
+      <binding widget="self.sldDawCH7" path="/Mixer/Feature_Volume_4" arg0="7" />
+      <binding widget="self.sldDawCH8" path="/Mixer/Feature_Volume_4" arg0="8" />
+    </group>
+    <group name="PanControls" line="51">
+      <binding widget="self.dialCh34" path="/Mixer/Feature_Volume_2" />
+      <binding widget="self.dialCh56" path="/Mixer/Feature_Volume_3" />
+    </group>
+  </mappings>
+  <ui_files>
+    <ui file="quatafire.ui" association="explicit">
+      <widgets>
+        <widget name="QuataFireMixerUI" class="QWidget" />
+        <widget name="groupBox2" class="QGroupBox" />
+        <widget name="sldCh1" class="QSlider" />
+        <widget name="textLabel1" class="QLabel" />
+        <widget name="sldCh2" class="QSlider" />
+        <widget name="textLabel1_2" class="QLabel" />
+        <widget name="dialCh34" class="QDial" />
+        <widget name="sldCh34" class="QSlider" />
+        <widget name="textLabel1_3" class="QLabel" />
+        <widget name="dialCh56" class="QDial" />
+        <widget name="sldCh56" class="QSlider" />
+        <widget name="textLabel1_3_2" class="QLabel" />
+        <widget name="groupBox4" class="QGroupBox" />
+        <widget name="sldDawAll" class="QSlider" />
+        <widget name="sldDawCH1" class="QSlider" />
+        <widget name="sldDawCH2" class="QSlider" />
+        <widget name="sldDawCH3" class="QSlider" />
+        <widget name="sldDawCH4" class="QSlider" />
+        <widget name="sldDawCH5" class="QSlider" />
+        <widget name="sldDawCH6" class="QSlider" />
+        <widget name="sldDawCH7" class="QSlider" />
+        <widget name="sldDawCH8" class="QSlider" />
+        <widget name="textLabel1_4" class="QLabel" />
+        <widget name="textLabel1_4_2" class="QLabel" />
+        <widget name="textLabel1_4_3" class="QLabel" />
+        <widget name="textLabel1_4_2_2" class="QLabel" />
+        <widget name="textLabel1_4_4" class="QLabel" />
+        <widget name="textLabel1_4_2_3" class="QLabel" />
+        <widget name="textLabel1_4_3_2" class="QLabel" />
+        <widget name="textLabel1_4_2_2_2" class="QLabel" />
+        <widget name="textLabel1_4_2_2_2_2" class="QLabel" />
+      </widgets>
+    </ui>
+  </ui_files>
+  <notes>Static extraction from legacy FFADO Qt mixer sources. Paths and indexes are references, not validated live D-Bus capabilities. Runtime discovery and device-specific logic are still required. No vendor/model-to-family mapping is asserted unless source defines it.</notes>
+</profile>

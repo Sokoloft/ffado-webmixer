@@ -1,0 +1,6 @@
+<?xml version='1.0' encoding='utf-8'?>
+<device family="quatafire" name="Quatafire 610 variant" extends="common.xml" identity_source="ffado_configuration">
+  <match vendor_id="0xf1b" configuration_model_id="0x210" />
+  <identity vendor="ESI" driver="BEBOB" ffado_mixer="QuataFire" />
+  <capabilities mode="discovered-controls-only" />
+</device>

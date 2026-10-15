@@ -1,0 +1,123 @@
+<?xml version='1.0' encoding='utf-8'?>
+<profile family="phase88control" schema_version="1" source="phase88control.py" status="extracted-reference">
+  <constants />
+  <controls>
+    <reference path="/Mixer/Feature_Volume_1" context="module.Phase88Control.initValues" line="43" />
+    <reference path="/Mixer/Feature_Volume_1" context="module.Phase88Control.initValues" line="44" />
+    <reference path="/Mixer/Feature_Volume_2" context="module.Phase88Control.initValues" line="45" />
+    <reference path="/Mixer/Feature_Volume_2" context="module.Phase88Control.initValues" line="46" />
+    <reference path="/Mixer/Feature_Volume_3" context="module.Phase88Control.initValues" line="47" />
+    <reference path="/Mixer/Feature_Volume_3" context="module.Phase88Control.initValues" line="48" />
+    <reference path="/Mixer/Feature_Volume_4" context="module.Phase88Control.initValues" line="49" />
+    <reference path="/Mixer/Feature_Volume_4" context="module.Phase88Control.initValues" line="50" />
+    <reference path="/Mixer/Feature_Volume_5" context="module.Phase88Control.initValues" line="51" />
+    <reference path="/Mixer/Feature_Volume_5" context="module.Phase88Control.initValues" line="52" />
+    <reference path="/Mixer/Feature_Volume_6" context="module.Phase88Control.initValues" line="53" />
+    <reference path="/Mixer/Feature_Volume_6" context="module.Phase88Control.initValues" line="54" />
+    <reference path="/Mixer/Feature_Volume_7" context="module.Phase88Control.initValues" line="55" />
+    <reference path="/Mixer/Feature_Volume_7" context="module.Phase88Control.initValues" line="56" />
+    <reference path="/Mixer/Selector_6" context="module.Phase88Control.initValues" line="60" />
+    <reference path="/Mixer/Selector_7" context="module.Phase88Control.initValues" line="61" />
+    <reference path="/Mixer/Selector_8" context="module.Phase88Control.initValues" line="62" />
+    <reference path="/Mixer/Selector_9" context="module.Phase88Control.initValues" line="63" />
+    <reference path="/Mixer/Selector_10" context="module.Phase88Control.initValues" line="64" />
+  </controls>
+  <mappings>
+    <group name="VolumeControls" line="42">
+      <binding widget="self.sldInputMasterL" path="/Mixer/Feature_Volume_1" arg0="1" arg1="self.sldInputMasterR" arg2="2" arg3="self.linkButtonMaster" arg4="self.decibelMasterL" arg5="0" />
+      <binding widget="self.sldInputMasterR" path="/Mixer/Feature_Volume_1" arg0="2" arg1="self.sldInputMasterL" arg2="1" arg3="self.linkButtonMaster" arg4="self.decibelMasterR" arg5="0" />
+      <binding widget="self.sldInput1" path="/Mixer/Feature_Volume_2" arg0="1" arg1="self.sldInput2" arg2="2" arg3="self.linkButton12" arg4="self.decibel1" arg5="0" />
+      <binding widget="self.sldInput2" path="/Mixer/Feature_Volume_2" arg0="2" arg1="self.sldInput1" arg2="1" arg3="self.linkButton12" arg4="self.decibel2" arg5="0" />
+      <binding widget="self.sldInput3" path="/Mixer/Feature_Volume_3" arg0="1" arg1="self.sldInput4" arg2="2" arg3="self.linkButton34" arg4="self.decibel3" arg5="0" />
+      <binding widget="self.sldInput4" path="/Mixer/Feature_Volume_3" arg0="2" arg1="self.sldInput3" arg2="1" arg3="self.linkButton34" arg4="self.decibel4" arg5="0" />
+      <binding widget="self.sldInput5" path="/Mixer/Feature_Volume_4" arg0="1" arg1="self.sldInput6" arg2="2" arg3="self.linkButton56" arg4="self.decibel5" arg5="0" />
+      <binding widget="self.sldInput6" path="/Mixer/Feature_Volume_4" arg0="2" arg1="self.sldInput5" arg2="1" arg3="self.linkButton56" arg4="self.decibel6" arg5="0" />
+      <binding widget="self.sldInput7" path="/Mixer/Feature_Volume_5" arg0="1" arg1="self.sldInput8" arg2="2" arg3="self.linkButton78" arg4="self.decibel7" arg5="0" />
+      <binding widget="self.sldInput8" path="/Mixer/Feature_Volume_5" arg0="2" arg1="self.sldInput7" arg2="1" arg3="self.linkButton78" arg4="self.decibel8" arg5="0" />
+      <binding widget="self.sldInputSPDIFL" path="/Mixer/Feature_Volume_6" arg0="1" arg1="self.sldInputSPDIFR" arg2="2" arg3="self.linkButtonSPDIF" arg4="self.decibelSPDIFL" arg5="0" />
+      <binding widget="self.sldInputSPDIFR" path="/Mixer/Feature_Volume_6" arg0="2" arg1="self.sldInputSPDIFL" arg2="1" arg3="self.linkButtonSPDIF" arg4="self.decibelSPDIFR" arg5="0" />
+      <binding widget="self.sldInputWavePlayL" path="/Mixer/Feature_Volume_7" arg0="1" arg1="self.sldInputWavePlayR" arg2="2" arg3="self.linkButtonWavePlay" arg4="self.decibelWavePlayL" arg5="0" />
+      <binding widget="self.sldInputWavePlayR" path="/Mixer/Feature_Volume_7" arg0="2" arg1="self.sldInputWavePlayL" arg2="1" arg3="self.linkButtonWavePlay" arg4="self.decibelWavePlayR" arg5="0" />
+    </group>
+  </mappings>
+  <ui_files>
+    <ui file="phase88.ui" association="explicit">
+      <widgets>
+        <widget name="Phase88ControlUI" class="QWidget" />
+        <widget name="groupBox1" class="QGroupBox" />
+        <widget name="frame_mixer" class="QFrame" />
+        <widget name="textLabelSPDIF" class="QLabel" />
+        <widget name="textLabel34" class="QLabel" />
+        <widget name="textLabel12" class="QLabel" />
+        <widget name="textLabelWavePlay" class="QLabel" />
+        <widget name="comboFrontBack" class="QComboBox" />
+        <widget name="textLabel56" class="QLabel" />
+        <widget name="textLabel78" class="QLabel" />
+        <widget name="comboInAssign" class="QComboBox" />
+        <widget name="frame_12" class="QFrame" />
+        <widget name="decibel1" class="QLabel" />
+        <widget name="decibel2" class="QLabel" />
+        <widget name="sldInput1" class="QSlider" />
+        <widget name="sldInput2" class="QSlider" />
+        <widget name="muteButton1" class="QToolButton" />
+        <widget name="muteButton2" class="QToolButton" />
+        <widget name="linkButton12" class="QToolButton" />
+        <widget name="frame_34" class="QFrame" />
+        <widget name="decibel3" class="QLabel" />
+        <widget name="decibel4" class="QLabel" />
+        <widget name="sldInput3" class="QSlider" />
+        <widget name="sldInput4" class="QSlider" />
+        <widget name="muteButton3" class="QToolButton" />
+        <widget name="muteButton4" class="QToolButton" />
+        <widget name="linkButton34" class="QToolButton" />
+        <widget name="frame_56" class="QFrame" />
+        <widget name="decibel5" class="QLabel" />
+        <widget name="decibel6" class="QLabel" />
+        <widget name="sldInput5" class="QSlider" />
+        <widget name="sldInput6" class="QSlider" />
+        <widget name="muteButton5" class="QToolButton" />
+        <widget name="muteButton6" class="QToolButton" />
+        <widget name="linkButton56" class="QToolButton" />
+        <widget name="frame_78" class="QFrame" />
+        <widget name="decibel7" class="QLabel" />
+        <widget name="decibel8" class="QLabel" />
+        <widget name="sldInput7" class="QSlider" />
+        <widget name="sldInput8" class="QSlider" />
+        <widget name="muteButton7" class="QToolButton" />
+        <widget name="muteButton8" class="QToolButton" />
+        <widget name="linkButton78" class="QToolButton" />
+        <widget name="frame_SPDIF" class="QFrame" />
+        <widget name="decibelSPDIFL" class="QLabel" />
+        <widget name="decibelSPDIFR" class="QLabel" />
+        <widget name="sldInputSPDIFL" class="QSlider" />
+        <widget name="sldInputSPDIFR" class="QSlider" />
+        <widget name="muteButtonSPDIFL" class="QToolButton" />
+        <widget name="muteButtonSPDIFR" class="QToolButton" />
+        <widget name="linkButtonSPDIF" class="QToolButton" />
+        <widget name="frame_WavePlay" class="QFrame" />
+        <widget name="decibelWavePlayL" class="QLabel" />
+        <widget name="decibelWavePlayR" class="QLabel" />
+        <widget name="sldInputWavePlayL" class="QSlider" />
+        <widget name="sldInputWavePlayR" class="QSlider" />
+        <widget name="muteButtonWavePlayL" class="QToolButton" />
+        <widget name="muteButtonWavePlayR" class="QToolButton" />
+        <widget name="linkButtonWavePlay" class="QToolButton" />
+        <widget name="frame_master" class="QFrame" />
+        <widget name="decibelMasterL" class="QLabel" />
+        <widget name="decibelMasterR" class="QLabel" />
+        <widget name="sldInputMasterL" class="QSlider" />
+        <widget name="sldInputMasterR" class="QSlider" />
+        <widget name="muteButtonMasterL" class="QToolButton" />
+        <widget name="muteButtonMasterR" class="QToolButton" />
+        <widget name="linkButtonMaster" class="QToolButton" />
+        <widget name="comboOutAssign" class="QComboBox" />
+        <widget name="textLabelMaster" class="QLabel" />
+        <widget name="textLabelSyncSource" class="QLabel" />
+        <widget name="comboSyncSource" class="QComboBox" />
+        <widget name="textLabelExtSncSource" class="QLabel" />
+        <widget name="comboExtSync" class="QComboBox" />
+      </widgets>
+    </ui>
+  </ui_files>
+  <notes>Static extraction from legacy FFADO Qt mixer sources. Paths and indexes are references, not validated live D-Bus capabilities. Runtime discovery and device-specific logic are still required. No vendor/model-to-family mapping is asserted unless source defines it.</notes>
+</profile>

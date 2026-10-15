@@ -1,0 +1,8 @@
+<?xml version='1.0' encoding='utf-8'?>
+<profile family="saffire_base" schema_version="1" source="saffire_base.py" status="extracted-reference">
+  <constants />
+  <controls />
+  <mappings />
+  <ui_files />
+  <notes>Static extraction from legacy FFADO Qt mixer sources. Paths and indexes are references, not validated live D-Bus capabilities. Runtime discovery and device-specific logic are still required. No vendor/model-to-family mapping is asserted unless source defines it.</notes>
+</profile>

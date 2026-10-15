@@ -1,0 +1,27 @@
+<?xml version='1.0' encoding='utf-8'?>
+<profile family="bcoaudio5control" schema_version="2">
+  <discovery source="bcoaudio5control.py" status="source-derived">
+    <element path="/Mixer/Feature_Volume_1" kind="unknown" />
+    <element path="/Mixer/Feature_Volume_2" kind="unknown" />
+    <element path="/Mixer/Feature_Volume_3" kind="unknown" />
+    <element path="/Mixer/Feature_Volume_6" kind="unknown" />
+    <element path="/Mixer/Feature_Volume_7" kind="unknown" />
+    <element path="/Mixer/Feature_Volume_4" kind="unknown" />
+    <element path="/Mixer/Feature_Volume_5" kind="unknown" />
+    <element path="/Mixer/Selector_1" kind="unknown" />
+  </discovery>
+  <source_bindings>
+    <group name="VolumeControls" line="35">
+      <binding widget="'in_line12'" path="/Mixer/Feature_Volume_1" arg0="self.sldInput12" />
+      <binding widget="'in_line34'" path="/Mixer/Feature_Volume_2" arg0="self.sldInput34" />
+      <binding widget="'in_spdif'" path="/Mixer/Feature_Volume_3" arg0="self.sldInputSPDIF" />
+      <binding widget="'out_line12'" path="/Mixer/Feature_Volume_6" arg0="self.sldOutput12" />
+      <binding widget="'out_line34'" path="/Mixer/Feature_Volume_7" arg0="self.sldOutput34" />
+      <binding widget="'cross_a'" path="/Mixer/Feature_Volume_4" arg0="self.sldCrossA" />
+      <binding widget="'cross_b'" path="/Mixer/Feature_Volume_5" arg0="self.sldCrossB" />
+    </group>
+    <group name="ComboControls" line="45">
+      <binding widget="'line34source'" path="/Mixer/Selector_1" arg0="self.comboMixSource" />
+    </group>
+  </source_bindings>
+</profile>

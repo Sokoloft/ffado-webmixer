@@ -1,0 +1,39 @@
+<?xml version='1.0' encoding='utf-8'?>
+<profile family="profire2626" schema_version="1" source="profire2626.py" status="extracted-reference">
+  <constants />
+  <controls>
+    <reference path="/EAP/Settings/VolumeKnob/Line1Line2" context="module.Profire2626.buildMixer" line="95" />
+    <reference path="/EAP/Settings/VolumeKnob/Line3Line4" context="module.Profire2626.buildMixer" line="97" />
+    <reference path="/EAP/Settings/VolumeKnob/Line5Line6" context="module.Profire2626.buildMixer" line="99" />
+    <reference path="/EAP/Settings/VolumeKnob/Line7Line8" context="module.Profire2626.buildMixer" line="101" />
+  </controls>
+  <mappings />
+  <ui_files>
+    <ui file="profire2626_settings.ui" association="name">
+      <widgets>
+        <widget name="Profire2626Settings" class="QWidget" />
+        <widget name="PeakMeters" class="QGroupBox" />
+        <widget name="meterMode" class="QComboBox" />
+        <widget name="label" class="QLabel" />
+        <widget name="label_2" class="QLabel" />
+        <widget name="peakHold" class="QComboBox" />
+        <widget name="StandaloneMode" class="QGroupBox" />
+        <widget name="syncSource" class="QComboBox" />
+        <widget name="label_5" class="QLabel" />
+        <widget name="label_4" class="QLabel" />
+        <widget name="label_3" class="QLabel" />
+        <widget name="label_6" class="QLabel" />
+        <widget name="sampleRate" class="QComboBox" />
+        <widget name="opticalBMode" class="QComboBox" />
+        <widget name="converterMode" class="QComboBox" />
+        <widget name="MasterVolumeKnob" class="QGroupBox" />
+        <widget name="line1line2" class="QCheckBox" />
+        <widget name="line3line4" class="QCheckBox" />
+        <widget name="line5line6" class="QCheckBox" />
+        <widget name="line7line8" class="QCheckBox" />
+        <widget name="label_7" class="QLabel" />
+      </widgets>
+    </ui>
+  </ui_files>
+  <notes>Static extraction from legacy FFADO Qt mixer sources. Paths and indexes are references, not validated live D-Bus capabilities. Runtime discovery and device-specific logic are still required. No vendor/model-to-family mapping is asserted unless source defines it.</notes>
+</profile>

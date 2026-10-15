@@ -1,0 +1,6 @@
+<?xml version='1.0' encoding='utf-8'?>
+<device family="bcoaudio5control" name="Audio 5" extends="common.xml" identity_source="ffado_configuration">
+  <match vendor_id="0x7f5" configuration_model_id="0x10049" />
+  <identity vendor="BridgeCo" driver="BEBOB" ffado_mixer="BCoAudio5Control" />
+  <capabilities mode="discovered-controls-only" />
+</device>

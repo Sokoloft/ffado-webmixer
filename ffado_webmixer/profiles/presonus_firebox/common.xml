@@ -1,0 +1,14 @@
+<?xml version='1.0' encoding='utf-8'?>
+<profile family="presonus_firebox" schema_version="2">
+  <discovery source="presonus_firebox.py" status="source-derived">
+    <element path="/Mixer/Feature_Volume_%d" kind="unknown" />
+    <element path="/Mixer/Selector_6" kind="unknown" />
+    <element path="/Mixer/Feature_LRBalance_%d" kind="unknown" />
+    <element path="/Mixer/Selector_%d" kind="unknown" />
+  </discovery>
+  <model_constants>
+    <constant name="p_idx" value="0x0" />
+    <constant name="p_idx" value="0x2" />
+    <constant name="p_idx" value="0x1" />
+  </model_constants>
+</profile>

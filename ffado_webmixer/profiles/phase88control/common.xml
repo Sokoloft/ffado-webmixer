@@ -1,0 +1,35 @@
+<?xml version='1.0' encoding='utf-8'?>
+<profile family="phase88control" schema_version="2">
+  <discovery source="phase88control.py" status="source-derived">
+    <element path="/Mixer/Feature_Volume_1" kind="unknown" />
+    <element path="/Mixer/Feature_Volume_2" kind="unknown" />
+    <element path="/Mixer/Feature_Volume_3" kind="unknown" />
+    <element path="/Mixer/Feature_Volume_4" kind="unknown" />
+    <element path="/Mixer/Feature_Volume_5" kind="unknown" />
+    <element path="/Mixer/Feature_Volume_6" kind="unknown" />
+    <element path="/Mixer/Feature_Volume_7" kind="unknown" />
+    <element path="/Mixer/Selector_6" kind="unknown" />
+    <element path="/Mixer/Selector_7" kind="unknown" />
+    <element path="/Mixer/Selector_8" kind="unknown" />
+    <element path="/Mixer/Selector_9" kind="unknown" />
+    <element path="/Mixer/Selector_10" kind="unknown" />
+  </discovery>
+  <source_bindings>
+    <group name="VolumeControls" line="42">
+      <binding widget="self.sldInputMasterL" path="/Mixer/Feature_Volume_1" arg0="1" arg1="self.sldInputMasterR" arg2="2" arg3="self.linkButtonMaster" arg4="self.decibelMasterL" arg5="0" />
+      <binding widget="self.sldInputMasterR" path="/Mixer/Feature_Volume_1" arg0="2" arg1="self.sldInputMasterL" arg2="1" arg3="self.linkButtonMaster" arg4="self.decibelMasterR" arg5="0" />
+      <binding widget="self.sldInput1" path="/Mixer/Feature_Volume_2" arg0="1" arg1="self.sldInput2" arg2="2" arg3="self.linkButton12" arg4="self.decibel1" arg5="0" />
+      <binding widget="self.sldInput2" path="/Mixer/Feature_Volume_2" arg0="2" arg1="self.sldInput1" arg2="1" arg3="self.linkButton12" arg4="self.decibel2" arg5="0" />
+      <binding widget="self.sldInput3" path="/Mixer/Feature_Volume_3" arg0="1" arg1="self.sldInput4" arg2="2" arg3="self.linkButton34" arg4="self.decibel3" arg5="0" />
+      <binding widget="self.sldInput4" path="/Mixer/Feature_Volume_3" arg0="2" arg1="self.sldInput3" arg2="1" arg3="self.linkButton34" arg4="self.decibel4" arg5="0" />
+      <binding widget="self.sldInput5" path="/Mixer/Feature_Volume_4" arg0="1" arg1="self.sldInput6" arg2="2" arg3="self.linkButton56" arg4="self.decibel5" arg5="0" />
+      <binding widget="self.sldInput6" path="/Mixer/Feature_Volume_4" arg0="2" arg1="self.sldInput5" arg2="1" arg3="self.linkButton56" arg4="self.decibel6" arg5="0" />
+      <binding widget="self.sldInput7" path="/Mixer/Feature_Volume_5" arg0="1" arg1="self.sldInput8" arg2="2" arg3="self.linkButton78" arg4="self.decibel7" arg5="0" />
+      <binding widget="self.sldInput8" path="/Mixer/Feature_Volume_5" arg0="2" arg1="self.sldInput7" arg2="1" arg3="self.linkButton78" arg4="self.decibel8" arg5="0" />
+      <binding widget="self.sldInputSPDIFL" path="/Mixer/Feature_Volume_6" arg0="1" arg1="self.sldInputSPDIFR" arg2="2" arg3="self.linkButtonSPDIF" arg4="self.decibelSPDIFL" arg5="0" />
+      <binding widget="self.sldInputSPDIFR" path="/Mixer/Feature_Volume_6" arg0="2" arg1="self.sldInputSPDIFL" arg2="1" arg3="self.linkButtonSPDIF" arg4="self.decibelSPDIFR" arg5="0" />
+      <binding widget="self.sldInputWavePlayL" path="/Mixer/Feature_Volume_7" arg0="1" arg1="self.sldInputWavePlayR" arg2="2" arg3="self.linkButtonWavePlay" arg4="self.decibelWavePlayL" arg5="0" />
+      <binding widget="self.sldInputWavePlayR" path="/Mixer/Feature_Volume_7" arg0="2" arg1="self.sldInputWavePlayL" arg2="1" arg3="self.linkButtonWavePlay" arg4="self.decibelWavePlayR" arg5="0" />
+    </group>
+  </source_bindings>
+</profile>

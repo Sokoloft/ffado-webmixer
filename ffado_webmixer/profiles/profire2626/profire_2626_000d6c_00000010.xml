@@ -1,0 +1,6 @@
+<?xml version='1.0' encoding='utf-8'?>
+<device family="profire2626" name="ProFire 2626" extends="common.xml" identity_source="ffado_configuration">
+  <match vendor_id="0xd6c" configuration_model_id="0x10" />
+  <identity vendor="M-Audio" driver="DICE" ffado_mixer="Profire2626" />
+  <capabilities mode="discovered-controls-only" />
+</device>

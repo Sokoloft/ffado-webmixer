@@ -1,0 +1,6 @@
+<?xml version='1.0' encoding='utf-8'?>
+<device family="yamahago" name="GO44" extends="common.xml" identity_source="ffado_configuration">
+  <match vendor_id="0xa0de" configuration_model_id="0x10000b" />
+  <identity vendor="Yamaha" driver="BEBOB" ffado_mixer="YamahaGo" />
+  <capabilities mode="discovered-controls-only" />
+</device>

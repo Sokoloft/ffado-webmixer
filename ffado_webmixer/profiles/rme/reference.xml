@@ -1,0 +1,355 @@
+<?xml version='1.0' encoding='utf-8'?>
+<profile family="rme" schema_version="1" source="rme.py" status="extracted-reference">
+  <constants>
+    <constant name="RME_MODEL_NONE" value="0x0" />
+    <constant name="RME_MODEL_FF800" value="0x1" />
+    <constant name="RME_MODEL_FF400" value="0x2" />
+    <constant name="idxb" value="-0x1" />
+    <constant name="idxe" value="-0x1" />
+    <constant name="idxb" value="-0x1" />
+    <constant name="idxe" value="-0x1" />
+    <constant name="idxb" value="-0x1" />
+    <constant name="idxe" value="-0x1" />
+    <constant name="idx" value="-0x1" />
+    <constant name="idx" value="-0x1" />
+    <constant name="idx" value="-0x1" />
+  </constants>
+  <controls>
+    <reference path="/Control/Phantom" context="module.Rme.init" line="50" />
+    <reference path="/Control/Phantom" context="module.Rme.init" line="51" />
+    <reference path="/Control/Phantom" context="module.Rme.init" line="52" />
+    <reference path="/Control/Phantom" context="module.Rme.init" line="53" />
+    <reference path="/Control/Chan3_opt_instr" context="module.Rme.init" line="57" />
+    <reference path="/Control/Chan3_opt_pad" context="module.Rme.init" line="58" />
+    <reference path="/Control/Chan4_opt_instr" context="module.Rme.init" line="59" />
+    <reference path="/Control/Chan4_opt_pad" context="module.Rme.init" line="60" />
+    <reference path="/Control/SPDIF_output_optical" context="module.Rme.init" line="62" />
+    <reference path="/Control/SPDIF_output_emphasis" context="module.Rme.init" line="63" />
+    <reference path="/Control/SPDIF_output_pro" context="module.Rme.init" line="64" />
+    <reference path="/Control/SPDIF_output_nonaudio" context="module.Rme.init" line="65" />
+    <reference path="/Control/Input_level" context="module.Rme.init" line="69" />
+    <reference path="/Control/Input_level" context="module.Rme.init" line="70" />
+    <reference path="/Control/Input_level" context="module.Rme.init" line="71" />
+    <reference path="/Control/Output_level" context="module.Rme.init" line="73" />
+    <reference path="/Control/Output_level" context="module.Rme.init" line="74" />
+    <reference path="/Control/Output_level" context="module.Rme.init" line="75" />
+    <reference path="/Control/SPDIF_input_mode" context="module.Rme.init" line="77" />
+    <reference path="/Control/SPDIF_input_mode" context="module.Rme.init" line="78" />
+    <reference path="/Control/Phones_level" context="module.Rme.init" line="80" />
+    <reference path="/Control/Phones_level" context="module.Rme.init" line="81" />
+    <reference path="/Control/Phones_level" context="module.Rme.init" line="82" />
+    <reference path="/Control/Clock_mode" context="module.Rme.init" line="84" />
+    <reference path="/Control/Clock_mode" context="module.Rme.init" line="85" />
+    <reference path="/Control/Sync_ref" context="module.Rme.init" line="87" />
+    <reference path="/Control/Sync_ref" context="module.Rme.init" line="88" />
+    <reference path="/Control/Sync_ref" context="module.Rme.init" line="89" />
+    <reference path="/Control/Sync_ref" context="module.Rme.init" line="90" />
+    <reference path="/Control/Sync_ref" context="module.Rme.init" line="91" />
+    <reference path="/Control/Tco_sync_src" context="module.Rme.init" line="94" />
+    <reference path="/Control/Tco_sync_src" context="module.Rme.init" line="95" />
+    <reference path="/Control/Tco_sync_src" context="module.Rme.init" line="96" />
+    <reference path="/Control/Tco_frame_rate" context="module.Rme.init" line="97" />
+    <reference path="/Control/Tco_frame_rate" context="module.Rme.init" line="98" />
+    <reference path="/Control/Tco_frame_rate" context="module.Rme.init" line="99" />
+    <reference path="/Control/Tco_frame_rate" context="module.Rme.init" line="100" />
+    <reference path="/Control/Tco_frame_rate" context="module.Rme.init" line="101" />
+    <reference path="/Control/Tco_frame_rate" context="module.Rme.init" line="102" />
+    <reference path="/Control/Tco_sample_rate" context="module.Rme.init" line="103" />
+    <reference path="/Control/Tco_sample_rate" context="module.Rme.init" line="104" />
+    <reference path="/Control/Tco_sample_rate_ofs" context="module.Rme.init" line="105" />
+    <reference path="/Control/Tco_sample_rate_ofs" context="module.Rme.init" line="106" />
+    <reference path="/Control/Tco_sample_rate_ofs" context="module.Rme.init" line="107" />
+    <reference path="/Control/Tco_sample_rate_ofs" context="module.Rme.init" line="108" />
+    <reference path="/Control/Tco_sample_rate_ofs" context="module.Rme.init" line="109" />
+    <reference path="/Control/Tco_word_clk_conv" context="module.Rme.init" line="110" />
+    <reference path="/Control/Tco_word_clk_conv" context="module.Rme.init" line="111" />
+    <reference path="/Control/Tco_word_clk_conv" context="module.Rme.init" line="112" />
+    <reference path="/Control/Chan1_instr_opts" context="module.Rme.init" line="116" />
+    <reference path="/Control/Chan1_instr_opts" context="module.Rme.init" line="117" />
+    <reference path="/Control/Chan1_instr_opts" context="module.Rme.init" line="118" />
+    <reference path="/Control/Tco_video_in_term" context="module.Rme.init" line="121" />
+    <reference path="/Control/Gains" context="module.Rme.init" line="125" />
+    <reference path="/Control/Gains" context="module.Rme.init" line="126" />
+    <reference path="/Control/Gains" context="module.Rme.init" line="127" />
+    <reference path="/Control/Gains" context="module.Rme.init" line="128" />
+    <reference path="/Control/Chan1_source" context="module.Rme.init" line="132" />
+    <reference path="/Control/Chan7_source" context="module.Rme.init" line="133" />
+    <reference path="/Control/Chan8_source" context="module.Rme.init" line="134" />
+    <reference path="/Control/Flash_control" context="module.Rme.init" line="138" />
+    <reference path="/Control/Flash_control" context="module.Rme.init" line="139" />
+    <reference path="/Control/Flash_control" context="module.Rme.init" line="140" />
+    <reference path="/Control/Flash_control" context="module.Rme.init" line="141" />
+    <reference path="/Control/Mixer_preset" context="module.Rme.init" line="142" />
+    <reference path="/Control/Bandwidth_limit" context="module.Rme.updateBandwidthLimit" line="196" />
+    <reference path="/Control/sysclock_mode" context="module.Rme.status_update" line="245" />
+    <reference path="/Control/sysclock_freq" context="module.Rme.status_update" line="246" />
+    <reference path="/Control/autosync_freq" context="module.Rme.status_update" line="247" />
+    <reference path="/Control/autosync_src" context="module.Rme.status_update" line="248" />
+    <reference path="/Control/sync_status" context="module.Rme.status_update" line="249" />
+    <reference path="/Control/spdif_freq" context="module.Rme.status_update" line="250" />
+    <reference path="/Control/Tco_ltc_in" context="module.Rme.status_update" line="269" />
+    <reference path="/Control/Tco_input_ltc_valid" context="module.Rme.status_update" line="270" />
+    <reference path="/Control/Tco_input_ltc_fps" context="module.Rme.status_update" line="271" />
+    <reference path="/Control/Tco_input_ltc_dropframe" context="module.Rme.status_update" line="272" />
+    <reference path="/Control/Tco_input_video_type" context="module.Rme.status_update" line="273" />
+    <reference path="/Control/Tco_input_word_clk" context="module.Rme.status_update" line="274" />
+    <reference path="/Control/Tco_input_lock" context="module.Rme.status_update" line="275" />
+    <reference path="/Control/Tco_freq" context="module.Rme.status_update" line="276" />
+    <reference path="/Control/Bandwidth_limit" context="module.Rme.getValuesFromFF" line="360" />
+    <reference path="/Mixer/InputFaders" context="module.Rme.initValues" line="441" />
+    <reference path="/Mixer/InputMutes" context="module.Rme.initValues" line="441" />
+    <reference path="/Mixer/InputInverts" context="module.Rme.initValues" line="441" />
+    <reference path="/Mixer/PlaybackFaders" context="module.Rme.initValues" line="446" />
+    <reference path="/Mixer/PlaybackMutes" context="module.Rme.initValues" line="446" />
+    <reference path="/Mixer/PlaybackInverts" context="module.Rme.initValues" line="446" />
+    <reference path="/Mixer/OutputFaders" context="module.Rme.initValues" line="451" />
+    <reference path="/Mixer/OutputMutes" context="module.Rme.initValues" line="451" />
+    <reference path="/Control/Model" context="module.Rme.initValues" line="477" />
+    <reference path="/Control/TCO_present" context="module.Rme.initValues" line="479" />
+  </controls>
+  <mappings>
+    <group name="PhantomSwitches" line="49">
+      <binding widget="self.phantom_0" path="/Control/Phantom" arg0="0" />
+      <binding widget="self.phantom_1" path="/Control/Phantom" arg0="1" />
+      <binding widget="self.phantom_2" path="/Control/Phantom" arg0="2" />
+      <binding widget="self.phantom_3" path="/Control/Phantom" arg0="3" />
+    </group>
+    <group name="Switches" line="56">
+      <binding widget="self.ff400_chan3_opt_instr" path="/Control/Chan3_opt_instr" />
+      <binding widget="self.ff400_chan3_opt_pad" path="/Control/Chan3_opt_pad" />
+      <binding widget="self.ff400_chan4_opt_instr" path="/Control/Chan4_opt_instr" />
+      <binding widget="self.ff400_chan4_opt_pad" path="/Control/Chan4_opt_pad" />
+      <binding widget="self.spdif_output_optical" path="/Control/SPDIF_output_optical" arg0="0" />
+      <binding widget="self.spdif_output_emphasis" path="/Control/SPDIF_output_emphasis" arg0="0" />
+      <binding widget="self.spdif_output_pro" path="/Control/SPDIF_output_pro" arg0="0" />
+      <binding widget="self.spdif_output_nonaudio" path="/Control/SPDIF_output_nonaudio" arg0="0" />
+    </group>
+    <group name="Radiobuttons" line="68">
+      <binding widget="self.level_in_lo_gain" path="/Control/Input_level" arg0="0" />
+      <binding widget="self.level_in_p4dBu" path="/Control/Input_level" arg0="2" />
+      <binding widget="self.level_in_m10dBV" path="/Control/Input_level" arg0="1" />
+      <binding widget="self.level_out_hi_gain" path="/Control/Output_level" arg0="2" />
+      <binding widget="self.level_out_p4dBu" path="/Control/Output_level" arg0="1" />
+      <binding widget="self.level_out_m10dBV" path="/Control/Output_level" arg0="0" />
+      <binding widget="self.spdif_input_coax" path="/Control/SPDIF_input_mode" arg0="0" />
+      <binding widget="self.spdif_input_optical" path="/Control/SPDIF_input_mode" arg0="1" />
+      <binding widget="self.phones_hi_gain" path="/Control/Phones_level" arg0="0" />
+      <binding widget="self.phones_p4dBu" path="/Control/Phones_level" arg0="1" />
+      <binding widget="self.phones_m10dBV" path="/Control/Phones_level" arg0="2" />
+      <binding widget="self.clock_mode_autosync" path="/Control/Clock_mode" arg0="1" />
+      <binding widget="self.clock_mode_master" path="/Control/Clock_mode" arg0="0" />
+      <binding widget="self.sync_ref_wordclk" path="/Control/Sync_ref" arg0="0" />
+      <binding widget="self.sync_ref_adat1" path="/Control/Sync_ref" arg0="1" />
+      <binding widget="self.sync_ref_adat2" path="/Control/Sync_ref" arg0="2" />
+      <binding widget="self.sync_ref_spdif" path="/Control/Sync_ref" arg0="3" />
+      <binding widget="self.sync_ref_tco" path="/Control/Sync_ref" arg0="4" />
+      <binding widget="self.sync_source_ltc" path="/Control/Tco_sync_src" arg0="0" />
+      <binding widget="self.sync_source_video" path="/Control/Tco_sync_src" arg0="1" />
+      <binding widget="self.sync_source_wordclk" path="/Control/Tco_sync_src" arg0="2" />
+      <binding widget="self.frame_rate_24fps" path="/Control/Tco_frame_rate" arg0="0" />
+      <binding widget="self.frame_rate_25fps" path="/Control/Tco_frame_rate" arg0="1" />
+      <binding widget="self.frame_rate_29_97fps" path="/Control/Tco_frame_rate" arg0="2" />
+      <binding widget="self.frame_rate_29_97dfps" path="/Control/Tco_frame_rate" arg0="3" />
+      <binding widget="self.frame_rate_30fps" path="/Control/Tco_frame_rate" arg0="4" />
+      <binding widget="self.frame_rate_30dfps" path="/Control/Tco_frame_rate" arg0="5" />
+      <binding widget="self.sample_rate_44k1" path="/Control/Tco_sample_rate" arg0="0" />
+      <binding widget="self.sample_rate_48k" path="/Control/Tco_sample_rate" arg0="1" />
+      <binding widget="self.sample_rate_0pc" path="/Control/Tco_sample_rate_ofs" arg0="0" />
+      <binding widget="self.sample_rate_p01pc" path="/Control/Tco_sample_rate_ofs" arg0="1" />
+      <binding widget="self.sample_rate_n01pc" path="/Control/Tco_sample_rate_ofs" arg0="2" />
+      <binding widget="self.sample_rate_p40pc" path="/Control/Tco_sample_rate_ofs" arg0="3" />
+      <binding widget="self.sample_rate_n40pc" path="/Control/Tco_sample_rate_ofs" arg0="4" />
+      <binding widget="self.wordclk_conv_1_1" path="/Control/Tco_word_clk_conv" arg0="0" />
+      <binding widget="self.wordclk_conv_44k1_48k" path="/Control/Tco_word_clk_conv" arg0="1" />
+      <binding widget="self.wordclk_conv_48k_44k1" path="/Control/Tco_word_clk_conv" arg0="2" />
+    </group>
+    <group name="Checkboxes" line="115">
+      <binding widget="self.ch1_instr_fuzz" path="/Control/Chan1_instr_opts" arg0="4" />
+      <binding widget="self.ch1_instr_limiter" path="/Control/Chan1_instr_opts" arg0="8" />
+      <binding widget="self.ch1_instr_filter" path="/Control/Chan1_instr_opts" arg0="2" />
+      <binding widget="self.video_input_termination_on" path="/Control/Tco_video_in_term" arg0="1" />
+    </group>
+    <group name="Gains" line="124">
+      <binding widget="self.gain_mic1" path="/Control/Gains" arg0="0" />
+      <binding widget="self.gain_mic2" path="/Control/Gains" arg0="1" />
+      <binding widget="self.gain_input3" path="/Control/Gains" arg0="2" />
+      <binding widget="self.gain_input4" path="/Control/Gains" arg0="3" />
+    </group>
+    <group name="Combos" line="131">
+      <binding widget="self.ff800_ch1_src" path="/Control/Chan1_source" />
+      <binding widget="self.ff800_ch7_src" path="/Control/Chan7_source" />
+      <binding widget="self.ff800_ch8_src" path="/Control/Chan8_source" />
+    </group>
+    <group name="CommandButtons" line="137">
+      <binding widget="self.control_load" path="/Control/Flash_control" arg0="0" />
+      <binding widget="self.control_save" path="/Control/Flash_control" arg0="1" />
+      <binding widget="self.mixer_load" path="/Control/Flash_control" arg0="2" />
+      <binding widget="self.mixer_save" path="/Control/Flash_control" arg0="3" />
+      <binding widget="self.mixer_preset_ffado_default" path="/Control/Mixer_preset" arg0="0" />
+    </group>
+  </mappings>
+  <ui_files>
+    <ui file="rme.ui" association="explicit">
+      <widgets>
+        <widget name="RmeMixerUI" class="QWidget" />
+        <widget name="tabWidget" class="QTabWidget" />
+        <widget name="control" class="QWidget" />
+        <widget name="igains_chan34_opts_frame" class="QFrame" />
+        <widget name="input_gains_group" class="QGroupBox" />
+        <widget name="gain_mic1_label" class="QLabel" />
+        <widget name="gain_mic1" class="QSlider" />
+        <widget name="gain_mic2_label" class="QLabel" />
+        <widget name="gain_mic2" class="QSlider" />
+        <widget name="gain_input3_label" class="QLabel" />
+        <widget name="gain_input3" class="QSlider" />
+        <widget name="gain_input4_label" class="QLabel" />
+        <widget name="gain_input4" class="QSlider" />
+        <widget name="channel_3_4_options_group" class="QGroupBox" />
+        <widget name="label_18" class="QLabel" />
+        <widget name="ff400_chan3_opt_instr" class="QCheckBox" />
+        <widget name="ff400_chan3_opt_pad" class="QCheckBox" />
+        <widget name="label_19" class="QLabel" />
+        <widget name="ff400_chan4_opt_pad" class="QCheckBox" />
+        <widget name="ff400_chan4_opt_instr" class="QCheckBox" />
+        <widget name="frame_4" class="QFrame" />
+        <widget name="phantom_group" class="QGroupBox" />
+        <widget name="phantom_0" class="QCheckBox" />
+        <widget name="phantom_2" class="QCheckBox" />
+        <widget name="phantom_1" class="QCheckBox" />
+        <widget name="phantom_3" class="QCheckBox" />
+        <widget name="level_in_group" class="QGroupBox" />
+        <widget name="level_in_lo_gain" class="QRadioButton" />
+        <widget name="level_in_p4dBu" class="QRadioButton" />
+        <widget name="level_in_m10dBV" class="QRadioButton" />
+        <widget name="input_plug_select_group" class="QGroupBox" />
+        <widget name="label_20" class="QLabel" />
+        <widget name="label_21" class="QLabel" />
+        <widget name="ff800_ch7_src" class="QComboBox" />
+        <widget name="label_22" class="QLabel" />
+        <widget name="ff800_ch8_src" class="QComboBox" />
+        <widget name="ff800_ch1_src" class="QComboBox" />
+        <widget name="instrument_options_group" class="QGroupBox" />
+        <widget name="ch1_instr_fuzz" class="QCheckBox" />
+        <widget name="ch1_instr_limiter" class="QCheckBox" />
+        <widget name="ch1_instr_filter" class="QCheckBox" />
+        <widget name="frame" class="QFrame" />
+        <widget name="spdif_in_group" class="QGroupBox" />
+        <widget name="spdif_input_optical" class="QRadioButton" />
+        <widget name="spdif_input_coax" class="QRadioButton" />
+        <widget name="spdif_out_group" class="QGroupBox" />
+        <widget name="spdif_output_optical" class="QCheckBox" />
+        <widget name="spdif_output_emphasis" class="QCheckBox" />
+        <widget name="spdif_output_pro" class="QCheckBox" />
+        <widget name="spdif_output_nonaudio" class="QCheckBox" />
+        <widget name="level_out_group" class="QGroupBox" />
+        <widget name="level_out_hi_gain" class="QRadioButton" />
+        <widget name="level_out_p4dBu" class="QRadioButton" />
+        <widget name="level_out_m10dBV" class="QRadioButton" />
+        <widget name="phones_level_group" class="QGroupBox" />
+        <widget name="phones_hi_gain" class="QRadioButton" />
+        <widget name="phones_p4dBu" class="QRadioButton" />
+        <widget name="phones_m10dBV" class="QRadioButton" />
+        <widget name="frame_2" class="QFrame" />
+        <widget name="clock_mode_group" class="QGroupBox" />
+        <widget name="clock_mode_autosync" class="QRadioButton" />
+        <widget name="clock_mode_master" class="QRadioButton" />
+        <widget name="sync_ref_group" class="QGroupBox" />
+        <widget name="sync_ref_wordclk" class="QRadioButton" />
+        <widget name="sync_ref_adat1" class="QRadioButton" />
+        <widget name="sync_ref_adat2" class="QRadioButton" />
+        <widget name="sync_ref_spdif" class="QRadioButton" />
+        <widget name="sync_ref_tco" class="QRadioButton" />
+        <widget name="sync_check_group" class="QGroupBox" />
+        <widget name="label_5" class="QLabel" />
+        <widget name="sync_check_wclk_status" class="QLabel" />
+        <widget name="label_7" class="QLabel" />
+        <widget name="sync_check_adat1_status" class="QLabel" />
+        <widget name="sync_check_adat2_label" class="QLabel" />
+        <widget name="sync_check_adat2_status" class="QLabel" />
+        <widget name="label_11" class="QLabel" />
+        <widget name="sync_check_spdif_status" class="QLabel" />
+        <widget name="sync_check_tco_label" class="QLabel" />
+        <widget name="sync_check_tco_status" class="QLabel" />
+        <widget name="autosync_ref_group" class="QGroupBox" />
+        <widget name="label" class="QLabel" />
+        <widget name="autosync_src" class="QLabel" />
+        <widget name="label_3" class="QLabel" />
+        <widget name="autosync_freq" class="QLabel" />
+        <widget name="frame_3" class="QFrame" />
+        <widget name="groupBox_8" class="QGroupBox" />
+        <widget name="spdif_freq" class="QLabel" />
+        <widget name="groupBox_9" class="QGroupBox" />
+        <widget name="checkBox_5" class="QCheckBox" />
+        <widget name="groupBox_10" class="QGroupBox" />
+        <widget name="label_14" class="QLabel" />
+        <widget name="sysclock_mode" class="QLabel" />
+        <widget name="label_16" class="QLabel" />
+        <widget name="sysclock_freq" class="QLabel" />
+        <widget name="groupBox_16" class="QGroupBox" />
+        <widget name="bandwidth_limit" class="QComboBox" />
+        <widget name="tco_options" class="QWidget" />
+        <widget name="groupBox_2" class="QGroupBox" />
+        <widget name="ltc_in_hours" class="QLabel" />
+        <widget name="label_4" class="QLabel" />
+        <widget name="ltc_in_minutes" class="QLabel" />
+        <widget name="label_8" class="QLabel" />
+        <widget name="ltc_in_seconds" class="QLabel" />
+        <widget name="label_10" class="QLabel" />
+        <widget name="ltc_in_frames" class="QLabel" />
+        <widget name="input_state" class="QGroupBox" />
+        <widget name="label_2" class="QLabel" />
+        <widget name="state_ltc_valid_label" class="QLabel" />
+        <widget name="state_ltc_framerate" class="QLabel" />
+        <widget name="state_ltc_frame_type" class="QLabel" />
+        <widget name="label_13" class="QLabel" />
+        <widget name="state_video_type" class="QLabel" />
+        <widget name="label_6" class="QLabel" />
+        <widget name="state_word_clk" class="QLabel" />
+        <widget name="label_9" class="QLabel" />
+        <widget name="label_12" class="QLabel" />
+        <widget name="sync_source" class="QGroupBox" />
+        <widget name="sync_source_ltc" class="QRadioButton" />
+        <widget name="sync_source_video" class="QRadioButton" />
+        <widget name="sync_source_wordclk" class="QRadioButton" />
+        <widget name="label_17" class="QLabel" />
+        <widget name="sync_source_status" class="QLabel" />
+        <widget name="video_input" class="QGroupBox" />
+        <widget name="video_input_termination_on" class="QCheckBox" />
+        <widget name="WordClockConv" class="QGroupBox" />
+        <widget name="wordclk_conv_1_1" class="QRadioButton" />
+        <widget name="wordclk_conv_44k1_48k" class="QRadioButton" />
+        <widget name="wordclk_conv_48k_44k1" class="QRadioButton" />
+        <widget name="frame_rate" class="QGroupBox" />
+        <widget name="frame_rate_24fps" class="QRadioButton" />
+        <widget name="frame_rate_25fps" class="QRadioButton" />
+        <widget name="frame_rate_29_97fps" class="QRadioButton" />
+        <widget name="frame_rate_29_97dfps" class="QRadioButton" />
+        <widget name="frame_rate_30fps" class="QRadioButton" />
+        <widget name="frame_rate_30dfps" class="QRadioButton" />
+        <widget name="sample_rate" class="QGroupBox" />
+        <widget name="sample_rate_44k1" class="QRadioButton" />
+        <widget name="sample_rate_48k" class="QRadioButton" />
+        <widget name="groupBox_3" class="QGroupBox" />
+        <widget name="sample_rate_0pc" class="QRadioButton" />
+        <widget name="sample_rate_p01pc" class="QRadioButton" />
+        <widget name="sample_rate_n01pc" class="QRadioButton" />
+        <widget name="sample_rate_p40pc" class="QRadioButton" />
+        <widget name="sample_rate_n40pc" class="QRadioButton" />
+        <widget name="tco_frequency" class="QGroupBox" />
+        <widget name="tco_frequency_label" class="QLabel" />
+        <widget name="mixer" class="QWidget" />
+        <widget name="playbackmixer" class="QWidget" />
+        <widget name="outputmixer" class="QWidget" />
+        <widget name="device_operations" class="QGroupBox" />
+        <widget name="groupBox" class="QGroupBox" />
+        <widget name="control_load" class="QPushButton" />
+        <widget name="control_save" class="QPushButton" />
+        <widget name="mixer_load" class="QPushButton" />
+        <widget name="mixer_save" class="QPushButton" />
+        <widget name="mixer_presets" class="QGroupBox" />
+        <widget name="mixer_preset_ffado_default" class="QPushButton" />
+      </widgets>
+    </ui>
+  </ui_files>
+  <notes>Static extraction from legacy FFADO Qt mixer sources. Paths and indexes are references, not validated live D-Bus capabilities. Runtime discovery and device-specific logic are still required. No vendor/model-to-family mapping is asserted unless source defines it.</notes>
+</profile>

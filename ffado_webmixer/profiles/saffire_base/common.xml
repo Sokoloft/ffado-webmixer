@@ -1,0 +1,4 @@
+<?xml version='1.0' encoding='utf-8'?>
+<profile family="saffire_base" schema_version="2">
+  <discovery source="saffire_base.py" status="source-derived" />
+</profile>

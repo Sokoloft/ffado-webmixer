@@ -1,0 +1,94 @@
+<?xml version='1.0' encoding='utf-8'?>
+<profile family="yamahago" schema_version="1" source="yamahago.py" status="extracted-reference">
+  <constants />
+  <controls>
+    <reference path="/Mixer/Feature_Volume_3" context="module.YamahaGo.initValues" line="62" />
+    <reference path="/Mixer/Feature_Volume_3" context="module.YamahaGo.initValues" line="65" />
+    <reference path="/Mixer/Feature_Volume_4" context="module.YamahaGo.initValues" line="68" />
+    <reference path="/Mixer/Feature_Volume_4" context="module.YamahaGo.initValues" line="71" />
+    <reference path="/Mixer/Feature_Volume_5" context="module.YamahaGo.initValues" line="74" />
+    <reference path="/Mixer/Feature_Volume_5" context="module.YamahaGo.initValues" line="77" />
+    <reference path="/Mixer/Feature_Volume_6" context="module.YamahaGo.initValues" line="80" />
+    <reference path="/Mixer/Feature_Volume_6" context="module.YamahaGo.initValues" line="83" />
+    <reference path="/Mixer/Feature_Volume_7" context="module.YamahaGo.initValues" line="86" />
+    <reference path="/Mixer/Feature_Volume_7" context="module.YamahaGo.initValues" line="89" />
+    <reference path="/Mixer/Selector_1" context="module.YamahaGo.initValues" line="93" />
+    <reference path="/Mixer/Selector_2" context="module.YamahaGo.initValues" line="94" />
+    <reference path="/Mixer/Selector_3" context="module.YamahaGo.initValues" line="95" />
+    <reference path="/Mixer/Feature_Volume_1" context="module.YamahaGo.initValues" line="101" />
+    <reference path="/Mixer/Feature_Volume_1" context="module.YamahaGo.initValues" line="105" />
+    <reference path="/Mixer/Feature_Volume_2" context="module.YamahaGo.initValues" line="113" />
+    <reference path="/Mixer/Feature_Volume_2" context="module.YamahaGo.initValues" line="117" />
+    <reference path="/Mixer/Feature_Volume_1" context="module.YamahaGo.initValues" line="122" />
+    <reference path="/Mixer/Feature_Volume_1" context="module.YamahaGo.initValues" line="126" />
+    <reference path="/Mixer/Feature_Volume_1" context="module.YamahaGo.initValues" line="130" />
+    <reference path="/Mixer/Feature_Volume_1" context="module.YamahaGo.initValues" line="134" />
+    <reference path="/Mixer/Feature_Volume_2" context="module.YamahaGo.updateMicLevel" line="179" />
+  </controls>
+  <mappings>
+    <group name="VolumeControls" line="60">
+      <binding widget="self.sld_mixer_strm_in_1" path="/Mixer/Feature_Volume_3" arg0="1" arg1="self.sld_mixer_strm_in_2" arg2="2" arg3="self.link_mixer_strm_in_12" />
+      <binding widget="self.sld_mixer_strm_in_2" path="/Mixer/Feature_Volume_3" arg0="2" arg1="self.sld_mixer_strm_in_1" arg2="1" arg3="self.link_mixer_strm_in_12" />
+      <binding widget="self.sld_mixer_strm_in_3" path="/Mixer/Feature_Volume_4" arg0="1" arg1="self.sld_mixer_strm_in_4" arg2="2" arg3="self.link_mixer_strm_in_34" />
+      <binding widget="self.sld_mixer_strm_in_4" path="/Mixer/Feature_Volume_4" arg0="2" arg1="self.sld_mixer_strm_in_3" arg2="1" arg3="self.link_mixer_strm_in_34" />
+      <binding widget="self.sld_mixer_strm_in_5" path="/Mixer/Feature_Volume_5" arg0="1" arg1="self.sld_mixer_strm_in_6" arg2="2" arg3="self.link_mixer_strm_in_56" />
+      <binding widget="self.sld_mixer_strm_in_6" path="/Mixer/Feature_Volume_5" arg0="2" arg1="self.sld_mixer_strm_in_5" arg2="1" arg3="self.link_mixer_strm_in_56" />
+      <binding widget="self.sld_mixer_ana_in_1" path="/Mixer/Feature_Volume_6" arg0="1" arg1="self.sld_mixer_ana_in_2" arg2="2" arg3="self.link_mixer_ana_in_12" />
+      <binding widget="self.sld_mixer_ana_in_2" path="/Mixer/Feature_Volume_6" arg0="2" arg1="self.sld_mixer_ana_in_1" arg2="1" arg3="self.link_mixer_ana_in_12" />
+      <binding widget="self.sld_mixer_dig_in_1" path="/Mixer/Feature_Volume_7" arg0="1" arg1="self.sld_mixer_dig_in_2" arg2="2" arg3="self.link_mixer_dig_in_12" />
+      <binding widget="self.sld_mixer_dig_in_2" path="/Mixer/Feature_Volume_7" arg0="2" arg1="self.sld_mixer_dig_in_1" arg2="1" arg3="self.link_mixer_dig_in_12" />
+    </group>
+  </mappings>
+  <ui_files>
+    <ui file="yamahago.ui" association="explicit">
+      <widgets>
+        <widget name="YamahaGoUI" class="QWidget" />
+        <widget name="box_out_route" class="QGroupBox" />
+        <widget name="label_ana_out_12_route" class="QLabel" />
+        <widget name="cmb_ana_out_12_route" class="QComboBox" />
+        <widget name="label_ana_out_34_route" class="QLabel" />
+        <widget name="cmb_ana_out_34_route" class="QComboBox" />
+        <widget name="label_dig_out_12_route" class="QLabel" />
+        <widget name="cmb_dig_out_12_route" class="QComboBox" />
+        <widget name="box_ana_in_12_level" class="QGroupBox" />
+        <widget name="label_ana_in_12" class="QLabel" />
+        <widget name="cmb_ana_in_12_level" class="QComboBox" />
+        <widget name="mixer" class="QGroupBox" />
+        <widget name="sld_mixer_strm_in_1" class="QSlider" />
+        <widget name="sld_mixer_strm_in_2" class="QSlider" />
+        <widget name="sld_mixer_strm_in_5" class="QSlider" />
+        <widget name="sld_mixer_strm_in_6" class="QSlider" />
+        <widget name="label_mixer_dig_in" class="QLabel" />
+        <widget name="sld_mixer_dig_in_1" class="QSlider" />
+        <widget name="sld_mixer_dig_in_2" class="QSlider" />
+        <widget name="label_mixer_out_12" class="QLabel" />
+        <widget name="label_mixer_ana_in" class="QLabel" />
+        <widget name="sld_mixer_ana_in_1" class="QSlider" />
+        <widget name="sld_mixer_ana_in_2" class="QSlider" />
+        <widget name="link_mixer_ana_in_12" class="QPushButton" />
+        <widget name="link_mixer_dig_in_12" class="QPushButton" />
+        <widget name="link_mixer_strm_in_12" class="QPushButton" />
+        <widget name="link_mixer_strm_in_56" class="QPushButton" />
+        <widget name="link_mixer_out_12" class="QPushButton" />
+        <widget name="label_mixer_strm_in" class="QLabel" />
+        <widget name="link_mixer_strm_in_34" class="QPushButton" />
+        <widget name="label_mixer_strm_in_34" class="QLabel" />
+        <widget name="sld_mixer_strm_in_3" class="QSlider" />
+        <widget name="sld_mixer_strm_in_4" class="QSlider" />
+        <widget name="label_mixer_strm_in_56" class="QLabel" />
+        <widget name="sld_mixer_out_1" class="QSlider" />
+        <widget name="sld_mixer_out_2" class="QSlider" />
+        <widget name="box_ana_out" class="QGroupBox" />
+        <widget name="label_ana_out_12" class="QLabel" />
+        <widget name="label_ana_out_34" class="QLabel" />
+        <widget name="sld_ana_out_1" class="QSlider" />
+        <widget name="sld_ana_out_2" class="QSlider" />
+        <widget name="sld_ana_out_3" class="QSlider" />
+        <widget name="sld_ana_out_4" class="QSlider" />
+        <widget name="link_ana_out_12" class="QPushButton" />
+        <widget name="link_ana_out_34" class="QPushButton" />
+      </widgets>
+    </ui>
+  </ui_files>
+  <notes>Static extraction from legacy FFADO Qt mixer sources. Paths and indexes are references, not validated live D-Bus capabilities. Runtime discovery and device-specific logic are still required. No vendor/model-to-family mapping is asserted unless source defines it.</notes>
+</profile>

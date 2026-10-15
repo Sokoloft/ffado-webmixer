@@ -1,0 +1,14 @@
+<?xml version='1.0' encoding='utf-8'?>
+<profile family="generic_dice_eap" schema_version="2">
+  <discovery source="generic_dice_eap.py" status="source-derived">
+    <element path="/EAP/MatrixMixer" kind="unknown" />
+    <element path="/EAP/Router" kind="unknown" />
+  </discovery>
+  <model_constants>
+    <constant name="idxb" value="-0x1" />
+    <constant name="idxe" value="-0x1" />
+    <constant name="idxb" value="-0x1" />
+    <constant name="idxe" value="-0x1" />
+    <constant name="idx" value="-0x1" />
+  </model_constants>
+</profile>

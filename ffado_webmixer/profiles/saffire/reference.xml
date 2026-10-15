@@ -1,0 +1,1023 @@
+<?xml version='1.0' encoding='utf-8'?>
+<profile family="saffire" schema_version="1" source="saffire.py" status="extracted-reference">
+  <constants />
+  <controls>
+    <reference path="/Mixer/MonoMode" context="module.Saffire.getMonoMode" line="69" />
+    <reference path="/Mixer/MonoMode" context="module.Saffire.setMonoMode" line="72" />
+    <reference path="/Mixer/MonoMode" context="module.Saffire.setMonoMode" line="74" />
+    <reference path="/Mixer/MatrixMixerStereo" context="module.SaffireMixerStereo.__init__" line="176" />
+    <reference path="/Mixer/MatrixMixerStereo" context="module.SaffireMixerStereo.__init__" line="177" />
+    <reference path="/Mixer/MatrixMixerStereo" context="module.SaffireMixerStereo.__init__" line="178" />
+    <reference path="/Mixer/MatrixMixerStereo" context="module.SaffireMixerStereo.__init__" line="179" />
+    <reference path="/Mixer/MatrixMixerStereo" context="module.SaffireMixerStereo.__init__" line="180" />
+    <reference path="/Mixer/MatrixMixerStereo" context="module.SaffireMixerStereo.__init__" line="181" />
+    <reference path="/Mixer/MatrixMixerStereo" context="module.SaffireMixerStereo.__init__" line="182" />
+    <reference path="/Mixer/MatrixMixerStereo" context="module.SaffireMixerStereo.__init__" line="183" />
+    <reference path="/Mixer/MatrixMixerStereo" context="module.SaffireMixerStereo.__init__" line="184" />
+    <reference path="/Mixer/MatrixMixerStereo" context="module.SaffireMixerStereo.__init__" line="185" />
+    <reference path="/Mixer/MatrixMixerStereo" context="module.SaffireMixerStereo.__init__" line="186" />
+    <reference path="/Mixer/MatrixMixerStereo" context="module.SaffireMixerStereo.__init__" line="187" />
+    <reference path="/Mixer/MatrixMixerStereo" context="module.SaffireMixerStereo.__init__" line="188" />
+    <reference path="/Mixer/MatrixMixerStereo" context="module.SaffireMixerStereo.__init__" line="189" />
+    <reference path="/Mixer/MatrixMixerStereo" context="module.SaffireMixerStereo.__init__" line="190" />
+    <reference path="/Mixer/MatrixMixerStereo" context="module.SaffireMixerStereo.__init__" line="191" />
+    <reference path="/Mixer/MatrixMixerStereo" context="module.SaffireMixerStereo.__init__" line="192" />
+    <reference path="/Mixer/MatrixMixerStereo" context="module.SaffireMixerStereo.__init__" line="193" />
+    <reference path="/Mixer/MatrixMixerStereo" context="module.SaffireMixerStereo.__init__" line="194" />
+    <reference path="/Mixer/MatrixMixerStereo" context="module.SaffireMixerStereo.__init__" line="195" />
+    <reference path="/Mixer/MatrixMixerStereo" context="module.SaffireMixerStereo.__init__" line="196" />
+    <reference path="/Mixer/MatrixMixerStereo" context="module.SaffireMixerStereo.__init__" line="197" />
+    <reference path="/Mixer/MatrixMixerStereo" context="module.SaffireMixerStereo.__init__" line="198" />
+    <reference path="/Mixer/MatrixMixerStereo" context="module.SaffireMixerStereo.__init__" line="199" />
+    <reference path="/Mixer/MatrixMixerStereo" context="module.SaffireMixerStereo.__init__" line="200" />
+    <reference path="/Mixer/MatrixMixerStereo" context="module.SaffireMixerStereo.__init__" line="202" />
+    <reference path="/Mixer/MatrixMixerStereo" context="module.SaffireMixerStereo.__init__" line="203" />
+    <reference path="/Mixer/MatrixMixerStereo" context="module.SaffireMixerStereo.__init__" line="204" />
+    <reference path="/Mixer/MatrixMixerStereo" context="module.SaffireMixerStereo.__init__" line="205" />
+    <reference path="/Mixer/MatrixMixerStereo" context="module.SaffireMixerStereo.__init__" line="206" />
+    <reference path="/Mixer/MatrixMixerStereo" context="module.SaffireMixerStereo.__init__" line="207" />
+    <reference path="/Mixer/MatrixMixerStereo" context="module.SaffireMixerStereo.__init__" line="208" />
+    <reference path="/Mixer/MatrixMixerStereo" context="module.SaffireMixerStereo.__init__" line="209" />
+    <reference path="/Mixer/MatrixMixerStereo" context="module.SaffireMixerStereo.__init__" line="210" />
+    <reference path="/Mixer/MatrixMixerStereo" context="module.SaffireMixerStereo.__init__" line="211" />
+    <reference path="/Mixer/MatrixMixerStereo" context="module.SaffireMixerStereo.__init__" line="213" />
+    <reference path="/Mixer/MatrixMixerStereo" context="module.SaffireMixerStereo.__init__" line="214" />
+    <reference path="/Mixer/MatrixMixerStereo" context="module.SaffireMixerStereo.__init__" line="215" />
+    <reference path="/Mixer/MatrixMixerStereo" context="module.SaffireMixerStereo.__init__" line="216" />
+    <reference path="/Mixer/MatrixMixerStereo" context="module.SaffireMixerStereo.__init__" line="217" />
+    <reference path="/Mixer/SpdifSwitch" context="module.SaffireMixerStereo.__init__" line="225" />
+    <reference path="/Mixer/Out12Mute" context="module.SaffireMixerStereo.__init__" line="226" />
+    <reference path="/Mixer/Out12HwCtrl" context="module.SaffireMixerStereo.__init__" line="227" />
+    <reference path="/Mixer/Out12Dim" context="module.SaffireMixerStereo.__init__" line="228" />
+    <reference path="/Mixer/Out34Mute" context="module.SaffireMixerStereo.__init__" line="229" />
+    <reference path="/Mixer/Out34HwCtrl" context="module.SaffireMixerStereo.__init__" line="230" />
+    <reference path="/Mixer/Out56Mute" context="module.SaffireMixerStereo.__init__" line="231" />
+    <reference path="/Mixer/Out56HwCtrl" context="module.SaffireMixerStereo.__init__" line="232" />
+    <reference path="/Mixer/Out78Mute" context="module.SaffireMixerStereo.__init__" line="233" />
+    <reference path="/Mixer/Out78HwCtrl" context="module.SaffireMixerStereo.__init__" line="234" />
+    <reference path="/Mixer/Out910Mute" context="module.SaffireMixerStereo.__init__" line="235" />
+    <reference path="/Mixer/Out12Level" context="module.SaffireMixerStereo.__init__" line="239" />
+    <reference path="/Mixer/Out34Level" context="module.SaffireMixerStereo.__init__" line="240" />
+    <reference path="/Mixer/Out56Level" context="module.SaffireMixerStereo.__init__" line="241" />
+    <reference path="/Mixer/Out78Level" context="module.SaffireMixerStereo.__init__" line="242" />
+    <reference path="/Mixer/SaveSettings" context="module.SaffireMixerStereo.__init__" line="246" />
+    <reference path="/Mixer/MonitorDial" context="module.SaffireMixerStereo.polledUpdateHwCtrl" line="267" />
+    <reference path="/Mixer/MatrixMixerMono" context="module.SaffireMixerMono.__init__" line="304" />
+    <reference path="/Mixer/MatrixMixerMono" context="module.SaffireMixerMono.__init__" line="305" />
+    <reference path="/Mixer/MatrixMixerMono" context="module.SaffireMixerMono.__init__" line="306" />
+    <reference path="/Mixer/MatrixMixerMono" context="module.SaffireMixerMono.__init__" line="307" />
+    <reference path="/Mixer/MatrixMixerMono" context="module.SaffireMixerMono.__init__" line="308" />
+    <reference path="/Mixer/MatrixMixerMono" context="module.SaffireMixerMono.__init__" line="309" />
+    <reference path="/Mixer/MatrixMixerMono" context="module.SaffireMixerMono.__init__" line="310" />
+    <reference path="/Mixer/MatrixMixerMono" context="module.SaffireMixerMono.__init__" line="311" />
+    <reference path="/Mixer/MatrixMixerMono" context="module.SaffireMixerMono.__init__" line="312" />
+    <reference path="/Mixer/MatrixMixerMono" context="module.SaffireMixerMono.__init__" line="313" />
+    <reference path="/Mixer/MatrixMixerMono" context="module.SaffireMixerMono.__init__" line="314" />
+    <reference path="/Mixer/MatrixMixerMono" context="module.SaffireMixerMono.__init__" line="315" />
+    <reference path="/Mixer/MatrixMixerMono" context="module.SaffireMixerMono.__init__" line="316" />
+    <reference path="/Mixer/MatrixMixerMono" context="module.SaffireMixerMono.__init__" line="317" />
+    <reference path="/Mixer/MatrixMixerMono" context="module.SaffireMixerMono.__init__" line="318" />
+    <reference path="/Mixer/MatrixMixerMono" context="module.SaffireMixerMono.__init__" line="319" />
+    <reference path="/Mixer/MatrixMixerMono" context="module.SaffireMixerMono.__init__" line="320" />
+    <reference path="/Mixer/MatrixMixerMono" context="module.SaffireMixerMono.__init__" line="321" />
+    <reference path="/Mixer/MatrixMixerMono" context="module.SaffireMixerMono.__init__" line="322" />
+    <reference path="/Mixer/MatrixMixerMono" context="module.SaffireMixerMono.__init__" line="323" />
+    <reference path="/Mixer/MatrixMixerMono" context="module.SaffireMixerMono.__init__" line="324" />
+    <reference path="/Mixer/MatrixMixerMono" context="module.SaffireMixerMono.__init__" line="325" />
+    <reference path="/Mixer/MatrixMixerMono" context="module.SaffireMixerMono.__init__" line="326" />
+    <reference path="/Mixer/MatrixMixerMono" context="module.SaffireMixerMono.__init__" line="327" />
+    <reference path="/Mixer/MatrixMixerMono" context="module.SaffireMixerMono.__init__" line="328" />
+    <reference path="/Mixer/MatrixMixerMono" context="module.SaffireMixerMono.__init__" line="329" />
+    <reference path="/Mixer/MatrixMixerMono" context="module.SaffireMixerMono.__init__" line="330" />
+    <reference path="/Mixer/MatrixMixerMono" context="module.SaffireMixerMono.__init__" line="331" />
+    <reference path="/Mixer/MatrixMixerMono" context="module.SaffireMixerMono.__init__" line="332" />
+    <reference path="/Mixer/MatrixMixerMono" context="module.SaffireMixerMono.__init__" line="333" />
+    <reference path="/Mixer/MatrixMixerMono" context="module.SaffireMixerMono.__init__" line="335" />
+    <reference path="/Mixer/MatrixMixerMono" context="module.SaffireMixerMono.__init__" line="336" />
+    <reference path="/Mixer/MatrixMixerMono" context="module.SaffireMixerMono.__init__" line="337" />
+    <reference path="/Mixer/MatrixMixerMono" context="module.SaffireMixerMono.__init__" line="338" />
+    <reference path="/Mixer/MatrixMixerMono" context="module.SaffireMixerMono.__init__" line="339" />
+    <reference path="/Mixer/MatrixMixerMono" context="module.SaffireMixerMono.__init__" line="340" />
+    <reference path="/Mixer/MatrixMixerMono" context="module.SaffireMixerMono.__init__" line="341" />
+    <reference path="/Mixer/MatrixMixerMono" context="module.SaffireMixerMono.__init__" line="342" />
+    <reference path="/Mixer/MatrixMixerMono" context="module.SaffireMixerMono.__init__" line="343" />
+    <reference path="/Mixer/MatrixMixerMono" context="module.SaffireMixerMono.__init__" line="344" />
+    <reference path="/Mixer/MatrixMixerMono" context="module.SaffireMixerMono.__init__" line="345" />
+    <reference path="/Mixer/MatrixMixerMono" context="module.SaffireMixerMono.__init__" line="346" />
+    <reference path="/Mixer/MatrixMixerMono" context="module.SaffireMixerMono.__init__" line="347" />
+    <reference path="/Mixer/MatrixMixerMono" context="module.SaffireMixerMono.__init__" line="348" />
+    <reference path="/Mixer/MatrixMixerMono" context="module.SaffireMixerMono.__init__" line="349" />
+    <reference path="/Mixer/MatrixMixerMono" context="module.SaffireMixerMono.__init__" line="350" />
+    <reference path="/Mixer/MatrixMixerMono" context="module.SaffireMixerMono.__init__" line="351" />
+    <reference path="/Mixer/MatrixMixerMono" context="module.SaffireMixerMono.__init__" line="352" />
+    <reference path="/Mixer/MatrixMixerMono" context="module.SaffireMixerMono.__init__" line="353" />
+    <reference path="/Mixer/MatrixMixerMono" context="module.SaffireMixerMono.__init__" line="354" />
+    <reference path="/Mixer/MatrixMixerMono" context="module.SaffireMixerMono.__init__" line="355" />
+    <reference path="/Mixer/MatrixMixerMono" context="module.SaffireMixerMono.__init__" line="356" />
+    <reference path="/Mixer/MatrixMixerMono" context="module.SaffireMixerMono.__init__" line="357" />
+    <reference path="/Mixer/MatrixMixerMono" context="module.SaffireMixerMono.__init__" line="358" />
+    <reference path="/Mixer/MatrixMixerMono" context="module.SaffireMixerMono.__init__" line="359" />
+    <reference path="/Mixer/SpdifSwitch" context="module.SaffireMixerMono.__init__" line="369" />
+    <reference path="/Mixer/Out12Mute" context="module.SaffireMixerMono.__init__" line="370" />
+    <reference path="/Mixer/Out12HwCtrl" context="module.SaffireMixerMono.__init__" line="371" />
+    <reference path="/Mixer/Out12Dim" context="module.SaffireMixerMono.__init__" line="372" />
+    <reference path="/Mixer/Out34Mute" context="module.SaffireMixerMono.__init__" line="373" />
+    <reference path="/Mixer/Out34HwCtrl" context="module.SaffireMixerMono.__init__" line="374" />
+    <reference path="/Mixer/Out56Mute" context="module.SaffireMixerMono.__init__" line="375" />
+    <reference path="/Mixer/Out56HwCtrl" context="module.SaffireMixerMono.__init__" line="376" />
+    <reference path="/Mixer/Out78Mute" context="module.SaffireMixerMono.__init__" line="377" />
+    <reference path="/Mixer/Out78HwCtrl" context="module.SaffireMixerMono.__init__" line="378" />
+    <reference path="/Mixer/Out910Mute" context="module.SaffireMixerMono.__init__" line="379" />
+    <reference path="/Mixer/Out12Level" context="module.SaffireMixerMono.__init__" line="383" />
+    <reference path="/Mixer/Out34Level" context="module.SaffireMixerMono.__init__" line="384" />
+    <reference path="/Mixer/Out56Level" context="module.SaffireMixerMono.__init__" line="385" />
+    <reference path="/Mixer/Out78Level" context="module.SaffireMixerMono.__init__" line="386" />
+    <reference path="/Mixer/SaveSettings" context="module.SaffireMixerMono.__init__" line="390" />
+    <reference path="/Mixer/MonitorDial" context="module.SaffireMixerMono.polledUpdateHwCtrl" line="411" />
+    <reference path="/Mixer/LEMix48" context="module.SaffireLEMixerLarge.__init__" line="449" />
+    <reference path="/Mixer/LEMix48" context="module.SaffireLEMixerLarge.__init__" line="450" />
+    <reference path="/Mixer/LEMix48" context="module.SaffireLEMixerLarge.__init__" line="451" />
+    <reference path="/Mixer/LEMix48" context="module.SaffireLEMixerLarge.__init__" line="452" />
+    <reference path="/Mixer/LEMix48" context="module.SaffireLEMixerLarge.__init__" line="453" />
+    <reference path="/Mixer/LEMix48" context="module.SaffireLEMixerLarge.__init__" line="454" />
+    <reference path="/Mixer/LEMix48" context="module.SaffireLEMixerLarge.__init__" line="455" />
+    <reference path="/Mixer/LEMix48" context="module.SaffireLEMixerLarge.__init__" line="456" />
+    <reference path="/Mixer/LEMix48" context="module.SaffireLEMixerLarge.__init__" line="457" />
+    <reference path="/Mixer/LEMix48" context="module.SaffireLEMixerLarge.__init__" line="458" />
+    <reference path="/Mixer/LEMix48" context="module.SaffireLEMixerLarge.__init__" line="459" />
+    <reference path="/Mixer/LEMix48" context="module.SaffireLEMixerLarge.__init__" line="460" />
+    <reference path="/Mixer/LEMix48" context="module.SaffireLEMixerLarge.__init__" line="461" />
+    <reference path="/Mixer/LEMix48" context="module.SaffireLEMixerLarge.__init__" line="462" />
+    <reference path="/Mixer/LEMix48" context="module.SaffireLEMixerLarge.__init__" line="463" />
+    <reference path="/Mixer/LEMix48" context="module.SaffireLEMixerLarge.__init__" line="464" />
+    <reference path="/Mixer/LEMix48" context="module.SaffireLEMixerLarge.__init__" line="465" />
+    <reference path="/Mixer/LEMix48" context="module.SaffireLEMixerLarge.__init__" line="466" />
+    <reference path="/Mixer/LEMix48" context="module.SaffireLEMixerLarge.__init__" line="467" />
+    <reference path="/Mixer/LEMix48" context="module.SaffireLEMixerLarge.__init__" line="468" />
+    <reference path="/Mixer/LEMix48" context="module.SaffireLEMixerLarge.__init__" line="469" />
+    <reference path="/Mixer/LEMix48" context="module.SaffireLEMixerLarge.__init__" line="470" />
+    <reference path="/Mixer/LEMix48" context="module.SaffireLEMixerLarge.__init__" line="471" />
+    <reference path="/Mixer/LEMix48" context="module.SaffireLEMixerLarge.__init__" line="472" />
+    <reference path="/Mixer/LEMix48" context="module.SaffireLEMixerLarge.__init__" line="474" />
+    <reference path="/Mixer/LEMix48" context="module.SaffireLEMixerLarge.__init__" line="475" />
+    <reference path="/Mixer/LEMix48" context="module.SaffireLEMixerLarge.__init__" line="476" />
+    <reference path="/Mixer/LEMix48" context="module.SaffireLEMixerLarge.__init__" line="477" />
+    <reference path="/Mixer/LEMix48" context="module.SaffireLEMixerLarge.__init__" line="478" />
+    <reference path="/Mixer/LEMix48" context="module.SaffireLEMixerLarge.__init__" line="479" />
+    <reference path="/Mixer/LEMix48" context="module.SaffireLEMixerLarge.__init__" line="480" />
+    <reference path="/Mixer/LEMix48" context="module.SaffireLEMixerLarge.__init__" line="481" />
+    <reference path="/Mixer/LEMix48" context="module.SaffireLEMixerLarge.__init__" line="482" />
+    <reference path="/Mixer/LEMix48" context="module.SaffireLEMixerLarge.__init__" line="483" />
+    <reference path="/Mixer/LEMix48" context="module.SaffireLEMixerLarge.__init__" line="484" />
+    <reference path="/Mixer/LEMix48" context="module.SaffireLEMixerLarge.__init__" line="485" />
+    <reference path="/Mixer/LEMix48" context="module.SaffireLEMixerLarge.__init__" line="486" />
+    <reference path="/Mixer/LEMix48" context="module.SaffireLEMixerLarge.__init__" line="487" />
+    <reference path="/Mixer/LEMix48" context="module.SaffireLEMixerLarge.__init__" line="488" />
+    <reference path="/Mixer/LEMix48" context="module.SaffireLEMixerLarge.__init__" line="489" />
+    <reference path="/Mixer/LEMix48" context="module.SaffireLEMixerLarge.__init__" line="490" />
+    <reference path="/Mixer/LEMix48" context="module.SaffireLEMixerLarge.__init__" line="491" />
+    <reference path="/Mixer/LEMix48" context="module.SaffireLEMixerLarge.__init__" line="492" />
+    <reference path="/Mixer/LEMix48" context="module.SaffireLEMixerLarge.__init__" line="493" />
+    <reference path="/Mixer/LEMix48" context="module.SaffireLEMixerLarge.__init__" line="494" />
+    <reference path="/Mixer/LEMix48" context="module.SaffireLEMixerLarge.__init__" line="495" />
+    <reference path="/Mixer/LEMix48" context="module.SaffireLEMixerLarge.__init__" line="496" />
+    <reference path="/Mixer/LEMix48" context="module.SaffireLEMixerLarge.__init__" line="497" />
+    <reference path="/Mixer/LEMix48" context="module.SaffireLEMixerLarge.__init__" line="498" />
+    <reference path="/Mixer/LEMix48" context="module.SaffireLEMixerLarge.__init__" line="499" />
+    <reference path="/Mixer/LEMix48" context="module.SaffireLEMixerLarge.__init__" line="500" />
+    <reference path="/Mixer/LEMix48" context="module.SaffireLEMixerLarge.__init__" line="501" />
+    <reference path="/Mixer/LEMix48" context="module.SaffireLEMixerLarge.__init__" line="502" />
+    <reference path="/Mixer/LEMix48" context="module.SaffireLEMixerLarge.__init__" line="503" />
+    <reference path="/Mixer/LEMix48" context="module.SaffireLEMixerLarge.__init__" line="504" />
+    <reference path="/Mixer/LEMix48" context="module.SaffireLEMixerLarge.__init__" line="505" />
+    <reference path="/Mixer/Out12Mute" context="module.SaffireLEMixerLarge.__init__" line="509" />
+    <reference path="/Mixer/Out12HwCtrl" context="module.SaffireLEMixerLarge.__init__" line="510" />
+    <reference path="/Mixer/Out34Mute" context="module.SaffireLEMixerLarge.__init__" line="511" />
+    <reference path="/Mixer/Out34HwCtrl" context="module.SaffireLEMixerLarge.__init__" line="512" />
+    <reference path="/Mixer/Out56Mute" context="module.SaffireLEMixerLarge.__init__" line="513" />
+    <reference path="/Mixer/Out56HwCtrl" context="module.SaffireLEMixerLarge.__init__" line="514" />
+    <reference path="/Mixer/SpdifTransparent" context="module.SaffireLEMixerLarge.__init__" line="515" />
+    <reference path="/Mixer/MidiThru" context="module.SaffireLEMixerLarge.__init__" line="516" />
+    <reference path="/Mixer/HighGainLine3" context="module.SaffireLEMixerLarge.__init__" line="517" />
+    <reference path="/Mixer/HighGainLine4" context="module.SaffireLEMixerLarge.__init__" line="518" />
+    <reference path="/Mixer/Out12Level" context="module.SaffireLEMixerLarge.__init__" line="522" />
+    <reference path="/Mixer/Out34Level" context="module.SaffireLEMixerLarge.__init__" line="523" />
+    <reference path="/Mixer/Out56Level" context="module.SaffireLEMixerLarge.__init__" line="524" />
+    <reference path="/Mixer/SaveSettings" context="module.SaffireLEMixerLarge.__init__" line="528" />
+    <reference path="/Mixer/LEMix96" context="module.SaffireLEMixerSmall.__init__" line="572" />
+    <reference path="/Mixer/LEMix96" context="module.SaffireLEMixerSmall.__init__" line="573" />
+    <reference path="/Mixer/LEMix96" context="module.SaffireLEMixerSmall.__init__" line="574" />
+    <reference path="/Mixer/LEMix96" context="module.SaffireLEMixerSmall.__init__" line="575" />
+    <reference path="/Mixer/LEMix96" context="module.SaffireLEMixerSmall.__init__" line="576" />
+    <reference path="/Mixer/LEMix96" context="module.SaffireLEMixerSmall.__init__" line="577" />
+    <reference path="/Mixer/LEMix96" context="module.SaffireLEMixerSmall.__init__" line="579" />
+    <reference path="/Mixer/LEMix96" context="module.SaffireLEMixerSmall.__init__" line="580" />
+    <reference path="/Mixer/LEMix96" context="module.SaffireLEMixerSmall.__init__" line="581" />
+    <reference path="/Mixer/LEMix96" context="module.SaffireLEMixerSmall.__init__" line="582" />
+    <reference path="/Mixer/LEMix96" context="module.SaffireLEMixerSmall.__init__" line="583" />
+    <reference path="/Mixer/LEMix96" context="module.SaffireLEMixerSmall.__init__" line="584" />
+    <reference path="/Mixer/LEMix96" context="module.SaffireLEMixerSmall.__init__" line="585" />
+    <reference path="/Mixer/LEMix96" context="module.SaffireLEMixerSmall.__init__" line="586" />
+    <reference path="/Mixer/Out12Mute" context="module.SaffireLEMixerSmall.__init__" line="590" />
+    <reference path="/Mixer/Out12HwCtrl" context="module.SaffireLEMixerSmall.__init__" line="591" />
+    <reference path="/Mixer/Out34Mute" context="module.SaffireLEMixerSmall.__init__" line="592" />
+    <reference path="/Mixer/Out34HwCtrl" context="module.SaffireLEMixerSmall.__init__" line="593" />
+    <reference path="/Mixer/Out56Mute" context="module.SaffireLEMixerSmall.__init__" line="594" />
+    <reference path="/Mixer/Out56HwCtrl" context="module.SaffireLEMixerSmall.__init__" line="595" />
+    <reference path="/Mixer/SpdifTransparent" context="module.SaffireLEMixerSmall.__init__" line="596" />
+    <reference path="/Mixer/MidiThru" context="module.SaffireLEMixerSmall.__init__" line="597" />
+    <reference path="/Mixer/HighGainLine3" context="module.SaffireLEMixerSmall.__init__" line="598" />
+    <reference path="/Mixer/HighGainLine4" context="module.SaffireLEMixerSmall.__init__" line="599" />
+    <reference path="/Mixer/Out12Level" context="module.SaffireLEMixerSmall.__init__" line="603" />
+    <reference path="/Mixer/Out34Level" context="module.SaffireLEMixerSmall.__init__" line="604" />
+    <reference path="/Mixer/Out56Level" context="module.SaffireLEMixerSmall.__init__" line="605" />
+    <reference path="/Mixer/SaveSettings" context="module.SaffireLEMixerSmall.__init__" line="609" />
+  </controls>
+  <mappings>
+    <group name="VolumeControls" line="175">
+      <binding widget="self.sldPC910Out910" path="/Mixer/MatrixMixerStereo" arg0="0" arg1="0" />
+      <binding widget="self.sldPC910Out12" path="/Mixer/MatrixMixerStereo" arg0="0" arg1="1" />
+      <binding widget="self.sldPC910Out34" path="/Mixer/MatrixMixerStereo" arg0="0" arg1="2" />
+      <binding widget="self.sldPC910Out56" path="/Mixer/MatrixMixerStereo" arg0="0" arg1="3" />
+      <binding widget="self.sldPC910Out78" path="/Mixer/MatrixMixerStereo" arg0="0" arg1="4" />
+      <binding widget="self.sldPC12Out910" path="/Mixer/MatrixMixerStereo" arg0="1" arg1="0" />
+      <binding widget="self.sldPC12Out12" path="/Mixer/MatrixMixerStereo" arg0="1" arg1="1" />
+      <binding widget="self.sldPC12Out34" path="/Mixer/MatrixMixerStereo" arg0="1" arg1="2" />
+      <binding widget="self.sldPC12Out56" path="/Mixer/MatrixMixerStereo" arg0="1" arg1="3" />
+      <binding widget="self.sldPC12Out78" path="/Mixer/MatrixMixerStereo" arg0="1" arg1="4" />
+      <binding widget="self.sldPC34Out910" path="/Mixer/MatrixMixerStereo" arg0="2" arg1="0" />
+      <binding widget="self.sldPC34Out12" path="/Mixer/MatrixMixerStereo" arg0="2" arg1="1" />
+      <binding widget="self.sldPC34Out34" path="/Mixer/MatrixMixerStereo" arg0="2" arg1="2" />
+      <binding widget="self.sldPC34Out56" path="/Mixer/MatrixMixerStereo" arg0="2" arg1="3" />
+      <binding widget="self.sldPC34Out78" path="/Mixer/MatrixMixerStereo" arg0="2" arg1="4" />
+      <binding widget="self.sldPC56Out910" path="/Mixer/MatrixMixerStereo" arg0="3" arg1="0" />
+      <binding widget="self.sldPC56Out12" path="/Mixer/MatrixMixerStereo" arg0="3" arg1="1" />
+      <binding widget="self.sldPC56Out34" path="/Mixer/MatrixMixerStereo" arg0="3" arg1="2" />
+      <binding widget="self.sldPC56Out56" path="/Mixer/MatrixMixerStereo" arg0="3" arg1="3" />
+      <binding widget="self.sldPC56Out78" path="/Mixer/MatrixMixerStereo" arg0="3" arg1="4" />
+      <binding widget="self.sldPC78Out910" path="/Mixer/MatrixMixerStereo" arg0="4" arg1="0" />
+      <binding widget="self.sldPC78Out12" path="/Mixer/MatrixMixerStereo" arg0="4" arg1="1" />
+      <binding widget="self.sldPC78Out34" path="/Mixer/MatrixMixerStereo" arg0="4" arg1="2" />
+      <binding widget="self.sldPC78Out56" path="/Mixer/MatrixMixerStereo" arg0="4" arg1="3" />
+      <binding widget="self.sldPC78Out78" path="/Mixer/MatrixMixerStereo" arg0="4" arg1="4" />
+      <binding widget="self.sldIN12Out910" path="/Mixer/MatrixMixerStereo" arg0="5" arg1="0" />
+      <binding widget="self.sldIN12Out12" path="/Mixer/MatrixMixerStereo" arg0="5" arg1="1" />
+      <binding widget="self.sldIN12Out34" path="/Mixer/MatrixMixerStereo" arg0="5" arg1="2" />
+      <binding widget="self.sldIN12Out56" path="/Mixer/MatrixMixerStereo" arg0="5" arg1="3" />
+      <binding widget="self.sldIN12Out78" path="/Mixer/MatrixMixerStereo" arg0="5" arg1="4" />
+      <binding widget="self.sldIN34Out910" path="/Mixer/MatrixMixerStereo" arg0="6" arg1="0" />
+      <binding widget="self.sldIN34Out12" path="/Mixer/MatrixMixerStereo" arg0="6" arg1="1" />
+      <binding widget="self.sldIN34Out34" path="/Mixer/MatrixMixerStereo" arg0="6" arg1="2" />
+      <binding widget="self.sldIN34Out56" path="/Mixer/MatrixMixerStereo" arg0="6" arg1="3" />
+      <binding widget="self.sldIN34Out78" path="/Mixer/MatrixMixerStereo" arg0="6" arg1="4" />
+      <binding widget="self.sldFXOut910" path="/Mixer/MatrixMixerStereo" arg0="7" arg1="0" />
+      <binding widget="self.sldFXOut12" path="/Mixer/MatrixMixerStereo" arg0="7" arg1="1" />
+      <binding widget="self.sldFXOut34" path="/Mixer/MatrixMixerStereo" arg0="7" arg1="2" />
+      <binding widget="self.sldFXOut56" path="/Mixer/MatrixMixerStereo" arg0="7" arg1="3" />
+      <binding widget="self.sldFXOut78" path="/Mixer/MatrixMixerStereo" arg0="7" arg1="4" />
+    </group>
+    <group name="SelectorControls" line="224">
+      <binding widget="self.chkSpdifSwitch" path="/Mixer/SpdifSwitch" />
+      <binding widget="self.chkOut12Mute" path="/Mixer/Out12Mute" arg0="[self.chkOut12HwCtrl]" />
+      <binding widget="self.chkOut12HwCtrl" path="/Mixer/Out12HwCtrl" />
+      <binding widget="self.chkOut12Dim" path="/Mixer/Out12Dim" />
+      <binding widget="self.chkOut34Mute" path="/Mixer/Out34Mute" arg0="[self.chkOut34HwCtrl]" />
+      <binding widget="self.chkOut34HwCtrl" path="/Mixer/Out34HwCtrl" />
+      <binding widget="self.chkOut56Mute" path="/Mixer/Out56Mute" arg0="[self.chkOut56HwCtrl]" />
+      <binding widget="self.chkOut56HwCtrl" path="/Mixer/Out56HwCtrl" />
+      <binding widget="self.chkOut78Mute" path="/Mixer/Out78Mute" arg0="[self.chkOut78HwCtrl]" />
+      <binding widget="self.chkOut78HwCtrl" path="/Mixer/Out78HwCtrl" />
+      <binding widget="self.chkOut910Mute" path="/Mixer/Out910Mute" />
+    </group>
+    <group name="VolumeControlsLowRes" line="238">
+      <binding widget="self.sldOut12Level" path="/Mixer/Out12Level" />
+      <binding widget="self.sldOut34Level" path="/Mixer/Out34Level" />
+      <binding widget="self.sldOut56Level" path="/Mixer/Out56Level" />
+      <binding widget="self.sldOut78Level" path="/Mixer/Out78Level" />
+    </group>
+    <group name="TriggerButtonControls" line="245">
+      <binding widget="self.btnSaveSettings" path="/Mixer/SaveSettings" />
+    </group>
+    <group name="VolumeControls" line="303">
+      <binding widget="self.sldIN1Out910" path="/Mixer/MatrixMixerMono" arg0="0" arg1="0" />
+      <binding widget="self.sldIN1Out12" path="/Mixer/MatrixMixerMono" arg0="0" arg1="1" />
+      <binding widget="self.sldIN1Out34" path="/Mixer/MatrixMixerMono" arg0="0" arg1="2" />
+      <binding widget="self.sldIN1Out56" path="/Mixer/MatrixMixerMono" arg0="0" arg1="3" />
+      <binding widget="self.sldIN1Out78" path="/Mixer/MatrixMixerMono" arg0="0" arg1="4" />
+      <binding widget="self.sldIN3Out910" path="/Mixer/MatrixMixerMono" arg0="1" arg1="0" />
+      <binding widget="self.sldIN3Out12" path="/Mixer/MatrixMixerMono" arg0="1" arg1="1" />
+      <binding widget="self.sldIN3Out34" path="/Mixer/MatrixMixerMono" arg0="1" arg1="2" />
+      <binding widget="self.sldIN3Out56" path="/Mixer/MatrixMixerMono" arg0="1" arg1="3" />
+      <binding widget="self.sldIN3Out78" path="/Mixer/MatrixMixerMono" arg0="1" arg1="4" />
+      <binding widget="self.sldFX1Out910" path="/Mixer/MatrixMixerMono" arg0="2" arg1="0" />
+      <binding widget="self.sldFX1Out12" path="/Mixer/MatrixMixerMono" arg0="2" arg1="1" />
+      <binding widget="self.sldFX1Out34" path="/Mixer/MatrixMixerMono" arg0="2" arg1="2" />
+      <binding widget="self.sldFX1Out56" path="/Mixer/MatrixMixerMono" arg0="2" arg1="3" />
+      <binding widget="self.sldFX1Out78" path="/Mixer/MatrixMixerMono" arg0="2" arg1="4" />
+      <binding widget="self.sldIN2Out910" path="/Mixer/MatrixMixerMono" arg0="3" arg1="0" />
+      <binding widget="self.sldIN2Out12" path="/Mixer/MatrixMixerMono" arg0="3" arg1="1" />
+      <binding widget="self.sldIN2Out34" path="/Mixer/MatrixMixerMono" arg0="3" arg1="2" />
+      <binding widget="self.sldIN2Out56" path="/Mixer/MatrixMixerMono" arg0="3" arg1="3" />
+      <binding widget="self.sldIN2Out78" path="/Mixer/MatrixMixerMono" arg0="3" arg1="4" />
+      <binding widget="self.sldIN4Out910" path="/Mixer/MatrixMixerMono" arg0="4" arg1="0" />
+      <binding widget="self.sldIN4Out12" path="/Mixer/MatrixMixerMono" arg0="4" arg1="1" />
+      <binding widget="self.sldIN4Out34" path="/Mixer/MatrixMixerMono" arg0="4" arg1="2" />
+      <binding widget="self.sldIN4Out56" path="/Mixer/MatrixMixerMono" arg0="4" arg1="3" />
+      <binding widget="self.sldIN4Out78" path="/Mixer/MatrixMixerMono" arg0="4" arg1="4" />
+      <binding widget="self.sldFX2Out910" path="/Mixer/MatrixMixerMono" arg0="5" arg1="0" />
+      <binding widget="self.sldFX2Out12" path="/Mixer/MatrixMixerMono" arg0="5" arg1="1" />
+      <binding widget="self.sldFX2Out34" path="/Mixer/MatrixMixerMono" arg0="5" arg1="2" />
+      <binding widget="self.sldFX2Out56" path="/Mixer/MatrixMixerMono" arg0="5" arg1="3" />
+      <binding widget="self.sldFX2Out78" path="/Mixer/MatrixMixerMono" arg0="5" arg1="4" />
+      <binding widget="self.sldPC910Out910" path="/Mixer/MatrixMixerMono" arg0="6" arg1="0" />
+      <binding widget="self.sldPC910Out12" path="/Mixer/MatrixMixerMono" arg0="6" arg1="1" />
+      <binding widget="self.sldPC910Out34" path="/Mixer/MatrixMixerMono" arg0="6" arg1="2" />
+      <binding widget="self.sldPC910Out56" path="/Mixer/MatrixMixerMono" arg0="6" arg1="3" />
+      <binding widget="self.sldPC910Out78" path="/Mixer/MatrixMixerMono" arg0="6" arg1="4" />
+      <binding widget="self.sldPC12Out910" path="/Mixer/MatrixMixerMono" arg0="7" arg1="0" />
+      <binding widget="self.sldPC12Out12" path="/Mixer/MatrixMixerMono" arg0="7" arg1="1" />
+      <binding widget="self.sldPC12Out34" path="/Mixer/MatrixMixerMono" arg0="7" arg1="2" />
+      <binding widget="self.sldPC12Out56" path="/Mixer/MatrixMixerMono" arg0="7" arg1="3" />
+      <binding widget="self.sldPC12Out78" path="/Mixer/MatrixMixerMono" arg0="7" arg1="4" />
+      <binding widget="self.sldPC34Out910" path="/Mixer/MatrixMixerMono" arg0="8" arg1="0" />
+      <binding widget="self.sldPC34Out12" path="/Mixer/MatrixMixerMono" arg0="8" arg1="1" />
+      <binding widget="self.sldPC34Out34" path="/Mixer/MatrixMixerMono" arg0="8" arg1="2" />
+      <binding widget="self.sldPC34Out56" path="/Mixer/MatrixMixerMono" arg0="8" arg1="3" />
+      <binding widget="self.sldPC34Out78" path="/Mixer/MatrixMixerMono" arg0="8" arg1="4" />
+      <binding widget="self.sldPC56Out910" path="/Mixer/MatrixMixerMono" arg0="9" arg1="0" />
+      <binding widget="self.sldPC56Out12" path="/Mixer/MatrixMixerMono" arg0="9" arg1="1" />
+      <binding widget="self.sldPC56Out34" path="/Mixer/MatrixMixerMono" arg0="9" arg1="2" />
+      <binding widget="self.sldPC56Out56" path="/Mixer/MatrixMixerMono" arg0="9" arg1="3" />
+      <binding widget="self.sldPC56Out78" path="/Mixer/MatrixMixerMono" arg0="9" arg1="4" />
+      <binding widget="self.sldPC78Out910" path="/Mixer/MatrixMixerMono" arg0="10" arg1="0" />
+      <binding widget="self.sldPC78Out12" path="/Mixer/MatrixMixerMono" arg0="10" arg1="1" />
+      <binding widget="self.sldPC78Out34" path="/Mixer/MatrixMixerMono" arg0="10" arg1="2" />
+      <binding widget="self.sldPC78Out56" path="/Mixer/MatrixMixerMono" arg0="10" arg1="3" />
+      <binding widget="self.sldPC78Out78" path="/Mixer/MatrixMixerMono" arg0="10" arg1="4" />
+    </group>
+    <group name="SelectorControls" line="368">
+      <binding widget="self.chkSpdifSwitch" path="/Mixer/SpdifSwitch" />
+      <binding widget="self.chkOut12Mute" path="/Mixer/Out12Mute" arg0="[self.chkOut12HwCtrl]" />
+      <binding widget="self.chkOut12HwCtrl" path="/Mixer/Out12HwCtrl" />
+      <binding widget="self.chkOut12Dim" path="/Mixer/Out12Dim" />
+      <binding widget="self.chkOut34Mute" path="/Mixer/Out34Mute" arg0="[self.chkOut34HwCtrl]" />
+      <binding widget="self.chkOut34HwCtrl" path="/Mixer/Out34HwCtrl" />
+      <binding widget="self.chkOut56Mute" path="/Mixer/Out56Mute" arg0="[self.chkOut56HwCtrl]" />
+      <binding widget="self.chkOut56HwCtrl" path="/Mixer/Out56HwCtrl" />
+      <binding widget="self.chkOut78Mute" path="/Mixer/Out78Mute" arg0="[self.chkOut78HwCtrl]" />
+      <binding widget="self.chkOut78HwCtrl" path="/Mixer/Out78HwCtrl" />
+      <binding widget="self.chkOut910Mute" path="/Mixer/Out910Mute" />
+    </group>
+    <group name="VolumeControlsLowRes" line="382">
+      <binding widget="self.sldOut12Level" path="/Mixer/Out12Level" />
+      <binding widget="self.sldOut34Level" path="/Mixer/Out34Level" />
+      <binding widget="self.sldOut56Level" path="/Mixer/Out56Level" />
+      <binding widget="self.sldOut78Level" path="/Mixer/Out78Level" />
+    </group>
+    <group name="TriggerButtonControls" line="389">
+      <binding widget="self.btnSaveSettings" path="/Mixer/SaveSettings" />
+    </group>
+    <group name="VolumeControls" line="448">
+      <binding widget="self.sldIN1Out1" path="/Mixer/LEMix48" arg0="0" arg1="0" />
+      <binding widget="self.sldIN1Out2" path="/Mixer/LEMix48" arg0="0" arg1="1" />
+      <binding widget="self.sldIN1Out3" path="/Mixer/LEMix48" arg0="0" arg1="2" />
+      <binding widget="self.sldIN1Out4" path="/Mixer/LEMix48" arg0="0" arg1="3" />
+      <binding widget="self.sldIN2Out1" path="/Mixer/LEMix48" arg0="1" arg1="0" />
+      <binding widget="self.sldIN2Out2" path="/Mixer/LEMix48" arg0="1" arg1="1" />
+      <binding widget="self.sldIN2Out3" path="/Mixer/LEMix48" arg0="1" arg1="2" />
+      <binding widget="self.sldIN2Out4" path="/Mixer/LEMix48" arg0="1" arg1="3" />
+      <binding widget="self.sldIN3Out1" path="/Mixer/LEMix48" arg0="2" arg1="0" />
+      <binding widget="self.sldIN3Out2" path="/Mixer/LEMix48" arg0="2" arg1="1" />
+      <binding widget="self.sldIN3Out3" path="/Mixer/LEMix48" arg0="2" arg1="2" />
+      <binding widget="self.sldIN3Out4" path="/Mixer/LEMix48" arg0="2" arg1="3" />
+      <binding widget="self.sldIN4Out1" path="/Mixer/LEMix48" arg0="3" arg1="0" />
+      <binding widget="self.sldIN4Out2" path="/Mixer/LEMix48" arg0="3" arg1="1" />
+      <binding widget="self.sldIN4Out3" path="/Mixer/LEMix48" arg0="3" arg1="2" />
+      <binding widget="self.sldIN4Out4" path="/Mixer/LEMix48" arg0="3" arg1="3" />
+      <binding widget="self.sldSPDIF1Out1" path="/Mixer/LEMix48" arg0="4" arg1="0" />
+      <binding widget="self.sldSPDIF1Out2" path="/Mixer/LEMix48" arg0="4" arg1="1" />
+      <binding widget="self.sldSPDIF1Out3" path="/Mixer/LEMix48" arg0="4" arg1="2" />
+      <binding widget="self.sldSPDIF1Out4" path="/Mixer/LEMix48" arg0="4" arg1="3" />
+      <binding widget="self.sldSPDIF2Out1" path="/Mixer/LEMix48" arg0="5" arg1="0" />
+      <binding widget="self.sldSPDIF2Out2" path="/Mixer/LEMix48" arg0="5" arg1="1" />
+      <binding widget="self.sldSPDIF2Out3" path="/Mixer/LEMix48" arg0="5" arg1="2" />
+      <binding widget="self.sldSPDIF2Out4" path="/Mixer/LEMix48" arg0="5" arg1="3" />
+      <binding widget="self.sldPC1Out1" path="/Mixer/LEMix48" arg0="6" arg1="0" />
+      <binding widget="self.sldPC1Out2" path="/Mixer/LEMix48" arg0="6" arg1="1" />
+      <binding widget="self.sldPC1Out3" path="/Mixer/LEMix48" arg0="6" arg1="2" />
+      <binding widget="self.sldPC1Out4" path="/Mixer/LEMix48" arg0="6" arg1="3" />
+      <binding widget="self.sldPC2Out1" path="/Mixer/LEMix48" arg0="7" arg1="0" />
+      <binding widget="self.sldPC2Out2" path="/Mixer/LEMix48" arg0="7" arg1="1" />
+      <binding widget="self.sldPC2Out3" path="/Mixer/LEMix48" arg0="7" arg1="2" />
+      <binding widget="self.sldPC2Out4" path="/Mixer/LEMix48" arg0="7" arg1="3" />
+      <binding widget="self.sldPC3Out1" path="/Mixer/LEMix48" arg0="8" arg1="0" />
+      <binding widget="self.sldPC3Out2" path="/Mixer/LEMix48" arg0="8" arg1="1" />
+      <binding widget="self.sldPC3Out3" path="/Mixer/LEMix48" arg0="8" arg1="2" />
+      <binding widget="self.sldPC3Out4" path="/Mixer/LEMix48" arg0="8" arg1="3" />
+      <binding widget="self.sldPC4Out1" path="/Mixer/LEMix48" arg0="9" arg1="0" />
+      <binding widget="self.sldPC4Out2" path="/Mixer/LEMix48" arg0="9" arg1="1" />
+      <binding widget="self.sldPC4Out3" path="/Mixer/LEMix48" arg0="9" arg1="2" />
+      <binding widget="self.sldPC4Out4" path="/Mixer/LEMix48" arg0="9" arg1="3" />
+      <binding widget="self.sldPC5Out1" path="/Mixer/LEMix48" arg0="10" arg1="0" />
+      <binding widget="self.sldPC5Out2" path="/Mixer/LEMix48" arg0="10" arg1="1" />
+      <binding widget="self.sldPC5Out3" path="/Mixer/LEMix48" arg0="10" arg1="2" />
+      <binding widget="self.sldPC5Out4" path="/Mixer/LEMix48" arg0="10" arg1="3" />
+      <binding widget="self.sldPC6Out1" path="/Mixer/LEMix48" arg0="11" arg1="0" />
+      <binding widget="self.sldPC6Out2" path="/Mixer/LEMix48" arg0="11" arg1="1" />
+      <binding widget="self.sldPC6Out3" path="/Mixer/LEMix48" arg0="11" arg1="2" />
+      <binding widget="self.sldPC6Out4" path="/Mixer/LEMix48" arg0="11" arg1="3" />
+      <binding widget="self.sldPC7Out1" path="/Mixer/LEMix48" arg0="12" arg1="0" />
+      <binding widget="self.sldPC7Out2" path="/Mixer/LEMix48" arg0="12" arg1="1" />
+      <binding widget="self.sldPC7Out3" path="/Mixer/LEMix48" arg0="12" arg1="2" />
+      <binding widget="self.sldPC7Out4" path="/Mixer/LEMix48" arg0="12" arg1="3" />
+      <binding widget="self.sldPC8Out1" path="/Mixer/LEMix48" arg0="13" arg1="0" />
+      <binding widget="self.sldPC8Out2" path="/Mixer/LEMix48" arg0="13" arg1="1" />
+      <binding widget="self.sldPC8Out3" path="/Mixer/LEMix48" arg0="13" arg1="2" />
+      <binding widget="self.sldPC8Out4" path="/Mixer/LEMix48" arg0="13" arg1="3" />
+    </group>
+    <group name="SelectorControls" line="508">
+      <binding widget="self.chkOut12Mute" path="/Mixer/Out12Mute" />
+      <binding widget="self.chkOut12HwCtrl" path="/Mixer/Out12HwCtrl" />
+      <binding widget="self.chkOut34Mute" path="/Mixer/Out34Mute" />
+      <binding widget="self.chkOut34HwCtrl" path="/Mixer/Out34HwCtrl" />
+      <binding widget="self.chkOut56Mute" path="/Mixer/Out56Mute" />
+      <binding widget="self.chkOut56HwCtrl" path="/Mixer/Out56HwCtrl" />
+      <binding widget="self.chkSPDIFTransparent" path="/Mixer/SpdifTransparent" />
+      <binding widget="self.chkMIDITru" path="/Mixer/MidiThru" />
+      <binding widget="self.chkHighGain3" path="/Mixer/HighGainLine3" />
+      <binding widget="self.chkHighGain4" path="/Mixer/HighGainLine4" />
+    </group>
+    <group name="VolumeControlsLowRes" line="521">
+      <binding widget="self.sldOut12Level" path="/Mixer/Out12Level" />
+      <binding widget="self.sldOut34Level" path="/Mixer/Out34Level" />
+      <binding widget="self.sldOut56Level" path="/Mixer/Out56Level" />
+    </group>
+    <group name="TriggerButtonControls" line="527">
+      <binding widget="self.btnSaveSettings" path="/Mixer/SaveSettings" />
+    </group>
+    <group name="VolumeControls" line="571">
+      <binding widget="self.sldIN1RecMix" path="/Mixer/LEMix96" arg0="0" arg1="4" />
+      <binding widget="self.sldIN2RecMix" path="/Mixer/LEMix96" arg0="1" arg1="4" />
+      <binding widget="self.sldIN3RecMix" path="/Mixer/LEMix96" arg0="2" arg1="4" />
+      <binding widget="self.sldIN4RecMix" path="/Mixer/LEMix96" arg0="3" arg1="4" />
+      <binding widget="self.sldSPDIF1RecMix" path="/Mixer/LEMix96" arg0="4" arg1="4" />
+      <binding widget="self.sldSPDIF2RecMix" path="/Mixer/LEMix96" arg0="5" arg1="4" />
+      <binding widget="self.sldPC1Out1" path="/Mixer/LEMix96" arg0="6" arg1="0" />
+      <binding widget="self.sldPC1Out2" path="/Mixer/LEMix96" arg0="6" arg1="1" />
+      <binding widget="self.sldPC1Out3" path="/Mixer/LEMix96" arg0="6" arg1="2" />
+      <binding widget="self.sldPC1Out4" path="/Mixer/LEMix96" arg0="6" arg1="3" />
+      <binding widget="self.sldPC2Out1" path="/Mixer/LEMix96" arg0="7" arg1="0" />
+      <binding widget="self.sldPC2Out2" path="/Mixer/LEMix96" arg0="7" arg1="1" />
+      <binding widget="self.sldPC2Out3" path="/Mixer/LEMix96" arg0="7" arg1="2" />
+      <binding widget="self.sldPC2Out4" path="/Mixer/LEMix96" arg0="7" arg1="3" />
+    </group>
+    <group name="SelectorControls" line="589">
+      <binding widget="self.chkOut12Mute" path="/Mixer/Out12Mute" />
+      <binding widget="self.chkOut12HwCtrl" path="/Mixer/Out12HwCtrl" />
+      <binding widget="self.chkOut34Mute" path="/Mixer/Out34Mute" />
+      <binding widget="self.chkOut34HwCtrl" path="/Mixer/Out34HwCtrl" />
+      <binding widget="self.chkOut56Mute" path="/Mixer/Out56Mute" />
+      <binding widget="self.chkOut56HwCtrl" path="/Mixer/Out56HwCtrl" />
+      <binding widget="self.chkSPDIFTransparent" path="/Mixer/SpdifTransparent" />
+      <binding widget="self.chkMIDITru" path="/Mixer/MidiThru" />
+      <binding widget="self.chkHighGain3" path="/Mixer/HighGainLine3" />
+      <binding widget="self.chkHighGain4" path="/Mixer/HighGainLine4" />
+    </group>
+    <group name="VolumeControlsLowRes" line="602">
+      <binding widget="self.sldOut12Level" path="/Mixer/Out12Level" />
+      <binding widget="self.sldOut34Level" path="/Mixer/Out34Level" />
+      <binding widget="self.sldOut56Level" path="/Mixer/Out56Level" />
+    </group>
+    <group name="TriggerButtonControls" line="608">
+      <binding widget="self.btnSaveSettings" path="/Mixer/SaveSettings" />
+    </group>
+  </mappings>
+  <ui_files>
+    <ui file="saffire_mono.ui" association="explicit">
+      <widgets>
+        <widget name="SaffireMixerMonoUI" class="QWidget" />
+        <widget name="tabWidget4" class="QTabWidget" />
+        <widget name="tab" class="QWidget" />
+        <widget name="groupOut12_1" class="QGroupBox" />
+        <widget name="sldOut12Level" class="QSlider" />
+        <widget name="txtOut12Lvl" class="QLabel" />
+        <widget name="chkOut12Mute" class="QCheckBox" />
+        <widget name="chkOut12HwCtrl" class="QCheckBox" />
+        <widget name="chkOut12Dim" class="QCheckBox" />
+        <widget name="groupOut12_2" class="QGroupBox" />
+        <widget name="sldIN1Out12" class="QSlider" />
+        <widget name="txtOut12In12" class="QLabel" />
+        <widget name="sldIN2Out12" class="QSlider" />
+        <widget name="txtOut12In34" class="QLabel" />
+        <widget name="sldIN3Out12" class="QSlider" />
+        <widget name="txtOut12In34_2" class="QLabel" />
+        <widget name="sldIN4Out12" class="QSlider" />
+        <widget name="txtOut12In34_3" class="QLabel" />
+        <widget name="groupOut12_3" class="QGroupBox" />
+        <widget name="sldPC12Out12" class="QSlider" />
+        <widget name="txtOut12PC12" class="QLabel" />
+        <widget name="sldPC34Out12" class="QSlider" />
+        <widget name="txtOut12PC34" class="QLabel" />
+        <widget name="sldPC56Out12" class="QSlider" />
+        <widget name="txtOut12PC56" class="QLabel" />
+        <widget name="sldPC78Out12" class="QSlider" />
+        <widget name="txtOut12PC78" class="QLabel" />
+        <widget name="sldPC910Out12" class="QSlider" />
+        <widget name="txtOut12PC910" class="QLabel" />
+        <widget name="groupOut12_4" class="QGroupBox" />
+        <widget name="sldFX1Out12" class="QSlider" />
+        <widget name="txtOut12In12_2" class="QLabel" />
+        <widget name="sldFX2Out12" class="QSlider" />
+        <widget name="txtOut12In12_2_6" class="QLabel" />
+        <widget name="tab" class="QWidget" />
+        <widget name="groupOut34_1" class="QGroupBox" />
+        <widget name="sldOut34Level" class="QSlider" />
+        <widget name="txtOut34Lvl" class="QLabel" />
+        <widget name="chkOut34Mute" class="QCheckBox" />
+        <widget name="chkOut34HwCtrl" class="QCheckBox" />
+        <widget name="groupOut34_2" class="QGroupBox" />
+        <widget name="sldIN1Out34" class="QSlider" />
+        <widget name="txtOut34In12" class="QLabel" />
+        <widget name="sldIN2Out34" class="QSlider" />
+        <widget name="txtOut34In34" class="QLabel" />
+        <widget name="sldIN3Out34" class="QSlider" />
+        <widget name="txtOut34In34_2" class="QLabel" />
+        <widget name="sldIN4Out34" class="QSlider" />
+        <widget name="txtOut34In34_3" class="QLabel" />
+        <widget name="groupOut34_3" class="QGroupBox" />
+        <widget name="sldPC12Out34" class="QSlider" />
+        <widget name="txtOut34PC12" class="QLabel" />
+        <widget name="sldPC34Out34" class="QSlider" />
+        <widget name="txtOut34PC34" class="QLabel" />
+        <widget name="sldPC56Out34" class="QSlider" />
+        <widget name="txtOut34PC56" class="QLabel" />
+        <widget name="sldPC78Out34" class="QSlider" />
+        <widget name="txtOut34PC78" class="QLabel" />
+        <widget name="sldPC910Out34" class="QSlider" />
+        <widget name="txtOut34PC910" class="QLabel" />
+        <widget name="groupOut12_4_2" class="QGroupBox" />
+        <widget name="sldFX1Out34" class="QSlider" />
+        <widget name="txtOut12In12_2_2" class="QLabel" />
+        <widget name="sldFX2Out34" class="QSlider" />
+        <widget name="txtOut12In12_2_2_2" class="QLabel" />
+        <widget name="tab" class="QWidget" />
+        <widget name="groupOut56_1" class="QGroupBox" />
+        <widget name="chkOut56Mute" class="QCheckBox" />
+        <widget name="chkOut56HwCtrl" class="QCheckBox" />
+        <widget name="sldOut56Level" class="QSlider" />
+        <widget name="txtOut56Lvl" class="QLabel" />
+        <widget name="groupOut56_2" class="QGroupBox" />
+        <widget name="sldIN1Out56" class="QSlider" />
+        <widget name="txtOut56In12" class="QLabel" />
+        <widget name="sldIN2Out56" class="QSlider" />
+        <widget name="txtOut56In34" class="QLabel" />
+        <widget name="sldIN3Out56" class="QSlider" />
+        <widget name="txtOut56In34_2" class="QLabel" />
+        <widget name="sldIN4Out56" class="QSlider" />
+        <widget name="txtOut56In34_3" class="QLabel" />
+        <widget name="groupOut56_3" class="QGroupBox" />
+        <widget name="sldPC12Out56" class="QSlider" />
+        <widget name="txtOut56PC12" class="QLabel" />
+        <widget name="sldPC34Out56" class="QSlider" />
+        <widget name="txtOut56PC34" class="QLabel" />
+        <widget name="sldPC56Out56" class="QSlider" />
+        <widget name="txtOut56PC56" class="QLabel" />
+        <widget name="sldPC78Out56" class="QSlider" />
+        <widget name="txtOut56PC78" class="QLabel" />
+        <widget name="sldPC910Out56" class="QSlider" />
+        <widget name="txtOut56PC910" class="QLabel" />
+        <widget name="groupOut12_4_3" class="QGroupBox" />
+        <widget name="sldFX1Out56" class="QSlider" />
+        <widget name="txtOut12In12_2_3" class="QLabel" />
+        <widget name="sldFX2Out56" class="QSlider" />
+        <widget name="txtOut12In12_2_3_2" class="QLabel" />
+        <widget name="tab" class="QWidget" />
+        <widget name="groupOut78_1" class="QGroupBox" />
+        <widget name="chkOut78Mute" class="QCheckBox" />
+        <widget name="chkOut78HwCtrl" class="QCheckBox" />
+        <widget name="sldOut78Level" class="QSlider" />
+        <widget name="txtOut78Lvl" class="QLabel" />
+        <widget name="groupOut78_2" class="QGroupBox" />
+        <widget name="sldIN1Out78" class="QSlider" />
+        <widget name="txtOut78In12" class="QLabel" />
+        <widget name="sldIN2Out78" class="QSlider" />
+        <widget name="txtOut78In34" class="QLabel" />
+        <widget name="sldIN3Out78" class="QSlider" />
+        <widget name="txtOut78In34_2" class="QLabel" />
+        <widget name="sldIN4Out78" class="QSlider" />
+        <widget name="txtOut78In34_3" class="QLabel" />
+        <widget name="groupOut78_3" class="QGroupBox" />
+        <widget name="sldPC12Out78" class="QSlider" />
+        <widget name="txtOut78PC12" class="QLabel" />
+        <widget name="sldPC34Out78" class="QSlider" />
+        <widget name="txtOut78PC34" class="QLabel" />
+        <widget name="sldPC56Out78" class="QSlider" />
+        <widget name="txtOut78PC56" class="QLabel" />
+        <widget name="sldPC78Out78" class="QSlider" />
+        <widget name="txtOut78PC78" class="QLabel" />
+        <widget name="sldPC910Out78" class="QSlider" />
+        <widget name="txtOut78PC910" class="QLabel" />
+        <widget name="groupOut12_4_4" class="QGroupBox" />
+        <widget name="sldFX1Out78" class="QSlider" />
+        <widget name="txtOut12In12_2_4" class="QLabel" />
+        <widget name="sldFX2Out78" class="QSlider" />
+        <widget name="txtOut12In12_2_4_2" class="QLabel" />
+        <widget name="tab" class="QWidget" />
+        <widget name="groupOut910_1" class="QGroupBox" />
+        <widget name="chkOut910Mute" class="QCheckBox" />
+        <widget name="groupOut910_2" class="QGroupBox" />
+        <widget name="sldIN1Out910" class="QSlider" />
+        <widget name="txtOut910In12" class="QLabel" />
+        <widget name="sldIN2Out910" class="QSlider" />
+        <widget name="txtOut910In12_3" class="QLabel" />
+        <widget name="sldIN3Out910" class="QSlider" />
+        <widget name="txtOut910In12_2" class="QLabel" />
+        <widget name="sldIN4Out910" class="QSlider" />
+        <widget name="txtOut910In34" class="QLabel" />
+        <widget name="groupOut910_3" class="QGroupBox" />
+        <widget name="sldPC12Out910" class="QSlider" />
+        <widget name="txtOut910PC12" class="QLabel" />
+        <widget name="sldPC34Out910" class="QSlider" />
+        <widget name="txtOut910PC34" class="QLabel" />
+        <widget name="sldPC56Out910" class="QSlider" />
+        <widget name="txtOut910PC56" class="QLabel" />
+        <widget name="sldPC78Out910" class="QSlider" />
+        <widget name="txtOut910PC78" class="QLabel" />
+        <widget name="sldPC910Out910" class="QSlider" />
+        <widget name="txtOut910PC910" class="QLabel" />
+        <widget name="groupOut12_4_5" class="QGroupBox" />
+        <widget name="sldFX1Out910" class="QSlider" />
+        <widget name="txtOut12In12_2_5" class="QLabel" />
+        <widget name="sldFX2Out910" class="QSlider" />
+        <widget name="txtOut12In12_2_5_2" class="QLabel" />
+        <widget name="groupBox7" class="QGroupBox" />
+        <widget name="chkSpdifSwitch" class="QCheckBox" />
+        <widget name="btnSwitchStereoMode" class="QPushButton" />
+        <widget name="btnRefresh" class="QPushButton" />
+        <widget name="btnSaveSettings" class="QPushButton" />
+      </widgets>
+    </ui>
+    <ui file="saffirele_large.ui" association="explicit">
+      <widgets>
+        <widget name="SaffireLEMixerLargeUI" class="QWidget" />
+        <widget name="tabWidget4" class="QTabWidget" />
+        <widget name="tab" class="QWidget" />
+        <widget name="groupOut14_2" class="QGroupBox" />
+        <widget name="sldIN1Out1" class="QSlider" />
+        <widget name="sldIN2Out1" class="QSlider" />
+        <widget name="sldIN3Out1" class="QSlider" />
+        <widget name="sldIN4Out1" class="QSlider" />
+        <widget name="sldSPDIF1Out1" class="QSlider" />
+        <widget name="sldSPDIF2Out1" class="QSlider" />
+        <widget name="txtOut14In12" class="QLabel" />
+        <widget name="txtOut14In34" class="QLabel" />
+        <widget name="txtOut14In34_2" class="QLabel" />
+        <widget name="groupOut14_3" class="QGroupBox" />
+        <widget name="txtOut14PC78" class="QLabel" />
+        <widget name="txtOut14PC56" class="QLabel" />
+        <widget name="txtOut14PC34" class="QLabel" />
+        <widget name="txtOut14PC12" class="QLabel" />
+        <widget name="txtOut14PC12_2" class="QLabel" />
+        <widget name="txtOut14PC34_2" class="QLabel" />
+        <widget name="txtOut14PC56_2" class="QLabel" />
+        <widget name="txtOut14PC78_2" class="QLabel" />
+        <widget name="sldPC2Out1" class="QSlider" />
+        <widget name="sldPC7Out1" class="QSlider" />
+        <widget name="sldPC5Out1" class="QSlider" />
+        <widget name="sldPC3Out1" class="QSlider" />
+        <widget name="sldPC1Out1" class="QSlider" />
+        <widget name="sldPC6Out1" class="QSlider" />
+        <widget name="sldPC8Out1" class="QSlider" />
+        <widget name="sldPC4Out1" class="QSlider" />
+        <widget name="tab" class="QWidget" />
+        <widget name="groupOut24_2" class="QGroupBox" />
+        <widget name="txtOut24In12" class="QLabel" />
+        <widget name="sldIN3Out2" class="QSlider" />
+        <widget name="sldSPDIF2Out2" class="QSlider" />
+        <widget name="txtOut24In34_2" class="QLabel" />
+        <widget name="txtOut24In34" class="QLabel" />
+        <widget name="sldSPDIF1Out2" class="QSlider" />
+        <widget name="sldIN4Out2" class="QSlider" />
+        <widget name="sldIN1Out2" class="QSlider" />
+        <widget name="sldIN2Out2" class="QSlider" />
+        <widget name="groupOut24_3" class="QGroupBox" />
+        <widget name="txtOut24PC78" class="QLabel" />
+        <widget name="txtOut24PC56" class="QLabel" />
+        <widget name="txtOut24PC34" class="QLabel" />
+        <widget name="txtOut24PC12" class="QLabel" />
+        <widget name="txtOut24PC12_2" class="QLabel" />
+        <widget name="txtOut24PC34_2" class="QLabel" />
+        <widget name="txtOut24PC56_2" class="QLabel" />
+        <widget name="txtOut24PC78_2" class="QLabel" />
+        <widget name="sldPC2Out2" class="QSlider" />
+        <widget name="sldPC7Out2" class="QSlider" />
+        <widget name="sldPC5Out2" class="QSlider" />
+        <widget name="sldPC3Out2" class="QSlider" />
+        <widget name="sldPC1Out2" class="QSlider" />
+        <widget name="sldPC6Out2" class="QSlider" />
+        <widget name="sldPC8Out2" class="QSlider" />
+        <widget name="sldPC4Out2" class="QSlider" />
+        <widget name="tab" class="QWidget" />
+        <widget name="groupOut34_2" class="QGroupBox" />
+        <widget name="txtOut34In12" class="QLabel" />
+        <widget name="sldIN3Out3" class="QSlider" />
+        <widget name="sldSPDIF2Out3" class="QSlider" />
+        <widget name="txtOut34In34_2" class="QLabel" />
+        <widget name="txtOut34In34" class="QLabel" />
+        <widget name="sldSPDIF1Out3" class="QSlider" />
+        <widget name="sldIN4Out3" class="QSlider" />
+        <widget name="sldIN1Out3" class="QSlider" />
+        <widget name="sldIN2Out3" class="QSlider" />
+        <widget name="groupOut34_3" class="QGroupBox" />
+        <widget name="txtOut34PC78" class="QLabel" />
+        <widget name="txtOut34PC56" class="QLabel" />
+        <widget name="txtOut34PC34" class="QLabel" />
+        <widget name="txtOut34PC12" class="QLabel" />
+        <widget name="txtOut34PC12_2" class="QLabel" />
+        <widget name="txtOut34PC34_2" class="QLabel" />
+        <widget name="txtOut34PC56_2" class="QLabel" />
+        <widget name="txtOut34PC78_2" class="QLabel" />
+        <widget name="sldPC2Out3" class="QSlider" />
+        <widget name="sldPC7Out3" class="QSlider" />
+        <widget name="sldPC5Out3" class="QSlider" />
+        <widget name="sldPC3Out3" class="QSlider" />
+        <widget name="sldPC1Out3" class="QSlider" />
+        <widget name="sldPC6Out3" class="QSlider" />
+        <widget name="sldPC8Out3" class="QSlider" />
+        <widget name="sldPC4Out3" class="QSlider" />
+        <widget name="tab" class="QWidget" />
+        <widget name="groupOut44_2" class="QGroupBox" />
+        <widget name="txtOut44In12" class="QLabel" />
+        <widget name="sldIN3Out4" class="QSlider" />
+        <widget name="sldSPDIF2Out4" class="QSlider" />
+        <widget name="txtOut44In34_2" class="QLabel" />
+        <widget name="txtOut44In34" class="QLabel" />
+        <widget name="sldSPDIF1Out4" class="QSlider" />
+        <widget name="sldIN4Out4" class="QSlider" />
+        <widget name="sldIN2Out4" class="QSlider" />
+        <widget name="sldIN1Out4" class="QSlider" />
+        <widget name="groupOut44_3" class="QGroupBox" />
+        <widget name="txtOut44PC78" class="QLabel" />
+        <widget name="txtOut44PC56" class="QLabel" />
+        <widget name="txtOut44PC34" class="QLabel" />
+        <widget name="txtOut44PC12" class="QLabel" />
+        <widget name="txtOut44PC12_2" class="QLabel" />
+        <widget name="txtOut44PC34_2" class="QLabel" />
+        <widget name="txtOut44PC56_2" class="QLabel" />
+        <widget name="txtOut44PC78_2" class="QLabel" />
+        <widget name="sldPC2Out4" class="QSlider" />
+        <widget name="sldPC7Out4" class="QSlider" />
+        <widget name="sldPC5Out4" class="QSlider" />
+        <widget name="sldPC3Out4" class="QSlider" />
+        <widget name="sldPC1Out4" class="QSlider" />
+        <widget name="sldPC6Out4" class="QSlider" />
+        <widget name="sldPC8Out4" class="QSlider" />
+        <widget name="sldPC4Out4" class="QSlider" />
+        <widget name="groupBox11" class="QGroupBox" />
+        <widget name="sldOut12Level" class="QSlider" />
+        <widget name="sldOut34Level" class="QSlider" />
+        <widget name="sldOut56Level" class="QSlider" />
+        <widget name="txtOut14In12_2" class="QLabel" />
+        <widget name="txtOut14In12_2_2" class="QLabel" />
+        <widget name="txtOut14In12_2_2_2" class="QLabel" />
+        <widget name="textLabel1" class="QLabel" />
+        <widget name="chkOut12HwCtrl" class="QCheckBox" />
+        <widget name="chkOut34HwCtrl" class="QCheckBox" />
+        <widget name="chkOut56HwCtrl" class="QCheckBox" />
+        <widget name="groupBox13" class="QGroupBox" />
+        <widget name="chkOut56Mute" class="QCheckBox" />
+        <widget name="chkOut34Mute" class="QCheckBox" />
+        <widget name="chkOut12Mute" class="QCheckBox" />
+        <widget name="groupBox13_2" class="QGroupBox" />
+        <widget name="chkHighGain3" class="QCheckBox" />
+        <widget name="chkHighGain4" class="QCheckBox" />
+        <widget name="chkSPDIFTransparent" class="QCheckBox" />
+        <widget name="chkMIDITru" class="QCheckBox" />
+        <widget name="btnSaveSettings" class="QPushButton" />
+      </widgets>
+    </ui>
+    <ui file="saffire_stereo.ui" association="explicit">
+      <widgets>
+        <widget name="SaffireMixerStereoUI" class="QWidget" />
+        <widget name="tabWidget4" class="QTabWidget" />
+        <widget name="tab" class="QWidget" />
+        <widget name="groupOut12_1" class="QGroupBox" />
+        <widget name="sldOut12Level" class="QSlider" />
+        <widget name="txtOut12Lvl" class="QLabel" />
+        <widget name="chkOut12Mute" class="QCheckBox" />
+        <widget name="chkOut12HwCtrl" class="QCheckBox" />
+        <widget name="chkOut12Dim" class="QCheckBox" />
+        <widget name="groupOut12_2" class="QGroupBox" />
+        <widget name="sldIN12Out12" class="QSlider" />
+        <widget name="txtOut12In12" class="QLabel" />
+        <widget name="sldIN34Out12" class="QSlider" />
+        <widget name="txtOut12In34" class="QLabel" />
+        <widget name="groupOut12_3" class="QGroupBox" />
+        <widget name="sldPC12Out12" class="QSlider" />
+        <widget name="txtOut12PC12" class="QLabel" />
+        <widget name="sldPC34Out12" class="QSlider" />
+        <widget name="txtOut12PC34" class="QLabel" />
+        <widget name="sldPC56Out12" class="QSlider" />
+        <widget name="txtOut12PC56" class="QLabel" />
+        <widget name="sldPC78Out12" class="QSlider" />
+        <widget name="txtOut12PC78" class="QLabel" />
+        <widget name="sldPC910Out12" class="QSlider" />
+        <widget name="txtOut12PC910" class="QLabel" />
+        <widget name="groupOut12_4" class="QGroupBox" />
+        <widget name="sldFXOut12" class="QSlider" />
+        <widget name="txtOut12In12_2" class="QLabel" />
+        <widget name="tab" class="QWidget" />
+        <widget name="groupOut34_1" class="QGroupBox" />
+        <widget name="sldOut34Level" class="QSlider" />
+        <widget name="txtOut34Lvl" class="QLabel" />
+        <widget name="chkOut34Mute" class="QCheckBox" />
+        <widget name="chkOut34HwCtrl" class="QCheckBox" />
+        <widget name="groupOut34_2" class="QGroupBox" />
+        <widget name="sldIN12Out34" class="QSlider" />
+        <widget name="txtOut34In12" class="QLabel" />
+        <widget name="sldIN34Out34" class="QSlider" />
+        <widget name="txtOut34In34" class="QLabel" />
+        <widget name="groupOut34_3" class="QGroupBox" />
+        <widget name="sldPC12Out34" class="QSlider" />
+        <widget name="txtOut34PC12" class="QLabel" />
+        <widget name="sldPC34Out34" class="QSlider" />
+        <widget name="txtOut34PC34" class="QLabel" />
+        <widget name="sldPC56Out34" class="QSlider" />
+        <widget name="txtOut34PC56" class="QLabel" />
+        <widget name="sldPC78Out34" class="QSlider" />
+        <widget name="txtOut34PC78" class="QLabel" />
+        <widget name="sldPC910Out34" class="QSlider" />
+        <widget name="txtOut34PC910" class="QLabel" />
+        <widget name="groupOut12_4_2" class="QGroupBox" />
+        <widget name="sldFXOut34" class="QSlider" />
+        <widget name="txtOut12In12_2_2" class="QLabel" />
+        <widget name="tab" class="QWidget" />
+        <widget name="groupOut56_1" class="QGroupBox" />
+        <widget name="chkOut56Mute" class="QCheckBox" />
+        <widget name="chkOut56HwCtrl" class="QCheckBox" />
+        <widget name="sldOut56Level" class="QSlider" />
+        <widget name="txtOut56Lvl" class="QLabel" />
+        <widget name="groupOut56_2" class="QGroupBox" />
+        <widget name="sldIN12Out56" class="QSlider" />
+        <widget name="txtOut56In12" class="QLabel" />
+        <widget name="sldIN34Out56" class="QSlider" />
+        <widget name="txtOut56In34" class="QLabel" />
+        <widget name="groupOut56_3" class="QGroupBox" />
+        <widget name="sldPC12Out56" class="QSlider" />
+        <widget name="txtOut56PC12" class="QLabel" />
+        <widget name="sldPC34Out56" class="QSlider" />
+        <widget name="txtOut56PC34" class="QLabel" />
+        <widget name="sldPC56Out56" class="QSlider" />
+        <widget name="txtOut56PC56" class="QLabel" />
+        <widget name="sldPC78Out56" class="QSlider" />
+        <widget name="txtOut56PC78" class="QLabel" />
+        <widget name="sldPC910Out56" class="QSlider" />
+        <widget name="txtOut56PC910" class="QLabel" />
+        <widget name="groupOut12_4_3" class="QGroupBox" />
+        <widget name="sldFXOut56" class="QSlider" />
+        <widget name="txtOut12In12_2_3" class="QLabel" />
+        <widget name="tab" class="QWidget" />
+        <widget name="groupOut78_1" class="QGroupBox" />
+        <widget name="chkOut78Mute" class="QCheckBox" />
+        <widget name="chkOut78HwCtrl" class="QCheckBox" />
+        <widget name="sldOut78Level" class="QSlider" />
+        <widget name="txtOut78Lvl" class="QLabel" />
+        <widget name="groupOut78_2" class="QGroupBox" />
+        <widget name="sldIN12Out78" class="QSlider" />
+        <widget name="txtOut78In12" class="QLabel" />
+        <widget name="sldIN34Out78" class="QSlider" />
+        <widget name="txtOut78In34" class="QLabel" />
+        <widget name="groupOut78_3" class="QGroupBox" />
+        <widget name="sldPC12Out78" class="QSlider" />
+        <widget name="txtOut78PC12" class="QLabel" />
+        <widget name="sldPC34Out78" class="QSlider" />
+        <widget name="txtOut78PC34" class="QLabel" />
+        <widget name="sldPC56Out78" class="QSlider" />
+        <widget name="txtOut78PC56" class="QLabel" />
+        <widget name="sldPC78Out78" class="QSlider" />
+        <widget name="txtOut78PC78" class="QLabel" />
+        <widget name="sldPC910Out78" class="QSlider" />
+        <widget name="txtOut78PC910" class="QLabel" />
+        <widget name="groupOut12_4_4" class="QGroupBox" />
+        <widget name="sldFXOut78" class="QSlider" />
+        <widget name="txtOut12In12_2_4" class="QLabel" />
+        <widget name="tab" class="QWidget" />
+        <widget name="groupOut910_1" class="QGroupBox" />
+        <widget name="chkOut910Mute" class="QCheckBox" />
+        <widget name="groupOut910_2" class="QGroupBox" />
+        <widget name="sldIN12Out910" class="QSlider" />
+        <widget name="txtOut910In12" class="QLabel" />
+        <widget name="sldIN34Out910" class="QSlider" />
+        <widget name="txtOut910In34" class="QLabel" />
+        <widget name="groupOut910_3" class="QGroupBox" />
+        <widget name="sldPC12Out910" class="QSlider" />
+        <widget name="txtOut910PC12" class="QLabel" />
+        <widget name="sldPC34Out910" class="QSlider" />
+        <widget name="txtOut910PC34" class="QLabel" />
+        <widget name="sldPC56Out910" class="QSlider" />
+        <widget name="txtOut910PC56" class="QLabel" />
+        <widget name="sldPC78Out910" class="QSlider" />
+        <widget name="txtOut910PC78" class="QLabel" />
+        <widget name="sldPC910Out910" class="QSlider" />
+        <widget name="txtOut910PC910" class="QLabel" />
+        <widget name="groupOut12_4_5" class="QGroupBox" />
+        <widget name="sldFXOut910" class="QSlider" />
+        <widget name="txtOut12In12_2_5" class="QLabel" />
+        <widget name="groupBox7" class="QGroupBox" />
+        <widget name="chkSpdifSwitch" class="QCheckBox" />
+        <widget name="btnSwitchStereoMode" class="QPushButton" />
+        <widget name="btnRefresh" class="QPushButton" />
+        <widget name="btnSaveSettings" class="QPushButton" />
+      </widgets>
+    </ui>
+    <ui file="saffirele_small.ui" association="explicit">
+      <widgets>
+        <widget name="SaffireLEMixerSmallUI" class="QWidget" />
+        <widget name="groupOut14_2" class="QGroupBox" />
+        <widget name="sldIN1RecMix" class="QSlider" />
+        <widget name="sldIN2RecMix" class="QSlider" />
+        <widget name="sldIN3RecMix" class="QSlider" />
+        <widget name="sldIN4RecMix" class="QSlider" />
+        <widget name="sldSPDIF1RecMix" class="QSlider" />
+        <widget name="sldSPDIF2RecMix" class="QSlider" />
+        <widget name="txtOut14In12" class="QLabel" />
+        <widget name="txtOut14In34" class="QLabel" />
+        <widget name="txtOut14In34_2" class="QLabel" />
+        <widget name="tabWidget4" class="QTabWidget" />
+        <widget name="tab" class="QWidget" />
+        <widget name="sldPC1Out1" class="QSlider" />
+        <widget name="sldPC2Out1" class="QSlider" />
+        <widget name="sldRecMixOut1" class="QSlider" />
+        <widget name="txtOut14PC12" class="QLabel" />
+        <widget name="txtOut14PC34" class="QLabel" />
+        <widget name="txtOut14PC78_2" class="QLabel" />
+        <widget name="tab" class="QWidget" />
+        <widget name="sldPC1Out2" class="QSlider" />
+        <widget name="sldPC2Out2" class="QSlider" />
+        <widget name="sldRecMixOut2" class="QSlider" />
+        <widget name="txtOut24PC12" class="QLabel" />
+        <widget name="txtOut24PC34" class="QLabel" />
+        <widget name="txtOut24PC78_2" class="QLabel" />
+        <widget name="tab" class="QWidget" />
+        <widget name="sldPC1Out3" class="QSlider" />
+        <widget name="sldPC2Out3" class="QSlider" />
+        <widget name="sldRecMixOut3" class="QSlider" />
+        <widget name="txtOut34PC12" class="QLabel" />
+        <widget name="txtOut34PC34" class="QLabel" />
+        <widget name="txtOut34PC56" class="QLabel" />
+        <widget name="tab" class="QWidget" />
+        <widget name="sldPC1Out4" class="QSlider" />
+        <widget name="sldPC2Out4" class="QSlider" />
+        <widget name="sldRecMixOut4" class="QSlider" />
+        <widget name="txtOut44PC12" class="QLabel" />
+        <widget name="txtOut44PC34" class="QLabel" />
+        <widget name="txtOut44PC56" class="QLabel" />
+        <widget name="groupBox11" class="QGroupBox" />
+        <widget name="sldOut12Level" class="QSlider" />
+        <widget name="sldOut34Level" class="QSlider" />
+        <widget name="sldOut56Level" class="QSlider" />
+        <widget name="txtOut14In12_2" class="QLabel" />
+        <widget name="txtOut14In12_2_2" class="QLabel" />
+        <widget name="txtOut14In12_2_2_2" class="QLabel" />
+        <widget name="textLabel1" class="QLabel" />
+        <widget name="chkOut12HwCtrl" class="QCheckBox" />
+        <widget name="chkOut34HwCtrl" class="QCheckBox" />
+        <widget name="chkOut56HwCtrl" class="QCheckBox" />
+        <widget name="groupBox13" class="QGroupBox" />
+        <widget name="chkOut56Mute" class="QCheckBox" />
+        <widget name="chkOut34Mute" class="QCheckBox" />
+        <widget name="chkOut12Mute" class="QCheckBox" />
+        <widget name="groupBox13_2" class="QGroupBox" />
+        <widget name="chkHighGain3" class="QCheckBox" />
+        <widget name="chkHighGain4" class="QCheckBox" />
+        <widget name="chkSPDIFTransparent" class="QCheckBox" />
+        <widget name="chkMIDITru" class="QCheckBox" />
+        <widget name="btnSaveSettings" class="QPushButton" />
+      </widgets>
+    </ui>
+    <ui file="saffire_dice_monitoring.ui" association="name">
+      <widgets>
+        <widget name="Form" class="QWidget" />
+        <widget name="splitter" class="QSplitter" />
+        <widget name="monitoringView" class="QTableView" />
+        <widget name="stacked" class="QStackedWidget" />
+        <widget name="pagePro24" class="QWidget" />
+        <widget name="chkInst1" class="QCheckBox" />
+        <widget name="chkLevel4" class="QCheckBox" />
+        <widget name="chkInst2" class="QCheckBox" />
+        <widget name="chkLevel3" class="QCheckBox" />
+        <widget name="pagePro40" class="QWidget" />
+        <widget name="chkSpdif" class="QCheckBox" />
+        <widget name="btnPad" class="QPushButton" />
+        <widget name="groupBox" class="QGroupBox" />
+        <widget name="volumeKnob" class="QDial" />
+        <widget name="volumeBox" class="QSpinBox" />
+        <widget name="label" class="QLabel" />
+        <widget name="dimLevel" class="QSpinBox" />
+        <widget name="btnDim" class="QPushButton" />
+        <widget name="btnMute" class="QPushButton" />
+      </widgets>
+    </ui>
+  </ui_files>
+  <notes>Static extraction from legacy FFADO Qt mixer sources. Paths and indexes are references, not validated live D-Bus capabilities. Runtime discovery and device-specific logic are still required. No vendor/model-to-family mapping is asserted unless source defines it.</notes>
+</profile>

@@ -1,0 +1,290 @@
+html { background: var(--page-background); }
+
+  [hidden] { display: none !important; }
+  html, body { height: 100%; }
+  body { margin: 0; height: 100dvh; box-sizing: border-box; display: flex; overscroll-behavior: none;
+         background: var(--page-background); color: var(--text-primary); font-family: Helvetica, Arial, sans-serif;
+         padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left); }
+  input { -webkit-user-select: text; user-select: text; }
+
+  #main { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+  #row { display: flex; gap: 6px; align-items: stretch; flex: 1; min-height: 0; padding: 10px 12px 12px; overflow: auto; }
+
+  /* ---- right side: settings, output buttons, master fader ---- */
+  #side { box-sizing: border-box; flex: none; display: flex; flex-direction: column; position: relative;
+          background: var(--sidebar-background); border-left: 1px solid var(--border-color); }
+  #splitter { position: absolute; left: -5px; top: 0; bottom: 0; width: 11px; z-index: 6;
+              cursor: col-resize; touch-action: none; }
+  #splitter::after { content: ""; position: absolute; left: 4px; top: 50%; width: 3px; height: 44px; margin-top: -22px;
+                     border-radius: 2px; background: var(--border-color); transition: background .12s; }
+  #splitter:hover::after, body.resizing #splitter::after { background: var(--accent-color); }
+  body.resizing, body.resizing * { cursor: col-resize !important; user-select: none !important; }
+  .sidehead { flex: none; display: flex; justify-content: flex-end; align-items: stretch; gap: 8px; padding: 10px 10px 10px; }
+  #gear { width: 34px; height: 34px; padding: 0; border: 0; border-radius: 4px; background: transparent;
+          color: var(--text-secondary); cursor: pointer; }
+  #gear:hover, #gear.open { background: var(--button-hover-background); color: var(--text-primary); }
+  #gear svg { display: block; margin: auto; }
+  /* settings dialog: centered, with the page dimmed behind it */
+  #overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: 100; display: flex; align-items: center;
+             justify-content: center; padding: 16px; background: rgba(4, 5, 7, .72); }
+  #dialog { width: 440px; max-width: 100%; max-height: 100%; overflow: auto; outline: none; background: var(--channel-background);
+            border: 1px solid var(--border-color); border-radius: 8px; box-shadow: 0 24px 60px rgba(0, 0, 0, .6); }
+  .dlghead { display: flex; align-items: center; justify-content: space-between; padding: 12px 12px 10px 18px; background: var(--dialog-header-background); }
+  #dlgTitle { font-size: 16px; font-weight: 500; letter-spacing: .03em; }
+  #dlgClose { width: 32px; height: 32px; padding: 0; border: 0; border-radius: 4px; background: transparent;
+              color: var(--text-secondary); cursor: pointer; }
+  #dlgClose:hover { background: var(--button-hover-background); color: var(--text-primary); }
+  #dlgClose svg { display: block; margin: auto; }
+
+  /* tabs, like a browser: the active one joins the panel below it */
+  .tabs { display: flex; gap: 3px; padding: 0 12px; background: var(--dialog-header-background); border-bottom: 1px solid var(--border-color); }
+  .tab { position: relative; top: 1px; padding: 9px 18px; border: 1px solid transparent; border-bottom: 0;
+         border-radius: 7px 7px 0 0; background: transparent; color: var(--text-secondary); font-size: 13px; cursor: pointer; }
+  .tab:hover { color: var(--text-primary); background: var(--tab-hover-background); }
+  .tab.active { color: var(--text-primary); background: var(--channel-background); border-color: var(--border-color); }
+  .tab:focus-visible { outline: 2px solid var(--accent-color); outline-offset: -2px; }
+  .panes { display: grid; }
+  .pane { grid-area: 1 / 1; padding: 18px; }       /* every tab in the same cell: the dialog is as tall as the tallest */
+  .pane.off { visibility: hidden; pointer-events: none; }
+
+  .about { display: grid; grid-template-columns: 96px 1fr; gap: 10px 12px; margin: 0; font-size: 13px; }
+  .about dt { color: var(--text-secondary); }
+  .about dd { margin: 0; word-break: break-all; }
+  .appname { font-size: 20px; font-weight: 500; letter-spacing: .03em; margin-bottom: 4px; }
+  .appver { color: var(--text-secondary); font-size: 13px; margin-bottom: 18px; }
+  .sectitle { margin-bottom: 12px; font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: var(--text-secondary); }
+  .field { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }
+  .field label { flex: none; width: 82px; font-size: 13px; color: var(--text-secondary); }
+  .field select { flex: 1; min-width: 0; padding: 8px 10px; font-size: 14px; color: var(--text-primary); background: var(--control-background);
+                  border: 1px solid var(--border-color); border-radius: 4px; }
+  .field select:focus { outline: none; border-color: var(--accent-color); }
+  .subsec { margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--group-border-color); }
+  .dlgbtns { display: flex; gap: 10px; margin-bottom: 10px; }
+  .dlgbtn { flex: 1; padding: 10px 8px; border: 1px solid var(--border-color); border-radius: 4px; background: var(--button-background);
+            color: var(--text-primary); font-size: 14px; cursor: pointer; }
+  .dlgbtn:hover { background: var(--button-hover-background); }
+  .dlgbtn:active { background: var(--button-active-background); }
+  .dlgbtn:disabled { opacity: .55; cursor: default; }
+  .dlgnote { min-height: 16px; font-size: 12px; color: var(--text-secondary); }
+  .dlgnote.err { color: var(--error-text-color); }
+  .hidemin { font-size: 13px; cursor: pointer; }
+  .hidemin input { vertical-align: middle; margin-right: 6px; }
+  .hidemin span { color: var(--text-secondary); }
+
+  .sidebody { flex: 1; min-height: 0; display: flex; justify-content: flex-end; gap: 10px; padding: 0 10px 12px; }
+  /* one outer box, pinned to the bottom, holding two nested groups: Outputs and Buses */
+  #outbox { flex: none; align-self: flex-end; max-height: 100%; overflow-y: auto; display: flex; flex-direction: column; gap: 10px;
+            padding: 10px; border: 1px solid var(--border-color); border-radius: 6px; background: var(--sidebar-box-background); }
+  #masterbox, #gearbox { border: 1px solid var(--border-color); border-radius: 6px; background: var(--sidebar-box-background); }
+  #masterbox { flex: none; display: flex; flex-direction: column; padding: 10px; }
+  #masterbox .strip.master { flex: 1; }
+  #gearbox { padding: 4px; }
+  .outgroup { padding: 8px 18px 12px; border: 1px solid var(--group-border-color); border-radius: 5px; background: var(--sidebar-background); }
+  .grouptitle { margin-bottom: 8px; font-size: 11px; letter-spacing: .12em; text-align: center;
+                text-transform: uppercase; color: var(--text-secondary); }
+  .groupgrid { --btn-w: 68px; --cols: 2; display: grid; grid-template-columns: repeat(var(--cols), var(--btn-w));
+               grid-auto-rows: 48px; gap: 8px; }
+  #side.narrow .groupgrid { --cols: 1; }                    /* bar dragged narrower than two columns need */
+  .outbtn { position: relative; display: flex; align-items: center; justify-content: center; padding: 0 5px; border: 1px solid var(--border-color); border-radius: 4px; background: var(--button-background);
+            color: var(--text-primary); font-size: 14px; cursor: pointer; }
+  .olabel { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden;
+            max-width: 100%; text-align: center; line-height: 1.15; word-break: break-word; font-size: 13px; }
+  .outbtn:hover { background: var(--button-hover-background); }
+  .outbtn.bus::before { content: ""; position: absolute; left: -1px; top: 5px; bottom: 5px; width: 3px; background: var(--solo-color); }
+  /* Main/Phones is the active output but the channel strips are showing this bus: a dot in the corner */
+  .outbtn.shows::after { content: ""; position: absolute; top: 6px; right: 6px; width: 7px; height: 7px; border-radius: 50%;
+                         background: var(--accent-color); box-shadow: 0 0 5px var(--accent-color); }
+  .outbtn.active { border-color: var(--accent-color); color: var(--text-primary); background: var(--selected-output-background); }
+
+  /* ---- channel strip ---- */
+  .strip { position: relative; flex: none; width: 108px; box-sizing: border-box; padding: 6px 10px 12px;
+           display: flex; flex-direction: column; align-items: stretch; gap: 9px;
+           background: var(--channel-background); border: 1px solid var(--strip-border-color); border-top: 3px solid transparent;
+           border-radius: 4px; user-select: none; }
+  .strip.pinned { border-top-color: var(--pin-color); }
+  .strip.dragging { opacity: .55; outline: 2px solid var(--fader-value-color); }
+
+  .grip { flex: none; height: 22px; line-height: 22px; text-align: center; cursor: grab;
+          color: var(--icon-muted-color); font-size: 14px; letter-spacing: 2px; touch-action: none; }
+  .grip:active { cursor: grabbing; }
+  .strip.pinned .grip { visibility: hidden; }       /* pinned strips can't be moved */
+
+  .pin, .eye { position: absolute; top: 3px; width: 22px; height: 22px; padding: 0; border: 0;
+               border-radius: 4px; background: transparent; cursor: pointer; }
+  .pin { right: 3px; color: var(--icon-muted-color); }
+  .eye { left: 3px; color: var(--text-secondary); }
+  .pin:hover, .eye:hover { background: var(--button-hover-background); }
+  .pin svg, .eye svg { display: block; margin: auto; }
+  .strip.pinned .pin { color: var(--pin-color); }
+  .eye:hover { color: var(--text-primary); }
+
+  .cap { font-size: 10px; letter-spacing: .1em; color: var(--text-secondary); text-align: center; margin-bottom: 3px; }
+  .na { visibility: hidden; }
+
+  .gaininv { flex: none; display: flex; align-items: flex-end; gap: 6px; }
+  .gainrow { flex: 1; min-width: 0; }
+  .gainboxes { display: flex; gap: 4px; }
+  .gainboxes .gain { width: auto; flex: 1; min-width: 0; }
+  .gain.na { visibility: hidden; }
+  .gain { width: 100%; height: 32px; box-sizing: border-box; padding: 0 4px; background: var(--control-background);
+          border: 1px solid var(--border-color); border-radius: 3px; color: var(--fader-value-color); font-size: 14px; text-align: center; }
+  .gain:focus { outline: none; border-color: var(--fader-value-color); }
+
+  .invert, .btn { flex: none; padding: 8px 0; border: 1px solid var(--border-color); border-radius: 3px;
+                  background: var(--button-background); color: var(--text-primary); font-size: 13px; cursor: pointer; }
+  .invert { width: 36px; height: 32px; padding: 0; font-size: 16px; color: var(--text-secondary); }
+  .invert.on { background: var(--fader-value-color); border-color: var(--fader-value-color); color: var(--detail-color-1); }
+  .strip.soloed .solo { background: var(--solo-color); border-color: var(--solo-color); color: var(--detail-color-1); }
+  .strip.muted .mute { background: var(--mute-color); border-color: var(--mute-color); color: var(--input-text-color); }
+
+  .panrow { flex: none; }
+  .caprow { display: flex; justify-content: space-between; align-items: center; height: 14px; padding: 0 12px 0 6px;
+            overflow: visible; font-size: 10px; letter-spacing: 0; color: var(--text-secondary); margin-bottom: 3px; }
+  .caprow span:first-child { letter-spacing: .1em; }
+  .panval { min-width: 28px; text-align: right; color: var(--accent-color); font-size: 11px; }
+  .pan { display: block; -webkit-appearance: none; appearance: none; width: 100%; height: 18px; margin: 0; touch-action: none;
+         background: linear-gradient(var(--text-secondary), var(--text-secondary)) center / 1px 12px no-repeat; }
+  .pan::-webkit-slider-runnable-track { height: 4px; background: var(--control-background); border: 1px solid var(--border-color); border-radius: 3px; }
+  .pan::-webkit-slider-thumb { -webkit-appearance: none; width: 14px; height: 14px; margin-top: -6px;
+                               border-radius: 50%; background: var(--accent-color); border: 0; }
+  .pan::-moz-range-track { height: 4px; background: var(--control-background); border: 1px solid var(--border-color); border-radius: 3px; }
+  .pan::-moz-range-thumb { width: 14px; height: 14px; border-radius: 50%; background: var(--accent-color); border: 0; }
+  .pan:disabled::-webkit-slider-thumb { background: var(--text-secondary); }
+
+  /* stereo pair: one strip for two channels */
+  .strip.stereo { background: var(--stereo-strip-background); }
+  /* Stereo names use the same resting and focus borders as mono names. */
+  .strip.stereo .name { border-color: var(--border-color); }
+  .strip.stereo .name:focus { border-color: var(--fader-value-color); }
+  .stereorow { flex: none; }
+  .stval { color: var(--stereo-color); }
+  .stereobtns { display: flex; gap: 4px; }
+  .unlink { flex: 1; min-width: 0; height: 18px; padding: 0; border: 1px solid var(--stereo-border-color); border-radius: 3px; background: var(--stereo-button-background);
+            color: var(--stereo-color); font-size: 11px; cursor: pointer; }
+  .unlink:hover { background: var(--stereo-button-hover-background); }
+  .strip.link-target { outline: 2px dashed var(--stereo-color); outline-offset: -4px; background: var(--stereo-target-background); }
+  .strip.link-target::after { content: "Link as stereo"; position: absolute; left: 6px; right: 6px; top: 50%; margin-top: -16px;
+                              padding: 8px 4px; border-radius: 4px; background: rgba(40, 34, 60, .94); color: var(--stereo-color);
+                              font-size: 12px; text-align: center; pointer-events: none; z-index: 5; }
+  #toast { position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%); z-index: 120; max-width: 80%;
+           padding: 10px 16px; border: 1px solid var(--border-color); border-radius: 6px; background: var(--button-background); color: var(--text-primary);
+           font-size: 13px; box-shadow: 0 8px 24px rgba(0, 0, 0, .5); }
+  .name, .mname { flex: none; width: 100%; box-sizing: border-box; padding: 7px 4px; background: var(--input-background);
+          border: 1px solid var(--border-color); border-radius: 3px; color: var(--input-text-color); font-size: 14px; text-align: center; }
+  .name:focus { outline: none; border-color: var(--fader-value-color); }
+
+  .fval { flex: none; height: 24px; line-height: 24px; text-align: center; font-size: 13px; color: var(--fader-value-color);
+        background: var(--control-background); border: 1px solid var(--border-color); border-radius: 3px; white-space: nowrap; }
+
+  .faderwrap { flex: 1; min-height: 120px; display: flex; }
+  /* Reserve half the handle height at each end so it cannot overlap adjacent controls. */
+  .track { position: relative; width: 8px; align-self: stretch; margin: 13px auto; background: var(--control-background); border-radius: 4px; }
+  .track::before { content: ""; position: absolute; left: -17px; top: 0; bottom: 0; width: 9px;
+                   border-bottom: 1px solid var(--fader-tick-color);
+                   background: repeating-linear-gradient(to bottom, var(--fader-tick-color) 0, var(--fader-tick-color) 1px, transparent 1px, transparent 10%); }
+  .handle { position: absolute; left: -17px; width: 42px; height: 26px; margin-top: -13px; box-sizing: border-box;
+            background: linear-gradient(var(--fader-handle-top), var(--fader-handle-bottom)); border: 1px solid var(--fader-handle-border); border-radius: 3px;
+            cursor: grab; touch-action: none; }
+  .handle::after { content: ""; position: absolute; left: 4px; right: 4px; top: 50%; height: 2px; margin-top: -1px; background: var(--fader-handle-mark); }
+  .strip.muted .handle { background: linear-gradient(var(--muted-handle-top), var(--muted-handle-bottom)); }
+
+  .inname { flex: none; text-align: center; font-size: 11px; color: var(--text-secondary);
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+  /* master (output) strip */
+  .strip.master { width: 100px; border-top-color: var(--accent-color); }
+  .mname { color: var(--input-text-color); font-family: inherit; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; cursor: text; }
+  .mname:hover { border-color: var(--input-hover-border-color); }
+  .mname:focus { outline: none; border-color: var(--fader-value-color); }
+
+  /* ---- minimized strip ---- */
+  .vname { display: none; white-space: pre; line-height: 1.15; font-size: 14px; text-align: center; }
+  .strip.minimized { width: 30px; padding: 40px 0 8px; border-top-color: var(--mute-color); }
+  .strip.minimized .eye { color: var(--mute-color); }
+  .strip.minimized > :not(.eye):not(.vname) { display: none; }
+  .strip.minimized .vname { display: block; }
+  .strip.minimized:not(.pinned) .vname { cursor: grab; }
+  #row.hide-min .strip.minimized { display: none; }
+
+  /* ---- phones and tablets ---- */
+  @media (pointer: coarse) {
+    .strip { width: 124px; }
+    .strip.master { width: 112px; }
+    .handle { width: 56px; left: -24px; height: 36px; margin-top: -18px; }
+    .track::before { left: -26px; }
+    .grip { height: 32px; line-height: 32px; }
+    .pin, .eye { width: 34px; height: 34px; }
+    .pin svg, .eye svg { width: 20px; height: 20px; }
+    .name, .gain { font-size: 16px; }
+    .btn { padding: 11px 0; font-size: 14px; }
+    .gain, .invert { height: 40px; }
+    .unlink { height: 26px; font-size: 13px; }
+    .invert { width: 44px; }
+    .pan::-webkit-slider-thumb { width: 22px; height: 22px; margin-top: -10px; }
+    .pan { height: 26px; }
+    .groupgrid { --btn-w: 72px; grid-auto-rows: 56px; }
+    #splitter { left: -10px; width: 22px; }
+    #splitter::after { left: 9px; height: 56px; margin-top: -28px; }
+    .outbtn { font-size: 15px; }
+    #gear { width: 40px; height: 40px; }
+    .hidemin { font-size: 15px; }
+    .field select { font-size: 16px; padding: 10px; }
+    .dlgbtn { padding: 14px 8px; font-size: 15px; }
+    #dlgClose { width: 40px; height: 40px; }
+    .tab { padding: 12px 18px; font-size: 14px; }
+    .hidemin input { width: 20px; height: 20px; }
+    .strip.minimized { width: 44px; padding-top: 48px; }
+  }
+  @media (max-height: 640px) {
+    .strip { gap: 5px; padding-bottom: 8px; }
+    .cap { display: none; }
+    .grip { height: 18px; line-height: 18px; }
+    .btn { padding: 6px 0; }
+    .name, .mname { padding: 5px 4px; }
+    .faderwrap { min-height: 80px; }
+    .strip.minimized { padding-top: 36px; }
+    .groupgrid { grid-auto-rows: 40px; }
+    #outbox { gap: 8px; padding: 8px; }
+    #masterbox { padding: 8px; }
+    .sidehead { padding: 6px 10px; }
+    .outgroup { padding: 6px 14px 8px; }
+    .grouptitle { margin-bottom: 6px; }
+  }
+  @media (max-width: 700px) {
+    .groupgrid { --btn-w: 58px; }
+    .strip.master { width: 88px; }
+  }
+
+
+
+/* Accent customization — applies to all theme stylesheets. */
+.accent-field { margin-top: 14px; }
+#accentButton { width: 30px; height: 30px; border-radius: 50%; flex: none;
+  border: 2px solid var(--text-secondary); background: var(--accent-color); cursor: pointer; }
+#accentButton:focus-visible { outline: 2px solid var(--accent-color); outline-offset: 3px; }
+#accentCurrent { font-size: 12px; color: var(--text-secondary); font-family: monospace; }
+.accent-editor { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; margin: 4px 0 14px; }
+.accent-editor label { font-size: 12px; color: var(--text-secondary); width: 100%; }
+#accentHex { box-sizing: border-box; width: 112px; padding: 8px; background: var(--control-background);
+  border: 1px solid var(--border-color); border-radius: 4px; color: var(--text-primary); font-family: monospace; }
+.accent-editor .dlgbtn { flex: none; margin: 0; padding: 8px 12px; font-size: 12px; }
+#accentError { width: 100%; font-size: 12px; color: var(--error-text-color); }
+
+  .about-github { display: flex; align-items: center; justify-content: center; gap: 9px;
+                  margin-top: 24px; text-decoration: none; }
+  .about-github svg { flex: none; }
+
+/* Fullscreen control for browsers outside the pywebview desktop client. */
+#fullscreenbox { display: block; padding: 4px; border: 1px solid var(--border-color);
+  border-radius: 6px; background: var(--sidebar-box-background); }
+#fullscreenButton { width: 34px; height: 34px; padding: 0; border: 0; border-radius: 4px;
+  background: transparent; color: var(--text-secondary); cursor: pointer; }
+#fullscreenButton:hover { background: var(--button-hover-background); color: var(--text-primary); }
+#fullscreenButton svg { display: block; margin: auto; }
+#fullscreenButton .fullscreen-exit { display: none; }
+#fullscreenButton.is-fullscreen .fullscreen-enter { display: none; }
+#fullscreenButton.is-fullscreen .fullscreen-exit { display: block; }
+html.pywebview-client #fullscreenbox { display: none; }
+@media (pointer: coarse) {
+  #fullscreenButton { width: 40px; height: 40px; }
+}

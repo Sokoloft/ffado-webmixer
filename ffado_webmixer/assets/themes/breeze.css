@@ -1,0 +1,43 @@
+/* Breeze — mixer and loading screen. */
+:root {
+  --accent-color: #3daee9;
+  --border-color: #474e58;
+  --button-active-background: #444c57;
+  --button-background: #383e47;
+  --button-hover-background: #444c57;
+  --channel-background: #30343b;
+  --control-background: #1b2026;
+  --detail-color-1: #1b1b1b;
+  --dialog-header-background: #252a31;
+  --error-text-color: #e5766e;
+  --fader-handle-border: #6b665a;
+  --fader-handle-bottom: #a8a394;
+  --fader-handle-mark: #4a4a4a;
+  --fader-handle-top: #e4dfd2;
+  --fader-tick-color: #59606b;
+  --fader-value-color: #3daee9;
+  --group-border-color: #474e58;
+  --icon-muted-color: #6b7380;
+  --input-background: #1b2026;
+  --input-hover-border-color: #4a515c;
+  --input-text-color: #eff2f5;
+  --mute-color: #bf616a;
+  --muted-handle-bottom: #7d5252;
+  --muted-handle-top: #b98a8a;
+  --page-background: #202329;
+  --pin-color: #3daee9;
+  --selected-output-background: #304454;
+  --sidebar-background: #252a31;
+  --sidebar-box-background: #2c3139;
+  --solo-color: #ebcb8b;
+  --stereo-border-color: var(--accent-color);
+  --stereo-button-background: var(--button-background);
+  --stereo-button-hover-background: var(--button-hover-background);
+  --stereo-color: var(--accent-color);
+  --stereo-strip-background: var(--sidebar-box-background);
+  --stereo-target-background: var(--selected-output-background);
+  --strip-border-color: #20252b;
+  --tab-hover-background: #444c57;
+  --text-primary: #eff2f5;
+  --text-secondary: #abb6c2;
+}

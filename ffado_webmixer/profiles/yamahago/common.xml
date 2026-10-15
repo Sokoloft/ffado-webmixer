@@ -1,0 +1,29 @@
+<?xml version='1.0' encoding='utf-8'?>
+<profile family="yamahago" schema_version="2">
+  <discovery source="yamahago.py" status="source-derived">
+    <element path="/Mixer/Feature_Volume_3" kind="unknown" />
+    <element path="/Mixer/Feature_Volume_4" kind="unknown" />
+    <element path="/Mixer/Feature_Volume_5" kind="unknown" />
+    <element path="/Mixer/Feature_Volume_6" kind="unknown" />
+    <element path="/Mixer/Feature_Volume_7" kind="unknown" />
+    <element path="/Mixer/Selector_1" kind="unknown" />
+    <element path="/Mixer/Selector_2" kind="unknown" />
+    <element path="/Mixer/Selector_3" kind="unknown" />
+    <element path="/Mixer/Feature_Volume_1" kind="unknown" />
+    <element path="/Mixer/Feature_Volume_2" kind="unknown" />
+  </discovery>
+  <source_bindings>
+    <group name="VolumeControls" line="60">
+      <binding widget="self.sld_mixer_strm_in_1" path="/Mixer/Feature_Volume_3" arg0="1" arg1="self.sld_mixer_strm_in_2" arg2="2" arg3="self.link_mixer_strm_in_12" />
+      <binding widget="self.sld_mixer_strm_in_2" path="/Mixer/Feature_Volume_3" arg0="2" arg1="self.sld_mixer_strm_in_1" arg2="1" arg3="self.link_mixer_strm_in_12" />
+      <binding widget="self.sld_mixer_strm_in_3" path="/Mixer/Feature_Volume_4" arg0="1" arg1="self.sld_mixer_strm_in_4" arg2="2" arg3="self.link_mixer_strm_in_34" />
+      <binding widget="self.sld_mixer_strm_in_4" path="/Mixer/Feature_Volume_4" arg0="2" arg1="self.sld_mixer_strm_in_3" arg2="1" arg3="self.link_mixer_strm_in_34" />
+      <binding widget="self.sld_mixer_strm_in_5" path="/Mixer/Feature_Volume_5" arg0="1" arg1="self.sld_mixer_strm_in_6" arg2="2" arg3="self.link_mixer_strm_in_56" />
+      <binding widget="self.sld_mixer_strm_in_6" path="/Mixer/Feature_Volume_5" arg0="2" arg1="self.sld_mixer_strm_in_5" arg2="1" arg3="self.link_mixer_strm_in_56" />
+      <binding widget="self.sld_mixer_ana_in_1" path="/Mixer/Feature_Volume_6" arg0="1" arg1="self.sld_mixer_ana_in_2" arg2="2" arg3="self.link_mixer_ana_in_12" />
+      <binding widget="self.sld_mixer_ana_in_2" path="/Mixer/Feature_Volume_6" arg0="2" arg1="self.sld_mixer_ana_in_1" arg2="1" arg3="self.link_mixer_ana_in_12" />
+      <binding widget="self.sld_mixer_dig_in_1" path="/Mixer/Feature_Volume_7" arg0="1" arg1="self.sld_mixer_dig_in_2" arg2="2" arg3="self.link_mixer_dig_in_12" />
+      <binding widget="self.sld_mixer_dig_in_2" path="/Mixer/Feature_Volume_7" arg0="2" arg1="self.sld_mixer_dig_in_1" arg2="1" arg3="self.link_mixer_dig_in_12" />
+    </group>
+  </source_bindings>
+</profile>

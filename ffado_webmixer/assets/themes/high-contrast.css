@@ -1,0 +1,43 @@
+/* High Contrast — strong separation, bright text, accessible control states. */
+:root {
+  --accent-color: #00e5ff;
+  --border-color: #aab6c5;
+  --button-active-background: #345779;
+  --button-background: #202a38;
+  --button-hover-background: #34465c;
+  --channel-background: #101821;
+  --control-background: #000000;
+  --detail-color-1: #000000;
+  --dialog-header-background: #101821;
+  --error-text-color: #ff7777;
+  --fader-handle-border: #ffffff;
+  --fader-handle-bottom: #9ba8b8;
+  --fader-handle-mark: #000000;
+  --fader-handle-top: #ffffff;
+  --fader-tick-color: #d4dce5;
+  --fader-value-color: #ffe16a;
+  --group-border-color: #8e9eae;
+  --icon-muted-color: #b6c2cf;
+  --input-background: #000000;
+  --input-hover-border-color: #ffffff;
+  --input-text-color: #ffffff;
+  --mute-color: #ff5151;
+  --muted-handle-bottom: #b95454;
+  --muted-handle-top: #ffc2c2;
+  --page-background: #000000;
+  --pin-color: #73baff;
+  --selected-output-background: #164458;
+  --sidebar-background: #0b1119;
+  --sidebar-box-background: #192432;
+  --solo-color: #ffe16a;
+  --stereo-border-color: var(--accent-color);
+  --stereo-button-background: var(--button-background);
+  --stereo-button-hover-background: var(--button-hover-background);
+  --stereo-color: var(--accent-color);
+  --stereo-strip-background: #182b3b;
+  --stereo-target-background: #154557;
+  --strip-border-color: #c1cbd6;
+  --tab-hover-background: #34465c;
+  --text-primary: #ffffff;
+  --text-secondary: #d1dce8;
+}

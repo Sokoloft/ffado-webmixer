@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="dark light">
+<title>Mixer</title>
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+   <!-- first thing the browser paints: no white frame -->
+
+<link id="themeStylesheet" data-base="/themes/" rel="stylesheet" href="/themes/dark.css">
+<script src="/static/themes.js"></script>
+<link rel="stylesheet" href="/static/index.css">
+</head>
+<body>
+<div id="main">
+  <div id="row"></div>
+</div>
+
+<aside id="side">
+  <div id="splitter" title="Drag to resize. Double-click to reset."></div>
+  <div class="sidehead">
+    <div id="gearbox"><button id="gear" title="Settings"><svg viewBox="0 0 24 24" width="22" height="22"><path fill="currentColor" fill-rule="evenodd" d="M18.97 9.84 L22.05 10.27 L22.05 13.73 L18.97 14.16 L18.46 15.41 L20.33 17.89 L17.89 20.33 L15.41 18.46 L14.16 18.97 L13.73 22.05 L10.27 22.05 L9.84 18.97 L8.59 18.46 L6.11 20.33 L3.67 17.89 L5.54 15.41 L5.03 14.16 L1.95 13.73 L1.95 10.27 L5.03 9.84 L5.54 8.59 L3.67 6.11 L6.11 3.67 L8.59 5.54 L9.84 5.03 L10.27 1.95 L13.73 1.95 L14.16 5.03 L15.41 5.54 L17.89 3.67 L20.33 6.11 L18.46 8.59 Z M12 8.6 a3.4 3.4 0 1 0 0.01 0 Z"/></svg></button></div>
+    <div id="fullscreenbox"><button id="fullscreenButton" type="button" title="Enter fullscreen" aria-label="Enter fullscreen" aria-pressed="false">
+      <svg class="fullscreen-enter" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 3H3v5M16 3h5v5M3 16v5h5M21 16v5h-5"/></svg>
+      <svg class="fullscreen-exit" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 8h5V3M21 8h-5V3M3 16h5v5M21 16h-5v5"/></svg>
+    </button></div>
+  </div>
+  <div class="sidebody">
+    <div id="outbox" hidden></div>
+    <div id="masterbox" hidden><div id="master" class="strip master">
+      <input class="mname" id="masterName" maxlength="16" spellcheck="false" autocomplete="off" title="Click to rename">
+      <div class="fval" id="masterVal"></div>
+      <div class="faderwrap"><div class="track" id="masterTrack"><div class="handle" id="masterHandle"></div></div></div>
+      <button class="btn mute" id="masterMute">Mute</button>
+      <div class="inname">Output</div>
+    </div></div>
+  </div>
+</aside>
+
+<div id="toast" hidden></div>
+
+<div id="overlay" hidden>
+  <div id="dialog" role="dialog" aria-modal="true" aria-labelledby="dlgTitle" tabindex="-1">
+    <div class="dlghead">
+      <div id="dlgTitle">Settings</div>
+      <button id="dlgClose" title="Close"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+        stroke-width="2.2" stroke-linecap="round"><path d="M5 5l14 14M19 5L5 19"/></svg></button>
+    </div>
+    <div class="tabs" role="tablist" aria-label="Settings sections">
+      <button class="tab active" role="tab" id="tab-general" data-tab="general" aria-selected="true" aria-controls="pane-general">General</button>
+      <button class="tab" role="tab" id="tab-inout" data-tab="inout" aria-selected="false" aria-controls="pane-inout" tabindex="-1">In/Out</button>
+      <button class="tab" role="tab" id="tab-theme" data-tab="theme" aria-selected="false" aria-controls="pane-theme" tabindex="-1">Theme</button>
+      <button class="tab" role="tab" id="tab-about" data-tab="about" aria-selected="false" aria-controls="pane-about" tabindex="-1">About</button>
+    </div>
+
+    <div class="panes">
+    <div class="pane" id="pane-general" role="tabpanel" aria-labelledby="tab-general">
+      <label class="hidemin"><input type="checkbox" id="hideMin">Hide minimized strips <span id="minCount"></span></label>
+      <label class="hidemin"><input type="checkbox" id="skipLoadingScreen">Skip loading screen</label>
+    </div>
+
+    <div class="pane off" id="pane-inout" role="tabpanel" aria-labelledby="tab-inout">
+      <div id="destFields">
+        <div class="sectitle">Bus destination</div>
+        <div class="field"><label for="destBus">Bus</label><select id="destBus"></select></div>
+        <div class="field"><label for="destTo">Send to</label><select id="destTo"></select></div>
+        <div class="dlgnote" id="destMsg"></div>
+      </div>
+      <div class="dlgnote" id="destNone" hidden>This device has no input or output settings to change yet.</div>
+
+      <div class="subsec">
+        <div class="sectitle">QjackCtl</div>
+        <div class="dlgbtns" id="jackButtons" hidden>
+          <button class="dlgbtn" id="btnGraph" data-window="graph">Graph</button>
+          <button class="dlgbtn" id="btnPatchbay" data-window="patchbay">Patchbay</button>
+        </div>
+        <div class="dlgnote" id="jackMsg">Checking QjackCtl...</div>
+        <button class="dlgbtn" id="jackRefresh" type="button" hidden>Check again</button>
+      </div>
+    </div>
+
+    <div class="pane off" id="pane-theme" role="tabpanel" aria-labelledby="tab-theme">
+      <div class="sectitle">Appearance</div>
+      <div class="field"><label for="themeSelect">Theme</label><select id="themeSelect">
+        <option value="dark">Classic Dark</option>
+        <option value="midnight">Midnight Blue</option>
+        <option value="light">Light</option>
+        <option value="nordic">Nordic</option>
+        <option value="breeze">Breeze</option>
+        <option value="catppuccin">Catppuccin</option>
+        <option value="gruvbox">Gruvbox</option>
+        <option value="tokyonight">Tokyo Night</option>
+        <option value="everforest">Everforest</option>
+
+      </select></div>
+      <div class="field accent-field">
+        <label for="accentButton">Accent</label>
+        <button type="button" id="accentButton" aria-label="Change accent color" title="Customize accent color"></button>
+        <span id="accentCurrent"></span>
+      </div>
+      <div id="accentEditor" class="accent-editor" hidden>
+        <label for="accentHex">HTML color</label>
+        <input id="accentHex" type="text" maxlength="7" placeholder="#3DAEE9" spellcheck="false" autocomplete="off">
+        <button type="button" id="accentApply" class="dlgbtn">Apply</button>
+        <button type="button" id="accentReset" class="dlgbtn">Default</button>
+        <div id="accentError" role="status" aria-live="polite"></div>
+      </div>
+      <div class="dlgnote">Changes apply immediately and are saved for future sessions.</div>
+    </div>
+
+    <div class="pane off" id="pane-about" role="tabpanel" aria-labelledby="tab-about">
+      <div class="appname" id="aboutName"></div>
+      <div class="appver" id="aboutVersion"></div>
+      <dl class="about">
+        <dt>Mode</dt><dd id="aboutMode"></dd>
+        <dt>Device</dt><dd id="aboutDevice"></dd>
+        <dt>Network</dt><dd id="aboutAddress"></dd>
+      </dl>
+      <a class="dlgbtn about-github" id="aboutGithub" href="https://github.com" target="_blank" rel="noopener noreferrer" aria-label="Open GitHub in your browser">
+        <svg viewBox="0 0 24 24" width="19" height="19" fill="currentColor" aria-hidden="true"><path d="M12 .75a11.25 11.25 0 0 0-3.558 21.924c.563.105.77-.244.77-.543 0-.268-.01-.978-.016-1.92-3.133.68-3.794-1.51-3.794-1.51-.512-1.301-1.25-1.648-1.25-1.648-1.022-.699.078-.685.078-.685 1.13.08 1.725 1.16 1.725 1.16 1.005 1.722 2.635 1.225 3.277.937.102-.727.393-1.225.715-1.506-2.5-.284-5.129-1.25-5.129-5.561 0-1.228.439-2.232 1.158-3.018-.116-.284-.502-1.428.11-2.978 0 0 .944-.302 3.094 1.153A10.76 10.76 0 0 1 12 6.75c.957.004 1.922.129 2.822.379 2.15-1.455 3.092-1.153 3.092-1.153.614 1.55.228 2.694.112 2.978.72.786 1.156 1.79 1.156 3.018 0 4.322-2.633 5.273-5.14 5.551.404.35.764 1.042.764 2.101 0 1.518-.014 2.742-.014 3.115 0 .302.204.654.774.542A11.25 11.25 0 0 0 12 .75Z"/></svg>
+        GitHub
+      </a>
+    </div>
+    </div>
+  </div>
+</div>
+
+
+<script src="/static/index.js"></script>
+</body>
+</html>

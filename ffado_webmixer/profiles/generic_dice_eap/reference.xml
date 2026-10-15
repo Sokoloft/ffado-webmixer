@@ -1,0 +1,18 @@
+<?xml version='1.0' encoding='utf-8'?>
+<profile family="generic_dice_eap" schema_version="1" source="generic_dice_eap.py" status="extracted-reference">
+  <constants>
+    <constant name="idxb" value="-0x1" />
+    <constant name="idxe" value="-0x1" />
+    <constant name="idxb" value="-0x1" />
+    <constant name="idxe" value="-0x1" />
+    <constant name="idx" value="-0x1" />
+  </constants>
+  <controls>
+    <reference path="/EAP/MatrixMixer" context="module.Generic_Dice_EAP.buildMixer" line="45" />
+    <reference path="/EAP/Router" context="module.Generic_Dice_EAP.buildMixer" line="48" />
+    <reference path="/EAP/Router" context="module.Generic_Dice_EAP.onSamplerateChange" line="67" />
+  </controls>
+  <mappings />
+  <ui_files />
+  <notes>Static extraction from legacy FFADO Qt mixer sources. Paths and indexes are references, not validated live D-Bus capabilities. Runtime discovery and device-specific logic are still required. No vendor/model-to-family mapping is asserted unless source defines it.</notes>
+</profile>

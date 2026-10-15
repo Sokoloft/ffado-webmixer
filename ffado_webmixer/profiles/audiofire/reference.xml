@@ -1,0 +1,79 @@
+<?xml version='1.0' encoding='utf-8'?>
+<profile family="audiofire" schema_version="1" source="audiofire.py" status="extracted-reference">
+  <constants />
+  <controls>
+    <reference path="/HwInfo/PhysicalAudioOutCount" context="module.AudioFire.buildMixer" line="177" />
+    <reference path="/HwInfo/PhysicalAudioInCount" context="module.AudioFire.buildMixer" line="178" />
+    <reference path="/Mixer/MonitorMute" context="module.AudioFire.buildMixer" line="214" />
+    <reference path="/Mixer/MonitorMute" context="module.AudioFire.buildMixer" line="215" />
+    <reference path="/Mixer/MonitorSolo" context="module.AudioFire.buildMixer" line="216" />
+    <reference path="/Mixer/MonitorSolo" context="module.AudioFire.buildMixer" line="217" />
+    <reference path="/Mixer/MonitorPan" context="module.AudioFire.buildMixer" line="218" />
+    <reference path="/Mixer/MonitorPan" context="module.AudioFire.buildMixer" line="219" />
+    <reference path="/Mixer/MonitorGain" context="module.AudioFire.buildMixer" line="220" />
+    <reference path="/Mixer/MonitorGain" context="module.AudioFire.buildMixer" line="221" />
+    <reference path="/Mixer/PC%dGain" context="module.AudioFire.buildMixer" line="231" />
+    <reference path="/Mixer/PC%dGain" context="module.AudioFire.buildMixer" line="232" />
+    <reference path="/Mixer/PC%dMute" context="module.AudioFire.buildMixer" line="233" />
+    <reference path="/Mixer/PC%dMute" context="module.AudioFire.buildMixer" line="234" />
+    <reference path="/Mixer/PC%dSolo" context="module.AudioFire.buildMixer" line="235" />
+    <reference path="/Mixer/PC%dSolo" context="module.AudioFire.buildMixer" line="236" />
+    <reference path="/Mixer/OUT%dGain" context="module.AudioFire.buildMixer" line="249" />
+    <reference path="/Mixer/OUT%dGain" context="module.AudioFire.buildMixer" line="250" />
+    <reference path="/Mixer/OUT%dMute" context="module.AudioFire.buildMixer" line="251" />
+    <reference path="/Mixer/OUT%dMute" context="module.AudioFire.buildMixer" line="252" />
+    <reference path="/Mixer/OUT%dNominal" context="module.AudioFire.buildMixer" line="253" />
+    <reference path="/Mixer/OUT%dNominal" context="module.AudioFire.buildMixer" line="254" />
+    <reference path="/Mixer/IN%dNominal" context="module.AudioFire.buildMixer" line="288" />
+    <reference path="/HwInfo/PhantomPower" context="module.AudioFire.buildMixer" line="301" />
+    <reference path="/PhantomPower" context="module.AudioFire.buildMixer" line="303" />
+    <reference path="/HwInfo/OpticalInterface" context="module.AudioFire.buildMixer" line="307" />
+    <reference path="/DigitalInterface" context="module.AudioFire.buildMixer" line="309" />
+    <reference path="/HwInfo/PlaybackRouting" context="module.AudioFire.buildMixer" line="313" />
+    <reference path="/PlaybackRouting" context="module.AudioFire.buildMixer" line="315" />
+    <reference path="/PlaybackRouting" context="module.AudioFire.buildMixer" line="316" />
+    <reference path="/PlaybackRouting" context="module.AudioFire.buildMixer" line="317" />
+    <reference path="/SaveSettings" context="module.AudioFire.buildMixer" line="326" />
+    <reference path="/Identify" context="module.AudioFire.buildMixer" line="327" />
+    <reference path="/SpdifMode" context="module.AudioFire.buildMixer" line="332" />
+    <reference path="/SpdifMode" context="module.AudioFire.buildMixer" line="333" />
+  </controls>
+  <mappings />
+  <ui_files>
+    <ui file="audiofire_settings.ui" association="explicit">
+      <widgets>
+        <widget name="AfSettingsWidget" class="QWidget" />
+        <widget name="btnSaveSettings" class="QPushButton" />
+        <widget name="spdifMode" class="QGroupBox" />
+        <widget name="radioConsumer" class="QRadioButton" />
+        <widget name="radioProfessional" class="QRadioButton" />
+        <widget name="btnPhantom" class="QPushButton" />
+        <widget name="btnIdentify" class="QPushButton" />
+        <widget name="DigIface" class="QGroupBox" />
+        <widget name="cmbDigIface" class="QComboBox" />
+        <widget name="PlbkRoute" class="QGroupBox" />
+        <widget name="label" class="QLabel" />
+        <widget name="cmbRoute1" class="QComboBox" />
+        <widget name="labelRoute2" class="QLabel" />
+        <widget name="cmbRoute2" class="QComboBox" />
+        <widget name="label_3" class="QLabel" />
+        <widget name="cmbRoute3" class="QComboBox" />
+      </widgets>
+    </ui>
+    <ui file="audiofire_strip.ui" association="explicit">
+      <widgets>
+        <widget name="AfMonitorWidget" class="QWidget" />
+        <widget name="lblName" class="QLabel" />
+        <widget name="rotPan0" class="QDial" />
+        <widget name="rotPan1" class="QDial" />
+        <widget name="sldGain0" class="QSlider" />
+        <widget name="sldGain1" class="QSlider" />
+        <widget name="btnSolo0" class="QToolButton" />
+        <widget name="btnMute0" class="QToolButton" />
+        <widget name="btnMute1" class="QToolButton" />
+        <widget name="btnSolo1" class="QToolButton" />
+      </widgets>
+    </ui>
+  </ui_files>
+  <notes>Static extraction from legacy FFADO Qt mixer sources. Paths and indexes are references, not validated live D-Bus capabilities. Runtime discovery and device-specific logic are still required. No vendor/model-to-family mapping is asserted unless source defines it.</notes>
+</profile>

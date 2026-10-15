@@ -1,0 +1,1613 @@
+<?xml version='1.0' encoding='utf-8'?>
+<profile family="motu" schema_version="1" source="motu.py" status="extracted-reference">
+  <constants>
+    <constant name="MOTU_MODEL_NONE" value="0x0" />
+    <constant name="MOTU_MODEL_828mkII" value="0x1" />
+    <constant name="MOTU_MODEL_TRAVELER" value="0x2" />
+    <constant name="MOTU_MODEL_ULTRALITE" value="0x3" />
+    <constant name="MOTU_MODEL_8PRE" value="0x4" />
+    <constant name="MOTU_MODEL_828MkI" value="0x5" />
+    <constant name="MOTU_MODEL_896HD" value="0x6" />
+    <constant name="MOTU_MODEL_828mk3" value="0x7" />
+    <constant name="MOTU_MODEL_ULTRALITEmk3" value="0x8" />
+    <constant name="MOTU_MODEL_ULTRALITEmk3_HYB" value="0x9" />
+    <constant name="MOTU_MODEL_TRAVELERmk3" value="0xa" />
+    <constant name="MOTU_MODEL_896HDmk3" value="0xb" />
+  </constants>
+  <controls>
+    <reference path="/Mixer/fader" context="module.Motu.init" line="64" />
+    <reference path="/Mixer/fader" context="module.Motu.init" line="65" />
+    <reference path="/Mixer/fader" context="module.Motu.init" line="66" />
+    <reference path="/Mixer/fader" context="module.Motu.init" line="67" />
+    <reference path="/Mixer/fader" context="module.Motu.init" line="68" />
+    <reference path="/Mixer/fader" context="module.Motu.init" line="69" />
+    <reference path="/Mixer/fader" context="module.Motu.init" line="70" />
+    <reference path="/Mixer/fader" context="module.Motu.init" line="71" />
+    <reference path="/Mixer/fader" context="module.Motu.init" line="72" />
+    <reference path="/Mixer/fader" context="module.Motu.init" line="73" />
+    <reference path="/Mixer/fader" context="module.Motu.init" line="74" />
+    <reference path="/Mixer/fader" context="module.Motu.init" line="75" />
+    <reference path="/Mixer/fader" context="module.Motu.init" line="76" />
+    <reference path="/Mixer/fader" context="module.Motu.init" line="77" />
+    <reference path="/Mixer/fader" context="module.Motu.init" line="78" />
+    <reference path="/Mixer/fader" context="module.Motu.init" line="79" />
+    <reference path="/Mixer/fader" context="module.Motu.init" line="80" />
+    <reference path="/Mixer/fader" context="module.Motu.init" line="81" />
+    <reference path="/Mixer/fader" context="module.Motu.init" line="82" />
+    <reference path="/Mixer/fader" context="module.Motu.init" line="83" />
+    <reference path="/Mixer/fader" context="module.Motu.init" line="85" />
+    <reference path="/Mixer/fader" context="module.Motu.init" line="86" />
+    <reference path="/Mixer/fader" context="module.Motu.init" line="87" />
+    <reference path="/Mixer/fader" context="module.Motu.init" line="88" />
+    <reference path="/Mixer/fader" context="module.Motu.init" line="89" />
+    <reference path="/Mixer/fader" context="module.Motu.init" line="90" />
+    <reference path="/Mixer/fader" context="module.Motu.init" line="91" />
+    <reference path="/Mixer/fader" context="module.Motu.init" line="92" />
+    <reference path="/Mixer/fader" context="module.Motu.init" line="93" />
+    <reference path="/Mixer/fader" context="module.Motu.init" line="94" />
+    <reference path="/Mixer/fader" context="module.Motu.init" line="95" />
+    <reference path="/Mixer/fader" context="module.Motu.init" line="96" />
+    <reference path="/Mixer/fader" context="module.Motu.init" line="97" />
+    <reference path="/Mixer/fader" context="module.Motu.init" line="98" />
+    <reference path="/Mixer/fader" context="module.Motu.init" line="99" />
+    <reference path="/Mixer/fader" context="module.Motu.init" line="100" />
+    <reference path="/Mixer/fader" context="module.Motu.init" line="101" />
+    <reference path="/Mixer/fader" context="module.Motu.init" line="102" />
+    <reference path="/Mixer/fader" context="module.Motu.init" line="103" />
+    <reference path="/Mixer/fader" context="module.Motu.init" line="104" />
+    <reference path="/Mixer/fader" context="module.Motu.init" line="106" />
+    <reference path="/Mixer/fader" context="module.Motu.init" line="107" />
+    <reference path="/Mixer/fader" context="module.Motu.init" line="108" />
+    <reference path="/Mixer/fader" context="module.Motu.init" line="109" />
+    <reference path="/Mixer/fader" context="module.Motu.init" line="110" />
+    <reference path="/Mixer/fader" context="module.Motu.init" line="111" />
+    <reference path="/Mixer/fader" context="module.Motu.init" line="112" />
+    <reference path="/Mixer/fader" context="module.Motu.init" line="113" />
+    <reference path="/Mixer/fader" context="module.Motu.init" line="114" />
+    <reference path="/Mixer/fader" context="module.Motu.init" line="115" />
+    <reference path="/Mixer/fader" context="module.Motu.init" line="116" />
+    <reference path="/Mixer/fader" context="module.Motu.init" line="117" />
+    <reference path="/Mixer/fader" context="module.Motu.init" line="118" />
+    <reference path="/Mixer/fader" context="module.Motu.init" line="119" />
+    <reference path="/Mixer/fader" context="module.Motu.init" line="120" />
+    <reference path="/Mixer/fader" context="module.Motu.init" line="121" />
+    <reference path="/Mixer/fader" context="module.Motu.init" line="122" />
+    <reference path="/Mixer/fader" context="module.Motu.init" line="123" />
+    <reference path="/Mixer/fader" context="module.Motu.init" line="124" />
+    <reference path="/Mixer/fader" context="module.Motu.init" line="125" />
+    <reference path="/Mixer/fader" context="module.Motu.init" line="127" />
+    <reference path="/Mixer/fader" context="module.Motu.init" line="128" />
+    <reference path="/Mixer/fader" context="module.Motu.init" line="129" />
+    <reference path="/Mixer/fader" context="module.Motu.init" line="130" />
+    <reference path="/Mixer/fader" context="module.Motu.init" line="131" />
+    <reference path="/Mixer/fader" context="module.Motu.init" line="132" />
+    <reference path="/Mixer/fader" context="module.Motu.init" line="133" />
+    <reference path="/Mixer/fader" context="module.Motu.init" line="134" />
+    <reference path="/Mixer/fader" context="module.Motu.init" line="135" />
+    <reference path="/Mixer/fader" context="module.Motu.init" line="136" />
+    <reference path="/Mixer/fader" context="module.Motu.init" line="137" />
+    <reference path="/Mixer/fader" context="module.Motu.init" line="138" />
+    <reference path="/Mixer/fader" context="module.Motu.init" line="139" />
+    <reference path="/Mixer/fader" context="module.Motu.init" line="140" />
+    <reference path="/Mixer/fader" context="module.Motu.init" line="141" />
+    <reference path="/Mixer/fader" context="module.Motu.init" line="142" />
+    <reference path="/Mixer/fader" context="module.Motu.init" line="143" />
+    <reference path="/Mixer/fader" context="module.Motu.init" line="144" />
+    <reference path="/Mixer/fader" context="module.Motu.init" line="145" />
+    <reference path="/Mixer/fader" context="module.Motu.init" line="146" />
+    <reference path="/Mixer/Mix1/Mix_fader" context="module.Motu.init" line="150" />
+    <reference path="/Mixer/Mix2/Mix_fader" context="module.Motu.init" line="151" />
+    <reference path="/Mixer/Mix3/Mix_fader" context="module.Motu.init" line="152" />
+    <reference path="/Mixer/Mix4/Mix_fader" context="module.Motu.init" line="153" />
+    <reference path="/Mixer/Mainout_fader" context="module.Motu.init" line="154" />
+    <reference path="/Mixer/Phones_fader" context="module.Motu.init" line="155" />
+    <reference path="/Mixer/pan" context="module.Motu.init" line="159" />
+    <reference path="/Mixer/pan" context="module.Motu.init" line="160" />
+    <reference path="/Mixer/pan" context="module.Motu.init" line="161" />
+    <reference path="/Mixer/pan" context="module.Motu.init" line="162" />
+    <reference path="/Mixer/pan" context="module.Motu.init" line="163" />
+    <reference path="/Mixer/pan" context="module.Motu.init" line="164" />
+    <reference path="/Mixer/pan" context="module.Motu.init" line="165" />
+    <reference path="/Mixer/pan" context="module.Motu.init" line="166" />
+    <reference path="/Mixer/pan" context="module.Motu.init" line="167" />
+    <reference path="/Mixer/pan" context="module.Motu.init" line="168" />
+    <reference path="/Mixer/pan" context="module.Motu.init" line="169" />
+    <reference path="/Mixer/pan" context="module.Motu.init" line="170" />
+    <reference path="/Mixer/pan" context="module.Motu.init" line="171" />
+    <reference path="/Mixer/pan" context="module.Motu.init" line="172" />
+    <reference path="/Mixer/pan" context="module.Motu.init" line="173" />
+    <reference path="/Mixer/pan" context="module.Motu.init" line="174" />
+    <reference path="/Mixer/pan" context="module.Motu.init" line="175" />
+    <reference path="/Mixer/pan" context="module.Motu.init" line="176" />
+    <reference path="/Mixer/pan" context="module.Motu.init" line="177" />
+    <reference path="/Mixer/pan" context="module.Motu.init" line="178" />
+    <reference path="/Mixer/pan" context="module.Motu.init" line="180" />
+    <reference path="/Mixer/pan" context="module.Motu.init" line="181" />
+    <reference path="/Mixer/pan" context="module.Motu.init" line="182" />
+    <reference path="/Mixer/pan" context="module.Motu.init" line="183" />
+    <reference path="/Mixer/pan" context="module.Motu.init" line="184" />
+    <reference path="/Mixer/pan" context="module.Motu.init" line="185" />
+    <reference path="/Mixer/pan" context="module.Motu.init" line="186" />
+    <reference path="/Mixer/pan" context="module.Motu.init" line="187" />
+    <reference path="/Mixer/pan" context="module.Motu.init" line="188" />
+    <reference path="/Mixer/pan" context="module.Motu.init" line="189" />
+    <reference path="/Mixer/pan" context="module.Motu.init" line="190" />
+    <reference path="/Mixer/pan" context="module.Motu.init" line="191" />
+    <reference path="/Mixer/pan" context="module.Motu.init" line="192" />
+    <reference path="/Mixer/pan" context="module.Motu.init" line="193" />
+    <reference path="/Mixer/pan" context="module.Motu.init" line="194" />
+    <reference path="/Mixer/pan" context="module.Motu.init" line="195" />
+    <reference path="/Mixer/pan" context="module.Motu.init" line="196" />
+    <reference path="/Mixer/pan" context="module.Motu.init" line="197" />
+    <reference path="/Mixer/pan" context="module.Motu.init" line="198" />
+    <reference path="/Mixer/pan" context="module.Motu.init" line="199" />
+    <reference path="/Mixer/pan" context="module.Motu.init" line="201" />
+    <reference path="/Mixer/pan" context="module.Motu.init" line="202" />
+    <reference path="/Mixer/pan" context="module.Motu.init" line="203" />
+    <reference path="/Mixer/pan" context="module.Motu.init" line="204" />
+    <reference path="/Mixer/pan" context="module.Motu.init" line="205" />
+    <reference path="/Mixer/pan" context="module.Motu.init" line="206" />
+    <reference path="/Mixer/pan" context="module.Motu.init" line="207" />
+    <reference path="/Mixer/pan" context="module.Motu.init" line="208" />
+    <reference path="/Mixer/pan" context="module.Motu.init" line="209" />
+    <reference path="/Mixer/pan" context="module.Motu.init" line="210" />
+    <reference path="/Mixer/pan" context="module.Motu.init" line="211" />
+    <reference path="/Mixer/pan" context="module.Motu.init" line="212" />
+    <reference path="/Mixer/pan" context="module.Motu.init" line="213" />
+    <reference path="/Mixer/pan" context="module.Motu.init" line="214" />
+    <reference path="/Mixer/pan" context="module.Motu.init" line="215" />
+    <reference path="/Mixer/pan" context="module.Motu.init" line="216" />
+    <reference path="/Mixer/pan" context="module.Motu.init" line="217" />
+    <reference path="/Mixer/pan" context="module.Motu.init" line="218" />
+    <reference path="/Mixer/pan" context="module.Motu.init" line="219" />
+    <reference path="/Mixer/pan" context="module.Motu.init" line="220" />
+    <reference path="/Mixer/pan" context="module.Motu.init" line="222" />
+    <reference path="/Mixer/pan" context="module.Motu.init" line="223" />
+    <reference path="/Mixer/pan" context="module.Motu.init" line="224" />
+    <reference path="/Mixer/pan" context="module.Motu.init" line="225" />
+    <reference path="/Mixer/pan" context="module.Motu.init" line="226" />
+    <reference path="/Mixer/pan" context="module.Motu.init" line="227" />
+    <reference path="/Mixer/pan" context="module.Motu.init" line="228" />
+    <reference path="/Mixer/pan" context="module.Motu.init" line="229" />
+    <reference path="/Mixer/pan" context="module.Motu.init" line="230" />
+    <reference path="/Mixer/pan" context="module.Motu.init" line="231" />
+    <reference path="/Mixer/pan" context="module.Motu.init" line="232" />
+    <reference path="/Mixer/pan" context="module.Motu.init" line="233" />
+    <reference path="/Mixer/pan" context="module.Motu.init" line="234" />
+    <reference path="/Mixer/pan" context="module.Motu.init" line="235" />
+    <reference path="/Mixer/pan" context="module.Motu.init" line="236" />
+    <reference path="/Mixer/pan" context="module.Motu.init" line="237" />
+    <reference path="/Mixer/pan" context="module.Motu.init" line="238" />
+    <reference path="/Mixer/pan" context="module.Motu.init" line="239" />
+    <reference path="/Mixer/pan" context="module.Motu.init" line="240" />
+    <reference path="/Mixer/pan" context="module.Motu.init" line="241" />
+    <reference path="/Mixer/Control/Ana1_trimgain" context="module.Motu.init" line="245" />
+    <reference path="/Mixer/Control/Ana2_trimgain" context="module.Motu.init" line="246" />
+    <reference path="/Mixer/Control/Ana3_trimgain" context="module.Motu.init" line="247" />
+    <reference path="/Mixer/Control/Ana4_trimgain" context="module.Motu.init" line="248" />
+    <reference path="/Mixer/Control/Ana5_trimgain" context="module.Motu.init" line="249" />
+    <reference path="/Mixer/Control/Ana6_trimgain" context="module.Motu.init" line="250" />
+    <reference path="/Mixer/Control/Ana7_trimgain" context="module.Motu.init" line="251" />
+    <reference path="/Mixer/Control/Ana8_trimgain" context="module.Motu.init" line="252" />
+    <reference path="/Mixer/Control/Spdif1_trimgain" context="module.Motu.init" line="253" />
+    <reference path="/Mixer/Control/Spdif2_trimgain" context="module.Motu.init" line="254" />
+    <reference path="/Mixer/mute" context="module.Motu.init" line="258" />
+    <reference path="/Mixer/mute" context="module.Motu.init" line="259" />
+    <reference path="/Mixer/mute" context="module.Motu.init" line="260" />
+    <reference path="/Mixer/mute" context="module.Motu.init" line="261" />
+    <reference path="/Mixer/mute" context="module.Motu.init" line="262" />
+    <reference path="/Mixer/mute" context="module.Motu.init" line="263" />
+    <reference path="/Mixer/mute" context="module.Motu.init" line="264" />
+    <reference path="/Mixer/mute" context="module.Motu.init" line="265" />
+    <reference path="/Mixer/mute" context="module.Motu.init" line="266" />
+    <reference path="/Mixer/mute" context="module.Motu.init" line="267" />
+    <reference path="/Mixer/mute" context="module.Motu.init" line="268" />
+    <reference path="/Mixer/mute" context="module.Motu.init" line="269" />
+    <reference path="/Mixer/mute" context="module.Motu.init" line="270" />
+    <reference path="/Mixer/mute" context="module.Motu.init" line="271" />
+    <reference path="/Mixer/mute" context="module.Motu.init" line="272" />
+    <reference path="/Mixer/mute" context="module.Motu.init" line="273" />
+    <reference path="/Mixer/mute" context="module.Motu.init" line="274" />
+    <reference path="/Mixer/mute" context="module.Motu.init" line="275" />
+    <reference path="/Mixer/mute" context="module.Motu.init" line="276" />
+    <reference path="/Mixer/mute" context="module.Motu.init" line="277" />
+    <reference path="/Mixer/solo" context="module.Motu.init" line="278" />
+    <reference path="/Mixer/solo" context="module.Motu.init" line="279" />
+    <reference path="/Mixer/solo" context="module.Motu.init" line="280" />
+    <reference path="/Mixer/solo" context="module.Motu.init" line="281" />
+    <reference path="/Mixer/solo" context="module.Motu.init" line="282" />
+    <reference path="/Mixer/solo" context="module.Motu.init" line="283" />
+    <reference path="/Mixer/solo" context="module.Motu.init" line="284" />
+    <reference path="/Mixer/solo" context="module.Motu.init" line="285" />
+    <reference path="/Mixer/solo" context="module.Motu.init" line="286" />
+    <reference path="/Mixer/solo" context="module.Motu.init" line="287" />
+    <reference path="/Mixer/solo" context="module.Motu.init" line="288" />
+    <reference path="/Mixer/solo" context="module.Motu.init" line="289" />
+    <reference path="/Mixer/solo" context="module.Motu.init" line="290" />
+    <reference path="/Mixer/solo" context="module.Motu.init" line="291" />
+    <reference path="/Mixer/solo" context="module.Motu.init" line="292" />
+    <reference path="/Mixer/solo" context="module.Motu.init" line="293" />
+    <reference path="/Mixer/solo" context="module.Motu.init" line="294" />
+    <reference path="/Mixer/solo" context="module.Motu.init" line="295" />
+    <reference path="/Mixer/solo" context="module.Motu.init" line="296" />
+    <reference path="/Mixer/solo" context="module.Motu.init" line="297" />
+    <reference path="/Mixer/mute" context="module.Motu.init" line="299" />
+    <reference path="/Mixer/mute" context="module.Motu.init" line="300" />
+    <reference path="/Mixer/mute" context="module.Motu.init" line="301" />
+    <reference path="/Mixer/mute" context="module.Motu.init" line="302" />
+    <reference path="/Mixer/mute" context="module.Motu.init" line="303" />
+    <reference path="/Mixer/mute" context="module.Motu.init" line="304" />
+    <reference path="/Mixer/mute" context="module.Motu.init" line="305" />
+    <reference path="/Mixer/mute" context="module.Motu.init" line="306" />
+    <reference path="/Mixer/mute" context="module.Motu.init" line="307" />
+    <reference path="/Mixer/mute" context="module.Motu.init" line="308" />
+    <reference path="/Mixer/mute" context="module.Motu.init" line="309" />
+    <reference path="/Mixer/mute" context="module.Motu.init" line="310" />
+    <reference path="/Mixer/mute" context="module.Motu.init" line="311" />
+    <reference path="/Mixer/mute" context="module.Motu.init" line="312" />
+    <reference path="/Mixer/mute" context="module.Motu.init" line="313" />
+    <reference path="/Mixer/mute" context="module.Motu.init" line="314" />
+    <reference path="/Mixer/mute" context="module.Motu.init" line="315" />
+    <reference path="/Mixer/mute" context="module.Motu.init" line="316" />
+    <reference path="/Mixer/mute" context="module.Motu.init" line="317" />
+    <reference path="/Mixer/mute" context="module.Motu.init" line="318" />
+    <reference path="/Mixer/solo" context="module.Motu.init" line="319" />
+    <reference path="/Mixer/solo" context="module.Motu.init" line="320" />
+    <reference path="/Mixer/solo" context="module.Motu.init" line="321" />
+    <reference path="/Mixer/solo" context="module.Motu.init" line="322" />
+    <reference path="/Mixer/solo" context="module.Motu.init" line="323" />
+    <reference path="/Mixer/solo" context="module.Motu.init" line="324" />
+    <reference path="/Mixer/solo" context="module.Motu.init" line="325" />
+    <reference path="/Mixer/solo" context="module.Motu.init" line="326" />
+    <reference path="/Mixer/solo" context="module.Motu.init" line="327" />
+    <reference path="/Mixer/solo" context="module.Motu.init" line="328" />
+    <reference path="/Mixer/solo" context="module.Motu.init" line="329" />
+    <reference path="/Mixer/solo" context="module.Motu.init" line="330" />
+    <reference path="/Mixer/solo" context="module.Motu.init" line="331" />
+    <reference path="/Mixer/solo" context="module.Motu.init" line="332" />
+    <reference path="/Mixer/solo" context="module.Motu.init" line="333" />
+    <reference path="/Mixer/solo" context="module.Motu.init" line="334" />
+    <reference path="/Mixer/solo" context="module.Motu.init" line="335" />
+    <reference path="/Mixer/solo" context="module.Motu.init" line="336" />
+    <reference path="/Mixer/solo" context="module.Motu.init" line="337" />
+    <reference path="/Mixer/solo" context="module.Motu.init" line="338" />
+    <reference path="/Mixer/mute" context="module.Motu.init" line="340" />
+    <reference path="/Mixer/mute" context="module.Motu.init" line="341" />
+    <reference path="/Mixer/mute" context="module.Motu.init" line="342" />
+    <reference path="/Mixer/mute" context="module.Motu.init" line="343" />
+    <reference path="/Mixer/mute" context="module.Motu.init" line="344" />
+    <reference path="/Mixer/mute" context="module.Motu.init" line="345" />
+    <reference path="/Mixer/mute" context="module.Motu.init" line="346" />
+    <reference path="/Mixer/mute" context="module.Motu.init" line="347" />
+    <reference path="/Mixer/mute" context="module.Motu.init" line="348" />
+    <reference path="/Mixer/mute" context="module.Motu.init" line="349" />
+    <reference path="/Mixer/mute" context="module.Motu.init" line="350" />
+    <reference path="/Mixer/mute" context="module.Motu.init" line="351" />
+    <reference path="/Mixer/mute" context="module.Motu.init" line="352" />
+    <reference path="/Mixer/mute" context="module.Motu.init" line="353" />
+    <reference path="/Mixer/mute" context="module.Motu.init" line="354" />
+    <reference path="/Mixer/mute" context="module.Motu.init" line="355" />
+    <reference path="/Mixer/mute" context="module.Motu.init" line="356" />
+    <reference path="/Mixer/mute" context="module.Motu.init" line="357" />
+    <reference path="/Mixer/mute" context="module.Motu.init" line="358" />
+    <reference path="/Mixer/mute" context="module.Motu.init" line="359" />
+    <reference path="/Mixer/solo" context="module.Motu.init" line="360" />
+    <reference path="/Mixer/solo" context="module.Motu.init" line="361" />
+    <reference path="/Mixer/solo" context="module.Motu.init" line="362" />
+    <reference path="/Mixer/solo" context="module.Motu.init" line="363" />
+    <reference path="/Mixer/solo" context="module.Motu.init" line="364" />
+    <reference path="/Mixer/solo" context="module.Motu.init" line="365" />
+    <reference path="/Mixer/solo" context="module.Motu.init" line="366" />
+    <reference path="/Mixer/solo" context="module.Motu.init" line="367" />
+    <reference path="/Mixer/solo" context="module.Motu.init" line="368" />
+    <reference path="/Mixer/solo" context="module.Motu.init" line="369" />
+    <reference path="/Mixer/solo" context="module.Motu.init" line="370" />
+    <reference path="/Mixer/solo" context="module.Motu.init" line="371" />
+    <reference path="/Mixer/solo" context="module.Motu.init" line="372" />
+    <reference path="/Mixer/solo" context="module.Motu.init" line="373" />
+    <reference path="/Mixer/solo" context="module.Motu.init" line="374" />
+    <reference path="/Mixer/solo" context="module.Motu.init" line="375" />
+    <reference path="/Mixer/solo" context="module.Motu.init" line="376" />
+    <reference path="/Mixer/solo" context="module.Motu.init" line="377" />
+    <reference path="/Mixer/solo" context="module.Motu.init" line="378" />
+    <reference path="/Mixer/solo" context="module.Motu.init" line="379" />
+    <reference path="/Mixer/mute" context="module.Motu.init" line="381" />
+    <reference path="/Mixer/mute" context="module.Motu.init" line="382" />
+    <reference path="/Mixer/mute" context="module.Motu.init" line="383" />
+    <reference path="/Mixer/mute" context="module.Motu.init" line="384" />
+    <reference path="/Mixer/mute" context="module.Motu.init" line="385" />
+    <reference path="/Mixer/mute" context="module.Motu.init" line="386" />
+    <reference path="/Mixer/mute" context="module.Motu.init" line="387" />
+    <reference path="/Mixer/mute" context="module.Motu.init" line="388" />
+    <reference path="/Mixer/mute" context="module.Motu.init" line="389" />
+    <reference path="/Mixer/mute" context="module.Motu.init" line="390" />
+    <reference path="/Mixer/mute" context="module.Motu.init" line="391" />
+    <reference path="/Mixer/mute" context="module.Motu.init" line="392" />
+    <reference path="/Mixer/mute" context="module.Motu.init" line="393" />
+    <reference path="/Mixer/mute" context="module.Motu.init" line="394" />
+    <reference path="/Mixer/mute" context="module.Motu.init" line="395" />
+    <reference path="/Mixer/mute" context="module.Motu.init" line="396" />
+    <reference path="/Mixer/mute" context="module.Motu.init" line="397" />
+    <reference path="/Mixer/mute" context="module.Motu.init" line="398" />
+    <reference path="/Mixer/mute" context="module.Motu.init" line="399" />
+    <reference path="/Mixer/mute" context="module.Motu.init" line="400" />
+    <reference path="/Mixer/solo" context="module.Motu.init" line="401" />
+    <reference path="/Mixer/solo" context="module.Motu.init" line="402" />
+    <reference path="/Mixer/solo" context="module.Motu.init" line="403" />
+    <reference path="/Mixer/solo" context="module.Motu.init" line="404" />
+    <reference path="/Mixer/solo" context="module.Motu.init" line="405" />
+    <reference path="/Mixer/solo" context="module.Motu.init" line="406" />
+    <reference path="/Mixer/solo" context="module.Motu.init" line="407" />
+    <reference path="/Mixer/solo" context="module.Motu.init" line="408" />
+    <reference path="/Mixer/solo" context="module.Motu.init" line="409" />
+    <reference path="/Mixer/solo" context="module.Motu.init" line="410" />
+    <reference path="/Mixer/solo" context="module.Motu.init" line="411" />
+    <reference path="/Mixer/solo" context="module.Motu.init" line="412" />
+    <reference path="/Mixer/solo" context="module.Motu.init" line="413" />
+    <reference path="/Mixer/solo" context="module.Motu.init" line="414" />
+    <reference path="/Mixer/solo" context="module.Motu.init" line="415" />
+    <reference path="/Mixer/solo" context="module.Motu.init" line="416" />
+    <reference path="/Mixer/solo" context="module.Motu.init" line="417" />
+    <reference path="/Mixer/solo" context="module.Motu.init" line="418" />
+    <reference path="/Mixer/solo" context="module.Motu.init" line="419" />
+    <reference path="/Mixer/solo" context="module.Motu.init" line="420" />
+    <reference path="/Mixer/Mix1/Mix_mute" context="module.Motu.init" line="424" />
+    <reference path="/Mixer/Mix2/Mix_mute" context="module.Motu.init" line="425" />
+    <reference path="/Mixer/Mix3/Mix_mute" context="module.Motu.init" line="426" />
+    <reference path="/Mixer/Mix4/Mix_mute" context="module.Motu.init" line="427" />
+    <reference path="/Mixer/Control/Ana1_pad" context="module.Motu.init" line="429" />
+    <reference path="/Mixer/Control/Ana2_pad" context="module.Motu.init" line="430" />
+    <reference path="/Mixer/Control/Ana3_pad" context="module.Motu.init" line="431" />
+    <reference path="/Mixer/Control/Ana4_pad" context="module.Motu.init" line="432" />
+    <reference path="/Mixer/Control/Ana5_pad" context="module.Motu.init" line="433" />
+    <reference path="/Mixer/Control/Ana6_pad" context="module.Motu.init" line="434" />
+    <reference path="/Mixer/Control/Ana7_pad" context="module.Motu.init" line="435" />
+    <reference path="/Mixer/Control/Ana8_pad" context="module.Motu.init" line="436" />
+    <reference path="/Mixer/Control/Ana1_invert" context="module.Motu.init" line="437" />
+    <reference path="/Mixer/Control/Ana2_invert" context="module.Motu.init" line="438" />
+    <reference path="/Mixer/Control/Ana3_invert" context="module.Motu.init" line="439" />
+    <reference path="/Mixer/Control/Ana4_invert" context="module.Motu.init" line="440" />
+    <reference path="/Mixer/Control/Ana5_invert" context="module.Motu.init" line="441" />
+    <reference path="/Mixer/Control/Ana6_invert" context="module.Motu.init" line="442" />
+    <reference path="/Mixer/Control/Ana7_invert" context="module.Motu.init" line="443" />
+    <reference path="/Mixer/Control/Ana8_invert" context="module.Motu.init" line="444" />
+    <reference path="/Mixer/Control/Spdif1_invert" context="module.Motu.init" line="445" />
+    <reference path="/Mixer/Control/Spdif2_invert" context="module.Motu.init" line="446" />
+    <reference path="/Mixer/Control/Ana1_level" context="module.Motu.init" line="447" />
+    <reference path="/Mixer/Control/Ana2_level" context="module.Motu.init" line="448" />
+    <reference path="/Mixer/Control/Ana3_level" context="module.Motu.init" line="449" />
+    <reference path="/Mixer/Control/Ana4_level" context="module.Motu.init" line="450" />
+    <reference path="/Mixer/Control/Ana5_level" context="module.Motu.init" line="451" />
+    <reference path="/Mixer/Control/Ana6_level" context="module.Motu.init" line="452" />
+    <reference path="/Mixer/Control/Ana7_level" context="module.Motu.init" line="453" />
+    <reference path="/Mixer/Control/Ana8_level" context="module.Motu.init" line="454" />
+    <reference path="/Mixer/Control/Ana1_boost" context="module.Motu.init" line="455" />
+    <reference path="/Mixer/Control/Ana2_boost" context="module.Motu.init" line="456" />
+    <reference path="/Mixer/Control/Ana3_boost" context="module.Motu.init" line="457" />
+    <reference path="/Mixer/Control/Ana4_boost" context="module.Motu.init" line="458" />
+    <reference path="/Mixer/Control/Ana5_boost" context="module.Motu.init" line="459" />
+    <reference path="/Mixer/Control/Ana6_boost" context="module.Motu.init" line="460" />
+    <reference path="/Mixer/Control/Ana7_boost" context="module.Motu.init" line="461" />
+    <reference path="/Mixer/Control/Ana8_boost" context="module.Motu.init" line="462" />
+    <reference path="/Mixer/Mix1/Mix_dest" context="module.Motu.init" line="466" />
+    <reference path="/Mixer/Mix2/Mix_dest" context="module.Motu.init" line="467" />
+    <reference path="/Mixer/Mix3/Mix_dest" context="module.Motu.init" line="468" />
+    <reference path="/Mixer/Mix4/Mix_dest" context="module.Motu.init" line="469" />
+    <reference path="/Mixer/Control/Phones_src" context="module.Motu.init" line="471" />
+    <reference path="/Mixer/Control/OpticalIn_mode" context="module.Motu.init" line="473" />
+    <reference path="/Mixer/Control/OpticalOut_mode" context="module.Motu.init" line="474" />
+    <reference path="/Mixer/Control/Meter_src" context="module.Motu.init" line="476" />
+    <reference path="/Mixer/Control/Meter_aesebu_src" context="module.Motu.init" line="477" />
+    <reference path="/Mixer/Control/Meter_peakhold_time" context="module.Motu.init" line="478" />
+    <reference path="/Mixer/Control/Meter_cliphold_time" context="module.Motu.init" line="479" />
+    <reference path="/Mixer/Info/IsStreaming" context="module.Motu.initValues" line="806" />
+    <reference path="/Mixer/Info/Model" context="module.Motu.initValues" line="811" />
+    <reference path="/Mixer/Info/SampleRate" context="module.Motu.initValues" line="813" />
+  </controls>
+  <mappings>
+    <group name="ChannelFaders" line="63">
+      <binding widget="self.mix1ana1_fader" path="/Mixer/fader" arg0="0" arg1="0" arg2="self.mix1ana2_fader" />
+      <binding widget="self.mix1ana2_fader" path="/Mixer/fader" arg0="0" arg1="1" arg2="self.mix1ana1_fader" />
+      <binding widget="self.mix1ana3_fader" path="/Mixer/fader" arg0="0" arg1="2" arg2="self.mix1ana4_fader" />
+      <binding widget="self.mix1ana4_fader" path="/Mixer/fader" arg0="0" arg1="3" arg2="self.mix1ana3_fader" />
+      <binding widget="self.mix1ana5_fader" path="/Mixer/fader" arg0="0" arg1="4" arg2="self.mix1ana6_fader" />
+      <binding widget="self.mix1ana6_fader" path="/Mixer/fader" arg0="0" arg1="5" arg2="self.mix1ana5_fader" />
+      <binding widget="self.mix1ana7_fader" path="/Mixer/fader" arg0="0" arg1="6" arg2="self.mix1ana8_fader" />
+      <binding widget="self.mix1ana8_fader" path="/Mixer/fader" arg0="0" arg1="7" arg2="self.mix1ana7_fader" />
+      <binding widget="self.mix1aes1_fader" path="/Mixer/fader" arg0="0" arg1="8" arg2="self.mix1aes2_fader" />
+      <binding widget="self.mix1aes2_fader" path="/Mixer/fader" arg0="0" arg1="9" arg2="self.mix1aes1_fader" />
+      <binding widget="self.mix1spdif1_fader" path="/Mixer/fader" arg0="0" arg1="10" arg2="self.mix1spdif2_fader" />
+      <binding widget="self.mix1spdif2_fader" path="/Mixer/fader" arg0="0" arg1="11" arg2="self.mix1spdif1_fader" />
+      <binding widget="self.mix1adat1_fader" path="/Mixer/fader" arg0="0" arg1="12" arg2="self.mix1adat2_fader" />
+      <binding widget="self.mix1adat2_fader" path="/Mixer/fader" arg0="0" arg1="13" arg2="self.mix1adat1_fader" />
+      <binding widget="self.mix1adat3_fader" path="/Mixer/fader" arg0="0" arg1="14" arg2="self.mix1adat4_fader" />
+      <binding widget="self.mix1adat4_fader" path="/Mixer/fader" arg0="0" arg1="15" arg2="self.mix1adat3_fader" />
+      <binding widget="self.mix1adat5_fader" path="/Mixer/fader" arg0="0" arg1="16" arg2="self.mix1adat6_fader" />
+      <binding widget="self.mix1adat6_fader" path="/Mixer/fader" arg0="0" arg1="17" arg2="self.mix1adat5_fader" />
+      <binding widget="self.mix1adat7_fader" path="/Mixer/fader" arg0="0" arg1="18" arg2="self.mix1adat8_fader" />
+      <binding widget="self.mix1adat8_fader" path="/Mixer/fader" arg0="0" arg1="19" arg2="self.mix1adat7_fader" />
+      <binding widget="self.mix2ana1_fader" path="/Mixer/fader" arg0="1" arg1="0" arg2="self.mix2ana2_fader" />
+      <binding widget="self.mix2ana2_fader" path="/Mixer/fader" arg0="1" arg1="1" arg2="self.mix2ana1_fader" />
+      <binding widget="self.mix2ana3_fader" path="/Mixer/fader" arg0="1" arg1="2" arg2="self.mix2ana4_fader" />
+      <binding widget="self.mix2ana4_fader" path="/Mixer/fader" arg0="1" arg1="3" arg2="self.mix2ana3_fader" />
+      <binding widget="self.mix2ana5_fader" path="/Mixer/fader" arg0="1" arg1="4" arg2="self.mix2ana6_fader" />
+      <binding widget="self.mix2ana6_fader" path="/Mixer/fader" arg0="1" arg1="5" arg2="self.mix2ana5_fader" />
+      <binding widget="self.mix2ana7_fader" path="/Mixer/fader" arg0="1" arg1="6" arg2="self.mix2ana8_fader" />
+      <binding widget="self.mix2ana8_fader" path="/Mixer/fader" arg0="1" arg1="7" arg2="self.mix2ana7_fader" />
+      <binding widget="self.mix2aes1_fader" path="/Mixer/fader" arg0="1" arg1="8" arg2="self.mix2aes2_fader" />
+      <binding widget="self.mix2aes2_fader" path="/Mixer/fader" arg0="1" arg1="9" arg2="self.mix2aes1_fader" />
+      <binding widget="self.mix2spdif1_fader" path="/Mixer/fader" arg0="1" arg1="10" arg2="self.mix2spdif2_fader" />
+      <binding widget="self.mix2spdif2_fader" path="/Mixer/fader" arg0="1" arg1="11" arg2="self.mix2spdif1_fader" />
+      <binding widget="self.mix2adat1_fader" path="/Mixer/fader" arg0="1" arg1="12" arg2="self.mix2adat2_fader" />
+      <binding widget="self.mix2adat2_fader" path="/Mixer/fader" arg0="1" arg1="13" arg2="self.mix2adat1_fader" />
+      <binding widget="self.mix2adat3_fader" path="/Mixer/fader" arg0="1" arg1="14" arg2="self.mix2adat4_fader" />
+      <binding widget="self.mix2adat4_fader" path="/Mixer/fader" arg0="1" arg1="15" arg2="self.mix2adat3_fader" />
+      <binding widget="self.mix2adat5_fader" path="/Mixer/fader" arg0="1" arg1="16" arg2="self.mix2adat6_fader" />
+      <binding widget="self.mix2adat6_fader" path="/Mixer/fader" arg0="1" arg1="17" arg2="self.mix2adat5_fader" />
+      <binding widget="self.mix2adat7_fader" path="/Mixer/fader" arg0="1" arg1="18" arg2="self.mix2adat8_fader" />
+      <binding widget="self.mix2adat8_fader" path="/Mixer/fader" arg0="1" arg1="19" arg2="self.mix2adat7_fader" />
+      <binding widget="self.mix3ana1_fader" path="/Mixer/fader" arg0="2" arg1="0" arg2="self.mix3ana2_fader" />
+      <binding widget="self.mix3ana2_fader" path="/Mixer/fader" arg0="2" arg1="1" arg2="self.mix3ana1_fader" />
+      <binding widget="self.mix3ana3_fader" path="/Mixer/fader" arg0="2" arg1="2" arg2="self.mix3ana4_fader" />
+      <binding widget="self.mix3ana4_fader" path="/Mixer/fader" arg0="2" arg1="3" arg2="self.mix3ana3_fader" />
+      <binding widget="self.mix3ana5_fader" path="/Mixer/fader" arg0="2" arg1="4" arg2="self.mix3ana6_fader" />
+      <binding widget="self.mix3ana6_fader" path="/Mixer/fader" arg0="2" arg1="5" arg2="self.mix3ana5_fader" />
+      <binding widget="self.mix3ana7_fader" path="/Mixer/fader" arg0="2" arg1="6" arg2="self.mix3ana8_fader" />
+      <binding widget="self.mix3ana8_fader" path="/Mixer/fader" arg0="2" arg1="7" arg2="self.mix3ana7_fader" />
+      <binding widget="self.mix3aes1_fader" path="/Mixer/fader" arg0="2" arg1="8" arg2="self.mix3aes2_fader" />
+      <binding widget="self.mix3aes2_fader" path="/Mixer/fader" arg0="2" arg1="9" arg2="self.mix3aes1_fader" />
+      <binding widget="self.mix3spdif1_fader" path="/Mixer/fader" arg0="2" arg1="10" arg2="self.mix3spdif2_fader" />
+      <binding widget="self.mix3spdif2_fader" path="/Mixer/fader" arg0="2" arg1="11" arg2="self.mix3spdif1_fader" />
+      <binding widget="self.mix3adat1_fader" path="/Mixer/fader" arg0="2" arg1="12" arg2="self.mix3adat2_fader" />
+      <binding widget="self.mix3adat2_fader" path="/Mixer/fader" arg0="2" arg1="13" arg2="self.mix3adat1_fader" />
+      <binding widget="self.mix3adat3_fader" path="/Mixer/fader" arg0="2" arg1="14" arg2="self.mix3adat4_fader" />
+      <binding widget="self.mix3adat4_fader" path="/Mixer/fader" arg0="2" arg1="15" arg2="self.mix3adat3_fader" />
+      <binding widget="self.mix3adat5_fader" path="/Mixer/fader" arg0="2" arg1="16" arg2="self.mix3adat6_fader" />
+      <binding widget="self.mix3adat6_fader" path="/Mixer/fader" arg0="2" arg1="17" arg2="self.mix3adat5_fader" />
+      <binding widget="self.mix3adat7_fader" path="/Mixer/fader" arg0="2" arg1="18" arg2="self.mix3adat8_fader" />
+      <binding widget="self.mix3adat8_fader" path="/Mixer/fader" arg0="2" arg1="19" arg2="self.mix3adat7_fader" />
+      <binding widget="self.mix4ana1_fader" path="/Mixer/fader" arg0="3" arg1="0" arg2="self.mix4ana2_fader" />
+      <binding widget="self.mix4ana2_fader" path="/Mixer/fader" arg0="3" arg1="1" arg2="self.mix4ana1_fader" />
+      <binding widget="self.mix4ana3_fader" path="/Mixer/fader" arg0="3" arg1="2" arg2="self.mix4ana4_fader" />
+      <binding widget="self.mix4ana4_fader" path="/Mixer/fader" arg0="3" arg1="3" arg2="self.mix4ana3_fader" />
+      <binding widget="self.mix4ana5_fader" path="/Mixer/fader" arg0="3" arg1="4" arg2="self.mix4ana6_fader" />
+      <binding widget="self.mix4ana6_fader" path="/Mixer/fader" arg0="3" arg1="5" arg2="self.mix4ana5_fader" />
+      <binding widget="self.mix4ana7_fader" path="/Mixer/fader" arg0="3" arg1="6" arg2="self.mix4ana8_fader" />
+      <binding widget="self.mix4ana8_fader" path="/Mixer/fader" arg0="3" arg1="7" arg2="self.mix4ana7_fader" />
+      <binding widget="self.mix4aes1_fader" path="/Mixer/fader" arg0="3" arg1="8" arg2="self.mix4aes2_fader" />
+      <binding widget="self.mix4aes2_fader" path="/Mixer/fader" arg0="3" arg1="9" arg2="self.mix4aes1_fader" />
+      <binding widget="self.mix4spdif1_fader" path="/Mixer/fader" arg0="3" arg1="10" arg2="self.mix4spdif2_fader" />
+      <binding widget="self.mix4spdif2_fader" path="/Mixer/fader" arg0="3" arg1="11" arg2="self.mix4spdif1_fader" />
+      <binding widget="self.mix4adat1_fader" path="/Mixer/fader" arg0="3" arg1="12" arg2="self.mix4adat2_fader" />
+      <binding widget="self.mix4adat2_fader" path="/Mixer/fader" arg0="3" arg1="13" arg2="self.mix4adat1_fader" />
+      <binding widget="self.mix4adat3_fader" path="/Mixer/fader" arg0="3" arg1="14" arg2="self.mix4adat4_fader" />
+      <binding widget="self.mix4adat4_fader" path="/Mixer/fader" arg0="3" arg1="15" arg2="self.mix4adat3_fader" />
+      <binding widget="self.mix4adat5_fader" path="/Mixer/fader" arg0="3" arg1="16" arg2="self.mix4adat6_fader" />
+      <binding widget="self.mix4adat6_fader" path="/Mixer/fader" arg0="3" arg1="17" arg2="self.mix4adat5_fader" />
+      <binding widget="self.mix4adat7_fader" path="/Mixer/fader" arg0="3" arg1="18" arg2="self.mix4adat8_fader" />
+      <binding widget="self.mix4adat8_fader" path="/Mixer/fader" arg0="3" arg1="19" arg2="self.mix4adat7_fader" />
+    </group>
+    <group name="Faders" line="149">
+      <binding widget="self.mix1_fader" path="/Mixer/Mix1/Mix_fader" />
+      <binding widget="self.mix2_fader" path="/Mixer/Mix2/Mix_fader" />
+      <binding widget="self.mix3_fader" path="/Mixer/Mix3/Mix_fader" />
+      <binding widget="self.mix4_fader" path="/Mixer/Mix4/Mix_fader" />
+      <binding widget="self.mainout_fader" path="/Mixer/Mainout_fader" />
+      <binding widget="self.phones_fader" path="/Mixer/Phones_fader" />
+    </group>
+    <group name="ChannelControls" line="158">
+      <binding widget="self.mix1ana1_pan" path="/Mixer/pan" arg0="0" arg1="0" />
+      <binding widget="self.mix1ana2_pan" path="/Mixer/pan" arg0="0" arg1="1" />
+      <binding widget="self.mix1ana3_pan" path="/Mixer/pan" arg0="0" arg1="2" />
+      <binding widget="self.mix1ana4_pan" path="/Mixer/pan" arg0="0" arg1="3" />
+      <binding widget="self.mix1ana5_pan" path="/Mixer/pan" arg0="0" arg1="4" />
+      <binding widget="self.mix1ana6_pan" path="/Mixer/pan" arg0="0" arg1="5" />
+      <binding widget="self.mix1ana7_pan" path="/Mixer/pan" arg0="0" arg1="6" />
+      <binding widget="self.mix1ana8_pan" path="/Mixer/pan" arg0="0" arg1="7" />
+      <binding widget="self.mix1aes1_pan" path="/Mixer/pan" arg0="0" arg1="8" />
+      <binding widget="self.mix1aes2_pan" path="/Mixer/pan" arg0="0" arg1="9" />
+      <binding widget="self.mix1spdif1_pan" path="/Mixer/pan" arg0="0" arg1="10" />
+      <binding widget="self.mix1spdif2_pan" path="/Mixer/pan" arg0="0" arg1="11" />
+      <binding widget="self.mix1adat1_pan" path="/Mixer/pan" arg0="0" arg1="12" />
+      <binding widget="self.mix1adat2_pan" path="/Mixer/pan" arg0="0" arg1="13" />
+      <binding widget="self.mix1adat3_pan" path="/Mixer/pan" arg0="0" arg1="14" />
+      <binding widget="self.mix1adat4_pan" path="/Mixer/pan" arg0="0" arg1="15" />
+      <binding widget="self.mix1adat5_pan" path="/Mixer/pan" arg0="0" arg1="16" />
+      <binding widget="self.mix1adat6_pan" path="/Mixer/pan" arg0="0" arg1="17" />
+      <binding widget="self.mix1adat7_pan" path="/Mixer/pan" arg0="0" arg1="18" />
+      <binding widget="self.mix1adat8_pan" path="/Mixer/pan" arg0="0" arg1="19" />
+      <binding widget="self.mix2ana1_pan" path="/Mixer/pan" arg0="1" arg1="0" />
+      <binding widget="self.mix2ana2_pan" path="/Mixer/pan" arg0="1" arg1="1" />
+      <binding widget="self.mix2ana3_pan" path="/Mixer/pan" arg0="1" arg1="2" />
+      <binding widget="self.mix2ana4_pan" path="/Mixer/pan" arg0="1" arg1="3" />
+      <binding widget="self.mix2ana5_pan" path="/Mixer/pan" arg0="1" arg1="4" />
+      <binding widget="self.mix2ana6_pan" path="/Mixer/pan" arg0="1" arg1="5" />
+      <binding widget="self.mix2ana7_pan" path="/Mixer/pan" arg0="1" arg1="6" />
+      <binding widget="self.mix2ana8_pan" path="/Mixer/pan" arg0="1" arg1="7" />
+      <binding widget="self.mix2aes1_pan" path="/Mixer/pan" arg0="1" arg1="8" />
+      <binding widget="self.mix2aes2_pan" path="/Mixer/pan" arg0="1" arg1="9" />
+      <binding widget="self.mix2spdif1_pan" path="/Mixer/pan" arg0="1" arg1="10" />
+      <binding widget="self.mix2spdif2_pan" path="/Mixer/pan" arg0="1" arg1="11" />
+      <binding widget="self.mix2adat1_pan" path="/Mixer/pan" arg0="1" arg1="12" />
+      <binding widget="self.mix2adat2_pan" path="/Mixer/pan" arg0="1" arg1="13" />
+      <binding widget="self.mix2adat3_pan" path="/Mixer/pan" arg0="1" arg1="14" />
+      <binding widget="self.mix2adat4_pan" path="/Mixer/pan" arg0="1" arg1="15" />
+      <binding widget="self.mix2adat5_pan" path="/Mixer/pan" arg0="1" arg1="16" />
+      <binding widget="self.mix2adat6_pan" path="/Mixer/pan" arg0="1" arg1="17" />
+      <binding widget="self.mix2adat7_pan" path="/Mixer/pan" arg0="1" arg1="18" />
+      <binding widget="self.mix2adat8_pan" path="/Mixer/pan" arg0="1" arg1="19" />
+      <binding widget="self.mix3ana1_pan" path="/Mixer/pan" arg0="2" arg1="0" />
+      <binding widget="self.mix3ana2_pan" path="/Mixer/pan" arg0="2" arg1="1" />
+      <binding widget="self.mix3ana3_pan" path="/Mixer/pan" arg0="2" arg1="2" />
+      <binding widget="self.mix3ana4_pan" path="/Mixer/pan" arg0="2" arg1="3" />
+      <binding widget="self.mix3ana5_pan" path="/Mixer/pan" arg0="2" arg1="4" />
+      <binding widget="self.mix3ana6_pan" path="/Mixer/pan" arg0="2" arg1="5" />
+      <binding widget="self.mix3ana7_pan" path="/Mixer/pan" arg0="2" arg1="6" />
+      <binding widget="self.mix3ana8_pan" path="/Mixer/pan" arg0="2" arg1="7" />
+      <binding widget="self.mix3aes1_pan" path="/Mixer/pan" arg0="2" arg1="8" />
+      <binding widget="self.mix3aes2_pan" path="/Mixer/pan" arg0="2" arg1="9" />
+      <binding widget="self.mix3spdif1_pan" path="/Mixer/pan" arg0="2" arg1="10" />
+      <binding widget="self.mix3spdif2_pan" path="/Mixer/pan" arg0="2" arg1="11" />
+      <binding widget="self.mix3adat1_pan" path="/Mixer/pan" arg0="2" arg1="12" />
+      <binding widget="self.mix3adat2_pan" path="/Mixer/pan" arg0="2" arg1="13" />
+      <binding widget="self.mix3adat3_pan" path="/Mixer/pan" arg0="2" arg1="14" />
+      <binding widget="self.mix3adat4_pan" path="/Mixer/pan" arg0="2" arg1="15" />
+      <binding widget="self.mix3adat5_pan" path="/Mixer/pan" arg0="2" arg1="16" />
+      <binding widget="self.mix3adat6_pan" path="/Mixer/pan" arg0="2" arg1="17" />
+      <binding widget="self.mix3adat7_pan" path="/Mixer/pan" arg0="2" arg1="18" />
+      <binding widget="self.mix3adat8_pan" path="/Mixer/pan" arg0="2" arg1="19" />
+      <binding widget="self.mix4ana1_pan" path="/Mixer/pan" arg0="3" arg1="0" />
+      <binding widget="self.mix4ana2_pan" path="/Mixer/pan" arg0="3" arg1="1" />
+      <binding widget="self.mix4ana3_pan" path="/Mixer/pan" arg0="3" arg1="2" />
+      <binding widget="self.mix4ana4_pan" path="/Mixer/pan" arg0="3" arg1="3" />
+      <binding widget="self.mix4ana5_pan" path="/Mixer/pan" arg0="3" arg1="4" />
+      <binding widget="self.mix4ana6_pan" path="/Mixer/pan" arg0="3" arg1="5" />
+      <binding widget="self.mix4ana7_pan" path="/Mixer/pan" arg0="3" arg1="6" />
+      <binding widget="self.mix4ana8_pan" path="/Mixer/pan" arg0="3" arg1="7" />
+      <binding widget="self.mix4aes1_pan" path="/Mixer/pan" arg0="3" arg1="8" />
+      <binding widget="self.mix4aes2_pan" path="/Mixer/pan" arg0="3" arg1="9" />
+      <binding widget="self.mix4spdif1_pan" path="/Mixer/pan" arg0="3" arg1="10" />
+      <binding widget="self.mix4spdif2_pan" path="/Mixer/pan" arg0="3" arg1="11" />
+      <binding widget="self.mix4adat1_pan" path="/Mixer/pan" arg0="3" arg1="12" />
+      <binding widget="self.mix4adat2_pan" path="/Mixer/pan" arg0="3" arg1="13" />
+      <binding widget="self.mix4adat3_pan" path="/Mixer/pan" arg0="3" arg1="14" />
+      <binding widget="self.mix4adat4_pan" path="/Mixer/pan" arg0="3" arg1="15" />
+      <binding widget="self.mix4adat5_pan" path="/Mixer/pan" arg0="3" arg1="16" />
+      <binding widget="self.mix4adat6_pan" path="/Mixer/pan" arg0="3" arg1="17" />
+      <binding widget="self.mix4adat7_pan" path="/Mixer/pan" arg0="3" arg1="18" />
+      <binding widget="self.mix4adat8_pan" path="/Mixer/pan" arg0="3" arg1="19" />
+    </group>
+    <group name="Controls" line="244">
+      <binding widget="self.ana1_trimgain" path="/Mixer/Control/Ana1_trimgain" />
+      <binding widget="self.ana2_trimgain" path="/Mixer/Control/Ana2_trimgain" />
+      <binding widget="self.ana3_trimgain" path="/Mixer/Control/Ana3_trimgain" />
+      <binding widget="self.ana4_trimgain" path="/Mixer/Control/Ana4_trimgain" />
+      <binding widget="self.ana5_trimgain" path="/Mixer/Control/Ana5_trimgain" />
+      <binding widget="self.ana6_trimgain" path="/Mixer/Control/Ana6_trimgain" />
+      <binding widget="self.ana7_trimgain" path="/Mixer/Control/Ana7_trimgain" />
+      <binding widget="self.ana8_trimgain" path="/Mixer/Control/Ana8_trimgain" />
+      <binding widget="self.spdif1_trimgain" path="/Mixer/Control/Spdif1_trimgain" />
+      <binding widget="self.spdif2_trimgain" path="/Mixer/Control/Spdif2_trimgain" />
+    </group>
+    <group name="ChannelBinarySwitches" line="257">
+      <binding widget="self.mix1ana1_mute" path="/Mixer/mute" arg0="0" arg1="0" />
+      <binding widget="self.mix1ana2_mute" path="/Mixer/mute" arg0="0" arg1="1" />
+      <binding widget="self.mix1ana3_mute" path="/Mixer/mute" arg0="0" arg1="2" />
+      <binding widget="self.mix1ana4_mute" path="/Mixer/mute" arg0="0" arg1="3" />
+      <binding widget="self.mix1ana5_mute" path="/Mixer/mute" arg0="0" arg1="4" />
+      <binding widget="self.mix1ana6_mute" path="/Mixer/mute" arg0="0" arg1="5" />
+      <binding widget="self.mix1ana7_mute" path="/Mixer/mute" arg0="0" arg1="6" />
+      <binding widget="self.mix1ana8_mute" path="/Mixer/mute" arg0="0" arg1="7" />
+      <binding widget="self.mix1aes1_mute" path="/Mixer/mute" arg0="0" arg1="8" />
+      <binding widget="self.mix1aes2_mute" path="/Mixer/mute" arg0="0" arg1="9" />
+      <binding widget="self.mix1spdif1_mute" path="/Mixer/mute" arg0="0" arg1="10" />
+      <binding widget="self.mix1spdif2_mute" path="/Mixer/mute" arg0="0" arg1="11" />
+      <binding widget="self.mix1adat1_mute" path="/Mixer/mute" arg0="0" arg1="12" />
+      <binding widget="self.mix1adat2_mute" path="/Mixer/mute" arg0="0" arg1="13" />
+      <binding widget="self.mix1adat3_mute" path="/Mixer/mute" arg0="0" arg1="14" />
+      <binding widget="self.mix1adat4_mute" path="/Mixer/mute" arg0="0" arg1="15" />
+      <binding widget="self.mix1adat5_mute" path="/Mixer/mute" arg0="0" arg1="16" />
+      <binding widget="self.mix1adat6_mute" path="/Mixer/mute" arg0="0" arg1="17" />
+      <binding widget="self.mix1adat7_mute" path="/Mixer/mute" arg0="0" arg1="18" />
+      <binding widget="self.mix1adat8_mute" path="/Mixer/mute" arg0="0" arg1="19" />
+      <binding widget="self.mix1ana1_solo" path="/Mixer/solo" arg0="0" arg1="0" />
+      <binding widget="self.mix1ana2_solo" path="/Mixer/solo" arg0="0" arg1="1" />
+      <binding widget="self.mix1ana3_solo" path="/Mixer/solo" arg0="0" arg1="2" />
+      <binding widget="self.mix1ana4_solo" path="/Mixer/solo" arg0="0" arg1="3" />
+      <binding widget="self.mix1ana5_solo" path="/Mixer/solo" arg0="0" arg1="4" />
+      <binding widget="self.mix1ana6_solo" path="/Mixer/solo" arg0="0" arg1="5" />
+      <binding widget="self.mix1ana7_solo" path="/Mixer/solo" arg0="0" arg1="6" />
+      <binding widget="self.mix1ana8_solo" path="/Mixer/solo" arg0="0" arg1="7" />
+      <binding widget="self.mix1aes1_solo" path="/Mixer/solo" arg0="0" arg1="8" />
+      <binding widget="self.mix1aes2_solo" path="/Mixer/solo" arg0="0" arg1="9" />
+      <binding widget="self.mix1spdif1_solo" path="/Mixer/solo" arg0="0" arg1="10" />
+      <binding widget="self.mix1spdif2_solo" path="/Mixer/solo" arg0="0" arg1="11" />
+      <binding widget="self.mix1adat1_solo" path="/Mixer/solo" arg0="0" arg1="12" />
+      <binding widget="self.mix1adat2_solo" path="/Mixer/solo" arg0="0" arg1="13" />
+      <binding widget="self.mix1adat3_solo" path="/Mixer/solo" arg0="0" arg1="14" />
+      <binding widget="self.mix1adat4_solo" path="/Mixer/solo" arg0="0" arg1="15" />
+      <binding widget="self.mix1adat5_solo" path="/Mixer/solo" arg0="0" arg1="16" />
+      <binding widget="self.mix1adat6_solo" path="/Mixer/solo" arg0="0" arg1="17" />
+      <binding widget="self.mix1adat7_solo" path="/Mixer/solo" arg0="0" arg1="18" />
+      <binding widget="self.mix1adat8_solo" path="/Mixer/solo" arg0="0" arg1="19" />
+      <binding widget="self.mix2ana1_mute" path="/Mixer/mute" arg0="1" arg1="0" />
+      <binding widget="self.mix2ana2_mute" path="/Mixer/mute" arg0="1" arg1="1" />
+      <binding widget="self.mix2ana3_mute" path="/Mixer/mute" arg0="1" arg1="2" />
+      <binding widget="self.mix2ana4_mute" path="/Mixer/mute" arg0="1" arg1="3" />
+      <binding widget="self.mix2ana5_mute" path="/Mixer/mute" arg0="1" arg1="4" />
+      <binding widget="self.mix2ana6_mute" path="/Mixer/mute" arg0="1" arg1="5" />
+      <binding widget="self.mix2ana7_mute" path="/Mixer/mute" arg0="1" arg1="6" />
+      <binding widget="self.mix2ana8_mute" path="/Mixer/mute" arg0="1" arg1="7" />
+      <binding widget="self.mix2aes1_mute" path="/Mixer/mute" arg0="1" arg1="8" />
+      <binding widget="self.mix2aes2_mute" path="/Mixer/mute" arg0="1" arg1="9" />
+      <binding widget="self.mix2spdif1_mute" path="/Mixer/mute" arg0="1" arg1="10" />
+      <binding widget="self.mix2spdif2_mute" path="/Mixer/mute" arg0="1" arg1="11" />
+      <binding widget="self.mix2adat1_mute" path="/Mixer/mute" arg0="1" arg1="12" />
+      <binding widget="self.mix2adat2_mute" path="/Mixer/mute" arg0="1" arg1="13" />
+      <binding widget="self.mix2adat3_mute" path="/Mixer/mute" arg0="1" arg1="14" />
+      <binding widget="self.mix2adat4_mute" path="/Mixer/mute" arg0="1" arg1="15" />
+      <binding widget="self.mix2adat5_mute" path="/Mixer/mute" arg0="1" arg1="16" />
+      <binding widget="self.mix2adat6_mute" path="/Mixer/mute" arg0="1" arg1="17" />
+      <binding widget="self.mix2adat7_mute" path="/Mixer/mute" arg0="1" arg1="18" />
+      <binding widget="self.mix2adat8_mute" path="/Mixer/mute" arg0="1" arg1="19" />
+      <binding widget="self.mix2ana1_solo" path="/Mixer/solo" arg0="1" arg1="0" />
+      <binding widget="self.mix2ana2_solo" path="/Mixer/solo" arg0="1" arg1="1" />
+      <binding widget="self.mix2ana3_solo" path="/Mixer/solo" arg0="1" arg1="2" />
+      <binding widget="self.mix2ana4_solo" path="/Mixer/solo" arg0="1" arg1="3" />
+      <binding widget="self.mix2ana5_solo" path="/Mixer/solo" arg0="1" arg1="4" />
+      <binding widget="self.mix2ana6_solo" path="/Mixer/solo" arg0="1" arg1="5" />
+      <binding widget="self.mix2ana7_solo" path="/Mixer/solo" arg0="1" arg1="6" />
+      <binding widget="self.mix2ana8_solo" path="/Mixer/solo" arg0="1" arg1="7" />
+      <binding widget="self.mix2aes1_solo" path="/Mixer/solo" arg0="1" arg1="8" />
+      <binding widget="self.mix2aes2_solo" path="/Mixer/solo" arg0="1" arg1="9" />
+      <binding widget="self.mix2spdif1_solo" path="/Mixer/solo" arg0="1" arg1="10" />
+      <binding widget="self.mix2spdif2_solo" path="/Mixer/solo" arg0="1" arg1="11" />
+      <binding widget="self.mix2adat1_solo" path="/Mixer/solo" arg0="1" arg1="12" />
+      <binding widget="self.mix2adat2_solo" path="/Mixer/solo" arg0="1" arg1="13" />
+      <binding widget="self.mix2adat3_solo" path="/Mixer/solo" arg0="1" arg1="14" />
+      <binding widget="self.mix2adat4_solo" path="/Mixer/solo" arg0="1" arg1="15" />
+      <binding widget="self.mix2adat5_solo" path="/Mixer/solo" arg0="1" arg1="16" />
+      <binding widget="self.mix2adat6_solo" path="/Mixer/solo" arg0="1" arg1="17" />
+      <binding widget="self.mix2adat7_solo" path="/Mixer/solo" arg0="1" arg1="18" />
+      <binding widget="self.mix2adat8_solo" path="/Mixer/solo" arg0="1" arg1="19" />
+      <binding widget="self.mix3ana1_mute" path="/Mixer/mute" arg0="2" arg1="0" />
+      <binding widget="self.mix3ana2_mute" path="/Mixer/mute" arg0="2" arg1="1" />
+      <binding widget="self.mix3ana3_mute" path="/Mixer/mute" arg0="2" arg1="2" />
+      <binding widget="self.mix3ana4_mute" path="/Mixer/mute" arg0="2" arg1="3" />
+      <binding widget="self.mix3ana5_mute" path="/Mixer/mute" arg0="2" arg1="4" />
+      <binding widget="self.mix3ana6_mute" path="/Mixer/mute" arg0="2" arg1="5" />
+      <binding widget="self.mix3ana7_mute" path="/Mixer/mute" arg0="2" arg1="6" />
+      <binding widget="self.mix3ana8_mute" path="/Mixer/mute" arg0="2" arg1="7" />
+      <binding widget="self.mix3aes1_mute" path="/Mixer/mute" arg0="2" arg1="8" />
+      <binding widget="self.mix3aes2_mute" path="/Mixer/mute" arg0="2" arg1="9" />
+      <binding widget="self.mix3spdif1_mute" path="/Mixer/mute" arg0="2" arg1="10" />
+      <binding widget="self.mix3spdif2_mute" path="/Mixer/mute" arg0="2" arg1="11" />
+      <binding widget="self.mix3adat1_mute" path="/Mixer/mute" arg0="2" arg1="12" />
+      <binding widget="self.mix3adat2_mute" path="/Mixer/mute" arg0="2" arg1="13" />
+      <binding widget="self.mix3adat3_mute" path="/Mixer/mute" arg0="2" arg1="14" />
+      <binding widget="self.mix3adat4_mute" path="/Mixer/mute" arg0="2" arg1="15" />
+      <binding widget="self.mix3adat5_mute" path="/Mixer/mute" arg0="2" arg1="16" />
+      <binding widget="self.mix3adat6_mute" path="/Mixer/mute" arg0="2" arg1="17" />
+      <binding widget="self.mix3adat7_mute" path="/Mixer/mute" arg0="2" arg1="18" />
+      <binding widget="self.mix3adat8_mute" path="/Mixer/mute" arg0="2" arg1="19" />
+      <binding widget="self.mix3ana1_solo" path="/Mixer/solo" arg0="2" arg1="0" />
+      <binding widget="self.mix3ana2_solo" path="/Mixer/solo" arg0="2" arg1="1" />
+      <binding widget="self.mix3ana3_solo" path="/Mixer/solo" arg0="2" arg1="2" />
+      <binding widget="self.mix3ana4_solo" path="/Mixer/solo" arg0="2" arg1="3" />
+      <binding widget="self.mix3ana5_solo" path="/Mixer/solo" arg0="2" arg1="4" />
+      <binding widget="self.mix3ana6_solo" path="/Mixer/solo" arg0="2" arg1="5" />
+      <binding widget="self.mix3ana7_solo" path="/Mixer/solo" arg0="2" arg1="6" />
+      <binding widget="self.mix3ana8_solo" path="/Mixer/solo" arg0="2" arg1="7" />
+      <binding widget="self.mix3aes1_solo" path="/Mixer/solo" arg0="2" arg1="8" />
+      <binding widget="self.mix3aes2_solo" path="/Mixer/solo" arg0="2" arg1="9" />
+      <binding widget="self.mix3spdif1_solo" path="/Mixer/solo" arg0="2" arg1="10" />
+      <binding widget="self.mix3spdif2_solo" path="/Mixer/solo" arg0="2" arg1="11" />
+      <binding widget="self.mix3adat1_solo" path="/Mixer/solo" arg0="2" arg1="12" />
+      <binding widget="self.mix3adat2_solo" path="/Mixer/solo" arg0="2" arg1="13" />
+      <binding widget="self.mix3adat3_solo" path="/Mixer/solo" arg0="2" arg1="14" />
+      <binding widget="self.mix3adat4_solo" path="/Mixer/solo" arg0="2" arg1="15" />
+      <binding widget="self.mix3adat5_solo" path="/Mixer/solo" arg0="2" arg1="16" />
+      <binding widget="self.mix3adat6_solo" path="/Mixer/solo" arg0="2" arg1="17" />
+      <binding widget="self.mix3adat7_solo" path="/Mixer/solo" arg0="2" arg1="18" />
+      <binding widget="self.mix3adat8_solo" path="/Mixer/solo" arg0="2" arg1="19" />
+      <binding widget="self.mix4ana1_mute" path="/Mixer/mute" arg0="3" arg1="0" />
+      <binding widget="self.mix4ana2_mute" path="/Mixer/mute" arg0="3" arg1="1" />
+      <binding widget="self.mix4ana3_mute" path="/Mixer/mute" arg0="3" arg1="2" />
+      <binding widget="self.mix4ana4_mute" path="/Mixer/mute" arg0="3" arg1="3" />
+      <binding widget="self.mix4ana5_mute" path="/Mixer/mute" arg0="3" arg1="4" />
+      <binding widget="self.mix4ana6_mute" path="/Mixer/mute" arg0="3" arg1="5" />
+      <binding widget="self.mix4ana7_mute" path="/Mixer/mute" arg0="3" arg1="6" />
+      <binding widget="self.mix4ana8_mute" path="/Mixer/mute" arg0="3" arg1="7" />
+      <binding widget="self.mix4aes1_mute" path="/Mixer/mute" arg0="3" arg1="8" />
+      <binding widget="self.mix4aes2_mute" path="/Mixer/mute" arg0="3" arg1="9" />
+      <binding widget="self.mix4spdif1_mute" path="/Mixer/mute" arg0="3" arg1="10" />
+      <binding widget="self.mix4spdif2_mute" path="/Mixer/mute" arg0="3" arg1="11" />
+      <binding widget="self.mix4adat1_mute" path="/Mixer/mute" arg0="3" arg1="12" />
+      <binding widget="self.mix4adat2_mute" path="/Mixer/mute" arg0="3" arg1="13" />
+      <binding widget="self.mix4adat3_mute" path="/Mixer/mute" arg0="3" arg1="14" />
+      <binding widget="self.mix4adat4_mute" path="/Mixer/mute" arg0="3" arg1="15" />
+      <binding widget="self.mix4adat5_mute" path="/Mixer/mute" arg0="3" arg1="16" />
+      <binding widget="self.mix4adat6_mute" path="/Mixer/mute" arg0="3" arg1="17" />
+      <binding widget="self.mix4adat7_mute" path="/Mixer/mute" arg0="3" arg1="18" />
+      <binding widget="self.mix4adat8_mute" path="/Mixer/mute" arg0="3" arg1="19" />
+      <binding widget="self.mix4ana1_solo" path="/Mixer/solo" arg0="3" arg1="0" />
+      <binding widget="self.mix4ana2_solo" path="/Mixer/solo" arg0="3" arg1="1" />
+      <binding widget="self.mix4ana3_solo" path="/Mixer/solo" arg0="3" arg1="2" />
+      <binding widget="self.mix4ana4_solo" path="/Mixer/solo" arg0="3" arg1="3" />
+      <binding widget="self.mix4ana5_solo" path="/Mixer/solo" arg0="3" arg1="4" />
+      <binding widget="self.mix4ana6_solo" path="/Mixer/solo" arg0="3" arg1="5" />
+      <binding widget="self.mix4ana7_solo" path="/Mixer/solo" arg0="3" arg1="6" />
+      <binding widget="self.mix4ana8_solo" path="/Mixer/solo" arg0="3" arg1="7" />
+      <binding widget="self.mix4aes1_solo" path="/Mixer/solo" arg0="3" arg1="8" />
+      <binding widget="self.mix4aes2_solo" path="/Mixer/solo" arg0="3" arg1="9" />
+      <binding widget="self.mix4spdif1_solo" path="/Mixer/solo" arg0="3" arg1="10" />
+      <binding widget="self.mix4spdif2_solo" path="/Mixer/solo" arg0="3" arg1="11" />
+      <binding widget="self.mix4adat1_solo" path="/Mixer/solo" arg0="3" arg1="12" />
+      <binding widget="self.mix4adat2_solo" path="/Mixer/solo" arg0="3" arg1="13" />
+      <binding widget="self.mix4adat3_solo" path="/Mixer/solo" arg0="3" arg1="14" />
+      <binding widget="self.mix4adat4_solo" path="/Mixer/solo" arg0="3" arg1="15" />
+      <binding widget="self.mix4adat5_solo" path="/Mixer/solo" arg0="3" arg1="16" />
+      <binding widget="self.mix4adat6_solo" path="/Mixer/solo" arg0="3" arg1="17" />
+      <binding widget="self.mix4adat7_solo" path="/Mixer/solo" arg0="3" arg1="18" />
+      <binding widget="self.mix4adat8_solo" path="/Mixer/solo" arg0="3" arg1="19" />
+    </group>
+    <group name="BinarySwitches" line="423">
+      <binding widget="self.mix1_mute" path="/Mixer/Mix1/Mix_mute" />
+      <binding widget="self.mix2_mute" path="/Mixer/Mix2/Mix_mute" />
+      <binding widget="self.mix3_mute" path="/Mixer/Mix3/Mix_mute" />
+      <binding widget="self.mix4_mute" path="/Mixer/Mix4/Mix_mute" />
+      <binding widget="self.ana1_pad" path="/Mixer/Control/Ana1_pad" />
+      <binding widget="self.ana2_pad" path="/Mixer/Control/Ana2_pad" />
+      <binding widget="self.ana3_pad" path="/Mixer/Control/Ana3_pad" />
+      <binding widget="self.ana4_pad" path="/Mixer/Control/Ana4_pad" />
+      <binding widget="self.ana5_pad" path="/Mixer/Control/Ana5_pad" />
+      <binding widget="self.ana6_pad" path="/Mixer/Control/Ana6_pad" />
+      <binding widget="self.ana7_pad" path="/Mixer/Control/Ana7_pad" />
+      <binding widget="self.ana8_pad" path="/Mixer/Control/Ana8_pad" />
+      <binding widget="self.ana1_invert" path="/Mixer/Control/Ana1_invert" />
+      <binding widget="self.ana2_invert" path="/Mixer/Control/Ana2_invert" />
+      <binding widget="self.ana3_invert" path="/Mixer/Control/Ana3_invert" />
+      <binding widget="self.ana4_invert" path="/Mixer/Control/Ana4_invert" />
+      <binding widget="self.ana5_invert" path="/Mixer/Control/Ana5_invert" />
+      <binding widget="self.ana6_invert" path="/Mixer/Control/Ana6_invert" />
+      <binding widget="self.ana7_invert" path="/Mixer/Control/Ana7_invert" />
+      <binding widget="self.ana8_invert" path="/Mixer/Control/Ana8_invert" />
+      <binding widget="self.spdif1_invert" path="/Mixer/Control/Spdif1_invert" />
+      <binding widget="self.spdif2_invert" path="/Mixer/Control/Spdif2_invert" />
+      <binding widget="self.ana1_level" path="/Mixer/Control/Ana1_level" />
+      <binding widget="self.ana2_level" path="/Mixer/Control/Ana2_level" />
+      <binding widget="self.ana3_level" path="/Mixer/Control/Ana3_level" />
+      <binding widget="self.ana4_level" path="/Mixer/Control/Ana4_level" />
+      <binding widget="self.ana5_level" path="/Mixer/Control/Ana5_level" />
+      <binding widget="self.ana6_level" path="/Mixer/Control/Ana6_level" />
+      <binding widget="self.ana7_level" path="/Mixer/Control/Ana7_level" />
+      <binding widget="self.ana8_level" path="/Mixer/Control/Ana8_level" />
+      <binding widget="self.ana1_boost" path="/Mixer/Control/Ana1_boost" />
+      <binding widget="self.ana2_boost" path="/Mixer/Control/Ana2_boost" />
+      <binding widget="self.ana3_boost" path="/Mixer/Control/Ana3_boost" />
+      <binding widget="self.ana4_boost" path="/Mixer/Control/Ana4_boost" />
+      <binding widget="self.ana5_boost" path="/Mixer/Control/Ana5_boost" />
+      <binding widget="self.ana6_boost" path="/Mixer/Control/Ana6_boost" />
+      <binding widget="self.ana7_boost" path="/Mixer/Control/Ana7_boost" />
+      <binding widget="self.ana8_boost" path="/Mixer/Control/Ana8_boost" />
+    </group>
+    <group name="Selectors" line="465">
+      <binding widget="self.mix1_dest" path="/Mixer/Mix1/Mix_dest" />
+      <binding widget="self.mix2_dest" path="/Mixer/Mix2/Mix_dest" />
+      <binding widget="self.mix3_dest" path="/Mixer/Mix3/Mix_dest" />
+      <binding widget="self.mix4_dest" path="/Mixer/Mix4/Mix_dest" />
+      <binding widget="self.phones_src" path="/Mixer/Control/Phones_src" />
+      <binding widget="self.optical_in_mode" path="/Mixer/Control/OpticalIn_mode" />
+      <binding widget="self.optical_out_mode" path="/Mixer/Control/OpticalOut_mode" />
+      <binding widget="self.meter_src_ctrl" path="/Mixer/Control/Meter_src" />
+      <binding widget="self.aesebu_meter_ctrl" path="/Mixer/Control/Meter_aesebu_src" />
+      <binding widget="self.peakhold_time_ctrl" path="/Mixer/Control/Meter_peakhold_time" />
+      <binding widget="self.cliphold_time_ctrl" path="/Mixer/Control/Meter_cliphold_time" />
+    </group>
+  </mappings>
+  <ui_files>
+    <ui file="motu_mark3.ui" association="name">
+      <widgets>
+        <widget name="MotuMark3MixerUI" class="QWidget" />
+      </widgets>
+    </ui>
+    <ui file="motu.ui" association="explicit">
+      <widgets>
+        <widget name="MotuMixerUI" class="QWidget" />
+        <widget name="settings_pane" class="QGroupBox" />
+        <widget name="groupBox11_2" class="QGroupBox" />
+        <widget name="optical_in_mode" class="QComboBox" />
+        <widget name="line2" class="Line" />
+        <widget name="groupBox10" class="QGroupBox" />
+        <widget name="optical_out_mode" class="QComboBox" />
+        <widget name="phones_src_frame" class="QGroupBox" />
+        <widget name="phones_src" class="QComboBox" />
+        <widget name="line2_2" class="Line" />
+        <widget name="meter_src" class="QGroupBox" />
+        <widget name="meter_src_ctrl" class="QComboBox" />
+        <widget name="aesebu_meter" class="QGroupBox" />
+        <widget name="aesebu_meter_ctrl" class="QComboBox" />
+        <widget name="peakhold_time" class="QGroupBox" />
+        <widget name="peakhold_time_ctrl" class="QComboBox" />
+        <widget name="cliphold_time" class="QGroupBox" />
+        <widget name="cliphold_time_ctrl" class="QComboBox" />
+        <widget name="right_pane" class="QFrame" />
+        <widget name="analog_settings_box" class="QGroupBox" />
+        <widget name="ana1ctrl" class="QFrame" />
+        <widget name="ana1_trimgain" class="QSpinBox" />
+        <widget name="ana1_trimgain_label" class="QLabel" />
+        <widget name="ana1_pad" class="QToolButton" />
+        <widget name="ana1_invert" class="QToolButton" />
+        <widget name="ana1_boost" class="QToolButton" />
+        <widget name="ana1_level" class="QToolButton" />
+        <widget name="textLabel6_14" class="QLabel" />
+        <widget name="ana2ctrl" class="QFrame" />
+        <widget name="ana2_trimgain" class="QSpinBox" />
+        <widget name="ana2_trimgain_label" class="QLabel" />
+        <widget name="ana2_pad" class="QToolButton" />
+        <widget name="ana2_invert" class="QToolButton" />
+        <widget name="ana2_boost" class="QToolButton" />
+        <widget name="ana2_level" class="QToolButton" />
+        <widget name="textLabel6_14_2" class="QLabel" />
+        <widget name="ana3ctrl" class="QFrame" />
+        <widget name="ana3_trimgain" class="QSpinBox" />
+        <widget name="ana3_trimgain_label" class="QLabel" />
+        <widget name="ana3_pad" class="QToolButton" />
+        <widget name="ana3_invert" class="QToolButton" />
+        <widget name="ana3_boost" class="QToolButton" />
+        <widget name="ana3_level" class="QToolButton" />
+        <widget name="textLabel6_14_3" class="QLabel" />
+        <widget name="ana4ctrl" class="QFrame" />
+        <widget name="ana4_trimgain" class="QSpinBox" />
+        <widget name="ana4_trimgain_label" class="QLabel" />
+        <widget name="ana4_pad" class="QToolButton" />
+        <widget name="ana4_invert" class="QToolButton" />
+        <widget name="ana4_boost" class="QToolButton" />
+        <widget name="ana4_level" class="QToolButton" />
+        <widget name="textLabel6_14_4" class="QLabel" />
+        <widget name="ana5ctrl" class="QFrame" />
+        <widget name="ana5_trimgain" class="QSpinBox" />
+        <widget name="ana5_trimgain_label" class="QLabel" />
+        <widget name="ana5_pad" class="QToolButton" />
+        <widget name="ana5_invert" class="QToolButton" />
+        <widget name="ana5_boost" class="QToolButton" />
+        <widget name="ana5_level" class="QToolButton" />
+        <widget name="textLabel6_14_5" class="QLabel" />
+        <widget name="ana6ctrl" class="QFrame" />
+        <widget name="ana6_trimgain" class="QSpinBox" />
+        <widget name="ana6_trimgain_label" class="QLabel" />
+        <widget name="ana6_pad" class="QToolButton" />
+        <widget name="ana6_invert" class="QToolButton" />
+        <widget name="ana6_boost" class="QToolButton" />
+        <widget name="ana6_level" class="QToolButton" />
+        <widget name="textLabel6_14_6" class="QLabel" />
+        <widget name="ana7ctrl" class="QFrame" />
+        <widget name="ana7_trimgain" class="QSpinBox" />
+        <widget name="ana7_trimgain_label" class="QLabel" />
+        <widget name="ana7_pad" class="QToolButton" />
+        <widget name="ana7_invert" class="QToolButton" />
+        <widget name="ana7_boost" class="QToolButton" />
+        <widget name="ana7_level" class="QToolButton" />
+        <widget name="textLabel6_14_7" class="QLabel" />
+        <widget name="ana8ctrl" class="QFrame" />
+        <widget name="ana8_trimgain" class="QSpinBox" />
+        <widget name="ana8_trimgain_label" class="QLabel" />
+        <widget name="ana8_pad" class="QToolButton" />
+        <widget name="ana8_invert" class="QToolButton" />
+        <widget name="ana8_boost" class="QToolButton" />
+        <widget name="ana8_level" class="QToolButton" />
+        <widget name="textLabel6_14_8" class="QLabel" />
+        <widget name="spdif1ctrl" class="QFrame" />
+        <widget name="spdif1_trimgain" class="QSpinBox" />
+        <widget name="spdif1_trimgain_label" class="QLabel" />
+        <widget name="spdif1_invert" class="QToolButton" />
+        <widget name="textLabel6_14_10" class="QLabel" />
+        <widget name="spdif2ctrl" class="QFrame" />
+        <widget name="spdif2_trimgain" class="QSpinBox" />
+        <widget name="spdif2_trimgain_label" class="QLabel" />
+        <widget name="spdif2_invert" class="QToolButton" />
+        <widget name="textLabel6_14_9" class="QLabel" />
+        <widget name="frame" class="QFrame" />
+        <widget name="mixtab" class="QTabWidget" />
+        <widget name="mix1" class="QWidget" />
+        <widget name="mix1_tab" class="QTabWidget" />
+        <widget name="tab" class="QWidget" />
+        <widget name="mix1ana1" class="QFrame" />
+        <widget name="mix1ana1_solo" class="QToolButton" />
+        <widget name="mix1ana1_mute" class="QToolButton" />
+        <widget name="mix1ana1_pan" class="QSpinBox" />
+        <widget name="textLabel1" class="QLabel" />
+        <widget name="frame8_2" class="QFrame" />
+        <widget name="mix1ana1_fader" class="QSlider" />
+        <widget name="textLabel6" class="QLabel" />
+        <widget name="mix1ana2" class="QFrame" />
+        <widget name="mix1ana2_solo" class="QToolButton" />
+        <widget name="mix1ana2_mute" class="QToolButton" />
+        <widget name="mix1ana2_pan" class="QSpinBox" />
+        <widget name="textLabel1_3" class="QLabel" />
+        <widget name="frame8_2_3" class="QFrame" />
+        <widget name="mix1ana2_fader" class="QSlider" />
+        <widget name="textLabel6_3" class="QLabel" />
+        <widget name="mix1ana3" class="QFrame" />
+        <widget name="mix1ana3_solo" class="QToolButton" />
+        <widget name="mix1ana3_mute" class="QToolButton" />
+        <widget name="mix1ana3_pan" class="QSpinBox" />
+        <widget name="textLabel1_4" class="QLabel" />
+        <widget name="frame8_2_4" class="QFrame" />
+        <widget name="mix1ana3_fader" class="QSlider" />
+        <widget name="textLabel6_4" class="QLabel" />
+        <widget name="mix1ana4" class="QFrame" />
+        <widget name="mix1ana4_solo" class="QToolButton" />
+        <widget name="mix1ana4_mute" class="QToolButton" />
+        <widget name="mix1ana4_pan" class="QSpinBox" />
+        <widget name="textLabel1_5" class="QLabel" />
+        <widget name="frame8_2_5" class="QFrame" />
+        <widget name="mix1ana4_fader" class="QSlider" />
+        <widget name="textLabel6_5" class="QLabel" />
+        <widget name="mix1ana5" class="QFrame" />
+        <widget name="mix1ana5_solo" class="QToolButton" />
+        <widget name="mix1ana5_mute" class="QToolButton" />
+        <widget name="mix1ana5_pan" class="QSpinBox" />
+        <widget name="textLabel1_6" class="QLabel" />
+        <widget name="frame8_2_6" class="QFrame" />
+        <widget name="mix1ana5_fader" class="QSlider" />
+        <widget name="textLabel6_6" class="QLabel" />
+        <widget name="mix1ana6" class="QFrame" />
+        <widget name="mix1ana6_solo" class="QToolButton" />
+        <widget name="mix1ana6_mute" class="QToolButton" />
+        <widget name="mix1ana6_pan" class="QSpinBox" />
+        <widget name="textLabel1_7" class="QLabel" />
+        <widget name="frame8_2_7" class="QFrame" />
+        <widget name="mix1ana6_fader" class="QSlider" />
+        <widget name="textLabel6_7" class="QLabel" />
+        <widget name="mix1ana7" class="QFrame" />
+        <widget name="mix1ana7_solo" class="QToolButton" />
+        <widget name="mix1ana7_mute" class="QToolButton" />
+        <widget name="mix1ana7_pan" class="QSpinBox" />
+        <widget name="textLabel1_8" class="QLabel" />
+        <widget name="frame8_2_8" class="QFrame" />
+        <widget name="mix1ana7_fader" class="QSlider" />
+        <widget name="textLabel6_8" class="QLabel" />
+        <widget name="mix1ana8" class="QFrame" />
+        <widget name="mix1ana8_solo" class="QToolButton" />
+        <widget name="mix1ana8_mute" class="QToolButton" />
+        <widget name="mix1ana8_pan" class="QSpinBox" />
+        <widget name="textLabel1_9" class="QLabel" />
+        <widget name="frame8_2_9" class="QFrame" />
+        <widget name="mix1ana8_fader" class="QSlider" />
+        <widget name="textLabel6_9" class="QLabel" />
+        <widget name="tab" class="QWidget" />
+        <widget name="mix1aes1" class="QFrame" />
+        <widget name="mix1aes1_solo" class="QToolButton" />
+        <widget name="mix1aes1_mute" class="QToolButton" />
+        <widget name="mix1aes1_pan" class="QSpinBox" />
+        <widget name="textLabel1_13" class="QLabel" />
+        <widget name="frame8_2_13" class="QFrame" />
+        <widget name="mix1aes1_fader" class="QSlider" />
+        <widget name="textLabel6_12" class="QLabel" />
+        <widget name="mix1aes2" class="QFrame" />
+        <widget name="mix1aes2_solo" class="QToolButton" />
+        <widget name="mix1aes2_mute" class="QToolButton" />
+        <widget name="mix1aes2_pan" class="QSpinBox" />
+        <widget name="textLabel1_3_5" class="QLabel" />
+        <widget name="frame8_2_3_5" class="QFrame" />
+        <widget name="mix1aes2_fader" class="QSlider" />
+        <widget name="textLabel6_3_5" class="QLabel" />
+        <widget name="TabPage" class="QWidget" />
+        <widget name="mix1spdif1" class="QFrame" />
+        <widget name="mix1spdif1_solo" class="QToolButton" />
+        <widget name="mix1spdif1_mute" class="QToolButton" />
+        <widget name="mix1spdif1_pan" class="QSpinBox" />
+        <widget name="textLabel1_14" class="QLabel" />
+        <widget name="frame8_2_14" class="QFrame" />
+        <widget name="mix1spdif1_fader" class="QSlider" />
+        <widget name="textLabel6_13" class="QLabel" />
+        <widget name="mix1spdif2" class="QFrame" />
+        <widget name="mix1spdif2_solo" class="QToolButton" />
+        <widget name="mix1spdif2_mute" class="QToolButton" />
+        <widget name="mix1spdif2_pan" class="QSpinBox" />
+        <widget name="textLabel1_3_6" class="QLabel" />
+        <widget name="frame8_2_3_6" class="QFrame" />
+        <widget name="mix1spdif2_fader" class="QSlider" />
+        <widget name="textLabel6_3_6" class="QLabel" />
+        <widget name="TabPage" class="QWidget" />
+        <widget name="mix1adat1" class="QFrame" />
+        <widget name="mix1adat1_solo" class="QToolButton" />
+        <widget name="mix1adat1_mute" class="QToolButton" />
+        <widget name="mix1adat1_pan" class="QSpinBox" />
+        <widget name="textLabel1_12" class="QLabel" />
+        <widget name="frame8_2_12" class="QFrame" />
+        <widget name="mix1adat1_fader" class="QSlider" />
+        <widget name="textLabel6_11" class="QLabel" />
+        <widget name="mix1adat2" class="QFrame" />
+        <widget name="mix1adat2_solo" class="QToolButton" />
+        <widget name="mix1adat2_mute" class="QToolButton" />
+        <widget name="mix1adat2_pan" class="QSpinBox" />
+        <widget name="textLabel1_3_4" class="QLabel" />
+        <widget name="frame8_2_3_4" class="QFrame" />
+        <widget name="mix1adat2_fader" class="QSlider" />
+        <widget name="textLabel6_3_4" class="QLabel" />
+        <widget name="mix1adat3" class="QFrame" />
+        <widget name="mix1adat3_solo" class="QToolButton" />
+        <widget name="mix1adat3_mute" class="QToolButton" />
+        <widget name="mix1adat3_pan" class="QSpinBox" />
+        <widget name="textLabel1_4_4" class="QLabel" />
+        <widget name="frame8_2_4_4" class="QFrame" />
+        <widget name="mix1adat3_fader" class="QSlider" />
+        <widget name="textLabel6_4_4" class="QLabel" />
+        <widget name="mix1adat4" class="QFrame" />
+        <widget name="mix1adat4_solo" class="QToolButton" />
+        <widget name="mix1adat4_mute" class="QToolButton" />
+        <widget name="mix1adat4_pan" class="QSpinBox" />
+        <widget name="textLabel1_5_4" class="QLabel" />
+        <widget name="frame8_2_5_4" class="QFrame" />
+        <widget name="mix1adat4_fader" class="QSlider" />
+        <widget name="textLabel6_5_4" class="QLabel" />
+        <widget name="mix1adat5" class="QFrame" />
+        <widget name="mix1adat5_solo" class="QToolButton" />
+        <widget name="mix1adat5_mute" class="QToolButton" />
+        <widget name="mix1adat5_pan" class="QSpinBox" />
+        <widget name="textLabel1_6_4" class="QLabel" />
+        <widget name="frame8_2_6_4" class="QFrame" />
+        <widget name="mix1adat5_fader" class="QSlider" />
+        <widget name="textLabel6_6_4" class="QLabel" />
+        <widget name="mix1adat6" class="QFrame" />
+        <widget name="mix1adat6_solo" class="QToolButton" />
+        <widget name="mix1adat6_mute" class="QToolButton" />
+        <widget name="mix1adat6_pan" class="QSpinBox" />
+        <widget name="textLabel1_7_4" class="QLabel" />
+        <widget name="frame8_2_7_4" class="QFrame" />
+        <widget name="mix1adat6_fader" class="QSlider" />
+        <widget name="textLabel6_7_4" class="QLabel" />
+        <widget name="mix1adat7" class="QFrame" />
+        <widget name="mix1adat7_solo" class="QToolButton" />
+        <widget name="mix1adat7_mute" class="QToolButton" />
+        <widget name="mix1adat7_pan" class="QSpinBox" />
+        <widget name="textLabel1_8_4" class="QLabel" />
+        <widget name="frame8_2_8_4" class="QFrame" />
+        <widget name="mix1adat7_fader" class="QSlider" />
+        <widget name="textLabel6_8_4" class="QLabel" />
+        <widget name="mix1adat8" class="QFrame" />
+        <widget name="mix1adat8_solo" class="QToolButton" />
+        <widget name="mix1adat8_mute" class="QToolButton" />
+        <widget name="mix1adat8_pan" class="QSpinBox" />
+        <widget name="textLabel1_9_4" class="QLabel" />
+        <widget name="frame8_2_9_4" class="QFrame" />
+        <widget name="mix1adat8_fader" class="QSlider" />
+        <widget name="textLabel6_9_4" class="QLabel" />
+        <widget name="groupBox39" class="QGroupBox" />
+        <widget name="textLabel7" class="QLabel" />
+        <widget name="mix1_dest" class="QComboBox" />
+        <widget name="mix1_mute" class="QToolButton" />
+        <widget name="frame8_2_2" class="QFrame" />
+        <widget name="mix1_fader" class="QSlider" />
+        <widget name="mix2" class="QWidget" />
+        <widget name="mix2_tab" class="QTabWidget" />
+        <widget name="tab" class="QWidget" />
+        <widget name="mix2ana1" class="QFrame" />
+        <widget name="mix2ana1_solo" class="QToolButton" />
+        <widget name="mix2ana1_mute" class="QToolButton" />
+        <widget name="mix2ana1_pan" class="QSpinBox" />
+        <widget name="textLabel1" class="QLabel" />
+        <widget name="frame8_2" class="QFrame" />
+        <widget name="mix2ana1_fader" class="QSlider" />
+        <widget name="textLabel6" class="QLabel" />
+        <widget name="mix2ana2" class="QFrame" />
+        <widget name="mix2ana2_solo" class="QToolButton" />
+        <widget name="mix2ana2_mute" class="QToolButton" />
+        <widget name="mix2ana2_pan" class="QSpinBox" />
+        <widget name="textLabel1_3" class="QLabel" />
+        <widget name="frame8_2_3" class="QFrame" />
+        <widget name="mix2ana2_fader" class="QSlider" />
+        <widget name="textLabel6_3" class="QLabel" />
+        <widget name="mix2ana3" class="QFrame" />
+        <widget name="mix2ana3_solo" class="QToolButton" />
+        <widget name="mix2ana3_mute" class="QToolButton" />
+        <widget name="mix2ana3_pan" class="QSpinBox" />
+        <widget name="textLabel1_4" class="QLabel" />
+        <widget name="frame8_2_4" class="QFrame" />
+        <widget name="mix2ana3_fader" class="QSlider" />
+        <widget name="textLabel6_4" class="QLabel" />
+        <widget name="mix2ana4" class="QFrame" />
+        <widget name="mix2ana4_solo" class="QToolButton" />
+        <widget name="mix2ana4_mute" class="QToolButton" />
+        <widget name="mix2ana4_pan" class="QSpinBox" />
+        <widget name="textLabel1_5" class="QLabel" />
+        <widget name="frame8_2_5" class="QFrame" />
+        <widget name="mix2ana4_fader" class="QSlider" />
+        <widget name="textLabel6_5" class="QLabel" />
+        <widget name="mix2ana5" class="QFrame" />
+        <widget name="mix2ana5_solo" class="QToolButton" />
+        <widget name="mix2ana5_mute" class="QToolButton" />
+        <widget name="mix2ana5_pan" class="QSpinBox" />
+        <widget name="textLabel1_6" class="QLabel" />
+        <widget name="frame8_2_6" class="QFrame" />
+        <widget name="mix2ana5_fader" class="QSlider" />
+        <widget name="textLabel6_6" class="QLabel" />
+        <widget name="mix2ana6" class="QFrame" />
+        <widget name="mix2ana6_solo" class="QToolButton" />
+        <widget name="mix2ana6_mute" class="QToolButton" />
+        <widget name="mix2ana6_pan" class="QSpinBox" />
+        <widget name="textLabel1_7" class="QLabel" />
+        <widget name="frame8_2_7" class="QFrame" />
+        <widget name="mix2ana6_fader" class="QSlider" />
+        <widget name="textLabel6_7" class="QLabel" />
+        <widget name="mix2ana7" class="QFrame" />
+        <widget name="mix2ana7_solo" class="QToolButton" />
+        <widget name="mix2ana7_mute" class="QToolButton" />
+        <widget name="mix2ana7_pan" class="QSpinBox" />
+        <widget name="textLabel1_8" class="QLabel" />
+        <widget name="frame8_2_8" class="QFrame" />
+        <widget name="mix2ana7_fader" class="QSlider" />
+        <widget name="textLabel6_8" class="QLabel" />
+        <widget name="mix2ana8" class="QFrame" />
+        <widget name="mix2ana8_solo" class="QToolButton" />
+        <widget name="mix2ana8_mute" class="QToolButton" />
+        <widget name="mix2ana8_pan" class="QSpinBox" />
+        <widget name="textLabel1_9" class="QLabel" />
+        <widget name="frame8_2_9" class="QFrame" />
+        <widget name="mix2ana8_fader" class="QSlider" />
+        <widget name="textLabel6_9" class="QLabel" />
+        <widget name="tab" class="QWidget" />
+        <widget name="mix2aes1" class="QFrame" />
+        <widget name="mix2aes1_solo" class="QToolButton" />
+        <widget name="mix2aes1_mute" class="QToolButton" />
+        <widget name="mix2aes1_pan" class="QSpinBox" />
+        <widget name="textLabel1_13" class="QLabel" />
+        <widget name="frame8_2_13" class="QFrame" />
+        <widget name="mix2aes1_fader" class="QSlider" />
+        <widget name="textLabel6_12" class="QLabel" />
+        <widget name="mix2aes2" class="QFrame" />
+        <widget name="mix2aes2_solo" class="QToolButton" />
+        <widget name="mix2aes2_mute" class="QToolButton" />
+        <widget name="mix2aes2_pan" class="QSpinBox" />
+        <widget name="textLabel1_3_5" class="QLabel" />
+        <widget name="frame8_2_3_5" class="QFrame" />
+        <widget name="mix2aes2_fader" class="QSlider" />
+        <widget name="textLabel6_3_5" class="QLabel" />
+        <widget name="TabPage" class="QWidget" />
+        <widget name="mix2spdif1" class="QFrame" />
+        <widget name="mix2spdif1_solo" class="QToolButton" />
+        <widget name="mix2spdif1_mute" class="QToolButton" />
+        <widget name="mix2spdif1_pan" class="QSpinBox" />
+        <widget name="textLabel1_14" class="QLabel" />
+        <widget name="frame8_2_14" class="QFrame" />
+        <widget name="mix2spdif1_fader" class="QSlider" />
+        <widget name="textLabel6_13" class="QLabel" />
+        <widget name="mix2spdif2" class="QFrame" />
+        <widget name="mix2spdif2_solo" class="QToolButton" />
+        <widget name="mix2spdif2_mute" class="QToolButton" />
+        <widget name="mix2spdif2_pan" class="QSpinBox" />
+        <widget name="textLabel1_3_6" class="QLabel" />
+        <widget name="frame8_2_3_6" class="QFrame" />
+        <widget name="mix2spdif2_fader" class="QSlider" />
+        <widget name="textLabel6_3_6" class="QLabel" />
+        <widget name="TabPage" class="QWidget" />
+        <widget name="mix2adat1" class="QFrame" />
+        <widget name="mix2adat1_solo" class="QToolButton" />
+        <widget name="mix2adat1_mute" class="QToolButton" />
+        <widget name="mix2adat1_pan" class="QSpinBox" />
+        <widget name="textLabel1_12" class="QLabel" />
+        <widget name="frame8_2_12" class="QFrame" />
+        <widget name="mix2adat1_fader" class="QSlider" />
+        <widget name="textLabel6_11" class="QLabel" />
+        <widget name="mix2adat2" class="QFrame" />
+        <widget name="mix2adat2_solo" class="QToolButton" />
+        <widget name="mix2adat2_mute" class="QToolButton" />
+        <widget name="mix2adat2_pan" class="QSpinBox" />
+        <widget name="textLabel1_3_4" class="QLabel" />
+        <widget name="frame8_2_3_4" class="QFrame" />
+        <widget name="mix2adat2_fader" class="QSlider" />
+        <widget name="textLabel6_3_4" class="QLabel" />
+        <widget name="mix2adat3" class="QFrame" />
+        <widget name="mix2adat3_solo" class="QToolButton" />
+        <widget name="mix2adat3_mute" class="QToolButton" />
+        <widget name="mix2adat3_pan" class="QSpinBox" />
+        <widget name="textLabel1_4_4" class="QLabel" />
+        <widget name="frame8_2_4_4" class="QFrame" />
+        <widget name="mix2adat3_fader" class="QSlider" />
+        <widget name="textLabel6_4_4" class="QLabel" />
+        <widget name="mix2adat4" class="QFrame" />
+        <widget name="mix2adat4_solo" class="QToolButton" />
+        <widget name="mix2adat4_mute" class="QToolButton" />
+        <widget name="mix2adat4_pan" class="QSpinBox" />
+        <widget name="textLabel1_5_4" class="QLabel" />
+        <widget name="frame8_2_5_4" class="QFrame" />
+        <widget name="mix2adat4_fader" class="QSlider" />
+        <widget name="textLabel6_5_4" class="QLabel" />
+        <widget name="mix2adat5" class="QFrame" />
+        <widget name="mix2adat5_solo" class="QToolButton" />
+        <widget name="mix2adat5_mute" class="QToolButton" />
+        <widget name="mix2adat5_pan" class="QSpinBox" />
+        <widget name="textLabel1_6_4" class="QLabel" />
+        <widget name="frame8_2_6_4" class="QFrame" />
+        <widget name="mix2adat5_fader" class="QSlider" />
+        <widget name="textLabel6_6_4" class="QLabel" />
+        <widget name="mix2adat6" class="QFrame" />
+        <widget name="mix2adat6_solo" class="QToolButton" />
+        <widget name="mix2adat6_mute" class="QToolButton" />
+        <widget name="mix2adat6_pan" class="QSpinBox" />
+        <widget name="textLabel1_7_4" class="QLabel" />
+        <widget name="frame8_2_7_4" class="QFrame" />
+        <widget name="mix2adat6_fader" class="QSlider" />
+        <widget name="textLabel6_7_4" class="QLabel" />
+        <widget name="mix2adat7" class="QFrame" />
+        <widget name="mix2adat7_solo" class="QToolButton" />
+        <widget name="mix2adat7_mute" class="QToolButton" />
+        <widget name="mix2adat7_pan" class="QSpinBox" />
+        <widget name="textLabel1_8_4" class="QLabel" />
+        <widget name="frame8_2_8_4" class="QFrame" />
+        <widget name="mix2adat7_fader" class="QSlider" />
+        <widget name="textLabel6_8_4" class="QLabel" />
+        <widget name="mix2adat8" class="QFrame" />
+        <widget name="mix2adat8_solo" class="QToolButton" />
+        <widget name="mix2adat8_mute" class="QToolButton" />
+        <widget name="mix2adat8_pan" class="QSpinBox" />
+        <widget name="textLabel1_9_4" class="QLabel" />
+        <widget name="frame8_2_9_4" class="QFrame" />
+        <widget name="mix2adat8_fader" class="QSlider" />
+        <widget name="textLabel6_9_4" class="QLabel" />
+        <widget name="groupBox39" class="QGroupBox" />
+        <widget name="textLabel7" class="QLabel" />
+        <widget name="mix2_dest" class="QComboBox" />
+        <widget name="mix2_mute" class="QToolButton" />
+        <widget name="frame8_2_2" class="QFrame" />
+        <widget name="mix2_fader" class="QSlider" />
+        <widget name="mix3" class="QWidget" />
+        <widget name="mix3_tab" class="QTabWidget" />
+        <widget name="tab" class="QWidget" />
+        <widget name="mix3ana1" class="QFrame" />
+        <widget name="mix3ana1_solo" class="QToolButton" />
+        <widget name="mix3ana1_mute" class="QToolButton" />
+        <widget name="mix3ana1_pan" class="QSpinBox" />
+        <widget name="textLabel1" class="QLabel" />
+        <widget name="frame8_2" class="QFrame" />
+        <widget name="mix3ana1_fader" class="QSlider" />
+        <widget name="textLabel6" class="QLabel" />
+        <widget name="mix3ana2" class="QFrame" />
+        <widget name="mix3ana2_solo" class="QToolButton" />
+        <widget name="mix3ana2_mute" class="QToolButton" />
+        <widget name="mix3ana2_pan" class="QSpinBox" />
+        <widget name="textLabel1_3" class="QLabel" />
+        <widget name="frame8_2_3" class="QFrame" />
+        <widget name="mix3ana2_fader" class="QSlider" />
+        <widget name="textLabel6_3" class="QLabel" />
+        <widget name="mix3ana3" class="QFrame" />
+        <widget name="mix3ana3_solo" class="QToolButton" />
+        <widget name="mix3ana3_mute" class="QToolButton" />
+        <widget name="mix3ana3_pan" class="QSpinBox" />
+        <widget name="textLabel1_4" class="QLabel" />
+        <widget name="frame8_2_4" class="QFrame" />
+        <widget name="mix3ana3_fader" class="QSlider" />
+        <widget name="textLabel6_4" class="QLabel" />
+        <widget name="mix3ana4" class="QFrame" />
+        <widget name="mix3ana4_solo" class="QToolButton" />
+        <widget name="mix3ana4_mute" class="QToolButton" />
+        <widget name="mix3ana4_pan" class="QSpinBox" />
+        <widget name="textLabel1_5" class="QLabel" />
+        <widget name="frame8_2_5" class="QFrame" />
+        <widget name="mix3ana4_fader" class="QSlider" />
+        <widget name="textLabel6_5" class="QLabel" />
+        <widget name="mix3ana5" class="QFrame" />
+        <widget name="mix3ana5_solo" class="QToolButton" />
+        <widget name="mix3ana5_mute" class="QToolButton" />
+        <widget name="mix3ana5_pan" class="QSpinBox" />
+        <widget name="textLabel1_6" class="QLabel" />
+        <widget name="frame8_2_6" class="QFrame" />
+        <widget name="mix3ana5_fader" class="QSlider" />
+        <widget name="textLabel6_6" class="QLabel" />
+        <widget name="mix3ana6" class="QFrame" />
+        <widget name="mix3ana6_solo" class="QToolButton" />
+        <widget name="mix3ana6_mute" class="QToolButton" />
+        <widget name="mix3ana6_pan" class="QSpinBox" />
+        <widget name="textLabel1_7" class="QLabel" />
+        <widget name="frame8_2_7" class="QFrame" />
+        <widget name="mix3ana6_fader" class="QSlider" />
+        <widget name="textLabel6_7" class="QLabel" />
+        <widget name="mix3ana7" class="QFrame" />
+        <widget name="mix3ana7_solo" class="QToolButton" />
+        <widget name="mix3ana7_mute" class="QToolButton" />
+        <widget name="mix3ana7_pan" class="QSpinBox" />
+        <widget name="textLabel1_8" class="QLabel" />
+        <widget name="frame8_2_8" class="QFrame" />
+        <widget name="mix3ana7_fader" class="QSlider" />
+        <widget name="textLabel6_8" class="QLabel" />
+        <widget name="mix3ana8" class="QFrame" />
+        <widget name="mix3ana8_solo" class="QToolButton" />
+        <widget name="mix3ana8_mute" class="QToolButton" />
+        <widget name="mix3ana8_pan" class="QSpinBox" />
+        <widget name="textLabel1_9" class="QLabel" />
+        <widget name="frame8_2_9" class="QFrame" />
+        <widget name="mix3ana8_fader" class="QSlider" />
+        <widget name="textLabel6_9" class="QLabel" />
+        <widget name="tab" class="QWidget" />
+        <widget name="mix3aes1" class="QFrame" />
+        <widget name="mix3aes1_solo" class="QToolButton" />
+        <widget name="mix3aes1_mute" class="QToolButton" />
+        <widget name="mix3aes1_pan" class="QSpinBox" />
+        <widget name="textLabel1_13" class="QLabel" />
+        <widget name="frame8_2_13" class="QFrame" />
+        <widget name="mix3aes1_fader" class="QSlider" />
+        <widget name="textLabel6_12" class="QLabel" />
+        <widget name="mix3aes2" class="QFrame" />
+        <widget name="mix3aes2_solo" class="QToolButton" />
+        <widget name="mix3aes2_mute" class="QToolButton" />
+        <widget name="mix3aes2_pan" class="QSpinBox" />
+        <widget name="textLabel1_3_5" class="QLabel" />
+        <widget name="frame8_2_3_5" class="QFrame" />
+        <widget name="mix3aes2_fader" class="QSlider" />
+        <widget name="textLabel6_3_5" class="QLabel" />
+        <widget name="TabPage" class="QWidget" />
+        <widget name="mix3spdif1" class="QFrame" />
+        <widget name="mix3spdif1_solo" class="QToolButton" />
+        <widget name="mix3spdif1_mute" class="QToolButton" />
+        <widget name="mix3spdif1_pan" class="QSpinBox" />
+        <widget name="textLabel1_14" class="QLabel" />
+        <widget name="frame8_2_14" class="QFrame" />
+        <widget name="mix3spdif1_fader" class="QSlider" />
+        <widget name="textLabel6_13" class="QLabel" />
+        <widget name="mix3spdif2" class="QFrame" />
+        <widget name="mix3spdif2_solo" class="QToolButton" />
+        <widget name="mix3spdif2_mute" class="QToolButton" />
+        <widget name="mix3spdif2_pan" class="QSpinBox" />
+        <widget name="textLabel1_3_6" class="QLabel" />
+        <widget name="frame8_2_3_6" class="QFrame" />
+        <widget name="mix3spdif2_fader" class="QSlider" />
+        <widget name="textLabel6_3_6" class="QLabel" />
+        <widget name="TabPage" class="QWidget" />
+        <widget name="mix3adat1" class="QFrame" />
+        <widget name="mix3adat1_solo" class="QToolButton" />
+        <widget name="mix3adat1_mute" class="QToolButton" />
+        <widget name="mix3adat1_pan" class="QSpinBox" />
+        <widget name="textLabel1_12" class="QLabel" />
+        <widget name="frame8_2_12" class="QFrame" />
+        <widget name="mix3adat1_fader" class="QSlider" />
+        <widget name="textLabel6_11" class="QLabel" />
+        <widget name="mix3adat2" class="QFrame" />
+        <widget name="mix3adat2_solo" class="QToolButton" />
+        <widget name="mix3adat2_mute" class="QToolButton" />
+        <widget name="mix3adat2_pan" class="QSpinBox" />
+        <widget name="textLabel1_3_4" class="QLabel" />
+        <widget name="frame8_2_3_4" class="QFrame" />
+        <widget name="mix3adat2_fader" class="QSlider" />
+        <widget name="textLabel6_3_4" class="QLabel" />
+        <widget name="mix3adat3" class="QFrame" />
+        <widget name="mix3adat3_solo" class="QToolButton" />
+        <widget name="mix3adat3_mute" class="QToolButton" />
+        <widget name="mix3adat3_pan" class="QSpinBox" />
+        <widget name="textLabel1_4_4" class="QLabel" />
+        <widget name="frame8_2_4_4" class="QFrame" />
+        <widget name="mix3adat3_fader" class="QSlider" />
+        <widget name="textLabel6_4_4" class="QLabel" />
+        <widget name="mix3adat4" class="QFrame" />
+        <widget name="mix3adat4_solo" class="QToolButton" />
+        <widget name="mix3adat4_mute" class="QToolButton" />
+        <widget name="mix3adat4_pan" class="QSpinBox" />
+        <widget name="textLabel1_5_4" class="QLabel" />
+        <widget name="frame8_2_5_4" class="QFrame" />
+        <widget name="mix3adat4_fader" class="QSlider" />
+        <widget name="textLabel6_5_4" class="QLabel" />
+        <widget name="mix3adat5" class="QFrame" />
+        <widget name="mix3adat5_solo" class="QToolButton" />
+        <widget name="mix3adat5_mute" class="QToolButton" />
+        <widget name="mix3adat5_pan" class="QSpinBox" />
+        <widget name="textLabel1_6_4" class="QLabel" />
+        <widget name="frame8_2_6_4" class="QFrame" />
+        <widget name="mix3adat5_fader" class="QSlider" />
+        <widget name="textLabel6_6_4" class="QLabel" />
+        <widget name="mix3adat6" class="QFrame" />
+        <widget name="mix3adat6_solo" class="QToolButton" />
+        <widget name="mix3adat6_mute" class="QToolButton" />
+        <widget name="mix3adat6_pan" class="QSpinBox" />
+        <widget name="textLabel1_7_4" class="QLabel" />
+        <widget name="frame8_2_7_4" class="QFrame" />
+        <widget name="mix3adat6_fader" class="QSlider" />
+        <widget name="textLabel6_7_4" class="QLabel" />
+        <widget name="mix3adat7" class="QFrame" />
+        <widget name="mix3adat7_solo" class="QToolButton" />
+        <widget name="mix3adat7_mute" class="QToolButton" />
+        <widget name="mix3adat7_pan" class="QSpinBox" />
+        <widget name="textLabel1_8_4" class="QLabel" />
+        <widget name="frame8_2_8_4" class="QFrame" />
+        <widget name="mix3adat7_fader" class="QSlider" />
+        <widget name="textLabel6_8_4" class="QLabel" />
+        <widget name="mix3adat8" class="QFrame" />
+        <widget name="mix3adat8_solo" class="QToolButton" />
+        <widget name="mix3adat8_mute" class="QToolButton" />
+        <widget name="mix3adat8_pan" class="QSpinBox" />
+        <widget name="textLabel1_9_4" class="QLabel" />
+        <widget name="frame8_2_9_4" class="QFrame" />
+        <widget name="mix3adat8_fader" class="QSlider" />
+        <widget name="textLabel6_9_4" class="QLabel" />
+        <widget name="groupBox39" class="QGroupBox" />
+        <widget name="textLabel7" class="QLabel" />
+        <widget name="mix3_dest" class="QComboBox" />
+        <widget name="mix3_mute" class="QToolButton" />
+        <widget name="frame8_2_2" class="QFrame" />
+        <widget name="mix3_fader" class="QSlider" />
+        <widget name="mix4" class="QWidget" />
+        <widget name="mix4_tab" class="QTabWidget" />
+        <widget name="tab" class="QWidget" />
+        <widget name="mix4ana1" class="QFrame" />
+        <widget name="mix4ana1_solo" class="QToolButton" />
+        <widget name="mix4ana1_mute" class="QToolButton" />
+        <widget name="mix4ana1_pan" class="QSpinBox" />
+        <widget name="textLabel1" class="QLabel" />
+        <widget name="frame8_2" class="QFrame" />
+        <widget name="mix4ana1_fader" class="QSlider" />
+        <widget name="textLabel6" class="QLabel" />
+        <widget name="mix4ana2" class="QFrame" />
+        <widget name="mix4ana2_solo" class="QToolButton" />
+        <widget name="mix4ana2_mute" class="QToolButton" />
+        <widget name="mix4ana2_pan" class="QSpinBox" />
+        <widget name="textLabel1_3" class="QLabel" />
+        <widget name="frame8_2_3" class="QFrame" />
+        <widget name="mix4ana2_fader" class="QSlider" />
+        <widget name="textLabel6_3" class="QLabel" />
+        <widget name="mix4ana3" class="QFrame" />
+        <widget name="mix4ana3_solo" class="QToolButton" />
+        <widget name="mix4ana3_mute" class="QToolButton" />
+        <widget name="mix4ana3_pan" class="QSpinBox" />
+        <widget name="textLabel1_4" class="QLabel" />
+        <widget name="frame8_2_4" class="QFrame" />
+        <widget name="mix4ana3_fader" class="QSlider" />
+        <widget name="textLabel6_4" class="QLabel" />
+        <widget name="mix4ana4" class="QFrame" />
+        <widget name="mix4ana4_solo" class="QToolButton" />
+        <widget name="mix4ana4_mute" class="QToolButton" />
+        <widget name="mix4ana4_pan" class="QSpinBox" />
+        <widget name="textLabel1_5" class="QLabel" />
+        <widget name="frame8_2_5" class="QFrame" />
+        <widget name="mix4ana4_fader" class="QSlider" />
+        <widget name="textLabel6_5" class="QLabel" />
+        <widget name="mix4ana5" class="QFrame" />
+        <widget name="mix4ana5_solo" class="QToolButton" />
+        <widget name="mix4ana5_mute" class="QToolButton" />
+        <widget name="mix4ana5_pan" class="QSpinBox" />
+        <widget name="textLabel1_6" class="QLabel" />
+        <widget name="frame8_2_6" class="QFrame" />
+        <widget name="mix4ana5_fader" class="QSlider" />
+        <widget name="textLabel6_6" class="QLabel" />
+        <widget name="mix4ana6" class="QFrame" />
+        <widget name="mix4ana6_solo" class="QToolButton" />
+        <widget name="mix4ana6_mute" class="QToolButton" />
+        <widget name="mix4ana6_pan" class="QSpinBox" />
+        <widget name="textLabel1_7" class="QLabel" />
+        <widget name="frame8_2_7" class="QFrame" />
+        <widget name="mix4ana6_fader" class="QSlider" />
+        <widget name="textLabel6_7" class="QLabel" />
+        <widget name="mix4ana7" class="QFrame" />
+        <widget name="mix4ana7_solo" class="QToolButton" />
+        <widget name="mix4ana7_mute" class="QToolButton" />
+        <widget name="mix4ana7_pan" class="QSpinBox" />
+        <widget name="textLabel1_8" class="QLabel" />
+        <widget name="frame8_2_8" class="QFrame" />
+        <widget name="mix4ana7_fader" class="QSlider" />
+        <widget name="textLabel6_8" class="QLabel" />
+        <widget name="mix4ana8" class="QFrame" />
+        <widget name="mix4ana8_solo" class="QToolButton" />
+        <widget name="mix4ana8_mute" class="QToolButton" />
+        <widget name="mix4ana8_pan" class="QSpinBox" />
+        <widget name="textLabel1_9" class="QLabel" />
+        <widget name="frame8_2_9" class="QFrame" />
+        <widget name="mix4ana8_fader" class="QSlider" />
+        <widget name="textLabel6_9" class="QLabel" />
+        <widget name="tab" class="QWidget" />
+        <widget name="mix4aes1" class="QFrame" />
+        <widget name="mix4aes1_solo" class="QToolButton" />
+        <widget name="mix4aes1_mute" class="QToolButton" />
+        <widget name="mix4aes1_pan" class="QSpinBox" />
+        <widget name="textLabel1_13" class="QLabel" />
+        <widget name="frame8_2_13" class="QFrame" />
+        <widget name="mix4aes1_fader" class="QSlider" />
+        <widget name="textLabel6_12" class="QLabel" />
+        <widget name="mix4aes2" class="QFrame" />
+        <widget name="mix4aes2_solo" class="QToolButton" />
+        <widget name="mix4aes2_mute" class="QToolButton" />
+        <widget name="mix4aes2_pan" class="QSpinBox" />
+        <widget name="textLabel1_3_5" class="QLabel" />
+        <widget name="frame8_2_3_5" class="QFrame" />
+        <widget name="mix4aes2_fader" class="QSlider" />
+        <widget name="textLabel6_3_5" class="QLabel" />
+        <widget name="TabPage" class="QWidget" />
+        <widget name="mix4spdif1" class="QFrame" />
+        <widget name="mix4spdif1_solo" class="QToolButton" />
+        <widget name="mix4spdif1_mute" class="QToolButton" />
+        <widget name="mix4spdif1_pan" class="QSpinBox" />
+        <widget name="textLabel1_14" class="QLabel" />
+        <widget name="frame8_2_14" class="QFrame" />
+        <widget name="mix4spdif1_fader" class="QSlider" />
+        <widget name="textLabel6_13" class="QLabel" />
+        <widget name="mix4spdif2" class="QFrame" />
+        <widget name="mix4spdif2_solo" class="QToolButton" />
+        <widget name="mix4spdif2_mute" class="QToolButton" />
+        <widget name="mix4spdif2_pan" class="QSpinBox" />
+        <widget name="textLabel1_3_6" class="QLabel" />
+        <widget name="frame8_2_3_6" class="QFrame" />
+        <widget name="mix4spdif2_fader" class="QSlider" />
+        <widget name="textLabel6_3_6" class="QLabel" />
+        <widget name="TabPage" class="QWidget" />
+        <widget name="mix4adat1" class="QFrame" />
+        <widget name="mix4adat1_solo" class="QToolButton" />
+        <widget name="mix4adat1_mute" class="QToolButton" />
+        <widget name="mix4adat1_pan" class="QSpinBox" />
+        <widget name="textLabel1_12" class="QLabel" />
+        <widget name="frame8_2_12" class="QFrame" />
+        <widget name="mix4adat1_fader" class="QSlider" />
+        <widget name="textLabel6_11" class="QLabel" />
+        <widget name="mix4adat2" class="QFrame" />
+        <widget name="mix4adat2_solo" class="QToolButton" />
+        <widget name="mix4adat2_mute" class="QToolButton" />
+        <widget name="mix4adat2_pan" class="QSpinBox" />
+        <widget name="textLabel1_3_4" class="QLabel" />
+        <widget name="frame8_2_3_4" class="QFrame" />
+        <widget name="mix4adat2_fader" class="QSlider" />
+        <widget name="textLabel6_3_4" class="QLabel" />
+        <widget name="mix4adat3" class="QFrame" />
+        <widget name="mix4adat3_solo" class="QToolButton" />
+        <widget name="mix4adat3_mute" class="QToolButton" />
+        <widget name="mix4adat3_pan" class="QSpinBox" />
+        <widget name="textLabel1_4_4" class="QLabel" />
+        <widget name="frame8_2_4_4" class="QFrame" />
+        <widget name="mix4adat3_fader" class="QSlider" />
+        <widget name="textLabel6_4_4" class="QLabel" />
+        <widget name="mix4adat4" class="QFrame" />
+        <widget name="mix4adat4_solo" class="QToolButton" />
+        <widget name="mix4adat4_mute" class="QToolButton" />
+        <widget name="mix4adat4_pan" class="QSpinBox" />
+        <widget name="textLabel1_5_4" class="QLabel" />
+        <widget name="frame8_2_5_4" class="QFrame" />
+        <widget name="mix4adat4_fader" class="QSlider" />
+        <widget name="textLabel6_5_4" class="QLabel" />
+        <widget name="mix4adat5" class="QFrame" />
+        <widget name="mix4adat5_solo" class="QToolButton" />
+        <widget name="mix4adat5_mute" class="QToolButton" />
+        <widget name="mix4adat5_pan" class="QSpinBox" />
+        <widget name="textLabel1_6_4" class="QLabel" />
+        <widget name="frame8_2_6_4" class="QFrame" />
+        <widget name="mix4adat5_fader" class="QSlider" />
+        <widget name="textLabel6_6_4" class="QLabel" />
+        <widget name="mix4adat6" class="QFrame" />
+        <widget name="mix4adat6_solo" class="QToolButton" />
+        <widget name="mix4adat6_mute" class="QToolButton" />
+        <widget name="mix4adat6_pan" class="QSpinBox" />
+        <widget name="textLabel1_7_4" class="QLabel" />
+        <widget name="frame8_2_7_4" class="QFrame" />
+        <widget name="mix4adat6_fader" class="QSlider" />
+        <widget name="textLabel6_7_4" class="QLabel" />
+        <widget name="mix4adat7" class="QFrame" />
+        <widget name="mix4adat7_solo" class="QToolButton" />
+        <widget name="mix4adat7_mute" class="QToolButton" />
+        <widget name="mix4adat7_pan" class="QSpinBox" />
+        <widget name="textLabel1_8_4" class="QLabel" />
+        <widget name="frame8_2_8_4" class="QFrame" />
+        <widget name="mix4adat7_fader" class="QSlider" />
+        <widget name="textLabel6_8_4" class="QLabel" />
+        <widget name="mix4adat8" class="QFrame" />
+        <widget name="mix4adat8_solo" class="QToolButton" />
+        <widget name="mix4adat8_mute" class="QToolButton" />
+        <widget name="mix4adat8_pan" class="QSpinBox" />
+        <widget name="textLabel1_9_4" class="QLabel" />
+        <widget name="frame8_2_9_4" class="QFrame" />
+        <widget name="mix4adat8_fader" class="QSlider" />
+        <widget name="textLabel6_9_4" class="QLabel" />
+        <widget name="groupBox39" class="QGroupBox" />
+        <widget name="textLabel7" class="QLabel" />
+        <widget name="mix4_dest" class="QComboBox" />
+        <widget name="mix4_mute" class="QToolButton" />
+        <widget name="frame8_2_2" class="QFrame" />
+        <widget name="mix4_fader" class="QSlider" />
+        <widget name="masterbox" class="QGroupBox" />
+        <widget name="mix1ana8_2" class="QFrame" />
+        <widget name="frame8_2_10" class="QFrame" />
+        <widget name="phones_fader" class="QSlider" />
+        <widget name="textLabel6_10" class="QLabel" />
+        <widget name="mix1ana8_3" class="QFrame" />
+        <widget name="frame8_2_11" class="QFrame" />
+        <widget name="mainout_fader" class="QSlider" />
+        <widget name="textLabel6_15" class="QLabel" />
+      </widgets>
+    </ui>
+  </ui_files>
+  <notes>Static extraction from legacy FFADO Qt mixer sources. Paths and indexes are references, not validated live D-Bus capabilities. Runtime discovery and device-specific logic are still required. No vendor/model-to-family mapping is asserted unless source defines it.</notes>
+</profile>

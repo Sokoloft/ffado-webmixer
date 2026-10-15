@@ -1,0 +1,50 @@
+<?xml version='1.0' encoding='utf-8'?>
+<profile family="edirolfa101control" schema_version="1" source="edirolfa101control.py" status="extracted-reference">
+  <constants>
+    <constant name="widgetName" value="" />
+  </constants>
+  <controls>
+    <reference path="/Mixer/Feature_Volume_%d" context="module.EdirolFa101Control.getFeatureByName" line="120" />
+    <reference path="/Mixer/Feature_LRBalance_%d" context="module.EdirolFa101Control.getFeatureByName" line="122" />
+  </controls>
+  <mappings />
+  <ui_files>
+    <ui file="edirolfa101.ui" association="explicit">
+      <widgets>
+        <widget name="EdirolFa101ControlUI" class="QWidget" />
+        <widget name="groupBox1" class="QGroupBox" />
+        <widget name="textLabel1" class="QLabel" />
+        <widget name="sldInput1" class="QSlider" />
+        <widget name="sldBal1" class="QSlider" />
+        <widget name="textLabel2" class="QLabel" />
+        <widget name="sldInput2" class="QSlider" />
+        <widget name="sldBal2" class="QSlider" />
+        <widget name="textLabel3" class="QLabel" />
+        <widget name="sldInput3" class="QSlider" />
+        <widget name="sldBal3" class="QSlider" />
+        <widget name="textLabel4" class="QLabel" />
+        <widget name="sldInput4" class="QSlider" />
+        <widget name="sldBal4" class="QSlider" />
+        <widget name="textLabel5" class="QLabel" />
+        <widget name="sldInput5" class="QSlider" />
+        <widget name="sldBal5" class="QSlider" />
+        <widget name="textLabel6" class="QLabel" />
+        <widget name="sldInput6" class="QSlider" />
+        <widget name="sldBal6" class="QSlider" />
+        <widget name="textLabel7" class="QLabel" />
+        <widget name="sldInput7" class="QSlider" />
+        <widget name="sldBal7" class="QSlider" />
+        <widget name="textLabel8" class="QLabel" />
+        <widget name="sldInput8" class="QSlider" />
+        <widget name="sldBal8" class="QSlider" />
+        <widget name="textLabel9" class="QLabel" />
+        <widget name="sldInput9" class="QSlider" />
+        <widget name="sldBal9" class="QSlider" />
+        <widget name="textLabel10" class="QLabel" />
+        <widget name="sldInput10" class="QSlider" />
+        <widget name="sldBal10" class="QSlider" />
+      </widgets>
+    </ui>
+  </ui_files>
+  <notes>Static extraction from legacy FFADO Qt mixer sources. Paths and indexes are references, not validated live D-Bus capabilities. Runtime discovery and device-specific logic are still required. No vendor/model-to-family mapping is asserted unless source defines it.</notes>
+</profile>

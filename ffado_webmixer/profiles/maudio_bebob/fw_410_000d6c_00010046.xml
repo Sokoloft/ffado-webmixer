@@ -1,0 +1,6 @@
+<?xml version='1.0' encoding='utf-8'?>
+<device family="maudio_bebob" name="FW 410" extends="common.xml" identity_source="ffado_configuration">
+  <match vendor_id="0xd6c" configuration_model_id="0x10046" />
+  <identity vendor="M-Audio" driver="BEBOB" ffado_mixer="MAudio_BeBoB" />
+  <capabilities mode="discovered-controls-only" />
+</device>

@@ -1,0 +1,31 @@
+<?xml version='1.0' encoding='utf-8'?>
+<profile family="motu_mark3" schema_version="1" source="motu_mark3.py" status="extracted-reference">
+  <constants>
+    <constant name="MOTU_MODEL_NONE" value="0x0" />
+    <constant name="MOTU_MODEL_828mkII" value="0x1" />
+    <constant name="MOTU_MODEL_TRAVELER" value="0x2" />
+    <constant name="MOTU_MODEL_ULTRALITE" value="0x3" />
+    <constant name="MOTU_MODEL_8PRE" value="0x4" />
+    <constant name="MOTU_MODEL_828MkI" value="0x5" />
+    <constant name="MOTU_MODEL_896HD" value="0x6" />
+    <constant name="MOTU_MODEL_828mk3" value="0x7" />
+    <constant name="MOTU_MODEL_ULTRALITEmk3" value="0x8" />
+    <constant name="MOTU_MODEL_ULTRALITEmk3_HYB" value="0x9" />
+    <constant name="MOTU_MODEL_TRAVELERmk3" value="0xa" />
+    <constant name="MOTU_MODEL_896HDmk3" value="0xb" />
+  </constants>
+  <controls>
+    <reference path="/Mixer/Info/IsStreaming" context="module.Motu_Mark3.initValues" line="72" />
+    <reference path="/Mixer/Info/Model" context="module.Motu_Mark3.initValues" line="77" />
+    <reference path="/Mixer/Info/SampleRate" context="module.Motu_Mark3.initValues" line="79" />
+  </controls>
+  <mappings />
+  <ui_files>
+    <ui file="motu_mark3.ui" association="explicit">
+      <widgets>
+        <widget name="MotuMark3MixerUI" class="QWidget" />
+      </widgets>
+    </ui>
+  </ui_files>
+  <notes>Static extraction from legacy FFADO Qt mixer sources. Paths and indexes are references, not validated live D-Bus capabilities. Runtime discovery and device-specific logic are still required. No vendor/model-to-family mapping is asserted unless source defines it.</notes>
+</profile>

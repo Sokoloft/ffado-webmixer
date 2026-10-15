@@ -1,0 +1,43 @@
+/* Gruvbox — mixer and loading screen. */
+:root {
+  --accent-color: #d79921;
+  --border-color: #504945;
+  --button-active-background: #665c54;
+  --button-background: #504945;
+  --button-hover-background: #665c54;
+  --channel-background: #32302f;
+  --control-background: #1d2021;
+  --detail-color-1: #1b1b1b;
+  --dialog-header-background: #282828;
+  --error-text-color: #e5766e;
+  --fader-handle-border: #6b665a;
+  --fader-handle-bottom: #a8a394;
+  --fader-handle-mark: #4a4a4a;
+  --fader-handle-top: #e4dfd2;
+  --fader-tick-color: #59606b;
+  --fader-value-color: #d79921;
+  --group-border-color: #504945;
+  --icon-muted-color: #6b7380;
+  --input-background: #1d2021;
+  --input-hover-border-color: #4a515c;
+  --input-text-color: #ebdbb2;
+  --mute-color: #bf616a;
+  --muted-handle-bottom: #7d5252;
+  --muted-handle-top: #b98a8a;
+  --page-background: #1d2021;
+  --pin-color: #d79921;
+  --selected-output-background: #51432d;
+  --sidebar-background: #282828;
+  --sidebar-box-background: #3c3836;
+  --solo-color: #ebcb8b;
+  --stereo-border-color: var(--accent-color);
+  --stereo-button-background: var(--button-background);
+  --stereo-button-hover-background: var(--button-hover-background);
+  --stereo-color: var(--accent-color);
+  --stereo-strip-background: var(--sidebar-box-background);
+  --stereo-target-background: var(--selected-output-background);
+  --strip-border-color: #282828;
+  --tab-hover-background: #665c54;
+  --text-primary: #ebdbb2;
+  --text-secondary: #bdae93;
+}

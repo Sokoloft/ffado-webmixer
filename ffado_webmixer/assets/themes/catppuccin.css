@@ -1,0 +1,43 @@
+/* Catppuccin — mixer and loading screen. */
+:root {
+  --accent-color: #cba6f7;
+  --border-color: #45475a;
+  --button-active-background: #585b70;
+  --button-background: #45475a;
+  --button-hover-background: #585b70;
+  --channel-background: #313244;
+  --control-background: #11111b;
+  --detail-color-1: #1b1b1b;
+  --dialog-header-background: #1e1e2e;
+  --error-text-color: #e5766e;
+  --fader-handle-border: #6b665a;
+  --fader-handle-bottom: #a8a394;
+  --fader-handle-mark: #4a4a4a;
+  --fader-handle-top: #e4dfd2;
+  --fader-tick-color: #59606b;
+  --fader-value-color: #cba6f7;
+  --group-border-color: #45475a;
+  --icon-muted-color: #6b7380;
+  --input-background: #11111b;
+  --input-hover-border-color: #4a515c;
+  --input-text-color: #cdd6f4;
+  --mute-color: #bf616a;
+  --muted-handle-bottom: #7d5252;
+  --muted-handle-top: #b98a8a;
+  --page-background: #181825;
+  --pin-color: #cba6f7;
+  --selected-output-background: #423752;
+  --sidebar-background: #1e1e2e;
+  --sidebar-box-background: #29293c;
+  --solo-color: #ebcb8b;
+  --stereo-border-color: var(--accent-color);
+  --stereo-button-background: var(--button-background);
+  --stereo-button-hover-background: var(--button-hover-background);
+  --stereo-color: var(--accent-color);
+  --stereo-strip-background: var(--sidebar-box-background);
+  --stereo-target-background: var(--selected-output-background);
+  --strip-border-color: #181825;
+  --tab-hover-background: #585b70;
+  --text-primary: #cdd6f4;
+  --text-secondary: #a6adc8;
+}

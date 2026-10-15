@@ -1,0 +1,9 @@
+<?xml version='1.0' encoding='utf-8'?>
+<profile family="profire2626" schema_version="2">
+  <discovery source="profire2626.py" status="source-derived">
+    <element path="/EAP/Settings/VolumeKnob/Line1Line2" kind="unknown" />
+    <element path="/EAP/Settings/VolumeKnob/Line3Line4" kind="unknown" />
+    <element path="/EAP/Settings/VolumeKnob/Line5Line6" kind="unknown" />
+    <element path="/EAP/Settings/VolumeKnob/Line7Line8" kind="unknown" />
+  </discovery>
+</profile>

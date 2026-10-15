@@ -1,0 +1,6 @@
+<?xml version='1.0' encoding='utf-8'?>
+<device family="phase24control" name="Phase X24 FW (model version 7)" extends="common.xml" identity_source="ffado_configuration">
+  <match vendor_id="0xaac" configuration_model_id="0x7" />
+  <identity vendor="TerraTec Electronic GmbH" driver="BEBOB" ffado_mixer="Phase24Control" />
+  <capabilities mode="discovered-controls-only" />
+</device>

@@ -1,0 +1,4 @@
+<?xml version='1.0' encoding='utf-8'?>
+<profile family="mackieonyx" schema_version="2">
+  <discovery source="mackieonyx.py" status="source-derived" />
+</profile>

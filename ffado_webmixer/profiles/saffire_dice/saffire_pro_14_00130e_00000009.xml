@@ -1,0 +1,6 @@
+<?xml version='1.0' encoding='utf-8'?>
+<device family="saffire_dice" name="Saffire PRO 14" extends="common.xml" identity_source="ffado_configuration">
+  <match vendor_id="0x130e" configuration_model_id="0x9" />
+  <identity vendor="Focusrite" driver="DICE" ffado_mixer="Saffire_Dice" />
+  <capabilities mode="discovered-controls-only" />
+</device>

@@ -1,0 +1,43 @@
+/* Light theme — shared by mixer and loading screen. */
+:root {
+  --accent-color: #006d85;
+  --border-color: #b8c1ce;
+  --button-active-background: #414b57;
+  --button-background: #e6ebf2;
+  --button-hover-background: #d1dae6;
+  --channel-background: #ffffff;
+  --control-background: #d9dee6;
+  --detail-color-1: #1b1b1b;
+  --dialog-header-background: #edf0f5;
+  --error-text-color: #e5766e;
+  --fader-handle-border: #6b665a;
+  --fader-handle-bottom: #bec8d3;
+  --fader-handle-mark: #4a4a4a;
+  --fader-handle-top: #ffffff;
+  --fader-tick-color: #9da8b8;
+  --fader-value-color: #946000;
+  --group-border-color: #bec8d6;
+  --icon-muted-color: #718095;
+  --input-background: #f6f8fb;
+  --input-hover-border-color: #4a515c;
+  --input-text-color: #202733;
+  --mute-color: #bd3838;
+  --muted-handle-bottom: #7d5252;
+  --muted-handle-top: #b98a8a;
+  --page-background: #eef1f5;
+  --pin-color: #1465a5;
+  --selected-output-background: #d2edf2;
+  --sidebar-background: #e3e8ef;
+  --sidebar-box-background: #f7f9fc;
+  --solo-color: #8e6900;
+  --stereo-border-color: var(--accent-color);
+  --stereo-button-background: var(--button-background);
+  --stereo-button-hover-background: var(--button-hover-background);
+  --stereo-color: var(--accent-color);
+  --stereo-strip-background: var(--sidebar-box-background);
+  --stereo-target-background: var(--selected-output-background);
+  --strip-border-color: #bec8d6;
+  --tab-hover-background: #2a2e35;
+  --text-primary: #202733;
+  --text-secondary: #5b6574;
+}

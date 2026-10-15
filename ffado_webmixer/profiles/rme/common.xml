@@ -1,0 +1,153 @@
+<?xml version='1.0' encoding='utf-8'?>
+<profile family="rme" schema_version="2">
+  <discovery source="rme.py" status="source-derived">
+    <element path="/Control/Phantom" kind="unknown" />
+    <element path="/Control/Chan3_opt_instr" kind="unknown" />
+    <element path="/Control/Chan3_opt_pad" kind="unknown" />
+    <element path="/Control/Chan4_opt_instr" kind="unknown" />
+    <element path="/Control/Chan4_opt_pad" kind="unknown" />
+    <element path="/Control/SPDIF_output_optical" kind="unknown" />
+    <element path="/Control/SPDIF_output_emphasis" kind="unknown" />
+    <element path="/Control/SPDIF_output_pro" kind="unknown" />
+    <element path="/Control/SPDIF_output_nonaudio" kind="unknown" />
+    <element path="/Control/Input_level" kind="unknown" />
+    <element path="/Control/Output_level" kind="unknown" />
+    <element path="/Control/SPDIF_input_mode" kind="unknown" />
+    <element path="/Control/Phones_level" kind="unknown" />
+    <element path="/Control/Clock_mode" kind="unknown" />
+    <element path="/Control/Sync_ref" kind="unknown" />
+    <element path="/Control/Tco_sync_src" kind="unknown" />
+    <element path="/Control/Tco_frame_rate" kind="unknown" />
+    <element path="/Control/Tco_sample_rate" kind="unknown" />
+    <element path="/Control/Tco_sample_rate_ofs" kind="unknown" />
+    <element path="/Control/Tco_word_clk_conv" kind="unknown" />
+    <element path="/Control/Chan1_instr_opts" kind="unknown" />
+    <element path="/Control/Tco_video_in_term" kind="unknown" />
+    <element path="/Control/Gains" kind="unknown" />
+    <element path="/Control/Chan1_source" kind="unknown" />
+    <element path="/Control/Chan7_source" kind="unknown" />
+    <element path="/Control/Chan8_source" kind="unknown" />
+    <element path="/Control/Flash_control" kind="unknown" />
+    <element path="/Control/Mixer_preset" kind="unknown" />
+    <element path="/Control/Bandwidth_limit" kind="unknown" />
+    <element path="/Control/sysclock_mode" kind="unknown" />
+    <element path="/Control/sysclock_freq" kind="unknown" />
+    <element path="/Control/autosync_freq" kind="unknown" />
+    <element path="/Control/autosync_src" kind="unknown" />
+    <element path="/Control/sync_status" kind="unknown" />
+    <element path="/Control/spdif_freq" kind="unknown" />
+    <element path="/Control/Tco_ltc_in" kind="unknown" />
+    <element path="/Control/Tco_input_ltc_valid" kind="unknown" />
+    <element path="/Control/Tco_input_ltc_fps" kind="unknown" />
+    <element path="/Control/Tco_input_ltc_dropframe" kind="unknown" />
+    <element path="/Control/Tco_input_video_type" kind="unknown" />
+    <element path="/Control/Tco_input_word_clk" kind="unknown" />
+    <element path="/Control/Tco_input_lock" kind="unknown" />
+    <element path="/Control/Tco_freq" kind="unknown" />
+    <element path="/Mixer/InputFaders" kind="unknown" />
+    <element path="/Mixer/InputMutes" kind="unknown" />
+    <element path="/Mixer/InputInverts" kind="unknown" />
+    <element path="/Mixer/PlaybackFaders" kind="unknown" />
+    <element path="/Mixer/PlaybackMutes" kind="unknown" />
+    <element path="/Mixer/PlaybackInverts" kind="unknown" />
+    <element path="/Mixer/OutputFaders" kind="unknown" />
+    <element path="/Mixer/OutputMutes" kind="unknown" />
+    <element path="/Control/Model" kind="unknown" />
+    <element path="/Control/TCO_present" kind="unknown" />
+  </discovery>
+  <model_constants>
+    <constant name="RME_MODEL_NONE" value="0x0" />
+    <constant name="RME_MODEL_FF800" value="0x1" />
+    <constant name="RME_MODEL_FF400" value="0x2" />
+    <constant name="idxb" value="-0x1" />
+    <constant name="idxe" value="-0x1" />
+    <constant name="idxb" value="-0x1" />
+    <constant name="idxe" value="-0x1" />
+    <constant name="idxb" value="-0x1" />
+    <constant name="idxe" value="-0x1" />
+    <constant name="idx" value="-0x1" />
+    <constant name="idx" value="-0x1" />
+    <constant name="idx" value="-0x1" />
+  </model_constants>
+  <source_bindings>
+    <group name="PhantomSwitches" line="49">
+      <binding widget="self.phantom_0" path="/Control/Phantom" arg0="0" />
+      <binding widget="self.phantom_1" path="/Control/Phantom" arg0="1" />
+      <binding widget="self.phantom_2" path="/Control/Phantom" arg0="2" />
+      <binding widget="self.phantom_3" path="/Control/Phantom" arg0="3" />
+    </group>
+    <group name="Switches" line="56">
+      <binding widget="self.ff400_chan3_opt_instr" path="/Control/Chan3_opt_instr" />
+      <binding widget="self.ff400_chan3_opt_pad" path="/Control/Chan3_opt_pad" />
+      <binding widget="self.ff400_chan4_opt_instr" path="/Control/Chan4_opt_instr" />
+      <binding widget="self.ff400_chan4_opt_pad" path="/Control/Chan4_opt_pad" />
+      <binding widget="self.spdif_output_optical" path="/Control/SPDIF_output_optical" arg0="0" />
+      <binding widget="self.spdif_output_emphasis" path="/Control/SPDIF_output_emphasis" arg0="0" />
+      <binding widget="self.spdif_output_pro" path="/Control/SPDIF_output_pro" arg0="0" />
+      <binding widget="self.spdif_output_nonaudio" path="/Control/SPDIF_output_nonaudio" arg0="0" />
+    </group>
+    <group name="Radiobuttons" line="68">
+      <binding widget="self.level_in_lo_gain" path="/Control/Input_level" arg0="0" />
+      <binding widget="self.level_in_p4dBu" path="/Control/Input_level" arg0="2" />
+      <binding widget="self.level_in_m10dBV" path="/Control/Input_level" arg0="1" />
+      <binding widget="self.level_out_hi_gain" path="/Control/Output_level" arg0="2" />
+      <binding widget="self.level_out_p4dBu" path="/Control/Output_level" arg0="1" />
+      <binding widget="self.level_out_m10dBV" path="/Control/Output_level" arg0="0" />
+      <binding widget="self.spdif_input_coax" path="/Control/SPDIF_input_mode" arg0="0" />
+      <binding widget="self.spdif_input_optical" path="/Control/SPDIF_input_mode" arg0="1" />
+      <binding widget="self.phones_hi_gain" path="/Control/Phones_level" arg0="0" />
+      <binding widget="self.phones_p4dBu" path="/Control/Phones_level" arg0="1" />
+      <binding widget="self.phones_m10dBV" path="/Control/Phones_level" arg0="2" />
+      <binding widget="self.clock_mode_autosync" path="/Control/Clock_mode" arg0="1" />
+      <binding widget="self.clock_mode_master" path="/Control/Clock_mode" arg0="0" />
+      <binding widget="self.sync_ref_wordclk" path="/Control/Sync_ref" arg0="0" />
+      <binding widget="self.sync_ref_adat1" path="/Control/Sync_ref" arg0="1" />
+      <binding widget="self.sync_ref_adat2" path="/Control/Sync_ref" arg0="2" />
+      <binding widget="self.sync_ref_spdif" path="/Control/Sync_ref" arg0="3" />
+      <binding widget="self.sync_ref_tco" path="/Control/Sync_ref" arg0="4" />
+      <binding widget="self.sync_source_ltc" path="/Control/Tco_sync_src" arg0="0" />
+      <binding widget="self.sync_source_video" path="/Control/Tco_sync_src" arg0="1" />
+      <binding widget="self.sync_source_wordclk" path="/Control/Tco_sync_src" arg0="2" />
+      <binding widget="self.frame_rate_24fps" path="/Control/Tco_frame_rate" arg0="0" />
+      <binding widget="self.frame_rate_25fps" path="/Control/Tco_frame_rate" arg0="1" />
+      <binding widget="self.frame_rate_29_97fps" path="/Control/Tco_frame_rate" arg0="2" />
+      <binding widget="self.frame_rate_29_97dfps" path="/Control/Tco_frame_rate" arg0="3" />
+      <binding widget="self.frame_rate_30fps" path="/Control/Tco_frame_rate" arg0="4" />
+      <binding widget="self.frame_rate_30dfps" path="/Control/Tco_frame_rate" arg0="5" />
+      <binding widget="self.sample_rate_44k1" path="/Control/Tco_sample_rate" arg0="0" />
+      <binding widget="self.sample_rate_48k" path="/Control/Tco_sample_rate" arg0="1" />
+      <binding widget="self.sample_rate_0pc" path="/Control/Tco_sample_rate_ofs" arg0="0" />
+      <binding widget="self.sample_rate_p01pc" path="/Control/Tco_sample_rate_ofs" arg0="1" />
+      <binding widget="self.sample_rate_n01pc" path="/Control/Tco_sample_rate_ofs" arg0="2" />
+      <binding widget="self.sample_rate_p40pc" path="/Control/Tco_sample_rate_ofs" arg0="3" />
+      <binding widget="self.sample_rate_n40pc" path="/Control/Tco_sample_rate_ofs" arg0="4" />
+      <binding widget="self.wordclk_conv_1_1" path="/Control/Tco_word_clk_conv" arg0="0" />
+      <binding widget="self.wordclk_conv_44k1_48k" path="/Control/Tco_word_clk_conv" arg0="1" />
+      <binding widget="self.wordclk_conv_48k_44k1" path="/Control/Tco_word_clk_conv" arg0="2" />
+    </group>
+    <group name="Checkboxes" line="115">
+      <binding widget="self.ch1_instr_fuzz" path="/Control/Chan1_instr_opts" arg0="4" />
+      <binding widget="self.ch1_instr_limiter" path="/Control/Chan1_instr_opts" arg0="8" />
+      <binding widget="self.ch1_instr_filter" path="/Control/Chan1_instr_opts" arg0="2" />
+      <binding widget="self.video_input_termination_on" path="/Control/Tco_video_in_term" arg0="1" />
+    </group>
+    <group name="Gains" line="124">
+      <binding widget="self.gain_mic1" path="/Control/Gains" arg0="0" />
+      <binding widget="self.gain_mic2" path="/Control/Gains" arg0="1" />
+      <binding widget="self.gain_input3" path="/Control/Gains" arg0="2" />
+      <binding widget="self.gain_input4" path="/Control/Gains" arg0="3" />
+    </group>
+    <group name="Combos" line="131">
+      <binding widget="self.ff800_ch1_src" path="/Control/Chan1_source" />
+      <binding widget="self.ff800_ch7_src" path="/Control/Chan7_source" />
+      <binding widget="self.ff800_ch8_src" path="/Control/Chan8_source" />
+    </group>
+    <group name="CommandButtons" line="137">
+      <binding widget="self.control_load" path="/Control/Flash_control" arg0="0" />
+      <binding widget="self.control_save" path="/Control/Flash_control" arg0="1" />
+      <binding widget="self.mixer_load" path="/Control/Flash_control" arg0="2" />
+      <binding widget="self.mixer_save" path="/Control/Flash_control" arg0="3" />
+      <binding widget="self.mixer_preset_ffado_default" path="/Control/Mixer_preset" arg0="0" />
+    </group>
+  </source_bindings>
+</profile>

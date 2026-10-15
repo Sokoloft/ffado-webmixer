@@ -1,0 +1,15 @@
+<?xml version='1.0' encoding='utf-8'?>
+<profile family="mackieonyx" schema_version="1" source="mackieonyx.py" status="extracted-reference">
+  <constants />
+  <controls />
+  <mappings />
+  <ui_files>
+    <ui file="mackieonyx.ui" association="explicit">
+      <widgets>
+        <widget name="MackieOnyxMixerUI" class="QWidget" />
+        <widget name="textLabel1" class="QLabel" />
+      </widgets>
+    </ui>
+  </ui_files>
+  <notes>Static extraction from legacy FFADO Qt mixer sources. Paths and indexes are references, not validated live D-Bus capabilities. Runtime discovery and device-specific logic are still required. No vendor/model-to-family mapping is asserted unless source defines it.</notes>
+</profile>

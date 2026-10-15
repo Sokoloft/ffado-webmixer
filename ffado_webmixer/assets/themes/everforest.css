@@ -1,0 +1,43 @@
+/* Everforest — mixer and loading screen. */
+:root {
+  --accent-color: #a7c080;
+  --border-color: #4f585e;
+  --button-active-background: #56635f;
+  --button-background: #475258;
+  --button-hover-background: #56635f;
+  --channel-background: #343f44;
+  --control-background: #232a2e;
+  --detail-color-1: #1b1b1b;
+  --dialog-header-background: #2d353b;
+  --error-text-color: #e5766e;
+  --fader-handle-border: #6b665a;
+  --fader-handle-bottom: #a8a394;
+  --fader-handle-mark: #4a4a4a;
+  --fader-handle-top: #e4dfd2;
+  --fader-tick-color: #59606b;
+  --fader-value-color: #a7c080;
+  --group-border-color: #4f585e;
+  --icon-muted-color: #6b7380;
+  --input-background: #232a2e;
+  --input-hover-border-color: #4a515c;
+  --input-text-color: #d3c6aa;
+  --mute-color: #bf616a;
+  --muted-handle-bottom: #7d5252;
+  --muted-handle-top: #b98a8a;
+  --page-background: #232a2e;
+  --pin-color: #a7c080;
+  --selected-output-background: #394e43;
+  --sidebar-background: #2d353b;
+  --sidebar-box-background: #3d484d;
+  --solo-color: #ebcb8b;
+  --stereo-border-color: var(--accent-color);
+  --stereo-button-background: var(--button-background);
+  --stereo-button-hover-background: var(--button-hover-background);
+  --stereo-color: var(--accent-color);
+  --stereo-strip-background: var(--sidebar-box-background);
+  --stereo-target-background: var(--selected-output-background);
+  --strip-border-color: #2b3337;
+  --tab-hover-background: #56635f;
+  --text-primary: #d3c6aa;
+  --text-secondary: #a7b0a0;
+}

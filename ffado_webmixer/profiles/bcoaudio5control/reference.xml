@@ -1,0 +1,55 @@
+<?xml version='1.0' encoding='utf-8'?>
+<profile family="bcoaudio5control" schema_version="1" source="bcoaudio5control.py" status="extracted-reference">
+  <constants />
+  <controls>
+    <reference path="/Mixer/Feature_Volume_1" context="module.BCoAudio5Control.__init__" line="36" />
+    <reference path="/Mixer/Feature_Volume_2" context="module.BCoAudio5Control.__init__" line="37" />
+    <reference path="/Mixer/Feature_Volume_3" context="module.BCoAudio5Control.__init__" line="38" />
+    <reference path="/Mixer/Feature_Volume_6" context="module.BCoAudio5Control.__init__" line="39" />
+    <reference path="/Mixer/Feature_Volume_7" context="module.BCoAudio5Control.__init__" line="40" />
+    <reference path="/Mixer/Feature_Volume_4" context="module.BCoAudio5Control.__init__" line="41" />
+    <reference path="/Mixer/Feature_Volume_5" context="module.BCoAudio5Control.__init__" line="42" />
+    <reference path="/Mixer/Selector_1" context="module.BCoAudio5Control.__init__" line="46" />
+  </controls>
+  <mappings>
+    <group name="VolumeControls" line="35">
+      <binding widget="'in_line12'" path="/Mixer/Feature_Volume_1" arg0="self.sldInput12" />
+      <binding widget="'in_line34'" path="/Mixer/Feature_Volume_2" arg0="self.sldInput34" />
+      <binding widget="'in_spdif'" path="/Mixer/Feature_Volume_3" arg0="self.sldInputSPDIF" />
+      <binding widget="'out_line12'" path="/Mixer/Feature_Volume_6" arg0="self.sldOutput12" />
+      <binding widget="'out_line34'" path="/Mixer/Feature_Volume_7" arg0="self.sldOutput34" />
+      <binding widget="'cross_a'" path="/Mixer/Feature_Volume_4" arg0="self.sldCrossA" />
+      <binding widget="'cross_b'" path="/Mixer/Feature_Volume_5" arg0="self.sldCrossB" />
+    </group>
+    <group name="ComboControls" line="45">
+      <binding widget="'line34source'" path="/Mixer/Selector_1" arg0="self.comboMixSource" />
+    </group>
+  </mappings>
+  <ui_files>
+    <ui file="bcoaudio5.ui" association="explicit">
+      <widgets>
+        <widget name="BCoAudio5ControlUI" class="QWidget" />
+        <widget name="textLabel1_2_3_2" class="QLabel" />
+        <widget name="comboMixSource" class="QComboBox" />
+        <widget name="groupBox1" class="QGroupBox" />
+        <widget name="textLabel2_2" class="QLabel" />
+        <widget name="textLabel2_4_2" class="QLabel" />
+        <widget name="sldInputSPDIF" class="QSlider" />
+        <widget name="sldInput34" class="QSlider" />
+        <widget name="textLabel2" class="QLabel" />
+        <widget name="sldInput12" class="QSlider" />
+        <widget name="groupBox1_2" class="QGroupBox" />
+        <widget name="textLabel2_3" class="QLabel" />
+        <widget name="sldOutput12" class="QSlider" />
+        <widget name="sldOutput34" class="QSlider" />
+        <widget name="textLabel2_2_2" class="QLabel" />
+        <widget name="groupBox1_2_2" class="QGroupBox" />
+        <widget name="sldCrossA" class="QSlider" />
+        <widget name="sldCrossB" class="QSlider" />
+        <widget name="textLabel2_3_2" class="QLabel" />
+        <widget name="textLabel2_2_2_2" class="QLabel" />
+      </widgets>
+    </ui>
+  </ui_files>
+  <notes>Static extraction from legacy FFADO Qt mixer sources. Paths and indexes are references, not validated live D-Bus capabilities. Runtime discovery and device-specific logic are still required. No vendor/model-to-family mapping is asserted unless source defines it.</notes>
+</profile>

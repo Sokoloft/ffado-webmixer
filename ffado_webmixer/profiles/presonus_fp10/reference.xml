@@ -1,0 +1,14 @@
+<?xml version='1.0' encoding='utf-8'?>
+<profile family="presonus_fp10" schema_version="1" source="presonus_fp10.py" status="extracted-reference">
+  <constants>
+    <constant name="idx" value="0x2" />
+    <constant name="idx" value="0x1" />
+  </constants>
+  <controls>
+    <reference path="/Mixer/Feature_Volume_%d" context="module.Presonus_FP10.addVolume" line="73" />
+    <reference path="/Mixer/Feature_LRBalance_%d" context="module.Presonus_FP10.addVolume" line="79" />
+  </controls>
+  <mappings />
+  <ui_files />
+  <notes>Static extraction from legacy FFADO Qt mixer sources. Paths and indexes are references, not validated live D-Bus capabilities. Runtime discovery and device-specific logic are still required. No vendor/model-to-family mapping is asserted unless source defines it.</notes>
+</profile>

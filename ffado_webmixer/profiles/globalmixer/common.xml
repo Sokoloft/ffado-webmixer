@@ -1,0 +1,11 @@
+<?xml version='1.0' encoding='utf-8'?>
+<profile family="globalmixer" schema_version="2">
+  <discovery source="globalmixer.py" status="source-derived" />
+  <model_constants>
+    <constant name="idx" value="-0x1" />
+    <constant name="idx" value="-0x1" />
+    <constant name="idx" value="-0x1" />
+    <constant name="idxclock" value="-0x1" />
+    <constant name="idxsrate" value="-0x1" />
+  </model_constants>
+</profile>

@@ -1,0 +1,61 @@
+<?xml version='1.0' encoding='utf-8'?>
+<profile family="edirolfa66control" schema_version="1" source="edirolfa66control.py" status="extracted-reference">
+  <constants />
+  <controls>
+    <reference path="/Mixer/Feature_Volume_1" context="module.EdirolFa66Control.__init__" line="38" />
+    <reference path="/Mixer/Feature_Volume_1" context="module.EdirolFa66Control.__init__" line="39" />
+    <reference path="/Mixer/Feature_Volume_2" context="module.EdirolFa66Control.__init__" line="40" />
+    <reference path="/Mixer/Feature_Volume_2" context="module.EdirolFa66Control.__init__" line="41" />
+    <reference path="/Mixer/Feature_Volume_3" context="module.EdirolFa66Control.__init__" line="42" />
+    <reference path="/Mixer/Feature_Volume_3" context="module.EdirolFa66Control.__init__" line="43" />
+    <reference path="/Mixer/Feature_LRBalance_1" context="module.EdirolFa66Control.__init__" line="45" />
+    <reference path="/Mixer/Feature_LRBalance_1" context="module.EdirolFa66Control.__init__" line="46" />
+    <reference path="/Mixer/Feature_LRBalance_2" context="module.EdirolFa66Control.__init__" line="47" />
+    <reference path="/Mixer/Feature_LRBalance_2" context="module.EdirolFa66Control.__init__" line="48" />
+    <reference path="/Mixer/Feature_LRBalance_3" context="module.EdirolFa66Control.__init__" line="49" />
+    <reference path="/Mixer/Feature_LRBalance_3" context="module.EdirolFa66Control.__init__" line="50" />
+  </controls>
+  <mappings>
+    <group name="VolumeControls" line="36">
+      <binding widget="'vol1'" path="/Mixer/Feature_Volume_1" arg0="1" arg1="self.sldInput1" />
+      <binding widget="'vol2'" path="/Mixer/Feature_Volume_1" arg0="2" arg1="self.sldInput2" />
+      <binding widget="'vol3'" path="/Mixer/Feature_Volume_2" arg0="1" arg1="self.sldInput3" />
+      <binding widget="'vol4'" path="/Mixer/Feature_Volume_2" arg0="2" arg1="self.sldInput4" />
+      <binding widget="'vol5'" path="/Mixer/Feature_Volume_3" arg0="1" arg1="self.sldInput5" />
+      <binding widget="'vol6'" path="/Mixer/Feature_Volume_3" arg0="2" arg1="self.sldInput6" />
+      <binding widget="'bal1'" path="/Mixer/Feature_LRBalance_1" arg0="1" arg1="self.sldBal1" />
+      <binding widget="'bal2'" path="/Mixer/Feature_LRBalance_1" arg0="2" arg1="self.sldBal2" />
+      <binding widget="'bal3'" path="/Mixer/Feature_LRBalance_2" arg0="1" arg1="self.sldBal3" />
+      <binding widget="'bal4'" path="/Mixer/Feature_LRBalance_2" arg0="2" arg1="self.sldBal4" />
+      <binding widget="'bal5'" path="/Mixer/Feature_LRBalance_3" arg0="1" arg1="self.sldBal5" />
+      <binding widget="'bal6'" path="/Mixer/Feature_LRBalance_3" arg0="2" arg1="self.sldBal6" />
+    </group>
+  </mappings>
+  <ui_files>
+    <ui file="edirolfa66.ui" association="explicit">
+      <widgets>
+        <widget name="EdirolFa66ControlUI" class="QWidget" />
+        <widget name="groupBox1" class="QGroupBox" />
+        <widget name="textLabel1" class="QLabel" />
+        <widget name="sldInput1" class="QSlider" />
+        <widget name="sldBal1" class="QSlider" />
+        <widget name="textLabel2" class="QLabel" />
+        <widget name="sldInput2" class="QSlider" />
+        <widget name="sldBal2" class="QSlider" />
+        <widget name="textLabel3" class="QLabel" />
+        <widget name="sldInput3" class="QSlider" />
+        <widget name="sldBal3" class="QSlider" />
+        <widget name="textLabel4" class="QLabel" />
+        <widget name="sldInput4" class="QSlider" />
+        <widget name="sldBal4" class="QSlider" />
+        <widget name="textLabel5" class="QLabel" />
+        <widget name="sldInput5" class="QSlider" />
+        <widget name="sldBal5" class="QSlider" />
+        <widget name="textLabel6" class="QLabel" />
+        <widget name="sldInput6" class="QSlider" />
+        <widget name="sldBal6" class="QSlider" />
+      </widgets>
+    </ui>
+  </ui_files>
+  <notes>Static extraction from legacy FFADO Qt mixer sources. Paths and indexes are references, not validated live D-Bus capabilities. Runtime discovery and device-specific logic are still required. No vendor/model-to-family mapping is asserted unless source defines it.</notes>
+</profile>

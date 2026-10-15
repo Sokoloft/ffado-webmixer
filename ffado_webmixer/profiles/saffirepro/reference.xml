@@ -1,0 +1,803 @@
+<?xml version='1.0' encoding='utf-8'?>
+<profile family="saffirepro" schema_version="1" source="saffirepro.py" status="extracted-reference">
+  <constants />
+  <controls>
+    <reference path="/Control/ADATDisable" context="module.SaffirePro.initValues" line="79" />
+    <reference path="/Mixer/InputMix" context="module.SaffireProMixerLarge.__init__" line="121" />
+    <reference path="/Mixer/InputMix" context="module.SaffireProMixerLarge.__init__" line="122" />
+    <reference path="/Mixer/InputMix" context="module.SaffireProMixerLarge.__init__" line="123" />
+    <reference path="/Mixer/InputMix" context="module.SaffireProMixerLarge.__init__" line="124" />
+    <reference path="/Mixer/InputMix" context="module.SaffireProMixerLarge.__init__" line="125" />
+    <reference path="/Mixer/InputMix" context="module.SaffireProMixerLarge.__init__" line="126" />
+    <reference path="/Mixer/InputMix" context="module.SaffireProMixerLarge.__init__" line="127" />
+    <reference path="/Mixer/InputMix" context="module.SaffireProMixerLarge.__init__" line="128" />
+    <reference path="/Mixer/InputMix" context="module.SaffireProMixerLarge.__init__" line="129" />
+    <reference path="/Mixer/InputMix" context="module.SaffireProMixerLarge.__init__" line="130" />
+    <reference path="/Mixer/InputMix" context="module.SaffireProMixerLarge.__init__" line="131" />
+    <reference path="/Mixer/InputMix" context="module.SaffireProMixerLarge.__init__" line="132" />
+    <reference path="/Mixer/InputMix" context="module.SaffireProMixerLarge.__init__" line="133" />
+    <reference path="/Mixer/InputMix" context="module.SaffireProMixerLarge.__init__" line="134" />
+    <reference path="/Mixer/InputMix" context="module.SaffireProMixerLarge.__init__" line="135" />
+    <reference path="/Mixer/InputMix" context="module.SaffireProMixerLarge.__init__" line="136" />
+    <reference path="/Mixer/InputMix" context="module.SaffireProMixerLarge.__init__" line="137" />
+    <reference path="/Mixer/InputMix" context="module.SaffireProMixerLarge.__init__" line="138" />
+    <reference path="/Mixer/InputMix" context="module.SaffireProMixerLarge.__init__" line="139" />
+    <reference path="/Mixer/InputMix" context="module.SaffireProMixerLarge.__init__" line="140" />
+    <reference path="/Mixer/InputMix" context="module.SaffireProMixerLarge.__init__" line="141" />
+    <reference path="/Mixer/InputMix" context="module.SaffireProMixerLarge.__init__" line="142" />
+    <reference path="/Mixer/InputMix" context="module.SaffireProMixerLarge.__init__" line="143" />
+    <reference path="/Mixer/InputMix" context="module.SaffireProMixerLarge.__init__" line="144" />
+    <reference path="/Mixer/InputMix" context="module.SaffireProMixerLarge.__init__" line="145" />
+    <reference path="/Mixer/InputMix" context="module.SaffireProMixerLarge.__init__" line="146" />
+    <reference path="/Mixer/InputMix" context="module.SaffireProMixerLarge.__init__" line="147" />
+    <reference path="/Mixer/InputMix" context="module.SaffireProMixerLarge.__init__" line="148" />
+    <reference path="/Mixer/InputMix" context="module.SaffireProMixerLarge.__init__" line="149" />
+    <reference path="/Mixer/InputMix" context="module.SaffireProMixerLarge.__init__" line="150" />
+    <reference path="/Mixer/InputMix" context="module.SaffireProMixerLarge.__init__" line="151" />
+    <reference path="/Mixer/InputMix" context="module.SaffireProMixerLarge.__init__" line="152" />
+    <reference path="/Mixer/InputMix" context="module.SaffireProMixerLarge.__init__" line="153" />
+    <reference path="/Mixer/InputMix" context="module.SaffireProMixerLarge.__init__" line="154" />
+    <reference path="/Mixer/InputMix" context="module.SaffireProMixerLarge.__init__" line="155" />
+    <reference path="/Mixer/InputMix" context="module.SaffireProMixerLarge.__init__" line="156" />
+    <reference path="/Mixer/InputMix" context="module.SaffireProMixerLarge.__init__" line="157" />
+    <reference path="/Mixer/InputMix" context="module.SaffireProMixerLarge.__init__" line="158" />
+    <reference path="/Mixer/InputMix" context="module.SaffireProMixerLarge.__init__" line="159" />
+    <reference path="/Mixer/InputMix" context="module.SaffireProMixerLarge.__init__" line="160" />
+    <reference path="/Mixer/InputMix" context="module.SaffireProMixerLarge.__init__" line="161" />
+    <reference path="/Mixer/InputMix" context="module.SaffireProMixerLarge.__init__" line="162" />
+    <reference path="/Mixer/InputMix" context="module.SaffireProMixerLarge.__init__" line="163" />
+    <reference path="/Mixer/InputMix" context="module.SaffireProMixerLarge.__init__" line="164" />
+    <reference path="/Mixer/InputMix" context="module.SaffireProMixerLarge.__init__" line="165" />
+    <reference path="/Mixer/InputMix" context="module.SaffireProMixerLarge.__init__" line="166" />
+    <reference path="/Mixer/InputMix" context="module.SaffireProMixerLarge.__init__" line="167" />
+    <reference path="/Mixer/InputMix" context="module.SaffireProMixerLarge.__init__" line="168" />
+    <reference path="/Mixer/InputMix" context="module.SaffireProMixerLarge.__init__" line="169" />
+    <reference path="/Mixer/InputMix" context="module.SaffireProMixerLarge.__init__" line="170" />
+    <reference path="/Mixer/InputMix" context="module.SaffireProMixerLarge.__init__" line="171" />
+    <reference path="/Mixer/InputMix" context="module.SaffireProMixerLarge.__init__" line="172" />
+    <reference path="/Mixer/OutputMix" context="module.SaffireProMixerLarge.__init__" line="174" />
+    <reference path="/Mixer/OutputMix" context="module.SaffireProMixerLarge.__init__" line="175" />
+    <reference path="/Mixer/OutputMix" context="module.SaffireProMixerLarge.__init__" line="176" />
+    <reference path="/Mixer/OutputMix" context="module.SaffireProMixerLarge.__init__" line="177" />
+    <reference path="/Mixer/OutputMix" context="module.SaffireProMixerLarge.__init__" line="178" />
+    <reference path="/Mixer/OutputMix" context="module.SaffireProMixerLarge.__init__" line="179" />
+    <reference path="/Mixer/OutputMix" context="module.SaffireProMixerLarge.__init__" line="180" />
+    <reference path="/Mixer/OutputMix" context="module.SaffireProMixerLarge.__init__" line="181" />
+    <reference path="/Mixer/OutputMix" context="module.SaffireProMixerLarge.__init__" line="182" />
+    <reference path="/Mixer/OutputMix" context="module.SaffireProMixerLarge.__init__" line="183" />
+    <reference path="/Mixer/OutputMix" context="module.SaffireProMixerLarge.__init__" line="185" />
+    <reference path="/Mixer/OutputMix" context="module.SaffireProMixerLarge.__init__" line="186" />
+    <reference path="/Mixer/OutputMix" context="module.SaffireProMixerLarge.__init__" line="187" />
+    <reference path="/Mixer/OutputMix" context="module.SaffireProMixerLarge.__init__" line="188" />
+    <reference path="/Mixer/OutputMix" context="module.SaffireProMixerLarge.__init__" line="189" />
+    <reference path="/Mixer/OutputMix" context="module.SaffireProMixerLarge.__init__" line="190" />
+    <reference path="/Mixer/OutputMix" context="module.SaffireProMixerLarge.__init__" line="191" />
+    <reference path="/Mixer/OutputMix" context="module.SaffireProMixerLarge.__init__" line="192" />
+    <reference path="/Mixer/OutputMix" context="module.SaffireProMixerLarge.__init__" line="194" />
+    <reference path="/Mixer/OutputMix" context="module.SaffireProMixerLarge.__init__" line="195" />
+    <reference path="/Mixer/OutputMix" context="module.SaffireProMixerLarge.__init__" line="196" />
+    <reference path="/Mixer/OutputMix" context="module.SaffireProMixerLarge.__init__" line="197" />
+    <reference path="/Mixer/OutputMix" context="module.SaffireProMixerLarge.__init__" line="198" />
+    <reference path="/Mixer/OutputMix" context="module.SaffireProMixerLarge.__init__" line="199" />
+    <reference path="/Mixer/OutputMix" context="module.SaffireProMixerLarge.__init__" line="200" />
+    <reference path="/Mixer/OutputMix" context="module.SaffireProMixerLarge.__init__" line="201" />
+    <reference path="/Mixer/OutputMix" context="module.SaffireProMixerLarge.__init__" line="202" />
+    <reference path="/Mixer/OutputMix" context="module.SaffireProMixerLarge.__init__" line="203" />
+    <reference path="/Control/Insert1" context="module.SaffireProMixerLarge.__init__" line="209" />
+    <reference path="/Control/Insert2" context="module.SaffireProMixerLarge.__init__" line="210" />
+    <reference path="/Control/Phantom_1to4" context="module.SaffireProMixerLarge.__init__" line="211" />
+    <reference path="/Control/Phantom_5to8" context="module.SaffireProMixerLarge.__init__" line="212" />
+    <reference path="/Control/AC3pass" context="module.SaffireProMixerLarge.__init__" line="213" />
+    <reference path="/Control/MidiTru" context="module.SaffireProMixerLarge.__init__" line="214" />
+    <reference path="/Control/UseHighVoltageRail" context="module.SaffireProMixerLarge.__init__" line="215" />
+    <reference path="/Control/MIDIEnable" context="module.SaffireProMixerLarge.__init__" line="219" />
+    <reference path="/Control/ADATDisable" context="module.SaffireProMixerLarge.__init__" line="220" />
+    <reference path="/Mixer/Out12Mute" context="module.SaffireProMixerLarge.__init__" line="222" />
+    <reference path="/Mixer/Out12HwCtrl" context="module.SaffireProMixerLarge.__init__" line="223" />
+    <reference path="/Mixer/Out12Pad" context="module.SaffireProMixerLarge.__init__" line="224" />
+    <reference path="/Mixer/Out12Dim" context="module.SaffireProMixerLarge.__init__" line="225" />
+    <reference path="/Mixer/Out34Mute" context="module.SaffireProMixerLarge.__init__" line="226" />
+    <reference path="/Mixer/Out34HwCtrl" context="module.SaffireProMixerLarge.__init__" line="227" />
+    <reference path="/Mixer/Out34Pad" context="module.SaffireProMixerLarge.__init__" line="228" />
+    <reference path="/Mixer/Out34Dim" context="module.SaffireProMixerLarge.__init__" line="229" />
+    <reference path="/Mixer/Out56Mute" context="module.SaffireProMixerLarge.__init__" line="230" />
+    <reference path="/Mixer/Out56HwCtrl" context="module.SaffireProMixerLarge.__init__" line="231" />
+    <reference path="/Mixer/Out56Pad" context="module.SaffireProMixerLarge.__init__" line="232" />
+    <reference path="/Mixer/Out56Dim" context="module.SaffireProMixerLarge.__init__" line="233" />
+    <reference path="/Mixer/Out78Mute" context="module.SaffireProMixerLarge.__init__" line="234" />
+    <reference path="/Mixer/Out78HwCtrl" context="module.SaffireProMixerLarge.__init__" line="235" />
+    <reference path="/Mixer/Out78Pad" context="module.SaffireProMixerLarge.__init__" line="236" />
+    <reference path="/Mixer/Out78Dim" context="module.SaffireProMixerLarge.__init__" line="237" />
+    <reference path="/Mixer/DirectMonitorCH1" context="module.SaffireProMixerLarge.__init__" line="239" />
+    <reference path="/Mixer/DirectMonitorCH2" context="module.SaffireProMixerLarge.__init__" line="240" />
+    <reference path="/Mixer/DirectMonitorCH3" context="module.SaffireProMixerLarge.__init__" line="241" />
+    <reference path="/Mixer/DirectMonitorCH4" context="module.SaffireProMixerLarge.__init__" line="242" />
+    <reference path="/Mixer/DirectMonitorCH5" context="module.SaffireProMixerLarge.__init__" line="243" />
+    <reference path="/Mixer/DirectMonitorCH6" context="module.SaffireProMixerLarge.__init__" line="244" />
+    <reference path="/Mixer/DirectMonitorCH7" context="module.SaffireProMixerLarge.__init__" line="245" />
+    <reference path="/Mixer/DirectMonitorCH8" context="module.SaffireProMixerLarge.__init__" line="246" />
+    <reference path="/Mixer/Out12Level" context="module.SaffireProMixerLarge.__init__" line="250" />
+    <reference path="/Mixer/Out34Level" context="module.SaffireProMixerLarge.__init__" line="251" />
+    <reference path="/Mixer/Out56Level" context="module.SaffireProMixerLarge.__init__" line="252" />
+    <reference path="/Mixer/Out78Level" context="module.SaffireProMixerLarge.__init__" line="253" />
+    <reference path="/Control/Reboot" context="module.SaffireProMixerLarge.__init__" line="257" />
+    <reference path="/Control/FlashLed" context="module.SaffireProMixerLarge.__init__" line="258" />
+    <reference path="/Control/SaveSettings" context="module.SaffireProMixerLarge.__init__" line="259" />
+    <reference path="/Control/StandaloneConfig" context="module.SaffireProMixerLarge.__init__" line="269" />
+    <reference path="/Mixer/MonitorDial" context="module.SaffireProMixerLarge.polledUpdateHwCtrl" line="365" />
+    <reference path="/Mixer/OutputMix" context="module.SaffireProMixerSmall.__init__" line="380" />
+    <reference path="/Mixer/OutputMix" context="module.SaffireProMixerSmall.__init__" line="381" />
+    <reference path="/Mixer/OutputMix" context="module.SaffireProMixerSmall.__init__" line="382" />
+    <reference path="/Mixer/OutputMix" context="module.SaffireProMixerSmall.__init__" line="383" />
+    <reference path="/Mixer/OutputMix" context="module.SaffireProMixerSmall.__init__" line="384" />
+    <reference path="/Mixer/OutputMix" context="module.SaffireProMixerSmall.__init__" line="385" />
+    <reference path="/Mixer/OutputMix" context="module.SaffireProMixerSmall.__init__" line="386" />
+    <reference path="/Mixer/OutputMix" context="module.SaffireProMixerSmall.__init__" line="387" />
+    <reference path="/Mixer/OutputMix" context="module.SaffireProMixerSmall.__init__" line="388" />
+    <reference path="/Mixer/OutputMix" context="module.SaffireProMixerSmall.__init__" line="389" />
+    <reference path="/Mixer/OutputMix" context="module.SaffireProMixerSmall.__init__" line="391" />
+    <reference path="/Mixer/OutputMix" context="module.SaffireProMixerSmall.__init__" line="392" />
+    <reference path="/Mixer/OutputMix" context="module.SaffireProMixerSmall.__init__" line="393" />
+    <reference path="/Mixer/OutputMix" context="module.SaffireProMixerSmall.__init__" line="394" />
+    <reference path="/Mixer/OutputMix" context="module.SaffireProMixerSmall.__init__" line="395" />
+    <reference path="/Mixer/OutputMix" context="module.SaffireProMixerSmall.__init__" line="396" />
+    <reference path="/Mixer/OutputMix" context="module.SaffireProMixerSmall.__init__" line="397" />
+    <reference path="/Mixer/OutputMix" context="module.SaffireProMixerSmall.__init__" line="398" />
+    <reference path="/Mixer/OutputMix" context="module.SaffireProMixerSmall.__init__" line="400" />
+    <reference path="/Mixer/OutputMix" context="module.SaffireProMixerSmall.__init__" line="401" />
+    <reference path="/Mixer/OutputMix" context="module.SaffireProMixerSmall.__init__" line="402" />
+    <reference path="/Mixer/OutputMix" context="module.SaffireProMixerSmall.__init__" line="403" />
+    <reference path="/Mixer/OutputMix" context="module.SaffireProMixerSmall.__init__" line="404" />
+    <reference path="/Mixer/OutputMix" context="module.SaffireProMixerSmall.__init__" line="405" />
+    <reference path="/Mixer/OutputMix" context="module.SaffireProMixerSmall.__init__" line="406" />
+    <reference path="/Mixer/OutputMix" context="module.SaffireProMixerSmall.__init__" line="407" />
+    <reference path="/Mixer/OutputMix" context="module.SaffireProMixerSmall.__init__" line="408" />
+    <reference path="/Mixer/OutputMix" context="module.SaffireProMixerSmall.__init__" line="409" />
+    <reference path="/Control/Insert1" context="module.SaffireProMixerSmall.__init__" line="415" />
+    <reference path="/Control/Insert2" context="module.SaffireProMixerSmall.__init__" line="416" />
+    <reference path="/Control/Phantom_1to4" context="module.SaffireProMixerSmall.__init__" line="417" />
+    <reference path="/Control/Phantom_5to8" context="module.SaffireProMixerSmall.__init__" line="418" />
+    <reference path="/Control/AC3pass" context="module.SaffireProMixerSmall.__init__" line="419" />
+    <reference path="/Control/MidiTru" context="module.SaffireProMixerSmall.__init__" line="420" />
+    <reference path="/Control/UseHighVoltageRail" context="module.SaffireProMixerSmall.__init__" line="421" />
+    <reference path="/Control/MIDIEnable" context="module.SaffireProMixerSmall.__init__" line="425" />
+    <reference path="/Control/ADATDisable" context="module.SaffireProMixerSmall.__init__" line="426" />
+    <reference path="/Mixer/Out12Mute" context="module.SaffireProMixerSmall.__init__" line="428" />
+    <reference path="/Mixer/Out12HwCtrl" context="module.SaffireProMixerSmall.__init__" line="429" />
+    <reference path="/Mixer/Out12Pad" context="module.SaffireProMixerSmall.__init__" line="430" />
+    <reference path="/Mixer/Out12Dim" context="module.SaffireProMixerSmall.__init__" line="431" />
+    <reference path="/Mixer/Out34Mute" context="module.SaffireProMixerSmall.__init__" line="432" />
+    <reference path="/Mixer/Out34HwCtrl" context="module.SaffireProMixerSmall.__init__" line="433" />
+    <reference path="/Mixer/Out34Pad" context="module.SaffireProMixerSmall.__init__" line="434" />
+    <reference path="/Mixer/Out34Dim" context="module.SaffireProMixerSmall.__init__" line="435" />
+    <reference path="/Mixer/Out56Mute" context="module.SaffireProMixerSmall.__init__" line="436" />
+    <reference path="/Mixer/Out56HwCtrl" context="module.SaffireProMixerSmall.__init__" line="437" />
+    <reference path="/Mixer/Out56Pad" context="module.SaffireProMixerSmall.__init__" line="438" />
+    <reference path="/Mixer/Out56Dim" context="module.SaffireProMixerSmall.__init__" line="439" />
+    <reference path="/Mixer/Out78Mute" context="module.SaffireProMixerSmall.__init__" line="440" />
+    <reference path="/Mixer/Out78HwCtrl" context="module.SaffireProMixerSmall.__init__" line="441" />
+    <reference path="/Mixer/Out78Pad" context="module.SaffireProMixerSmall.__init__" line="442" />
+    <reference path="/Mixer/Out78Dim" context="module.SaffireProMixerSmall.__init__" line="443" />
+    <reference path="/Mixer/DirectMonitorCH1" context="module.SaffireProMixerSmall.__init__" line="445" />
+    <reference path="/Mixer/DirectMonitorCH2" context="module.SaffireProMixerSmall.__init__" line="446" />
+    <reference path="/Mixer/DirectMonitorCH3" context="module.SaffireProMixerSmall.__init__" line="447" />
+    <reference path="/Mixer/DirectMonitorCH4" context="module.SaffireProMixerSmall.__init__" line="448" />
+    <reference path="/Mixer/DirectMonitorCH5" context="module.SaffireProMixerSmall.__init__" line="449" />
+    <reference path="/Mixer/DirectMonitorCH6" context="module.SaffireProMixerSmall.__init__" line="450" />
+    <reference path="/Mixer/DirectMonitorCH7" context="module.SaffireProMixerSmall.__init__" line="451" />
+    <reference path="/Mixer/DirectMonitorCH8" context="module.SaffireProMixerSmall.__init__" line="452" />
+    <reference path="/Mixer/Out12Level" context="module.SaffireProMixerSmall.__init__" line="456" />
+    <reference path="/Mixer/Out34Level" context="module.SaffireProMixerSmall.__init__" line="457" />
+    <reference path="/Mixer/Out56Level" context="module.SaffireProMixerSmall.__init__" line="458" />
+    <reference path="/Mixer/Out78Level" context="module.SaffireProMixerSmall.__init__" line="459" />
+    <reference path="/Control/Reboot" context="module.SaffireProMixerSmall.__init__" line="463" />
+    <reference path="/Control/FlashLed" context="module.SaffireProMixerSmall.__init__" line="464" />
+    <reference path="/Control/SaveSettings" context="module.SaffireProMixerSmall.__init__" line="465" />
+    <reference path="/Control/StandaloneConfig" context="module.SaffireProMixerSmall.__init__" line="475" />
+    <reference path="/Mixer/MonitorDial" context="module.SaffireProMixerSmall.polledUpdateHwCtrl" line="558" />
+  </controls>
+  <mappings>
+    <group name="VolumeControls" line="120">
+      <binding widget="self.sldIMixAnalog1L" path="/Mixer/InputMix" arg0="0" arg1="0" />
+      <binding widget="self.sldIMixAnalog1R" path="/Mixer/InputMix" arg0="0" arg1="1" />
+      <binding widget="self.sldIMixAnalog2L" path="/Mixer/InputMix" arg0="1" arg1="0" />
+      <binding widget="self.sldIMixAnalog2R" path="/Mixer/InputMix" arg0="1" arg1="1" />
+      <binding widget="self.sldIMixAnalog3L" path="/Mixer/InputMix" arg0="2" arg1="0" />
+      <binding widget="self.sldIMixAnalog3R" path="/Mixer/InputMix" arg0="2" arg1="1" />
+      <binding widget="self.sldIMixAnalog4L" path="/Mixer/InputMix" arg0="3" arg1="0" />
+      <binding widget="self.sldIMixAnalog4R" path="/Mixer/InputMix" arg0="3" arg1="1" />
+      <binding widget="self.sldIMixAnalog5L" path="/Mixer/InputMix" arg0="4" arg1="0" />
+      <binding widget="self.sldIMixAnalog5R" path="/Mixer/InputMix" arg0="4" arg1="1" />
+      <binding widget="self.sldIMixAnalog6L" path="/Mixer/InputMix" arg0="5" arg1="0" />
+      <binding widget="self.sldIMixAnalog6R" path="/Mixer/InputMix" arg0="5" arg1="1" />
+      <binding widget="self.sldIMixAnalog7L" path="/Mixer/InputMix" arg0="6" arg1="0" />
+      <binding widget="self.sldIMixAnalog7R" path="/Mixer/InputMix" arg0="6" arg1="1" />
+      <binding widget="self.sldIMixAnalog8L" path="/Mixer/InputMix" arg0="7" arg1="0" />
+      <binding widget="self.sldIMixAnalog8R" path="/Mixer/InputMix" arg0="7" arg1="1" />
+      <binding widget="self.sldIMixAnalog9L" path="/Mixer/InputMix" arg0="8" arg1="0" />
+      <binding widget="self.sldIMixAnalog9R" path="/Mixer/InputMix" arg0="8" arg1="1" />
+      <binding widget="self.sldIMixAnalog10L" path="/Mixer/InputMix" arg0="9" arg1="0" />
+      <binding widget="self.sldIMixAnalog10R" path="/Mixer/InputMix" arg0="9" arg1="1" />
+      <binding widget="self.sldIMixADAT11L" path="/Mixer/InputMix" arg0="10" arg1="0" />
+      <binding widget="self.sldIMixADAT11R" path="/Mixer/InputMix" arg0="10" arg1="1" />
+      <binding widget="self.sldIMixADAT12L" path="/Mixer/InputMix" arg0="11" arg1="0" />
+      <binding widget="self.sldIMixADAT12R" path="/Mixer/InputMix" arg0="11" arg1="1" />
+      <binding widget="self.sldIMixADAT13L" path="/Mixer/InputMix" arg0="12" arg1="0" />
+      <binding widget="self.sldIMixADAT13R" path="/Mixer/InputMix" arg0="12" arg1="1" />
+      <binding widget="self.sldIMixADAT14L" path="/Mixer/InputMix" arg0="13" arg1="0" />
+      <binding widget="self.sldIMixADAT14R" path="/Mixer/InputMix" arg0="13" arg1="1" />
+      <binding widget="self.sldIMixADAT15L" path="/Mixer/InputMix" arg0="14" arg1="0" />
+      <binding widget="self.sldIMixADAT15R" path="/Mixer/InputMix" arg0="14" arg1="1" />
+      <binding widget="self.sldIMixADAT16L" path="/Mixer/InputMix" arg0="15" arg1="0" />
+      <binding widget="self.sldIMixADAT16R" path="/Mixer/InputMix" arg0="15" arg1="1" />
+      <binding widget="self.sldIMixADAT17L" path="/Mixer/InputMix" arg0="16" arg1="0" />
+      <binding widget="self.sldIMixADAT17R" path="/Mixer/InputMix" arg0="16" arg1="1" />
+      <binding widget="self.sldIMixADAT18L" path="/Mixer/InputMix" arg0="17" arg1="0" />
+      <binding widget="self.sldIMixADAT18R" path="/Mixer/InputMix" arg0="17" arg1="1" />
+      <binding widget="self.sldIMixADAT21L" path="/Mixer/InputMix" arg0="18" arg1="0" />
+      <binding widget="self.sldIMixADAT21R" path="/Mixer/InputMix" arg0="18" arg1="1" />
+      <binding widget="self.sldIMixADAT22L" path="/Mixer/InputMix" arg0="19" arg1="0" />
+      <binding widget="self.sldIMixADAT22R" path="/Mixer/InputMix" arg0="19" arg1="1" />
+      <binding widget="self.sldIMixADAT23L" path="/Mixer/InputMix" arg0="20" arg1="0" />
+      <binding widget="self.sldIMixADAT23R" path="/Mixer/InputMix" arg0="20" arg1="1" />
+      <binding widget="self.sldIMixADAT24L" path="/Mixer/InputMix" arg0="21" arg1="0" />
+      <binding widget="self.sldIMixADAT24R" path="/Mixer/InputMix" arg0="21" arg1="1" />
+      <binding widget="self.sldIMixADAT25L" path="/Mixer/InputMix" arg0="22" arg1="0" />
+      <binding widget="self.sldIMixADAT25R" path="/Mixer/InputMix" arg0="22" arg1="1" />
+      <binding widget="self.sldIMixADAT26L" path="/Mixer/InputMix" arg0="23" arg1="0" />
+      <binding widget="self.sldIMixADAT26R" path="/Mixer/InputMix" arg0="23" arg1="1" />
+      <binding widget="self.sldIMixADAT27L" path="/Mixer/InputMix" arg0="24" arg1="0" />
+      <binding widget="self.sldIMixADAT27R" path="/Mixer/InputMix" arg0="24" arg1="1" />
+      <binding widget="self.sldIMixADAT28L" path="/Mixer/InputMix" arg0="25" arg1="0" />
+      <binding widget="self.sldIMixADAT28R" path="/Mixer/InputMix" arg0="25" arg1="1" />
+      <binding widget="self.sldOMixPC1O1" path="/Mixer/OutputMix" arg0="0" arg1="0" />
+      <binding widget="self.sldOMixPC2O2" path="/Mixer/OutputMix" arg0="1" arg1="1" />
+      <binding widget="self.sldOMixPC3O3" path="/Mixer/OutputMix" arg0="2" arg1="2" />
+      <binding widget="self.sldOMixPC4O4" path="/Mixer/OutputMix" arg0="3" arg1="3" />
+      <binding widget="self.sldOMixPC5O5" path="/Mixer/OutputMix" arg0="4" arg1="4" />
+      <binding widget="self.sldOMixPC6O6" path="/Mixer/OutputMix" arg0="5" arg1="5" />
+      <binding widget="self.sldOMixPC7O7" path="/Mixer/OutputMix" arg0="6" arg1="6" />
+      <binding widget="self.sldOMixPC8O8" path="/Mixer/OutputMix" arg0="7" arg1="7" />
+      <binding widget="self.sldOMixPC9O9" path="/Mixer/OutputMix" arg0="8" arg1="8" />
+      <binding widget="self.sldOMixPC10O10" path="/Mixer/OutputMix" arg0="9" arg1="9" />
+      <binding widget="self.sldOMixPC1O3" path="/Mixer/OutputMix" arg0="0" arg1="2" />
+      <binding widget="self.sldOMixPC2O4" path="/Mixer/OutputMix" arg0="1" arg1="3" />
+      <binding widget="self.sldOMixPC1O5" path="/Mixer/OutputMix" arg0="0" arg1="4" />
+      <binding widget="self.sldOMixPC2O6" path="/Mixer/OutputMix" arg0="1" arg1="5" />
+      <binding widget="self.sldOMixPC1O7" path="/Mixer/OutputMix" arg0="0" arg1="6" />
+      <binding widget="self.sldOMixPC2O8" path="/Mixer/OutputMix" arg0="1" arg1="7" />
+      <binding widget="self.sldOMixPC1O9" path="/Mixer/OutputMix" arg0="0" arg1="8" />
+      <binding widget="self.sldOMixPC2O10" path="/Mixer/OutputMix" arg0="1" arg1="9" />
+      <binding widget="self.sldOMixIMixO1" path="/Mixer/OutputMix" arg0="10" arg1="0" />
+      <binding widget="self.sldOMixIMixO2" path="/Mixer/OutputMix" arg0="11" arg1="1" />
+      <binding widget="self.sldOMixIMixO3" path="/Mixer/OutputMix" arg0="10" arg1="2" />
+      <binding widget="self.sldOMixIMixO4" path="/Mixer/OutputMix" arg0="11" arg1="3" />
+      <binding widget="self.sldOMixIMixO5" path="/Mixer/OutputMix" arg0="10" arg1="4" />
+      <binding widget="self.sldOMixIMixO6" path="/Mixer/OutputMix" arg0="11" arg1="5" />
+      <binding widget="self.sldOMixIMixO7" path="/Mixer/OutputMix" arg0="10" arg1="6" />
+      <binding widget="self.sldOMixIMixO8" path="/Mixer/OutputMix" arg0="11" arg1="7" />
+      <binding widget="self.sldOMixIMixO9" path="/Mixer/OutputMix" arg0="10" arg1="8" />
+      <binding widget="self.sldOMixIMixO10" path="/Mixer/OutputMix" arg0="11" arg1="9" />
+    </group>
+    <group name="SelectorControls" line="207">
+      <binding widget="self.chkInsert1" path="/Control/Insert1" />
+      <binding widget="self.chkInsert2" path="/Control/Insert2" />
+      <binding widget="self.chkPhantom14" path="/Control/Phantom_1to4" />
+      <binding widget="self.chkPhantom58" path="/Control/Phantom_5to8" />
+      <binding widget="self.chkAC3" path="/Control/AC3pass" />
+      <binding widget="self.chkMidiThru" path="/Control/MidiTru" />
+      <binding widget="self.chkHighVoltage" path="/Control/UseHighVoltageRail" />
+      <binding widget="self.chkMidiEnable" path="/Control/MIDIEnable" />
+      <binding widget="self.chkAdatDisable" path="/Control/ADATDisable" />
+      <binding widget="self.chkMute12" path="/Mixer/Out12Mute" arg0="[self.chkHwCtrl12]" />
+      <binding widget="self.chkHwCtrl12" path="/Mixer/Out12HwCtrl" />
+      <binding widget="self.chkPad12" path="/Mixer/Out12Pad" />
+      <binding widget="self.chkDim12" path="/Mixer/Out12Dim" />
+      <binding widget="self.chkMute34" path="/Mixer/Out34Mute" arg0="[self.chkHwCtrl34]" />
+      <binding widget="self.chkHwCtrl34" path="/Mixer/Out34HwCtrl" />
+      <binding widget="self.chkPad34" path="/Mixer/Out34Pad" />
+      <binding widget="self.chkDim34" path="/Mixer/Out34Dim" />
+      <binding widget="self.chkMute56" path="/Mixer/Out56Mute" arg0="[self.chkHwCtrl56]" />
+      <binding widget="self.chkHwCtrl56" path="/Mixer/Out56HwCtrl" />
+      <binding widget="self.chkPad56" path="/Mixer/Out56Pad" />
+      <binding widget="self.chkDim56" path="/Mixer/Out56Dim" />
+      <binding widget="self.chkMute78" path="/Mixer/Out78Mute" arg0="[self.chkHwCtrl78]" />
+      <binding widget="self.chkHwCtrl78" path="/Mixer/Out78HwCtrl" />
+      <binding widget="self.chkPad78" path="/Mixer/Out78Pad" />
+      <binding widget="self.chkDim78" path="/Mixer/Out78Dim" />
+      <binding widget="self.chkMonitor1" path="/Mixer/DirectMonitorCH1" />
+      <binding widget="self.chkMonitor2" path="/Mixer/DirectMonitorCH2" />
+      <binding widget="self.chkMonitor3" path="/Mixer/DirectMonitorCH3" />
+      <binding widget="self.chkMonitor4" path="/Mixer/DirectMonitorCH4" />
+      <binding widget="self.chkMonitor5" path="/Mixer/DirectMonitorCH5" />
+      <binding widget="self.chkMonitor6" path="/Mixer/DirectMonitorCH6" />
+      <binding widget="self.chkMonitor7" path="/Mixer/DirectMonitorCH7" />
+      <binding widget="self.chkMonitor8" path="/Mixer/DirectMonitorCH8" />
+    </group>
+    <group name="VolumeControlsLowRes" line="249">
+      <binding widget="self.sldOut12Level" path="/Mixer/Out12Level" />
+      <binding widget="self.sldOut34Level" path="/Mixer/Out34Level" />
+      <binding widget="self.sldOut56Level" path="/Mixer/Out56Level" />
+      <binding widget="self.sldOut78Level" path="/Mixer/Out78Level" />
+    </group>
+    <group name="TriggerButtonControls" line="256">
+      <binding widget="self.btnReboot" path="/Control/Reboot" />
+      <binding widget="self.btnIdentify" path="/Control/FlashLed" />
+      <binding widget="self.btnSaveSettings" path="/Control/SaveSettings" />
+    </group>
+    <group name="ComboControls" line="268">
+      <binding widget="self.comboStandalone" path="/Control/StandaloneConfig" />
+    </group>
+    <group name="VolumeControls" line="378">
+      <binding widget="self.sldOMixPC1O1" path="/Mixer/OutputMix" arg0="0" arg1="0" />
+      <binding widget="self.sldOMixPC2O2" path="/Mixer/OutputMix" arg0="1" arg1="1" />
+      <binding widget="self.sldOMixPC3O3" path="/Mixer/OutputMix" arg0="2" arg1="2" />
+      <binding widget="self.sldOMixPC4O4" path="/Mixer/OutputMix" arg0="3" arg1="3" />
+      <binding widget="self.sldOMixPC5O5" path="/Mixer/OutputMix" arg0="4" arg1="4" />
+      <binding widget="self.sldOMixPC6O6" path="/Mixer/OutputMix" arg0="5" arg1="5" />
+      <binding widget="self.sldOMixPC7O7" path="/Mixer/OutputMix" arg0="6" arg1="6" />
+      <binding widget="self.sldOMixPC8O8" path="/Mixer/OutputMix" arg0="7" arg1="7" />
+      <binding widget="self.sldOMixPC9O9" path="/Mixer/OutputMix" arg0="8" arg1="8" />
+      <binding widget="self.sldOMixPC10O10" path="/Mixer/OutputMix" arg0="9" arg1="9" />
+      <binding widget="self.sldOMixPC1O3" path="/Mixer/OutputMix" arg0="0" arg1="2" />
+      <binding widget="self.sldOMixPC2O4" path="/Mixer/OutputMix" arg0="1" arg1="3" />
+      <binding widget="self.sldOMixPC1O5" path="/Mixer/OutputMix" arg0="0" arg1="4" />
+      <binding widget="self.sldOMixPC2O6" path="/Mixer/OutputMix" arg0="1" arg1="5" />
+      <binding widget="self.sldOMixPC1O7" path="/Mixer/OutputMix" arg0="0" arg1="6" />
+      <binding widget="self.sldOMixPC2O8" path="/Mixer/OutputMix" arg0="1" arg1="7" />
+      <binding widget="self.sldOMixPC1O9" path="/Mixer/OutputMix" arg0="0" arg1="8" />
+      <binding widget="self.sldOMixPC2O10" path="/Mixer/OutputMix" arg0="1" arg1="9" />
+      <binding widget="self.sldOMixIMixO1" path="/Mixer/OutputMix" arg0="10" arg1="0" />
+      <binding widget="self.sldOMixIMixO2" path="/Mixer/OutputMix" arg0="11" arg1="1" />
+      <binding widget="self.sldOMixIMixO3" path="/Mixer/OutputMix" arg0="10" arg1="2" />
+      <binding widget="self.sldOMixIMixO4" path="/Mixer/OutputMix" arg0="11" arg1="3" />
+      <binding widget="self.sldOMixIMixO5" path="/Mixer/OutputMix" arg0="10" arg1="4" />
+      <binding widget="self.sldOMixIMixO6" path="/Mixer/OutputMix" arg0="11" arg1="5" />
+      <binding widget="self.sldOMixIMixO7" path="/Mixer/OutputMix" arg0="10" arg1="6" />
+      <binding widget="self.sldOMixIMixO8" path="/Mixer/OutputMix" arg0="11" arg1="7" />
+      <binding widget="self.sldOMixIMixO9" path="/Mixer/OutputMix" arg0="10" arg1="8" />
+      <binding widget="self.sldOMixIMixO10" path="/Mixer/OutputMix" arg0="11" arg1="9" />
+    </group>
+    <group name="SelectorControls" line="413">
+      <binding widget="self.chkInsert1" path="/Control/Insert1" />
+      <binding widget="self.chkInsert2" path="/Control/Insert2" />
+      <binding widget="self.chkPhantom14" path="/Control/Phantom_1to4" />
+      <binding widget="self.chkPhantom58" path="/Control/Phantom_5to8" />
+      <binding widget="self.chkAC3" path="/Control/AC3pass" />
+      <binding widget="self.chkMidiThru" path="/Control/MidiTru" />
+      <binding widget="self.chkHighVoltage" path="/Control/UseHighVoltageRail" />
+      <binding widget="self.chkMidiEnable" path="/Control/MIDIEnable" />
+      <binding widget="self.chkAdatDisable" path="/Control/ADATDisable" />
+      <binding widget="self.chkMute12" path="/Mixer/Out12Mute" />
+      <binding widget="self.chkHwCtrl12" path="/Mixer/Out12HwCtrl" />
+      <binding widget="self.chkPad12" path="/Mixer/Out12Pad" />
+      <binding widget="self.chkDim12" path="/Mixer/Out12Dim" />
+      <binding widget="self.chkMute34" path="/Mixer/Out34Mute" />
+      <binding widget="self.chkHwCtrl34" path="/Mixer/Out34HwCtrl" />
+      <binding widget="self.chkPad34" path="/Mixer/Out34Pad" />
+      <binding widget="self.chkDim34" path="/Mixer/Out34Dim" />
+      <binding widget="self.chkMute56" path="/Mixer/Out56Mute" />
+      <binding widget="self.chkHwCtrl56" path="/Mixer/Out56HwCtrl" />
+      <binding widget="self.chkPad56" path="/Mixer/Out56Pad" />
+      <binding widget="self.chkDim56" path="/Mixer/Out56Dim" />
+      <binding widget="self.chkMute78" path="/Mixer/Out78Mute" />
+      <binding widget="self.chkHwCtrl78" path="/Mixer/Out78HwCtrl" />
+      <binding widget="self.chkPad78" path="/Mixer/Out78Pad" />
+      <binding widget="self.chkDim78" path="/Mixer/Out78Dim" />
+      <binding widget="self.chkMonitor1" path="/Mixer/DirectMonitorCH1" />
+      <binding widget="self.chkMonitor2" path="/Mixer/DirectMonitorCH2" />
+      <binding widget="self.chkMonitor3" path="/Mixer/DirectMonitorCH3" />
+      <binding widget="self.chkMonitor4" path="/Mixer/DirectMonitorCH4" />
+      <binding widget="self.chkMonitor5" path="/Mixer/DirectMonitorCH5" />
+      <binding widget="self.chkMonitor6" path="/Mixer/DirectMonitorCH6" />
+      <binding widget="self.chkMonitor7" path="/Mixer/DirectMonitorCH7" />
+      <binding widget="self.chkMonitor8" path="/Mixer/DirectMonitorCH8" />
+    </group>
+    <group name="VolumeControlsLowRes" line="455">
+      <binding widget="self.sldOut12Level" path="/Mixer/Out12Level" />
+      <binding widget="self.sldOut34Level" path="/Mixer/Out34Level" />
+      <binding widget="self.sldOut56Level" path="/Mixer/Out56Level" />
+      <binding widget="self.sldOut78Level" path="/Mixer/Out78Level" />
+    </group>
+    <group name="TriggerButtonControls" line="462">
+      <binding widget="self.btnReboot" path="/Control/Reboot" />
+      <binding widget="self.btnIdentify" path="/Control/FlashLed" />
+      <binding widget="self.btnSaveSettings" path="/Control/SaveSettings" />
+    </group>
+    <group name="ComboControls" line="474">
+      <binding widget="self.comboStandalone" path="/Control/StandaloneConfig" />
+    </group>
+  </mappings>
+  <ui_files>
+    <ui file="saffirepro_small.ui" association="explicit">
+      <widgets>
+        <widget name="SaffireProMixerSmallUI" class="QWidget" />
+        <widget name="groupBox14" class="QGroupBox" />
+        <widget name="tabWidget14" class="QTabWidget" />
+        <widget name="tab" class="QWidget" />
+        <widget name="chkMute12" class="QCheckBox" />
+        <widget name="chkMonitor2" class="QCheckBox" />
+        <widget name="chkDim12" class="QCheckBox" />
+        <widget name="chkMonitor1" class="QCheckBox" />
+        <widget name="chkHwCtrl12" class="QCheckBox" />
+        <widget name="chkPad12" class="QCheckBox" />
+        <widget name="txtOmixO1" class="QLabel" />
+        <widget name="txtOMixPC1O1" class="QLabel" />
+        <widget name="sldOMixPC1O1" class="QSlider" />
+        <widget name="sldOMixIMixO1" class="QSlider" />
+        <widget name="txtOMixIMixO1" class="QLabel" />
+        <widget name="txtOMixIMixO2" class="QLabel" />
+        <widget name="txtOmixO2" class="QLabel" />
+        <widget name="txtOMixPC2O2" class="QLabel" />
+        <widget name="sldOMixPC2O2" class="QSlider" />
+        <widget name="sldOMixIMixO2" class="QSlider" />
+        <widget name="groupLevel12" class="QGroupBox" />
+        <widget name="sldOut12Level" class="QSlider" />
+        <widget name="TabPage" class="QWidget" />
+        <widget name="chkMonitor3" class="QCheckBox" />
+        <widget name="chkHwCtrl34" class="QCheckBox" />
+        <widget name="chkMonitor4" class="QCheckBox" />
+        <widget name="chkMute34" class="QCheckBox" />
+        <widget name="chkPad34" class="QCheckBox" />
+        <widget name="chkDim34" class="QCheckBox" />
+        <widget name="txtOMixIMixO3" class="QLabel" />
+        <widget name="sldOMixPC1O3" class="QSlider" />
+        <widget name="txtOmixO3" class="QLabel" />
+        <widget name="txtOMixPC3O3" class="QLabel" />
+        <widget name="txtOMixPC1O3" class="QLabel" />
+        <widget name="sldOMixPC3O3" class="QSlider" />
+        <widget name="sldOMixIMixO3" class="QSlider" />
+        <widget name="sldOMixPC4O4" class="QSlider" />
+        <widget name="txtOMixPC4O4" class="QLabel" />
+        <widget name="sldOMixIMixO4" class="QSlider" />
+        <widget name="txtOMixIMixO4" class="QLabel" />
+        <widget name="sldOMixPC2O4" class="QSlider" />
+        <widget name="txtOMixPC2O4" class="QLabel" />
+        <widget name="txtOmixO4" class="QLabel" />
+        <widget name="groupLevel34" class="QGroupBox" />
+        <widget name="sldOut34Level" class="QSlider" />
+        <widget name="TabPage" class="QWidget" />
+        <widget name="chkMonitor6" class="QCheckBox" />
+        <widget name="chkMonitor5" class="QCheckBox" />
+        <widget name="chkDim56" class="QCheckBox" />
+        <widget name="chkHwCtrl56" class="QCheckBox" />
+        <widget name="chkPad56" class="QCheckBox" />
+        <widget name="chkMute56" class="QCheckBox" />
+        <widget name="txtOMixPC1O5" class="QLabel" />
+        <widget name="txtOMixIMixO5" class="QLabel" />
+        <widget name="sldOMixPC1O5" class="QSlider" />
+        <widget name="txtOMixPC5O5" class="QLabel" />
+        <widget name="sldOMixPC5O5" class="QSlider" />
+        <widget name="sldOMixIMixO5" class="QSlider" />
+        <widget name="txtOmixO5" class="QLabel" />
+        <widget name="txtOMixPC6O6" class="QLabel" />
+        <widget name="sldOMixPC2O6" class="QSlider" />
+        <widget name="txtOMixIMixO6" class="QLabel" />
+        <widget name="txtOMixPC2O6" class="QLabel" />
+        <widget name="txtOmixO6" class="QLabel" />
+        <widget name="sldOMixIMixO6" class="QSlider" />
+        <widget name="sldOMixPC6O6" class="QSlider" />
+        <widget name="groupLevel56" class="QGroupBox" />
+        <widget name="sldOut56Level" class="QSlider" />
+        <widget name="TabPage" class="QWidget" />
+        <widget name="chkMonitor8" class="QCheckBox" />
+        <widget name="chkDim78" class="QCheckBox" />
+        <widget name="chkMute78" class="QCheckBox" />
+        <widget name="chkPad78" class="QCheckBox" />
+        <widget name="chkMonitor7" class="QCheckBox" />
+        <widget name="chkHwCtrl78" class="QCheckBox" />
+        <widget name="txtOMixPC1O7" class="QLabel" />
+        <widget name="sldOMixIMixO7" class="QSlider" />
+        <widget name="txtOMixPC7O7" class="QLabel" />
+        <widget name="sldOMixPC7O7" class="QSlider" />
+        <widget name="txtOmixO7" class="QLabel" />
+        <widget name="txtOMixIMixO7" class="QLabel" />
+        <widget name="sldOMixPC1O7" class="QSlider" />
+        <widget name="txtOMixIMixO8" class="QLabel" />
+        <widget name="txtOmixO8" class="QLabel" />
+        <widget name="sldOMixIMixO8" class="QSlider" />
+        <widget name="sldOMixPC8O8" class="QSlider" />
+        <widget name="txtOMixPC2O8" class="QLabel" />
+        <widget name="txtOMixPC8O8" class="QLabel" />
+        <widget name="sldOMixPC2O8" class="QSlider" />
+        <widget name="groupLevel78" class="QGroupBox" />
+        <widget name="sldOut78Level" class="QSlider" />
+        <widget name="TabPage" class="QWidget" />
+        <widget name="sldOMixIMixO9" class="QSlider" />
+        <widget name="txtOMixPC1O9" class="QLabel" />
+        <widget name="sldOMixPC9O9" class="QSlider" />
+        <widget name="txtOMixIMixO9" class="QLabel" />
+        <widget name="txtOmixO9" class="QLabel" />
+        <widget name="txtOMixPC9O9" class="QLabel" />
+        <widget name="sldOMixPC1O9" class="QSlider" />
+        <widget name="sldOMixIMixO10" class="QSlider" />
+        <widget name="txtOmixO10" class="QLabel" />
+        <widget name="txtOMixPC2O10" class="QLabel" />
+        <widget name="sldOMixPC10O10" class="QSlider" />
+        <widget name="txtOMixPC10O10" class="QLabel" />
+        <widget name="txtOMixIMixO10" class="QLabel" />
+        <widget name="sldOMixPC2O10" class="QSlider" />
+        <widget name="groupBox21" class="QGroupBox" />
+        <widget name="textLabel1" class="QLabel" />
+        <widget name="chkPhantom14" class="QCheckBox" />
+        <widget name="chkPhantom58" class="QCheckBox" />
+        <widget name="textLabel2" class="QLabel" />
+        <widget name="chkInsert1" class="QCheckBox" />
+        <widget name="chkInsert2" class="QCheckBox" />
+        <widget name="chkAdatDisable" class="QCheckBox" />
+        <widget name="chkMidiEnable" class="QCheckBox" />
+        <widget name="comboStandalone" class="QComboBox" />
+        <widget name="chkAC3" class="QCheckBox" />
+        <widget name="chkMidiThru" class="QCheckBox" />
+        <widget name="chkHighVoltage" class="QCheckBox" />
+        <widget name="btnSaveSettings" class="QPushButton" />
+        <widget name="btnIdentify" class="QPushButton" />
+        <widget name="btnReboot" class="QPushButton" />
+        <widget name="btnRefresh" class="QPushButton" />
+      </widgets>
+    </ui>
+    <ui file="saffirepro_large.ui" association="explicit">
+      <widgets>
+        <widget name="SaffireProMixerLargeUI" class="QWidget" />
+        <widget name="groupBox1" class="QGroupBox" />
+        <widget name="tabInputMix" class="QTabWidget" />
+        <widget name="analog" class="QWidget" />
+        <widget name="sldIMixAnalog10R" class="QSlider" />
+        <widget name="txtIMixAnalog1R" class="QLabel" />
+        <widget name="sldIMixAnalog5R" class="QSlider" />
+        <widget name="txtIMixAnalog3" class="QLabel" />
+        <widget name="sldIMixAnalog10L" class="QSlider" />
+        <widget name="txtIMixAnalog2" class="QLabel" />
+        <widget name="sldIMixAnalog5L" class="QSlider" />
+        <widget name="sldIMixAnalog7L" class="QSlider" />
+        <widget name="sldIMixAnalog9R" class="QSlider" />
+        <widget name="sldIMixAnalog3L" class="QSlider" />
+        <widget name="sldIMixAnalog1R" class="QSlider" />
+        <widget name="txtIMixAnalog10R" class="QLabel" />
+        <widget name="txtIMixAnalog2L" class="QLabel" />
+        <widget name="txtIMixAnalog1L" class="QLabel" />
+        <widget name="txtIMixAnalog8R" class="QLabel" />
+        <widget name="sldIMixAnalog6L" class="QSlider" />
+        <widget name="txtIMixAnalog6R" class="QLabel" />
+        <widget name="sldIMixAnalog3R" class="QSlider" />
+        <widget name="txtIMixAnalog9L" class="QLabel" />
+        <widget name="txtIMixAnalog5L" class="QLabel" />
+        <widget name="sldIMixAnalog8R" class="QSlider" />
+        <widget name="txtIMixAnalog6" class="QLabel" />
+        <widget name="txtIMixAnalog10L" class="QLabel" />
+        <widget name="txtIMixAnalog7R" class="QLabel" />
+        <widget name="txtIMixAnalog3R" class="QLabel" />
+        <widget name="sldIMixAnalog4L" class="QSlider" />
+        <widget name="sldIMixAnalog7R" class="QSlider" />
+        <widget name="sldIMixAnalog2L" class="QSlider" />
+        <widget name="txtIMixAnalog4" class="QLabel" />
+        <widget name="txtIMixAnalog9R" class="QLabel" />
+        <widget name="txtIMixAnalog4R" class="QLabel" />
+        <widget name="txtIMixAnalog7" class="QLabel" />
+        <widget name="txtIMixAnalog6L" class="QLabel" />
+        <widget name="sldIMixAnalog8L" class="QSlider" />
+        <widget name="sldIMixAnalog4R" class="QSlider" />
+        <widget name="txtIMixAnalog3L" class="QLabel" />
+        <widget name="sldIMixAnalog9L" class="QSlider" />
+        <widget name="sldIMixAnalog6R" class="QSlider" />
+        <widget name="txtIMixAnalog4L" class="QLabel" />
+        <widget name="txtIMixAnalog8" class="QLabel" />
+        <widget name="txtIMixAnalog10" class="QLabel" />
+        <widget name="txtIMixAnalog7L" class="QLabel" />
+        <widget name="txtIMixAnalog5R" class="QLabel" />
+        <widget name="sldIMixAnalog2R" class="QSlider" />
+        <widget name="txtIMixAnalog5" class="QLabel" />
+        <widget name="txtIMixAnalog8L" class="QLabel" />
+        <widget name="txtIMixAnalog9" class="QLabel" />
+        <widget name="txtIMixAnalog2R" class="QLabel" />
+        <widget name="sldIMixAnalog1L" class="QSlider" />
+        <widget name="txtIMixAnalog1" class="QLabel" />
+        <widget name="adat1" class="QWidget" />
+        <widget name="sldIMixADAT12L" class="QSlider" />
+        <widget name="txtIMixADAT12" class="QLabel" />
+        <widget name="sldIMixADAT18L" class="QSlider" />
+        <widget name="txtIMixADAT18L" class="QLabel" />
+        <widget name="txtIMixADAT15R" class="QLabel" />
+        <widget name="txtIMixADAT14L" class="QLabel" />
+        <widget name="sldIMixADAT18R" class="QSlider" />
+        <widget name="txtIMixADAT17R" class="QLabel" />
+        <widget name="txtIMixADAT18R" class="QLabel" />
+        <widget name="txtIMixADAT17" class="QLabel" />
+        <widget name="txtIMixADAT11L" class="QLabel" />
+        <widget name="txtIMixADAT16" class="QLabel" />
+        <widget name="txtIMixADAT14" class="QLabel" />
+        <widget name="txtIMixADAT13L" class="QLabel" />
+        <widget name="txtIMixADAT16R" class="QLabel" />
+        <widget name="txtIMixADAT15" class="QLabel" />
+        <widget name="sldIMixADAT13R" class="QSlider" />
+        <widget name="sldIMixADAT17R" class="QSlider" />
+        <widget name="sldIMixADAT17L" class="QSlider" />
+        <widget name="sldIMixADAT15L" class="QSlider" />
+        <widget name="sldIMixADAT12R" class="QSlider" />
+        <widget name="txtIMixADAT12R" class="QLabel" />
+        <widget name="sldIMixADAT15R" class="QSlider" />
+        <widget name="txtIMixADAT14R" class="QLabel" />
+        <widget name="sldIMixADAT14L" class="QSlider" />
+        <widget name="txtIMixADAT13R" class="QLabel" />
+        <widget name="txtIMixADAT18" class="QLabel" />
+        <widget name="sldIMixADAT13L" class="QSlider" />
+        <widget name="sldIMixADAT11R" class="QSlider" />
+        <widget name="txtIMixADAT16L" class="QLabel" />
+        <widget name="sldIMixADAT14R" class="QSlider" />
+        <widget name="txtIMixADAT12L" class="QLabel" />
+        <widget name="txtIMixADAT11R" class="QLabel" />
+        <widget name="sldIMixADAT16L" class="QSlider" />
+        <widget name="txtIMixADAT15L" class="QLabel" />
+        <widget name="sldIMixADAT11L" class="QSlider" />
+        <widget name="txtIMixADAT11" class="QLabel" />
+        <widget name="txtIMixADAT17L" class="QLabel" />
+        <widget name="txtIMixADAT13" class="QLabel" />
+        <widget name="sldIMixADAT16R" class="QSlider" />
+        <widget name="adat2" class="QWidget" />
+        <widget name="sldIMixADAT26L" class="QSlider" />
+        <widget name="sldIMixADAT24R" class="QSlider" />
+        <widget name="txtIMixADAT21R" class="QLabel" />
+        <widget name="sldIMixADAT28R" class="QSlider" />
+        <widget name="txtIMixADAT25R" class="QLabel" />
+        <widget name="txtIMixADAT23" class="QLabel" />
+        <widget name="txtIMixADAT23L" class="QLabel" />
+        <widget name="txtIMixADAT27" class="QLabel" />
+        <widget name="txtIMixADAT27L" class="QLabel" />
+        <widget name="sldIMixADAT21L" class="QSlider" />
+        <widget name="sldIMixADAT25L" class="QSlider" />
+        <widget name="sldIMixADAT23R" class="QSlider" />
+        <widget name="sldIMixADAT27R" class="QSlider" />
+        <widget name="txtIMixADAT24R" class="QLabel" />
+        <widget name="txtIMixADAT28R" class="QLabel" />
+        <widget name="txtIMixADAT22" class="QLabel" />
+        <widget name="txtIMixADAT22L" class="QLabel" />
+        <widget name="txtIMixADAT21L" class="QLabel" />
+        <widget name="txtIMixADAT26" class="QLabel" />
+        <widget name="txtIMixADAT26L" class="QLabel" />
+        <widget name="sldIMixADAT24L" class="QSlider" />
+        <widget name="sldIMixADAT22R" class="QSlider" />
+        <widget name="sldIMixADAT28L" class="QSlider" />
+        <widget name="sldIMixADAT26R" class="QSlider" />
+        <widget name="txtIMixADAT23R" class="QLabel" />
+        <widget name="txtIMixADAT27R" class="QLabel" />
+        <widget name="txtIMixADAT21" class="QLabel" />
+        <widget name="txtIMixADAT25" class="QLabel" />
+        <widget name="txtIMixADAT25L" class="QLabel" />
+        <widget name="sldIMixADAT23L" class="QSlider" />
+        <widget name="sldIMixADAT21R" class="QSlider" />
+        <widget name="sldIMixADAT27L" class="QSlider" />
+        <widget name="sldIMixADAT25R" class="QSlider" />
+        <widget name="txtIMixADAT22R" class="QLabel" />
+        <widget name="txtIMixADAT26R" class="QLabel" />
+        <widget name="txtIMixADAT24" class="QLabel" />
+        <widget name="txtIMixADAT24L" class="QLabel" />
+        <widget name="txtIMixADAT28" class="QLabel" />
+        <widget name="txtIMixADAT28L" class="QLabel" />
+        <widget name="sldIMixADAT22L" class="QSlider" />
+        <widget name="groupBox14" class="QGroupBox" />
+        <widget name="tabWidget14" class="QTabWidget" />
+        <widget name="tab" class="QWidget" />
+        <widget name="chkMute12" class="QCheckBox" />
+        <widget name="chkMonitor2" class="QCheckBox" />
+        <widget name="chkDim12" class="QCheckBox" />
+        <widget name="chkMonitor1" class="QCheckBox" />
+        <widget name="chkHwCtrl12" class="QCheckBox" />
+        <widget name="chkPad12" class="QCheckBox" />
+        <widget name="txtOmixO1" class="QLabel" />
+        <widget name="txtOMixPC1O1" class="QLabel" />
+        <widget name="sldOMixPC1O1" class="QSlider" />
+        <widget name="sldOMixIMixO1" class="QSlider" />
+        <widget name="txtOMixIMixO1" class="QLabel" />
+        <widget name="txtOMixIMixO2" class="QLabel" />
+        <widget name="txtOmixO2" class="QLabel" />
+        <widget name="txtOMixPC2O2" class="QLabel" />
+        <widget name="sldOMixPC2O2" class="QSlider" />
+        <widget name="sldOMixIMixO2" class="QSlider" />
+        <widget name="groupLevel12" class="QGroupBox" />
+        <widget name="sldOut12Level" class="QSlider" />
+        <widget name="TabPage" class="QWidget" />
+        <widget name="chkMonitor3" class="QCheckBox" />
+        <widget name="chkHwCtrl34" class="QCheckBox" />
+        <widget name="chkMonitor4" class="QCheckBox" />
+        <widget name="chkMute34" class="QCheckBox" />
+        <widget name="chkPad34" class="QCheckBox" />
+        <widget name="chkDim34" class="QCheckBox" />
+        <widget name="txtOMixIMixO3" class="QLabel" />
+        <widget name="sldOMixPC1O3" class="QSlider" />
+        <widget name="txtOmixO3" class="QLabel" />
+        <widget name="txtOMixPC3O3" class="QLabel" />
+        <widget name="txtOMixPC1O3" class="QLabel" />
+        <widget name="sldOMixPC3O3" class="QSlider" />
+        <widget name="sldOMixIMixO3" class="QSlider" />
+        <widget name="sldOMixPC4O4" class="QSlider" />
+        <widget name="txtOMixPC4O4" class="QLabel" />
+        <widget name="sldOMixIMixO4" class="QSlider" />
+        <widget name="txtOMixIMixO4" class="QLabel" />
+        <widget name="sldOMixPC2O4" class="QSlider" />
+        <widget name="txtOMixPC2O4" class="QLabel" />
+        <widget name="txtOmixO4" class="QLabel" />
+        <widget name="groupLevel34" class="QGroupBox" />
+        <widget name="sldOut34Level" class="QSlider" />
+        <widget name="TabPage" class="QWidget" />
+        <widget name="chkMonitor6" class="QCheckBox" />
+        <widget name="chkMonitor5" class="QCheckBox" />
+        <widget name="chkDim56" class="QCheckBox" />
+        <widget name="chkHwCtrl56" class="QCheckBox" />
+        <widget name="chkPad56" class="QCheckBox" />
+        <widget name="chkMute56" class="QCheckBox" />
+        <widget name="txtOMixPC1O5" class="QLabel" />
+        <widget name="txtOMixIMixO5" class="QLabel" />
+        <widget name="sldOMixPC1O5" class="QSlider" />
+        <widget name="txtOMixPC5O5" class="QLabel" />
+        <widget name="sldOMixPC5O5" class="QSlider" />
+        <widget name="sldOMixIMixO5" class="QSlider" />
+        <widget name="txtOmixO5" class="QLabel" />
+        <widget name="txtOMixPC6O6" class="QLabel" />
+        <widget name="sldOMixPC2O6" class="QSlider" />
+        <widget name="txtOMixIMixO6" class="QLabel" />
+        <widget name="txtOMixPC2O6" class="QLabel" />
+        <widget name="txtOmixO6" class="QLabel" />
+        <widget name="sldOMixIMixO6" class="QSlider" />
+        <widget name="sldOMixPC6O6" class="QSlider" />
+        <widget name="groupLevel56" class="QGroupBox" />
+        <widget name="sldOut56Level" class="QSlider" />
+        <widget name="TabPage" class="QWidget" />
+        <widget name="chkMonitor8" class="QCheckBox" />
+        <widget name="chkDim78" class="QCheckBox" />
+        <widget name="chkMute78" class="QCheckBox" />
+        <widget name="chkPad78" class="QCheckBox" />
+        <widget name="chkMonitor7" class="QCheckBox" />
+        <widget name="chkHwCtrl78" class="QCheckBox" />
+        <widget name="txtOMixPC1O7" class="QLabel" />
+        <widget name="sldOMixIMixO7" class="QSlider" />
+        <widget name="txtOMixPC7O7" class="QLabel" />
+        <widget name="sldOMixPC7O7" class="QSlider" />
+        <widget name="txtOmixO7" class="QLabel" />
+        <widget name="txtOMixIMixO7" class="QLabel" />
+        <widget name="sldOMixPC1O7" class="QSlider" />
+        <widget name="txtOMixIMixO8" class="QLabel" />
+        <widget name="txtOmixO8" class="QLabel" />
+        <widget name="sldOMixIMixO8" class="QSlider" />
+        <widget name="sldOMixPC8O8" class="QSlider" />
+        <widget name="txtOMixPC2O8" class="QLabel" />
+        <widget name="txtOMixPC8O8" class="QLabel" />
+        <widget name="sldOMixPC2O8" class="QSlider" />
+        <widget name="groupLevel78" class="QGroupBox" />
+        <widget name="sldOut78Level" class="QSlider" />
+        <widget name="TabPage" class="QWidget" />
+        <widget name="sldOMixIMixO9" class="QSlider" />
+        <widget name="txtOMixPC1O9" class="QLabel" />
+        <widget name="sldOMixPC9O9" class="QSlider" />
+        <widget name="txtOMixIMixO9" class="QLabel" />
+        <widget name="txtOmixO9" class="QLabel" />
+        <widget name="txtOMixPC9O9" class="QLabel" />
+        <widget name="sldOMixPC1O9" class="QSlider" />
+        <widget name="sldOMixIMixO10" class="QSlider" />
+        <widget name="txtOmixO10" class="QLabel" />
+        <widget name="txtOMixPC2O10" class="QLabel" />
+        <widget name="sldOMixPC10O10" class="QSlider" />
+        <widget name="txtOMixPC10O10" class="QLabel" />
+        <widget name="txtOMixIMixO10" class="QLabel" />
+        <widget name="sldOMixPC2O10" class="QSlider" />
+        <widget name="groupBox21" class="QGroupBox" />
+        <widget name="textLabel1" class="QLabel" />
+        <widget name="chkPhantom14" class="QCheckBox" />
+        <widget name="chkPhantom58" class="QCheckBox" />
+        <widget name="textLabel2" class="QLabel" />
+        <widget name="chkInsert1" class="QCheckBox" />
+        <widget name="chkInsert2" class="QCheckBox" />
+        <widget name="chkAdatDisable" class="QCheckBox" />
+        <widget name="chkMidiEnable" class="QCheckBox" />
+        <widget name="comboStandalone" class="QComboBox" />
+        <widget name="chkAC3" class="QCheckBox" />
+        <widget name="chkMidiThru" class="QCheckBox" />
+        <widget name="chkHighVoltage" class="QCheckBox" />
+        <widget name="btnSaveSettings" class="QPushButton" />
+        <widget name="btnIdentify" class="QPushButton" />
+        <widget name="btnReboot" class="QPushButton" />
+        <widget name="btnRefresh" class="QPushButton" />
+      </widgets>
+    </ui>
+  </ui_files>
+  <notes>Static extraction from legacy FFADO Qt mixer sources. Paths and indexes are references, not validated live D-Bus capabilities. Runtime discovery and device-specific logic are still required. No vendor/model-to-family mapping is asserted unless source defines it.</notes>
+</profile>

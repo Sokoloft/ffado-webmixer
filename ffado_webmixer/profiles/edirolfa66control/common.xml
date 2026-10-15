@@ -1,0 +1,27 @@
+<?xml version='1.0' encoding='utf-8'?>
+<profile family="edirolfa66control" schema_version="2">
+  <discovery source="edirolfa66control.py" status="source-derived">
+    <element path="/Mixer/Feature_Volume_1" kind="unknown" />
+    <element path="/Mixer/Feature_Volume_2" kind="unknown" />
+    <element path="/Mixer/Feature_Volume_3" kind="unknown" />
+    <element path="/Mixer/Feature_LRBalance_1" kind="unknown" />
+    <element path="/Mixer/Feature_LRBalance_2" kind="unknown" />
+    <element path="/Mixer/Feature_LRBalance_3" kind="unknown" />
+  </discovery>
+  <source_bindings>
+    <group name="VolumeControls" line="36">
+      <binding widget="'vol1'" path="/Mixer/Feature_Volume_1" arg0="1" arg1="self.sldInput1" />
+      <binding widget="'vol2'" path="/Mixer/Feature_Volume_1" arg0="2" arg1="self.sldInput2" />
+      <binding widget="'vol3'" path="/Mixer/Feature_Volume_2" arg0="1" arg1="self.sldInput3" />
+      <binding widget="'vol4'" path="/Mixer/Feature_Volume_2" arg0="2" arg1="self.sldInput4" />
+      <binding widget="'vol5'" path="/Mixer/Feature_Volume_3" arg0="1" arg1="self.sldInput5" />
+      <binding widget="'vol6'" path="/Mixer/Feature_Volume_3" arg0="2" arg1="self.sldInput6" />
+      <binding widget="'bal1'" path="/Mixer/Feature_LRBalance_1" arg0="1" arg1="self.sldBal1" />
+      <binding widget="'bal2'" path="/Mixer/Feature_LRBalance_1" arg0="2" arg1="self.sldBal2" />
+      <binding widget="'bal3'" path="/Mixer/Feature_LRBalance_2" arg0="1" arg1="self.sldBal3" />
+      <binding widget="'bal4'" path="/Mixer/Feature_LRBalance_2" arg0="2" arg1="self.sldBal4" />
+      <binding widget="'bal5'" path="/Mixer/Feature_LRBalance_3" arg0="1" arg1="self.sldBal5" />
+      <binding widget="'bal6'" path="/Mixer/Feature_LRBalance_3" arg0="2" arg1="self.sldBal6" />
+    </group>
+  </source_bindings>
+</profile>

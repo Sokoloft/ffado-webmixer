@@ -1,0 +1,6 @@
+<?xml version='1.0' encoding='utf-8'?>
+<device family="generic_dice_eap" name="Zed R16" extends="common.xml" identity_source="ffado_configuration">
+  <match vendor_id="0x4c4" configuration_model_id="0x0" />
+  <identity vendor="Allen and Heath" driver="DICE" ffado_mixer="Generic_Dice_EAP" />
+  <capabilities mode="discovered-controls-only" />
+</device>

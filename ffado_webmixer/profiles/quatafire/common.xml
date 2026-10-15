@@ -1,0 +1,30 @@
+<?xml version='1.0' encoding='utf-8'?>
+<profile family="quatafire" schema_version="2">
+  <discovery source="quatafire.py" status="source-derived">
+    <element path="/Mixer/Feature_Volume_1" kind="unknown" />
+    <element path="/Mixer/Feature_Volume_2" kind="unknown" />
+    <element path="/Mixer/Feature_Volume_3" kind="unknown" />
+    <element path="/Mixer/Feature_Volume_4" kind="unknown" />
+  </discovery>
+  <source_bindings>
+    <group name="VolumeControls" line="36">
+      <binding widget="self.sldCh1" path="/Mixer/Feature_Volume_1" arg0="1" />
+      <binding widget="self.sldCh2" path="/Mixer/Feature_Volume_1" arg0="2" />
+      <binding widget="self.sldCh34" path="/Mixer/Feature_Volume_2" arg0="0" />
+      <binding widget="self.sldCh56" path="/Mixer/Feature_Volume_3" arg0="0" />
+      <binding widget="self.sldDawAll" path="/Mixer/Feature_Volume_4" arg0="0" />
+      <binding widget="self.sldDawCH1" path="/Mixer/Feature_Volume_4" arg0="1" />
+      <binding widget="self.sldDawCH2" path="/Mixer/Feature_Volume_4" arg0="2" />
+      <binding widget="self.sldDawCH3" path="/Mixer/Feature_Volume_4" arg0="3" />
+      <binding widget="self.sldDawCH4" path="/Mixer/Feature_Volume_4" arg0="4" />
+      <binding widget="self.sldDawCH5" path="/Mixer/Feature_Volume_4" arg0="5" />
+      <binding widget="self.sldDawCH6" path="/Mixer/Feature_Volume_4" arg0="6" />
+      <binding widget="self.sldDawCH7" path="/Mixer/Feature_Volume_4" arg0="7" />
+      <binding widget="self.sldDawCH8" path="/Mixer/Feature_Volume_4" arg0="8" />
+    </group>
+    <group name="PanControls" line="51">
+      <binding widget="self.dialCh34" path="/Mixer/Feature_Volume_2" />
+      <binding widget="self.dialCh56" path="/Mixer/Feature_Volume_3" />
+    </group>
+  </source_bindings>
+</profile>

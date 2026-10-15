@@ -1,0 +1,27 @@
+<?xml version='1.0' encoding='utf-8'?>
+<profile family="audiofire" schema_version="2">
+  <discovery source="audiofire.py" status="source-derived">
+    <element path="/HwInfo/PhysicalAudioOutCount" kind="unknown" />
+    <element path="/HwInfo/PhysicalAudioInCount" kind="unknown" />
+    <element path="/Mixer/MonitorMute" kind="unknown" />
+    <element path="/Mixer/MonitorSolo" kind="unknown" />
+    <element path="/Mixer/MonitorPan" kind="unknown" />
+    <element path="/Mixer/MonitorGain" kind="unknown" />
+    <element path="/Mixer/PC%dGain" kind="unknown" />
+    <element path="/Mixer/PC%dMute" kind="unknown" />
+    <element path="/Mixer/PC%dSolo" kind="unknown" />
+    <element path="/Mixer/OUT%dGain" kind="unknown" />
+    <element path="/Mixer/OUT%dMute" kind="unknown" />
+    <element path="/Mixer/OUT%dNominal" kind="unknown" />
+    <element path="/Mixer/IN%dNominal" kind="unknown" />
+    <element path="/HwInfo/PhantomPower" kind="unknown" />
+    <element path="/PhantomPower" kind="unknown" />
+    <element path="/HwInfo/OpticalInterface" kind="unknown" />
+    <element path="/DigitalInterface" kind="unknown" />
+    <element path="/HwInfo/PlaybackRouting" kind="unknown" />
+    <element path="/PlaybackRouting" kind="unknown" />
+    <element path="/SaveSettings" kind="unknown" />
+    <element path="/Identify" kind="unknown" />
+    <element path="/SpdifMode" kind="unknown" />
+  </discovery>
+</profile>

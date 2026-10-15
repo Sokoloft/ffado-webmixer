@@ -1,0 +1,10 @@
+<?xml version='1.0' encoding='utf-8'?>
+<profile family="edirolfa101control" schema_version="2">
+  <discovery source="edirolfa101control.py" status="source-derived">
+    <element path="/Mixer/Feature_Volume_%d" kind="unknown" />
+    <element path="/Mixer/Feature_LRBalance_%d" kind="unknown" />
+  </discovery>
+  <model_constants>
+    <constant name="widgetName" value="" />
+  </model_constants>
+</profile>

@@ -1,0 +1,30 @@
+<?xml version='1.0' encoding='utf-8'?>
+<profile family="globalmixer" schema_version="1" source="globalmixer.py" status="extracted-reference">
+  <constants>
+    <constant name="idx" value="-0x1" />
+    <constant name="idx" value="-0x1" />
+    <constant name="idx" value="-0x1" />
+    <constant name="idxclock" value="-0x1" />
+    <constant name="idxsrate" value="-0x1" />
+  </constants>
+  <controls />
+  <mappings />
+  <ui_files>
+    <ui file="globalmixer.ui" association="explicit">
+      <widgets>
+        <widget name="GlobalMixerUi" class="QWidget" />
+        <widget name="lblName" class="QLabel" />
+        <widget name="textLabel2" class="QLabel" />
+        <widget name="clocksource" class="QComboBox" />
+        <widget name="label" class="QLabel" />
+        <widget name="textLabel1" class="QLabel" />
+        <widget name="txtNickname" class="QLineEdit" />
+        <widget name="textLabel2_2" class="QLabel" />
+        <widget name="samplerate" class="QComboBox" />
+        <widget name="chkStreamOut" class="QCheckBox" />
+        <widget name="chkStreamIn" class="QCheckBox" />
+      </widgets>
+    </ui>
+  </ui_files>
+  <notes>Static extraction from legacy FFADO Qt mixer sources. Paths and indexes are references, not validated live D-Bus capabilities. Runtime discovery and device-specific logic are still required. No vendor/model-to-family mapping is asserted unless source defines it.</notes>
+</profile>

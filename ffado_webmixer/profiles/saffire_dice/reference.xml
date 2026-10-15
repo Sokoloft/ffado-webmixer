@@ -1,0 +1,98 @@
+<?xml version='1.0' encoding='utf-8'?>
+<profile family="saffire_dice" schema_version="1" source="saffire_dice.py" status="extracted-reference">
+  <constants>
+    <constant name="ModelName" value="SAFFIRE_PRO" />
+  </constants>
+  <controls>
+    <reference path="/EAP/Monitoring/GlobalMute/State" context="module.Saffire_Dice.buildMixer" line="116" />
+    <reference path="/EAP/Monitoring/GlobalDim/State" context="module.Saffire_Dice.buildMixer" line="120" />
+    <reference path="/EAP/Monitoring/GlobalDim/Level" context="module.Saffire_Dice.buildMixer" line="123" />
+    <reference path="/EAP/Monitoring/Mono/Line1Line2" context="module.Saffire_Dice.buildMixer" line="138" />
+    <reference path="/EAP/Monitoring/Mono/Line3Line4" context="module.Saffire_Dice.buildMixer" line="140" />
+    <reference path="/EAP/Monitoring/LineOut/UnActivate1" context="module.Saffire_Dice.buildMixer" line="145" />
+    <reference path="/EAP/Monitoring/LineOut/UnActivate2" context="module.Saffire_Dice.buildMixer" line="147" />
+    <reference path="/EAP/Monitoring/LineOut/UnActivate3" context="module.Saffire_Dice.buildMixer" line="149" />
+    <reference path="/EAP/Monitoring/LineOut/UnActivate4" context="module.Saffire_Dice.buildMixer" line="151" />
+    <reference path="/EAP/Monitoring/LineOut/Mute1" context="module.Saffire_Dice.buildMixer" line="156" />
+    <reference path="/EAP/Monitoring/LineOut/Mute2" context="module.Saffire_Dice.buildMixer" line="158" />
+    <reference path="/EAP/Monitoring/LineOut/Mute3" context="module.Saffire_Dice.buildMixer" line="160" />
+    <reference path="/EAP/Monitoring/LineOut/Mute4" context="module.Saffire_Dice.buildMixer" line="162" />
+    <reference path="/EAP/Monitoring/LineOut/GMute1" context="module.Saffire_Dice.buildMixer" line="167" />
+    <reference path="/EAP/Monitoring/LineOut/GMute2" context="module.Saffire_Dice.buildMixer" line="169" />
+    <reference path="/EAP/Monitoring/LineOut/GMute3" context="module.Saffire_Dice.buildMixer" line="171" />
+    <reference path="/EAP/Monitoring/LineOut/GMute4" context="module.Saffire_Dice.buildMixer" line="173" />
+    <reference path="/EAP/Monitoring/LineOut/GDim1" context="module.Saffire_Dice.buildMixer" line="178" />
+    <reference path="/EAP/Monitoring/LineOut/GDim2" context="module.Saffire_Dice.buildMixer" line="180" />
+    <reference path="/EAP/Monitoring/LineOut/GDim3" context="module.Saffire_Dice.buildMixer" line="182" />
+    <reference path="/EAP/Monitoring/LineOut/GDim4" context="module.Saffire_Dice.buildMixer" line="184" />
+    <reference path="/EAP/Monitoring/LineOut/Volume1" context="module.Saffire_Dice.buildMixer" line="189" />
+    <reference path="/EAP/Monitoring/LineOut/Volume2" context="module.Saffire_Dice.buildMixer" line="191" />
+    <reference path="/EAP/Monitoring/LineOut/Volume3" context="module.Saffire_Dice.buildMixer" line="193" />
+    <reference path="/EAP/Monitoring/LineOut/Volume4" context="module.Saffire_Dice.buildMixer" line="195" />
+    <reference path="/EAP/Monitoring/Mono/Line5Line6" context="module.Saffire_Dice.buildMixer" line="202" />
+    <reference path="/EAP/Monitoring/LineOut/UnActivate5" context="module.Saffire_Dice.buildMixer" line="205" />
+    <reference path="/EAP/Monitoring/LineOut/UnActivate6" context="module.Saffire_Dice.buildMixer" line="207" />
+    <reference path="/EAP/Monitoring/LineOut/Mute5" context="module.Saffire_Dice.buildMixer" line="210" />
+    <reference path="/EAP/Monitoring/LineOut/Mute6" context="module.Saffire_Dice.buildMixer" line="212" />
+    <reference path="/EAP/Monitoring/LineOut/GMute5" context="module.Saffire_Dice.buildMixer" line="215" />
+    <reference path="/EAP/Monitoring/LineOut/GMute6" context="module.Saffire_Dice.buildMixer" line="217" />
+    <reference path="/EAP/Monitoring/LineOut/GDim5" context="module.Saffire_Dice.buildMixer" line="220" />
+    <reference path="/EAP/Monitoring/LineOut/GDim6" context="module.Saffire_Dice.buildMixer" line="222" />
+    <reference path="/EAP/Monitoring/LineOut/Volume5" context="module.Saffire_Dice.buildMixer" line="225" />
+    <reference path="/EAP/Monitoring/LineOut/Volume6" context="module.Saffire_Dice.buildMixer" line="227" />
+    <reference path="/EAP/Monitoring/Mono/Line7Line8" context="module.Saffire_Dice.buildMixer" line="233" />
+    <reference path="/EAP/Monitoring/Mono/Line9Line10" context="module.Saffire_Dice.buildMixer" line="235" />
+    <reference path="/EAP/Monitoring/LineOut/UnActivate7" context="module.Saffire_Dice.buildMixer" line="238" />
+    <reference path="/EAP/Monitoring/LineOut/UnActivate8" context="module.Saffire_Dice.buildMixer" line="240" />
+    <reference path="/EAP/Monitoring/LineOut/UnActivate9" context="module.Saffire_Dice.buildMixer" line="242" />
+    <reference path="/EAP/Monitoring/LineOut/UnActivate10" context="module.Saffire_Dice.buildMixer" line="244" />
+    <reference path="/EAP/Monitoring/LineOut/Mute7" context="module.Saffire_Dice.buildMixer" line="247" />
+    <reference path="/EAP/Monitoring/LineOut/Mute8" context="module.Saffire_Dice.buildMixer" line="249" />
+    <reference path="/EAP/Monitoring/LineOut/Mute9" context="module.Saffire_Dice.buildMixer" line="251" />
+    <reference path="/EAP/Monitoring/LineOut/Mute10" context="module.Saffire_Dice.buildMixer" line="253" />
+    <reference path="/EAP/Monitoring/LineOut/GMute7" context="module.Saffire_Dice.buildMixer" line="256" />
+    <reference path="/EAP/Monitoring/LineOut/GMute8" context="module.Saffire_Dice.buildMixer" line="258" />
+    <reference path="/EAP/Monitoring/LineOut/GMute9" context="module.Saffire_Dice.buildMixer" line="260" />
+    <reference path="/EAP/Monitoring/LineOut/GMute10" context="module.Saffire_Dice.buildMixer" line="262" />
+    <reference path="/EAP/Monitoring/LineOut/GDim7" context="module.Saffire_Dice.buildMixer" line="265" />
+    <reference path="/EAP/Monitoring/LineOut/GDim8" context="module.Saffire_Dice.buildMixer" line="267" />
+    <reference path="/EAP/Monitoring/LineOut/GDim9" context="module.Saffire_Dice.buildMixer" line="269" />
+    <reference path="/EAP/Monitoring/LineOut/GDim10" context="module.Saffire_Dice.buildMixer" line="271" />
+    <reference path="/EAP/Monitoring/LineOut/Volume7" context="module.Saffire_Dice.buildMixer" line="274" />
+    <reference path="/EAP/Monitoring/LineOut/Volume8" context="module.Saffire_Dice.buildMixer" line="276" />
+    <reference path="/EAP/Monitoring/LineOut/Volume9" context="module.Saffire_Dice.buildMixer" line="278" />
+    <reference path="/EAP/Monitoring/LineOut/Volume10" context="module.Saffire_Dice.buildMixer" line="280" />
+    <reference path="/EAP/Monitoring/AdatSpdif/State" context="module.Saffire_Dice.buildMixer" line="284" />
+    <reference path="/EAP/Monitoring/LineInstGain/LineInst1" context="module.Saffire_Dice.buildMixer" line="292" />
+    <reference path="/EAP/Monitoring/LineInstGain/LineInst2" context="module.Saffire_Dice.buildMixer" line="294" />
+    <reference path="/EAP/Monitoring/LineInstGain/LineGain3" context="module.Saffire_Dice.buildMixer" line="296" />
+    <reference path="/EAP/Monitoring/LineInstGain/LineGain4" context="module.Saffire_Dice.buildMixer" line="298" />
+  </controls>
+  <mappings />
+  <ui_files>
+    <ui file="saffire_dice_monitoring.ui" association="name">
+      <widgets>
+        <widget name="Form" class="QWidget" />
+        <widget name="splitter" class="QSplitter" />
+        <widget name="monitoringView" class="QTableView" />
+        <widget name="stacked" class="QStackedWidget" />
+        <widget name="pagePro24" class="QWidget" />
+        <widget name="chkInst1" class="QCheckBox" />
+        <widget name="chkLevel4" class="QCheckBox" />
+        <widget name="chkInst2" class="QCheckBox" />
+        <widget name="chkLevel3" class="QCheckBox" />
+        <widget name="pagePro40" class="QWidget" />
+        <widget name="chkSpdif" class="QCheckBox" />
+        <widget name="btnPad" class="QPushButton" />
+        <widget name="groupBox" class="QGroupBox" />
+        <widget name="volumeKnob" class="QDial" />
+        <widget name="volumeBox" class="QSpinBox" />
+        <widget name="label" class="QLabel" />
+        <widget name="dimLevel" class="QSpinBox" />
+        <widget name="btnDim" class="QPushButton" />
+        <widget name="btnMute" class="QPushButton" />
+      </widgets>
+    </ui>
+  </ui_files>
+  <notes>Static extraction from legacy FFADO Qt mixer sources. Paths and indexes are references, not validated live D-Bus capabilities. Runtime discovery and device-specific logic are still required. No vendor/model-to-family mapping is asserted unless source defines it.</notes>
+</profile>

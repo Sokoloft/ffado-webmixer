@@ -1,0 +1,71 @@
+<?xml version='1.0' encoding='utf-8'?>
+<profile family="saffire_dice" schema_version="2">
+  <discovery source="saffire_dice.py" status="source-derived">
+    <element path="/EAP/Monitoring/GlobalMute/State" kind="unknown" />
+    <element path="/EAP/Monitoring/GlobalDim/State" kind="unknown" />
+    <element path="/EAP/Monitoring/GlobalDim/Level" kind="unknown" />
+    <element path="/EAP/Monitoring/Mono/Line1Line2" kind="unknown" />
+    <element path="/EAP/Monitoring/Mono/Line3Line4" kind="unknown" />
+    <element path="/EAP/Monitoring/LineOut/UnActivate1" kind="unknown" />
+    <element path="/EAP/Monitoring/LineOut/UnActivate2" kind="unknown" />
+    <element path="/EAP/Monitoring/LineOut/UnActivate3" kind="unknown" />
+    <element path="/EAP/Monitoring/LineOut/UnActivate4" kind="unknown" />
+    <element path="/EAP/Monitoring/LineOut/Mute1" kind="unknown" />
+    <element path="/EAP/Monitoring/LineOut/Mute2" kind="unknown" />
+    <element path="/EAP/Monitoring/LineOut/Mute3" kind="unknown" />
+    <element path="/EAP/Monitoring/LineOut/Mute4" kind="unknown" />
+    <element path="/EAP/Monitoring/LineOut/GMute1" kind="unknown" />
+    <element path="/EAP/Monitoring/LineOut/GMute2" kind="unknown" />
+    <element path="/EAP/Monitoring/LineOut/GMute3" kind="unknown" />
+    <element path="/EAP/Monitoring/LineOut/GMute4" kind="unknown" />
+    <element path="/EAP/Monitoring/LineOut/GDim1" kind="unknown" />
+    <element path="/EAP/Monitoring/LineOut/GDim2" kind="unknown" />
+    <element path="/EAP/Monitoring/LineOut/GDim3" kind="unknown" />
+    <element path="/EAP/Monitoring/LineOut/GDim4" kind="unknown" />
+    <element path="/EAP/Monitoring/LineOut/Volume1" kind="unknown" />
+    <element path="/EAP/Monitoring/LineOut/Volume2" kind="unknown" />
+    <element path="/EAP/Monitoring/LineOut/Volume3" kind="unknown" />
+    <element path="/EAP/Monitoring/LineOut/Volume4" kind="unknown" />
+    <element path="/EAP/Monitoring/Mono/Line5Line6" kind="unknown" />
+    <element path="/EAP/Monitoring/LineOut/UnActivate5" kind="unknown" />
+    <element path="/EAP/Monitoring/LineOut/UnActivate6" kind="unknown" />
+    <element path="/EAP/Monitoring/LineOut/Mute5" kind="unknown" />
+    <element path="/EAP/Monitoring/LineOut/Mute6" kind="unknown" />
+    <element path="/EAP/Monitoring/LineOut/GMute5" kind="unknown" />
+    <element path="/EAP/Monitoring/LineOut/GMute6" kind="unknown" />
+    <element path="/EAP/Monitoring/LineOut/GDim5" kind="unknown" />
+    <element path="/EAP/Monitoring/LineOut/GDim6" kind="unknown" />
+    <element path="/EAP/Monitoring/LineOut/Volume5" kind="unknown" />
+    <element path="/EAP/Monitoring/LineOut/Volume6" kind="unknown" />
+    <element path="/EAP/Monitoring/Mono/Line7Line8" kind="unknown" />
+    <element path="/EAP/Monitoring/Mono/Line9Line10" kind="unknown" />
+    <element path="/EAP/Monitoring/LineOut/UnActivate7" kind="unknown" />
+    <element path="/EAP/Monitoring/LineOut/UnActivate8" kind="unknown" />
+    <element path="/EAP/Monitoring/LineOut/UnActivate9" kind="unknown" />
+    <element path="/EAP/Monitoring/LineOut/UnActivate10" kind="unknown" />
+    <element path="/EAP/Monitoring/LineOut/Mute7" kind="unknown" />
+    <element path="/EAP/Monitoring/LineOut/Mute8" kind="unknown" />
+    <element path="/EAP/Monitoring/LineOut/Mute9" kind="unknown" />
+    <element path="/EAP/Monitoring/LineOut/Mute10" kind="unknown" />
+    <element path="/EAP/Monitoring/LineOut/GMute7" kind="unknown" />
+    <element path="/EAP/Monitoring/LineOut/GMute8" kind="unknown" />
+    <element path="/EAP/Monitoring/LineOut/GMute9" kind="unknown" />
+    <element path="/EAP/Monitoring/LineOut/GMute10" kind="unknown" />
+    <element path="/EAP/Monitoring/LineOut/GDim7" kind="unknown" />
+    <element path="/EAP/Monitoring/LineOut/GDim8" kind="unknown" />
+    <element path="/EAP/Monitoring/LineOut/GDim9" kind="unknown" />
+    <element path="/EAP/Monitoring/LineOut/GDim10" kind="unknown" />
+    <element path="/EAP/Monitoring/LineOut/Volume7" kind="unknown" />
+    <element path="/EAP/Monitoring/LineOut/Volume8" kind="unknown" />
+    <element path="/EAP/Monitoring/LineOut/Volume9" kind="unknown" />
+    <element path="/EAP/Monitoring/LineOut/Volume10" kind="unknown" />
+    <element path="/EAP/Monitoring/AdatSpdif/State" kind="unknown" />
+    <element path="/EAP/Monitoring/LineInstGain/LineInst1" kind="unknown" />
+    <element path="/EAP/Monitoring/LineInstGain/LineInst2" kind="unknown" />
+    <element path="/EAP/Monitoring/LineInstGain/LineGain3" kind="unknown" />
+    <element path="/EAP/Monitoring/LineInstGain/LineGain4" kind="unknown" />
+  </discovery>
+  <model_constants>
+    <constant name="ModelName" value="SAFFIRE_PRO" />
+  </model_constants>
+</profile>

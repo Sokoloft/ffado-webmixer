@@ -1,0 +1,13 @@
+<?xml version='1.0' encoding='utf-8'?>
+<profile family="presonus_inspire1394" schema_version="2">
+  <discovery source="presonus_inspire1394.py" status="source-derived">
+    <element path="/Preamp/%s" kind="unknown" />
+    <element path="/Mixer/Feature_LRBalance_%d" kind="unknown" />
+    <element path="/Mixer/Selector_%d" kind="unknown" />
+    <element path="/Mixer/Feature_Volume_%d" kind="unknown" />
+  </discovery>
+  <model_constants>
+    <constant name="idx" value="0x2" />
+    <constant name="idx" value="0x1" />
+  </model_constants>
+</profile>

@@ -1,0 +1,19 @@
+<?xml version='1.0' encoding='utf-8'?>
+<profile family="presonus_firebox" schema_version="1" source="presonus_firebox.py" status="extracted-reference">
+  <constants>
+    <constant name="p_idx" value="0x0" />
+    <constant name="p_idx" value="0x2" />
+    <constant name="p_idx" value="0x1" />
+  </constants>
+  <controls>
+    <reference path="/Mixer/Feature_Volume_%d" context="module.Presonus_Firebox.addMixer" line="104" />
+    <reference path="/Mixer/Selector_6" context="module.Presonus_Firebox.addMixer" line="112" />
+    <reference path="/Mixer/Feature_Volume_%d" context="module.Presonus_Firebox.addMixer" line="122" />
+    <reference path="/Mixer/Feature_LRBalance_%d" context="module.Presonus_Firebox.addMixer" line="131" />
+    <reference path="/Mixer/Selector_%d" context="module.Presonus_Firebox.addOutput" line="154" />
+    <reference path="/Mixer/Feature_Volume_%d" context="module.Presonus_Firebox.addOutput" line="170" />
+  </controls>
+  <mappings />
+  <ui_files />
+  <notes>Static extraction from legacy FFADO Qt mixer sources. Paths and indexes are references, not validated live D-Bus capabilities. Runtime discovery and device-specific logic are still required. No vendor/model-to-family mapping is asserted unless source defines it.</notes>
+</profile>

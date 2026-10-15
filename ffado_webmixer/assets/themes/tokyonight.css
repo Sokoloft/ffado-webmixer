@@ -1,0 +1,43 @@
+/* Tokyonight — mixer and loading screen. */
+:root {
+  --accent-color: #7aa2f7;
+  --border-color: #414868;
+  --button-active-background: #414868;
+  --button-background: #343b58;
+  --button-hover-background: #414868;
+  --channel-background: #24283b;
+  --control-background: #15161e;
+  --detail-color-1: #1b1b1b;
+  --dialog-header-background: #1a1b26;
+  --error-text-color: #e5766e;
+  --fader-handle-border: #6b665a;
+  --fader-handle-bottom: #a8a394;
+  --fader-handle-mark: #4a4a4a;
+  --fader-handle-top: #e4dfd2;
+  --fader-tick-color: #59606b;
+  --fader-value-color: #7aa2f7;
+  --group-border-color: #414868;
+  --icon-muted-color: #6b7380;
+  --input-background: #15161e;
+  --input-hover-border-color: #4a515c;
+  --input-text-color: #c0caf5;
+  --mute-color: #bf616a;
+  --muted-handle-bottom: #7d5252;
+  --muted-handle-top: #b98a8a;
+  --page-background: #16161e;
+  --pin-color: #7aa2f7;
+  --selected-output-background: #293b60;
+  --sidebar-background: #1a1b26;
+  --sidebar-box-background: #292e42;
+  --solo-color: #ebcb8b;
+  --stereo-border-color: var(--accent-color);
+  --stereo-button-background: var(--button-background);
+  --stereo-button-hover-background: var(--button-hover-background);
+  --stereo-color: var(--accent-color);
+  --stereo-strip-background: var(--sidebar-box-background);
+  --stereo-target-background: var(--selected-output-background);
+  --strip-border-color: #16161e;
+  --tab-hover-background: #414868;
+  --text-primary: #c0caf5;
+  --text-secondary: #a9b1d6;
+}

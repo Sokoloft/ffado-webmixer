@@ -1,0 +1,16 @@
+<?xml version='1.0' encoding='utf-8'?>
+<profile family="maudio_bebob" schema_version="2">
+  <discovery source="maudio_bebob.py" status="source-derived">
+    <element path="/Mixer/Feature_Volume_%d" kind="unknown" />
+    <element path="/Mixer/Feature_LRBalance_%d" kind="unknown" />
+    <element path="/Mixer/EnhancedMixer_%d" kind="unknown" />
+    <element path="/Mixer/Selector_%d" kind="unknown" />
+    <element path="/Mixer/Selector_7" kind="unknown" />
+    <element path="/Mixer/EnhancedMixer_7" kind="unknown" />
+  </discovery>
+  <model_constants>
+    <constant name="hp_idx" value="0x0" />
+    <constant name="in_id" value="0x0" />
+    <constant name="in_id" value="0x0" />
+  </model_constants>
+</profile>

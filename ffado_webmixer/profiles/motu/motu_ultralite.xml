@@ -1,0 +1,8 @@
+<?xml version='1.0' encoding='utf-8'?>
+<device family="motu" model_id="3" name="MOTU Ultralite" extends="common.xml">
+  <hide_col pattern="AES/EBU *" />
+  <hide_col pattern="ADAT *" />
+  <hide_dest pattern="ADAT *" />
+  <dest_name index="6" value="MainOut" />
+  <dest_output index="6" value="main" />
+</device>

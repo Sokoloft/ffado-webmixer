@@ -1,0 +1,261 @@
+<?xml version='1.0' encoding='utf-8'?>
+<profile family="saffirepro" schema_version="2">
+  <discovery source="saffirepro.py" status="source-derived">
+    <element path="/Control/ADATDisable" kind="unknown" />
+    <element path="/Mixer/InputMix" kind="unknown" />
+    <element path="/Mixer/OutputMix" kind="unknown" />
+    <element path="/Control/Insert1" kind="unknown" />
+    <element path="/Control/Insert2" kind="unknown" />
+    <element path="/Control/Phantom_1to4" kind="unknown" />
+    <element path="/Control/Phantom_5to8" kind="unknown" />
+    <element path="/Control/AC3pass" kind="unknown" />
+    <element path="/Control/MidiTru" kind="unknown" />
+    <element path="/Control/UseHighVoltageRail" kind="unknown" />
+    <element path="/Control/MIDIEnable" kind="unknown" />
+    <element path="/Mixer/Out12Mute" kind="unknown" />
+    <element path="/Mixer/Out12HwCtrl" kind="unknown" />
+    <element path="/Mixer/Out12Pad" kind="unknown" />
+    <element path="/Mixer/Out12Dim" kind="unknown" />
+    <element path="/Mixer/Out34Mute" kind="unknown" />
+    <element path="/Mixer/Out34HwCtrl" kind="unknown" />
+    <element path="/Mixer/Out34Pad" kind="unknown" />
+    <element path="/Mixer/Out34Dim" kind="unknown" />
+    <element path="/Mixer/Out56Mute" kind="unknown" />
+    <element path="/Mixer/Out56HwCtrl" kind="unknown" />
+    <element path="/Mixer/Out56Pad" kind="unknown" />
+    <element path="/Mixer/Out56Dim" kind="unknown" />
+    <element path="/Mixer/Out78Mute" kind="unknown" />
+    <element path="/Mixer/Out78HwCtrl" kind="unknown" />
+    <element path="/Mixer/Out78Pad" kind="unknown" />
+    <element path="/Mixer/Out78Dim" kind="unknown" />
+    <element path="/Mixer/DirectMonitorCH1" kind="unknown" />
+    <element path="/Mixer/DirectMonitorCH2" kind="unknown" />
+    <element path="/Mixer/DirectMonitorCH3" kind="unknown" />
+    <element path="/Mixer/DirectMonitorCH4" kind="unknown" />
+    <element path="/Mixer/DirectMonitorCH5" kind="unknown" />
+    <element path="/Mixer/DirectMonitorCH6" kind="unknown" />
+    <element path="/Mixer/DirectMonitorCH7" kind="unknown" />
+    <element path="/Mixer/DirectMonitorCH8" kind="unknown" />
+    <element path="/Mixer/Out12Level" kind="unknown" />
+    <element path="/Mixer/Out34Level" kind="unknown" />
+    <element path="/Mixer/Out56Level" kind="unknown" />
+    <element path="/Mixer/Out78Level" kind="unknown" />
+    <element path="/Control/Reboot" kind="unknown" />
+    <element path="/Control/FlashLed" kind="unknown" />
+    <element path="/Control/SaveSettings" kind="unknown" />
+    <element path="/Control/StandaloneConfig" kind="unknown" />
+    <element path="/Mixer/MonitorDial" kind="unknown" />
+  </discovery>
+  <source_bindings>
+    <group name="VolumeControls" line="120">
+      <binding widget="self.sldIMixAnalog1L" path="/Mixer/InputMix" arg0="0" arg1="0" />
+      <binding widget="self.sldIMixAnalog1R" path="/Mixer/InputMix" arg0="0" arg1="1" />
+      <binding widget="self.sldIMixAnalog2L" path="/Mixer/InputMix" arg0="1" arg1="0" />
+      <binding widget="self.sldIMixAnalog2R" path="/Mixer/InputMix" arg0="1" arg1="1" />
+      <binding widget="self.sldIMixAnalog3L" path="/Mixer/InputMix" arg0="2" arg1="0" />
+      <binding widget="self.sldIMixAnalog3R" path="/Mixer/InputMix" arg0="2" arg1="1" />
+      <binding widget="self.sldIMixAnalog4L" path="/Mixer/InputMix" arg0="3" arg1="0" />
+      <binding widget="self.sldIMixAnalog4R" path="/Mixer/InputMix" arg0="3" arg1="1" />
+      <binding widget="self.sldIMixAnalog5L" path="/Mixer/InputMix" arg0="4" arg1="0" />
+      <binding widget="self.sldIMixAnalog5R" path="/Mixer/InputMix" arg0="4" arg1="1" />
+      <binding widget="self.sldIMixAnalog6L" path="/Mixer/InputMix" arg0="5" arg1="0" />
+      <binding widget="self.sldIMixAnalog6R" path="/Mixer/InputMix" arg0="5" arg1="1" />
+      <binding widget="self.sldIMixAnalog7L" path="/Mixer/InputMix" arg0="6" arg1="0" />
+      <binding widget="self.sldIMixAnalog7R" path="/Mixer/InputMix" arg0="6" arg1="1" />
+      <binding widget="self.sldIMixAnalog8L" path="/Mixer/InputMix" arg0="7" arg1="0" />
+      <binding widget="self.sldIMixAnalog8R" path="/Mixer/InputMix" arg0="7" arg1="1" />
+      <binding widget="self.sldIMixAnalog9L" path="/Mixer/InputMix" arg0="8" arg1="0" />
+      <binding widget="self.sldIMixAnalog9R" path="/Mixer/InputMix" arg0="8" arg1="1" />
+      <binding widget="self.sldIMixAnalog10L" path="/Mixer/InputMix" arg0="9" arg1="0" />
+      <binding widget="self.sldIMixAnalog10R" path="/Mixer/InputMix" arg0="9" arg1="1" />
+      <binding widget="self.sldIMixADAT11L" path="/Mixer/InputMix" arg0="10" arg1="0" />
+      <binding widget="self.sldIMixADAT11R" path="/Mixer/InputMix" arg0="10" arg1="1" />
+      <binding widget="self.sldIMixADAT12L" path="/Mixer/InputMix" arg0="11" arg1="0" />
+      <binding widget="self.sldIMixADAT12R" path="/Mixer/InputMix" arg0="11" arg1="1" />
+      <binding widget="self.sldIMixADAT13L" path="/Mixer/InputMix" arg0="12" arg1="0" />
+      <binding widget="self.sldIMixADAT13R" path="/Mixer/InputMix" arg0="12" arg1="1" />
+      <binding widget="self.sldIMixADAT14L" path="/Mixer/InputMix" arg0="13" arg1="0" />
+      <binding widget="self.sldIMixADAT14R" path="/Mixer/InputMix" arg0="13" arg1="1" />
+      <binding widget="self.sldIMixADAT15L" path="/Mixer/InputMix" arg0="14" arg1="0" />
+      <binding widget="self.sldIMixADAT15R" path="/Mixer/InputMix" arg0="14" arg1="1" />
+      <binding widget="self.sldIMixADAT16L" path="/Mixer/InputMix" arg0="15" arg1="0" />
+      <binding widget="self.sldIMixADAT16R" path="/Mixer/InputMix" arg0="15" arg1="1" />
+      <binding widget="self.sldIMixADAT17L" path="/Mixer/InputMix" arg0="16" arg1="0" />
+      <binding widget="self.sldIMixADAT17R" path="/Mixer/InputMix" arg0="16" arg1="1" />
+      <binding widget="self.sldIMixADAT18L" path="/Mixer/InputMix" arg0="17" arg1="0" />
+      <binding widget="self.sldIMixADAT18R" path="/Mixer/InputMix" arg0="17" arg1="1" />
+      <binding widget="self.sldIMixADAT21L" path="/Mixer/InputMix" arg0="18" arg1="0" />
+      <binding widget="self.sldIMixADAT21R" path="/Mixer/InputMix" arg0="18" arg1="1" />
+      <binding widget="self.sldIMixADAT22L" path="/Mixer/InputMix" arg0="19" arg1="0" />
+      <binding widget="self.sldIMixADAT22R" path="/Mixer/InputMix" arg0="19" arg1="1" />
+      <binding widget="self.sldIMixADAT23L" path="/Mixer/InputMix" arg0="20" arg1="0" />
+      <binding widget="self.sldIMixADAT23R" path="/Mixer/InputMix" arg0="20" arg1="1" />
+      <binding widget="self.sldIMixADAT24L" path="/Mixer/InputMix" arg0="21" arg1="0" />
+      <binding widget="self.sldIMixADAT24R" path="/Mixer/InputMix" arg0="21" arg1="1" />
+      <binding widget="self.sldIMixADAT25L" path="/Mixer/InputMix" arg0="22" arg1="0" />
+      <binding widget="self.sldIMixADAT25R" path="/Mixer/InputMix" arg0="22" arg1="1" />
+      <binding widget="self.sldIMixADAT26L" path="/Mixer/InputMix" arg0="23" arg1="0" />
+      <binding widget="self.sldIMixADAT26R" path="/Mixer/InputMix" arg0="23" arg1="1" />
+      <binding widget="self.sldIMixADAT27L" path="/Mixer/InputMix" arg0="24" arg1="0" />
+      <binding widget="self.sldIMixADAT27R" path="/Mixer/InputMix" arg0="24" arg1="1" />
+      <binding widget="self.sldIMixADAT28L" path="/Mixer/InputMix" arg0="25" arg1="0" />
+      <binding widget="self.sldIMixADAT28R" path="/Mixer/InputMix" arg0="25" arg1="1" />
+      <binding widget="self.sldOMixPC1O1" path="/Mixer/OutputMix" arg0="0" arg1="0" />
+      <binding widget="self.sldOMixPC2O2" path="/Mixer/OutputMix" arg0="1" arg1="1" />
+      <binding widget="self.sldOMixPC3O3" path="/Mixer/OutputMix" arg0="2" arg1="2" />
+      <binding widget="self.sldOMixPC4O4" path="/Mixer/OutputMix" arg0="3" arg1="3" />
+      <binding widget="self.sldOMixPC5O5" path="/Mixer/OutputMix" arg0="4" arg1="4" />
+      <binding widget="self.sldOMixPC6O6" path="/Mixer/OutputMix" arg0="5" arg1="5" />
+      <binding widget="self.sldOMixPC7O7" path="/Mixer/OutputMix" arg0="6" arg1="6" />
+      <binding widget="self.sldOMixPC8O8" path="/Mixer/OutputMix" arg0="7" arg1="7" />
+      <binding widget="self.sldOMixPC9O9" path="/Mixer/OutputMix" arg0="8" arg1="8" />
+      <binding widget="self.sldOMixPC10O10" path="/Mixer/OutputMix" arg0="9" arg1="9" />
+      <binding widget="self.sldOMixPC1O3" path="/Mixer/OutputMix" arg0="0" arg1="2" />
+      <binding widget="self.sldOMixPC2O4" path="/Mixer/OutputMix" arg0="1" arg1="3" />
+      <binding widget="self.sldOMixPC1O5" path="/Mixer/OutputMix" arg0="0" arg1="4" />
+      <binding widget="self.sldOMixPC2O6" path="/Mixer/OutputMix" arg0="1" arg1="5" />
+      <binding widget="self.sldOMixPC1O7" path="/Mixer/OutputMix" arg0="0" arg1="6" />
+      <binding widget="self.sldOMixPC2O8" path="/Mixer/OutputMix" arg0="1" arg1="7" />
+      <binding widget="self.sldOMixPC1O9" path="/Mixer/OutputMix" arg0="0" arg1="8" />
+      <binding widget="self.sldOMixPC2O10" path="/Mixer/OutputMix" arg0="1" arg1="9" />
+      <binding widget="self.sldOMixIMixO1" path="/Mixer/OutputMix" arg0="10" arg1="0" />
+      <binding widget="self.sldOMixIMixO2" path="/Mixer/OutputMix" arg0="11" arg1="1" />
+      <binding widget="self.sldOMixIMixO3" path="/Mixer/OutputMix" arg0="10" arg1="2" />
+      <binding widget="self.sldOMixIMixO4" path="/Mixer/OutputMix" arg0="11" arg1="3" />
+      <binding widget="self.sldOMixIMixO5" path="/Mixer/OutputMix" arg0="10" arg1="4" />
+      <binding widget="self.sldOMixIMixO6" path="/Mixer/OutputMix" arg0="11" arg1="5" />
+      <binding widget="self.sldOMixIMixO7" path="/Mixer/OutputMix" arg0="10" arg1="6" />
+      <binding widget="self.sldOMixIMixO8" path="/Mixer/OutputMix" arg0="11" arg1="7" />
+      <binding widget="self.sldOMixIMixO9" path="/Mixer/OutputMix" arg0="10" arg1="8" />
+      <binding widget="self.sldOMixIMixO10" path="/Mixer/OutputMix" arg0="11" arg1="9" />
+    </group>
+    <group name="SelectorControls" line="207">
+      <binding widget="self.chkInsert1" path="/Control/Insert1" />
+      <binding widget="self.chkInsert2" path="/Control/Insert2" />
+      <binding widget="self.chkPhantom14" path="/Control/Phantom_1to4" />
+      <binding widget="self.chkPhantom58" path="/Control/Phantom_5to8" />
+      <binding widget="self.chkAC3" path="/Control/AC3pass" />
+      <binding widget="self.chkMidiThru" path="/Control/MidiTru" />
+      <binding widget="self.chkHighVoltage" path="/Control/UseHighVoltageRail" />
+      <binding widget="self.chkMidiEnable" path="/Control/MIDIEnable" />
+      <binding widget="self.chkAdatDisable" path="/Control/ADATDisable" />
+      <binding widget="self.chkMute12" path="/Mixer/Out12Mute" arg0="[self.chkHwCtrl12]" />
+      <binding widget="self.chkHwCtrl12" path="/Mixer/Out12HwCtrl" />
+      <binding widget="self.chkPad12" path="/Mixer/Out12Pad" />
+      <binding widget="self.chkDim12" path="/Mixer/Out12Dim" />
+      <binding widget="self.chkMute34" path="/Mixer/Out34Mute" arg0="[self.chkHwCtrl34]" />
+      <binding widget="self.chkHwCtrl34" path="/Mixer/Out34HwCtrl" />
+      <binding widget="self.chkPad34" path="/Mixer/Out34Pad" />
+      <binding widget="self.chkDim34" path="/Mixer/Out34Dim" />
+      <binding widget="self.chkMute56" path="/Mixer/Out56Mute" arg0="[self.chkHwCtrl56]" />
+      <binding widget="self.chkHwCtrl56" path="/Mixer/Out56HwCtrl" />
+      <binding widget="self.chkPad56" path="/Mixer/Out56Pad" />
+      <binding widget="self.chkDim56" path="/Mixer/Out56Dim" />
+      <binding widget="self.chkMute78" path="/Mixer/Out78Mute" arg0="[self.chkHwCtrl78]" />
+      <binding widget="self.chkHwCtrl78" path="/Mixer/Out78HwCtrl" />
+      <binding widget="self.chkPad78" path="/Mixer/Out78Pad" />
+      <binding widget="self.chkDim78" path="/Mixer/Out78Dim" />
+      <binding widget="self.chkMonitor1" path="/Mixer/DirectMonitorCH1" />
+      <binding widget="self.chkMonitor2" path="/Mixer/DirectMonitorCH2" />
+      <binding widget="self.chkMonitor3" path="/Mixer/DirectMonitorCH3" />
+      <binding widget="self.chkMonitor4" path="/Mixer/DirectMonitorCH4" />
+      <binding widget="self.chkMonitor5" path="/Mixer/DirectMonitorCH5" />
+      <binding widget="self.chkMonitor6" path="/Mixer/DirectMonitorCH6" />
+      <binding widget="self.chkMonitor7" path="/Mixer/DirectMonitorCH7" />
+      <binding widget="self.chkMonitor8" path="/Mixer/DirectMonitorCH8" />
+    </group>
+    <group name="VolumeControlsLowRes" line="249">
+      <binding widget="self.sldOut12Level" path="/Mixer/Out12Level" />
+      <binding widget="self.sldOut34Level" path="/Mixer/Out34Level" />
+      <binding widget="self.sldOut56Level" path="/Mixer/Out56Level" />
+      <binding widget="self.sldOut78Level" path="/Mixer/Out78Level" />
+    </group>
+    <group name="TriggerButtonControls" line="256">
+      <binding widget="self.btnReboot" path="/Control/Reboot" />
+      <binding widget="self.btnIdentify" path="/Control/FlashLed" />
+      <binding widget="self.btnSaveSettings" path="/Control/SaveSettings" />
+    </group>
+    <group name="ComboControls" line="268">
+      <binding widget="self.comboStandalone" path="/Control/StandaloneConfig" />
+    </group>
+    <group name="VolumeControls" line="378">
+      <binding widget="self.sldOMixPC1O1" path="/Mixer/OutputMix" arg0="0" arg1="0" />
+      <binding widget="self.sldOMixPC2O2" path="/Mixer/OutputMix" arg0="1" arg1="1" />
+      <binding widget="self.sldOMixPC3O3" path="/Mixer/OutputMix" arg0="2" arg1="2" />
+      <binding widget="self.sldOMixPC4O4" path="/Mixer/OutputMix" arg0="3" arg1="3" />
+      <binding widget="self.sldOMixPC5O5" path="/Mixer/OutputMix" arg0="4" arg1="4" />
+      <binding widget="self.sldOMixPC6O6" path="/Mixer/OutputMix" arg0="5" arg1="5" />
+      <binding widget="self.sldOMixPC7O7" path="/Mixer/OutputMix" arg0="6" arg1="6" />
+      <binding widget="self.sldOMixPC8O8" path="/Mixer/OutputMix" arg0="7" arg1="7" />
+      <binding widget="self.sldOMixPC9O9" path="/Mixer/OutputMix" arg0="8" arg1="8" />
+      <binding widget="self.sldOMixPC10O10" path="/Mixer/OutputMix" arg0="9" arg1="9" />
+      <binding widget="self.sldOMixPC1O3" path="/Mixer/OutputMix" arg0="0" arg1="2" />
+      <binding widget="self.sldOMixPC2O4" path="/Mixer/OutputMix" arg0="1" arg1="3" />
+      <binding widget="self.sldOMixPC1O5" path="/Mixer/OutputMix" arg0="0" arg1="4" />
+      <binding widget="self.sldOMixPC2O6" path="/Mixer/OutputMix" arg0="1" arg1="5" />
+      <binding widget="self.sldOMixPC1O7" path="/Mixer/OutputMix" arg0="0" arg1="6" />
+      <binding widget="self.sldOMixPC2O8" path="/Mixer/OutputMix" arg0="1" arg1="7" />
+      <binding widget="self.sldOMixPC1O9" path="/Mixer/OutputMix" arg0="0" arg1="8" />
+      <binding widget="self.sldOMixPC2O10" path="/Mixer/OutputMix" arg0="1" arg1="9" />
+      <binding widget="self.sldOMixIMixO1" path="/Mixer/OutputMix" arg0="10" arg1="0" />
+      <binding widget="self.sldOMixIMixO2" path="/Mixer/OutputMix" arg0="11" arg1="1" />
+      <binding widget="self.sldOMixIMixO3" path="/Mixer/OutputMix" arg0="10" arg1="2" />
+      <binding widget="self.sldOMixIMixO4" path="/Mixer/OutputMix" arg0="11" arg1="3" />
+      <binding widget="self.sldOMixIMixO5" path="/Mixer/OutputMix" arg0="10" arg1="4" />
+      <binding widget="self.sldOMixIMixO6" path="/Mixer/OutputMix" arg0="11" arg1="5" />
+      <binding widget="self.sldOMixIMixO7" path="/Mixer/OutputMix" arg0="10" arg1="6" />
+      <binding widget="self.sldOMixIMixO8" path="/Mixer/OutputMix" arg0="11" arg1="7" />
+      <binding widget="self.sldOMixIMixO9" path="/Mixer/OutputMix" arg0="10" arg1="8" />
+      <binding widget="self.sldOMixIMixO10" path="/Mixer/OutputMix" arg0="11" arg1="9" />
+    </group>
+    <group name="SelectorControls" line="413">
+      <binding widget="self.chkInsert1" path="/Control/Insert1" />
+      <binding widget="self.chkInsert2" path="/Control/Insert2" />
+      <binding widget="self.chkPhantom14" path="/Control/Phantom_1to4" />
+      <binding widget="self.chkPhantom58" path="/Control/Phantom_5to8" />
+      <binding widget="self.chkAC3" path="/Control/AC3pass" />
+      <binding widget="self.chkMidiThru" path="/Control/MidiTru" />
+      <binding widget="self.chkHighVoltage" path="/Control/UseHighVoltageRail" />
+      <binding widget="self.chkMidiEnable" path="/Control/MIDIEnable" />
+      <binding widget="self.chkAdatDisable" path="/Control/ADATDisable" />
+      <binding widget="self.chkMute12" path="/Mixer/Out12Mute" />
+      <binding widget="self.chkHwCtrl12" path="/Mixer/Out12HwCtrl" />
+      <binding widget="self.chkPad12" path="/Mixer/Out12Pad" />
+      <binding widget="self.chkDim12" path="/Mixer/Out12Dim" />
+      <binding widget="self.chkMute34" path="/Mixer/Out34Mute" />
+      <binding widget="self.chkHwCtrl34" path="/Mixer/Out34HwCtrl" />
+      <binding widget="self.chkPad34" path="/Mixer/Out34Pad" />
+      <binding widget="self.chkDim34" path="/Mixer/Out34Dim" />
+      <binding widget="self.chkMute56" path="/Mixer/Out56Mute" />
+      <binding widget="self.chkHwCtrl56" path="/Mixer/Out56HwCtrl" />
+      <binding widget="self.chkPad56" path="/Mixer/Out56Pad" />
+      <binding widget="self.chkDim56" path="/Mixer/Out56Dim" />
+      <binding widget="self.chkMute78" path="/Mixer/Out78Mute" />
+      <binding widget="self.chkHwCtrl78" path="/Mixer/Out78HwCtrl" />
+      <binding widget="self.chkPad78" path="/Mixer/Out78Pad" />
+      <binding widget="self.chkDim78" path="/Mixer/Out78Dim" />
+      <binding widget="self.chkMonitor1" path="/Mixer/DirectMonitorCH1" />
+      <binding widget="self.chkMonitor2" path="/Mixer/DirectMonitorCH2" />
+      <binding widget="self.chkMonitor3" path="/Mixer/DirectMonitorCH3" />
+      <binding widget="self.chkMonitor4" path="/Mixer/DirectMonitorCH4" />
+      <binding widget="self.chkMonitor5" path="/Mixer/DirectMonitorCH5" />
+      <binding widget="self.chkMonitor6" path="/Mixer/DirectMonitorCH6" />
+      <binding widget="self.chkMonitor7" path="/Mixer/DirectMonitorCH7" />
+      <binding widget="self.chkMonitor8" path="/Mixer/DirectMonitorCH8" />
+    </group>
+    <group name="VolumeControlsLowRes" line="455">
+      <binding widget="self.sldOut12Level" path="/Mixer/Out12Level" />
+      <binding widget="self.sldOut34Level" path="/Mixer/Out34Level" />
+      <binding widget="self.sldOut56Level" path="/Mixer/Out56Level" />
+      <binding widget="self.sldOut78Level" path="/Mixer/Out78Level" />
+    </group>
+    <group name="TriggerButtonControls" line="462">
+      <binding widget="self.btnReboot" path="/Control/Reboot" />
+      <binding widget="self.btnIdentify" path="/Control/FlashLed" />
+      <binding widget="self.btnSaveSettings" path="/Control/SaveSettings" />
+    </group>
+    <group name="ComboControls" line="474">
+      <binding widget="self.comboStandalone" path="/Control/StandaloneConfig" />
+    </group>
+  </source_bindings>
+</profile>

@@ -1,0 +1,72 @@
+<?xml version='1.0' encoding='utf-8'?>
+<profile family="phase24control" schema_version="1" source="phase24control.py" status="extracted-reference">
+  <constants />
+  <controls>
+    <reference path="/Mixer/Feature_Volume_6" context="module.Phase24Control.__init__" line="37" />
+    <reference path="/Mixer/Feature_Volume_7" context="module.Phase24Control.__init__" line="38" />
+    <reference path="/Mixer/Feature_Volume_3" context="module.Phase24Control.__init__" line="39" />
+    <reference path="/Mixer/Feature_Volume_4" context="module.Phase24Control.__init__" line="40" />
+    <reference path="/Mixer/Feature_Volume_5" context="module.Phase24Control.__init__" line="41" />
+    <reference path="/Mixer/Selector_1" context="module.Phase24Control.__init__" line="45" />
+    <reference path="/Mixer/Selector_2" context="module.Phase24Control.__init__" line="46" />
+    <reference path="/Mixer/Selector_3" context="module.Phase24Control.__init__" line="47" />
+    <reference path="/Mixer/Selector_4" context="module.Phase24Control.__init__" line="48" />
+    <reference path="/Mixer/Feature_Volume_2" context="module.Phase24Control.setLineLevel" line="80" />
+    <reference path="/Mixer/Feature_Volume_8" context="module.Phase24Control.setFrontLevel" line="88" />
+    <reference path="/Mixer/Feature_Volume_8" context="module.Phase24Control.setFrontLevel" line="91" />
+    <reference path="/Mixer/Feature_Volume_1" context="module.Phase24Control.initValues" line="135" />
+    <reference path="/Mixer/Feature_Volume_8" context="module.Phase24Control.initValues" line="139" />
+    <reference path="/Mixer/Feature_Volume_2" context="module.Phase24Control.initValues" line="155" />
+  </controls>
+  <mappings>
+    <group name="VolumeControls" line="36">
+      <binding widget="'analogin'" path="/Mixer/Feature_Volume_6" arg0="self.sldLineIn" />
+      <binding widget="'spdifin'" path="/Mixer/Feature_Volume_7" arg0="self.sldSPDIFIn" />
+      <binding widget="'out12'" path="/Mixer/Feature_Volume_3" arg0="self.sldInput12" />
+      <binding widget="'out34'" path="/Mixer/Feature_Volume_4" arg0="self.sldInput34" />
+      <binding widget="'outspdif'" path="/Mixer/Feature_Volume_5" arg0="self.sldSPDIFOut" />
+    </group>
+    <group name="SelectorControls" line="44">
+      <binding widget="'outsource12'" path="/Mixer/Selector_1" arg0="self.cmbOutSource12" />
+      <binding widget="'outsource34'" path="/Mixer/Selector_2" arg0="self.cmbOutSource34" />
+      <binding widget="'outsourcespdif'" path="/Mixer/Selector_3" arg0="self.cmbOutSourceSPDIF" />
+      <binding widget="'syncsource'" path="/Mixer/Selector_4" arg0="self.cmbSetSyncSource" />
+    </group>
+  </mappings>
+  <ui_files>
+    <ui file="phase24.ui" association="explicit">
+      <widgets>
+        <widget name="Phase24ControlUI" class="QWidget" />
+        <widget name="textLabel1_2_2" class="QLabel" />
+        <widget name="textLabel1_2_2_3" class="QLabel" />
+        <widget name="textLabel1_2_2_2_3_2" class="QLabel" />
+        <widget name="cmbFrontLevel" class="QComboBox" />
+        <widget name="cmbLineLevel" class="QComboBox" />
+        <widget name="cmbSetSyncSource" class="QComboBox" />
+        <widget name="groupBox1" class="QGroupBox" />
+        <widget name="textLabel2_4_2_3_2" class="QLabel" />
+        <widget name="textLabel2_3" class="QLabel" />
+        <widget name="sldLineIn" class="QSlider" />
+        <widget name="textLabel2_4_2" class="QLabel" />
+        <widget name="sldSPDIFIn" class="QSlider" />
+        <widget name="textLabel2_4_2_2" class="QLabel" />
+        <widget name="sldSPDIFOut" class="QSlider" />
+        <widget name="textLabel2" class="QLabel" />
+        <widget name="sldInput12" class="QSlider" />
+        <widget name="textLabel2_2" class="QLabel" />
+        <widget name="sldInput34" class="QSlider" />
+        <widget name="textLabel2_4_2_3_2_2" class="QLabel" />
+        <widget name="textLabel2_4_2_2_2" class="QLabel" />
+        <widget name="sldMaster" class="QSlider" />
+        <widget name="groupBox2" class="QGroupBox" />
+        <widget name="cmbOutSource34" class="QComboBox" />
+        <widget name="cmbOutSourceSPDIF" class="QComboBox" />
+        <widget name="textLabel1_2_2_2_3" class="QLabel" />
+        <widget name="textLabel1_2_2_2" class="QLabel" />
+        <widget name="cmbOutSource12" class="QComboBox" />
+        <widget name="textLabel1_2_2_2_2" class="QLabel" />
+      </widgets>
+    </ui>
+  </ui_files>
+  <notes>Static extraction from legacy FFADO Qt mixer sources. Paths and indexes are references, not validated live D-Bus capabilities. Runtime discovery and device-specific logic are still required. No vendor/model-to-family mapping is asserted unless source defines it.</notes>
+</profile>

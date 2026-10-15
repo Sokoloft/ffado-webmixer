@@ -1,0 +1,528 @@
+<?xml version='1.0' encoding='utf-8'?>
+<profile family="motu" schema_version="1">
+  <match vendor_id="498" />
+  <info name="model_element" path="Info/Model" />
+  <info name="rate_element" path="Info/SampleRate" />
+  <controls>
+    <control name="fader" type="fader" min="0" max="128" />
+    <control name="pan" type="knob" min="-64" max="64" />
+    <control name="gain" type="knob" min="0" max="53" />
+    <control name="output_fader" type="fader" min="0" max="128" />
+  </controls>
+  <destinations>
+    <destination value="0" name="Disabled" />
+    <destination value="1" name="Phones" output="phones" />
+    <destination value="2" name="Analog 1-2" />
+    <destination value="3" name="Analog 3-4" />
+    <destination value="4" name="Analog 5-6" />
+    <destination value="5" name="Analog 7-8" />
+    <destination value="6" name="AES/EBU" />
+    <destination value="7" name="SPDIF" />
+    <destination value="8" name="ADAT 1-2" />
+    <destination value="9" name="ADAT 3-4" />
+    <destination value="10" name="ADAT 5-6" />
+    <destination value="11" name="ADAT 7-8" />
+  </destinations>
+  <rate_rules>
+    <rule above="96000">
+      <hide_col pattern="AES/EBU *" />
+      <hide_col pattern="SPDIF *" />
+      <hide_col pattern="ADAT *" />
+    </rule>
+    <rule above="48000">
+      <hide_col pattern="ADAT 5" />
+      <hide_col pattern="ADAT 6" />
+      <hide_col pattern="ADAT 7" />
+      <hide_col pattern="ADAT 8" />
+    </rule>
+  </rate_rules>
+  <discovery source="motu.py" status="source-derived">
+    <element path="/Mixer/fader" kind="unknown" />
+    <element path="/Mixer/Mix1/Mix_fader" kind="unknown" />
+    <element path="/Mixer/Mix2/Mix_fader" kind="unknown" />
+    <element path="/Mixer/Mix3/Mix_fader" kind="unknown" />
+    <element path="/Mixer/Mix4/Mix_fader" kind="unknown" />
+    <element path="/Mixer/Mainout_fader" kind="unknown" />
+    <element path="/Mixer/Phones_fader" kind="unknown" />
+    <element path="/Mixer/pan" kind="unknown" />
+    <element path="/Mixer/Control/Ana1_trimgain" kind="unknown" />
+    <element path="/Mixer/Control/Ana2_trimgain" kind="unknown" />
+    <element path="/Mixer/Control/Ana3_trimgain" kind="unknown" />
+    <element path="/Mixer/Control/Ana4_trimgain" kind="unknown" />
+    <element path="/Mixer/Control/Ana5_trimgain" kind="unknown" />
+    <element path="/Mixer/Control/Ana6_trimgain" kind="unknown" />
+    <element path="/Mixer/Control/Ana7_trimgain" kind="unknown" />
+    <element path="/Mixer/Control/Ana8_trimgain" kind="unknown" />
+    <element path="/Mixer/Control/Spdif1_trimgain" kind="unknown" />
+    <element path="/Mixer/Control/Spdif2_trimgain" kind="unknown" />
+    <element path="/Mixer/mute" kind="unknown" />
+    <element path="/Mixer/solo" kind="unknown" />
+    <element path="/Mixer/Mix1/Mix_mute" kind="unknown" />
+    <element path="/Mixer/Mix2/Mix_mute" kind="unknown" />
+    <element path="/Mixer/Mix3/Mix_mute" kind="unknown" />
+    <element path="/Mixer/Mix4/Mix_mute" kind="unknown" />
+    <element path="/Mixer/Control/Ana1_pad" kind="unknown" />
+    <element path="/Mixer/Control/Ana2_pad" kind="unknown" />
+    <element path="/Mixer/Control/Ana3_pad" kind="unknown" />
+    <element path="/Mixer/Control/Ana4_pad" kind="unknown" />
+    <element path="/Mixer/Control/Ana5_pad" kind="unknown" />
+    <element path="/Mixer/Control/Ana6_pad" kind="unknown" />
+    <element path="/Mixer/Control/Ana7_pad" kind="unknown" />
+    <element path="/Mixer/Control/Ana8_pad" kind="unknown" />
+    <element path="/Mixer/Control/Ana1_invert" kind="unknown" />
+    <element path="/Mixer/Control/Ana2_invert" kind="unknown" />
+    <element path="/Mixer/Control/Ana3_invert" kind="unknown" />
+    <element path="/Mixer/Control/Ana4_invert" kind="unknown" />
+    <element path="/Mixer/Control/Ana5_invert" kind="unknown" />
+    <element path="/Mixer/Control/Ana6_invert" kind="unknown" />
+    <element path="/Mixer/Control/Ana7_invert" kind="unknown" />
+    <element path="/Mixer/Control/Ana8_invert" kind="unknown" />
+    <element path="/Mixer/Control/Spdif1_invert" kind="unknown" />
+    <element path="/Mixer/Control/Spdif2_invert" kind="unknown" />
+    <element path="/Mixer/Control/Ana1_level" kind="unknown" />
+    <element path="/Mixer/Control/Ana2_level" kind="unknown" />
+    <element path="/Mixer/Control/Ana3_level" kind="unknown" />
+    <element path="/Mixer/Control/Ana4_level" kind="unknown" />
+    <element path="/Mixer/Control/Ana5_level" kind="unknown" />
+    <element path="/Mixer/Control/Ana6_level" kind="unknown" />
+    <element path="/Mixer/Control/Ana7_level" kind="unknown" />
+    <element path="/Mixer/Control/Ana8_level" kind="unknown" />
+    <element path="/Mixer/Control/Ana1_boost" kind="unknown" />
+    <element path="/Mixer/Control/Ana2_boost" kind="unknown" />
+    <element path="/Mixer/Control/Ana3_boost" kind="unknown" />
+    <element path="/Mixer/Control/Ana4_boost" kind="unknown" />
+    <element path="/Mixer/Control/Ana5_boost" kind="unknown" />
+    <element path="/Mixer/Control/Ana6_boost" kind="unknown" />
+    <element path="/Mixer/Control/Ana7_boost" kind="unknown" />
+    <element path="/Mixer/Control/Ana8_boost" kind="unknown" />
+    <element path="/Mixer/Mix1/Mix_dest" kind="unknown" />
+    <element path="/Mixer/Mix2/Mix_dest" kind="unknown" />
+    <element path="/Mixer/Mix3/Mix_dest" kind="unknown" />
+    <element path="/Mixer/Mix4/Mix_dest" kind="unknown" />
+    <element path="/Mixer/Control/Phones_src" kind="unknown" />
+    <element path="/Mixer/Control/OpticalIn_mode" kind="unknown" />
+    <element path="/Mixer/Control/OpticalOut_mode" kind="unknown" />
+    <element path="/Mixer/Control/Meter_src" kind="unknown" />
+    <element path="/Mixer/Control/Meter_aesebu_src" kind="unknown" />
+    <element path="/Mixer/Control/Meter_peakhold_time" kind="unknown" />
+    <element path="/Mixer/Control/Meter_cliphold_time" kind="unknown" />
+    <element path="/Mixer/Info/IsStreaming" kind="unknown" />
+    <element path="/Mixer/Info/Model" kind="unknown" />
+    <element path="/Mixer/Info/SampleRate" kind="unknown" />
+  </discovery>
+  <model_constants>
+    <constant name="MOTU_MODEL_NONE" value="0x0" />
+    <constant name="MOTU_MODEL_828mkII" value="0x1" />
+    <constant name="MOTU_MODEL_TRAVELER" value="0x2" />
+    <constant name="MOTU_MODEL_ULTRALITE" value="0x3" />
+    <constant name="MOTU_MODEL_8PRE" value="0x4" />
+    <constant name="MOTU_MODEL_828MkI" value="0x5" />
+    <constant name="MOTU_MODEL_896HD" value="0x6" />
+    <constant name="MOTU_MODEL_828mk3" value="0x7" />
+    <constant name="MOTU_MODEL_ULTRALITEmk3" value="0x8" />
+    <constant name="MOTU_MODEL_ULTRALITEmk3_HYB" value="0x9" />
+    <constant name="MOTU_MODEL_TRAVELERmk3" value="0xa" />
+    <constant name="MOTU_MODEL_896HDmk3" value="0xb" />
+  </model_constants>
+  <source_bindings>
+    <group name="ChannelFaders" line="63">
+      <binding widget="self.mix1ana1_fader" path="/Mixer/fader" arg0="0" arg1="0" arg2="self.mix1ana2_fader" />
+      <binding widget="self.mix1ana2_fader" path="/Mixer/fader" arg0="0" arg1="1" arg2="self.mix1ana1_fader" />
+      <binding widget="self.mix1ana3_fader" path="/Mixer/fader" arg0="0" arg1="2" arg2="self.mix1ana4_fader" />
+      <binding widget="self.mix1ana4_fader" path="/Mixer/fader" arg0="0" arg1="3" arg2="self.mix1ana3_fader" />
+      <binding widget="self.mix1ana5_fader" path="/Mixer/fader" arg0="0" arg1="4" arg2="self.mix1ana6_fader" />
+      <binding widget="self.mix1ana6_fader" path="/Mixer/fader" arg0="0" arg1="5" arg2="self.mix1ana5_fader" />
+      <binding widget="self.mix1ana7_fader" path="/Mixer/fader" arg0="0" arg1="6" arg2="self.mix1ana8_fader" />
+      <binding widget="self.mix1ana8_fader" path="/Mixer/fader" arg0="0" arg1="7" arg2="self.mix1ana7_fader" />
+      <binding widget="self.mix1aes1_fader" path="/Mixer/fader" arg0="0" arg1="8" arg2="self.mix1aes2_fader" />
+      <binding widget="self.mix1aes2_fader" path="/Mixer/fader" arg0="0" arg1="9" arg2="self.mix1aes1_fader" />
+      <binding widget="self.mix1spdif1_fader" path="/Mixer/fader" arg0="0" arg1="10" arg2="self.mix1spdif2_fader" />
+      <binding widget="self.mix1spdif2_fader" path="/Mixer/fader" arg0="0" arg1="11" arg2="self.mix1spdif1_fader" />
+      <binding widget="self.mix1adat1_fader" path="/Mixer/fader" arg0="0" arg1="12" arg2="self.mix1adat2_fader" />
+      <binding widget="self.mix1adat2_fader" path="/Mixer/fader" arg0="0" arg1="13" arg2="self.mix1adat1_fader" />
+      <binding widget="self.mix1adat3_fader" path="/Mixer/fader" arg0="0" arg1="14" arg2="self.mix1adat4_fader" />
+      <binding widget="self.mix1adat4_fader" path="/Mixer/fader" arg0="0" arg1="15" arg2="self.mix1adat3_fader" />
+      <binding widget="self.mix1adat5_fader" path="/Mixer/fader" arg0="0" arg1="16" arg2="self.mix1adat6_fader" />
+      <binding widget="self.mix1adat6_fader" path="/Mixer/fader" arg0="0" arg1="17" arg2="self.mix1adat5_fader" />
+      <binding widget="self.mix1adat7_fader" path="/Mixer/fader" arg0="0" arg1="18" arg2="self.mix1adat8_fader" />
+      <binding widget="self.mix1adat8_fader" path="/Mixer/fader" arg0="0" arg1="19" arg2="self.mix1adat7_fader" />
+      <binding widget="self.mix2ana1_fader" path="/Mixer/fader" arg0="1" arg1="0" arg2="self.mix2ana2_fader" />
+      <binding widget="self.mix2ana2_fader" path="/Mixer/fader" arg0="1" arg1="1" arg2="self.mix2ana1_fader" />
+      <binding widget="self.mix2ana3_fader" path="/Mixer/fader" arg0="1" arg1="2" arg2="self.mix2ana4_fader" />
+      <binding widget="self.mix2ana4_fader" path="/Mixer/fader" arg0="1" arg1="3" arg2="self.mix2ana3_fader" />
+      <binding widget="self.mix2ana5_fader" path="/Mixer/fader" arg0="1" arg1="4" arg2="self.mix2ana6_fader" />
+      <binding widget="self.mix2ana6_fader" path="/Mixer/fader" arg0="1" arg1="5" arg2="self.mix2ana5_fader" />
+      <binding widget="self.mix2ana7_fader" path="/Mixer/fader" arg0="1" arg1="6" arg2="self.mix2ana8_fader" />
+      <binding widget="self.mix2ana8_fader" path="/Mixer/fader" arg0="1" arg1="7" arg2="self.mix2ana7_fader" />
+      <binding widget="self.mix2aes1_fader" path="/Mixer/fader" arg0="1" arg1="8" arg2="self.mix2aes2_fader" />
+      <binding widget="self.mix2aes2_fader" path="/Mixer/fader" arg0="1" arg1="9" arg2="self.mix2aes1_fader" />
+      <binding widget="self.mix2spdif1_fader" path="/Mixer/fader" arg0="1" arg1="10" arg2="self.mix2spdif2_fader" />
+      <binding widget="self.mix2spdif2_fader" path="/Mixer/fader" arg0="1" arg1="11" arg2="self.mix2spdif1_fader" />
+      <binding widget="self.mix2adat1_fader" path="/Mixer/fader" arg0="1" arg1="12" arg2="self.mix2adat2_fader" />
+      <binding widget="self.mix2adat2_fader" path="/Mixer/fader" arg0="1" arg1="13" arg2="self.mix2adat1_fader" />
+      <binding widget="self.mix2adat3_fader" path="/Mixer/fader" arg0="1" arg1="14" arg2="self.mix2adat4_fader" />
+      <binding widget="self.mix2adat4_fader" path="/Mixer/fader" arg0="1" arg1="15" arg2="self.mix2adat3_fader" />
+      <binding widget="self.mix2adat5_fader" path="/Mixer/fader" arg0="1" arg1="16" arg2="self.mix2adat6_fader" />
+      <binding widget="self.mix2adat6_fader" path="/Mixer/fader" arg0="1" arg1="17" arg2="self.mix2adat5_fader" />
+      <binding widget="self.mix2adat7_fader" path="/Mixer/fader" arg0="1" arg1="18" arg2="self.mix2adat8_fader" />
+      <binding widget="self.mix2adat8_fader" path="/Mixer/fader" arg0="1" arg1="19" arg2="self.mix2adat7_fader" />
+      <binding widget="self.mix3ana1_fader" path="/Mixer/fader" arg0="2" arg1="0" arg2="self.mix3ana2_fader" />
+      <binding widget="self.mix3ana2_fader" path="/Mixer/fader" arg0="2" arg1="1" arg2="self.mix3ana1_fader" />
+      <binding widget="self.mix3ana3_fader" path="/Mixer/fader" arg0="2" arg1="2" arg2="self.mix3ana4_fader" />
+      <binding widget="self.mix3ana4_fader" path="/Mixer/fader" arg0="2" arg1="3" arg2="self.mix3ana3_fader" />
+      <binding widget="self.mix3ana5_fader" path="/Mixer/fader" arg0="2" arg1="4" arg2="self.mix3ana6_fader" />
+      <binding widget="self.mix3ana6_fader" path="/Mixer/fader" arg0="2" arg1="5" arg2="self.mix3ana5_fader" />
+      <binding widget="self.mix3ana7_fader" path="/Mixer/fader" arg0="2" arg1="6" arg2="self.mix3ana8_fader" />
+      <binding widget="self.mix3ana8_fader" path="/Mixer/fader" arg0="2" arg1="7" arg2="self.mix3ana7_fader" />
+      <binding widget="self.mix3aes1_fader" path="/Mixer/fader" arg0="2" arg1="8" arg2="self.mix3aes2_fader" />
+      <binding widget="self.mix3aes2_fader" path="/Mixer/fader" arg0="2" arg1="9" arg2="self.mix3aes1_fader" />
+      <binding widget="self.mix3spdif1_fader" path="/Mixer/fader" arg0="2" arg1="10" arg2="self.mix3spdif2_fader" />
+      <binding widget="self.mix3spdif2_fader" path="/Mixer/fader" arg0="2" arg1="11" arg2="self.mix3spdif1_fader" />
+      <binding widget="self.mix3adat1_fader" path="/Mixer/fader" arg0="2" arg1="12" arg2="self.mix3adat2_fader" />
+      <binding widget="self.mix3adat2_fader" path="/Mixer/fader" arg0="2" arg1="13" arg2="self.mix3adat1_fader" />
+      <binding widget="self.mix3adat3_fader" path="/Mixer/fader" arg0="2" arg1="14" arg2="self.mix3adat4_fader" />
+      <binding widget="self.mix3adat4_fader" path="/Mixer/fader" arg0="2" arg1="15" arg2="self.mix3adat3_fader" />
+      <binding widget="self.mix3adat5_fader" path="/Mixer/fader" arg0="2" arg1="16" arg2="self.mix3adat6_fader" />
+      <binding widget="self.mix3adat6_fader" path="/Mixer/fader" arg0="2" arg1="17" arg2="self.mix3adat5_fader" />
+      <binding widget="self.mix3adat7_fader" path="/Mixer/fader" arg0="2" arg1="18" arg2="self.mix3adat8_fader" />
+      <binding widget="self.mix3adat8_fader" path="/Mixer/fader" arg0="2" arg1="19" arg2="self.mix3adat7_fader" />
+      <binding widget="self.mix4ana1_fader" path="/Mixer/fader" arg0="3" arg1="0" arg2="self.mix4ana2_fader" />
+      <binding widget="self.mix4ana2_fader" path="/Mixer/fader" arg0="3" arg1="1" arg2="self.mix4ana1_fader" />
+      <binding widget="self.mix4ana3_fader" path="/Mixer/fader" arg0="3" arg1="2" arg2="self.mix4ana4_fader" />
+      <binding widget="self.mix4ana4_fader" path="/Mixer/fader" arg0="3" arg1="3" arg2="self.mix4ana3_fader" />
+      <binding widget="self.mix4ana5_fader" path="/Mixer/fader" arg0="3" arg1="4" arg2="self.mix4ana6_fader" />
+      <binding widget="self.mix4ana6_fader" path="/Mixer/fader" arg0="3" arg1="5" arg2="self.mix4ana5_fader" />
+      <binding widget="self.mix4ana7_fader" path="/Mixer/fader" arg0="3" arg1="6" arg2="self.mix4ana8_fader" />
+      <binding widget="self.mix4ana8_fader" path="/Mixer/fader" arg0="3" arg1="7" arg2="self.mix4ana7_fader" />
+      <binding widget="self.mix4aes1_fader" path="/Mixer/fader" arg0="3" arg1="8" arg2="self.mix4aes2_fader" />
+      <binding widget="self.mix4aes2_fader" path="/Mixer/fader" arg0="3" arg1="9" arg2="self.mix4aes1_fader" />
+      <binding widget="self.mix4spdif1_fader" path="/Mixer/fader" arg0="3" arg1="10" arg2="self.mix4spdif2_fader" />
+      <binding widget="self.mix4spdif2_fader" path="/Mixer/fader" arg0="3" arg1="11" arg2="self.mix4spdif1_fader" />
+      <binding widget="self.mix4adat1_fader" path="/Mixer/fader" arg0="3" arg1="12" arg2="self.mix4adat2_fader" />
+      <binding widget="self.mix4adat2_fader" path="/Mixer/fader" arg0="3" arg1="13" arg2="self.mix4adat1_fader" />
+      <binding widget="self.mix4adat3_fader" path="/Mixer/fader" arg0="3" arg1="14" arg2="self.mix4adat4_fader" />
+      <binding widget="self.mix4adat4_fader" path="/Mixer/fader" arg0="3" arg1="15" arg2="self.mix4adat3_fader" />
+      <binding widget="self.mix4adat5_fader" path="/Mixer/fader" arg0="3" arg1="16" arg2="self.mix4adat6_fader" />
+      <binding widget="self.mix4adat6_fader" path="/Mixer/fader" arg0="3" arg1="17" arg2="self.mix4adat5_fader" />
+      <binding widget="self.mix4adat7_fader" path="/Mixer/fader" arg0="3" arg1="18" arg2="self.mix4adat8_fader" />
+      <binding widget="self.mix4adat8_fader" path="/Mixer/fader" arg0="3" arg1="19" arg2="self.mix4adat7_fader" />
+    </group>
+    <group name="Faders" line="149">
+      <binding widget="self.mix1_fader" path="/Mixer/Mix1/Mix_fader" />
+      <binding widget="self.mix2_fader" path="/Mixer/Mix2/Mix_fader" />
+      <binding widget="self.mix3_fader" path="/Mixer/Mix3/Mix_fader" />
+      <binding widget="self.mix4_fader" path="/Mixer/Mix4/Mix_fader" />
+      <binding widget="self.mainout_fader" path="/Mixer/Mainout_fader" />
+      <binding widget="self.phones_fader" path="/Mixer/Phones_fader" />
+    </group>
+    <group name="ChannelControls" line="158">
+      <binding widget="self.mix1ana1_pan" path="/Mixer/pan" arg0="0" arg1="0" />
+      <binding widget="self.mix1ana2_pan" path="/Mixer/pan" arg0="0" arg1="1" />
+      <binding widget="self.mix1ana3_pan" path="/Mixer/pan" arg0="0" arg1="2" />
+      <binding widget="self.mix1ana4_pan" path="/Mixer/pan" arg0="0" arg1="3" />
+      <binding widget="self.mix1ana5_pan" path="/Mixer/pan" arg0="0" arg1="4" />
+      <binding widget="self.mix1ana6_pan" path="/Mixer/pan" arg0="0" arg1="5" />
+      <binding widget="self.mix1ana7_pan" path="/Mixer/pan" arg0="0" arg1="6" />
+      <binding widget="self.mix1ana8_pan" path="/Mixer/pan" arg0="0" arg1="7" />
+      <binding widget="self.mix1aes1_pan" path="/Mixer/pan" arg0="0" arg1="8" />
+      <binding widget="self.mix1aes2_pan" path="/Mixer/pan" arg0="0" arg1="9" />
+      <binding widget="self.mix1spdif1_pan" path="/Mixer/pan" arg0="0" arg1="10" />
+      <binding widget="self.mix1spdif2_pan" path="/Mixer/pan" arg0="0" arg1="11" />
+      <binding widget="self.mix1adat1_pan" path="/Mixer/pan" arg0="0" arg1="12" />
+      <binding widget="self.mix1adat2_pan" path="/Mixer/pan" arg0="0" arg1="13" />
+      <binding widget="self.mix1adat3_pan" path="/Mixer/pan" arg0="0" arg1="14" />
+      <binding widget="self.mix1adat4_pan" path="/Mixer/pan" arg0="0" arg1="15" />
+      <binding widget="self.mix1adat5_pan" path="/Mixer/pan" arg0="0" arg1="16" />
+      <binding widget="self.mix1adat6_pan" path="/Mixer/pan" arg0="0" arg1="17" />
+      <binding widget="self.mix1adat7_pan" path="/Mixer/pan" arg0="0" arg1="18" />
+      <binding widget="self.mix1adat8_pan" path="/Mixer/pan" arg0="0" arg1="19" />
+      <binding widget="self.mix2ana1_pan" path="/Mixer/pan" arg0="1" arg1="0" />
+      <binding widget="self.mix2ana2_pan" path="/Mixer/pan" arg0="1" arg1="1" />
+      <binding widget="self.mix2ana3_pan" path="/Mixer/pan" arg0="1" arg1="2" />
+      <binding widget="self.mix2ana4_pan" path="/Mixer/pan" arg0="1" arg1="3" />
+      <binding widget="self.mix2ana5_pan" path="/Mixer/pan" arg0="1" arg1="4" />
+      <binding widget="self.mix2ana6_pan" path="/Mixer/pan" arg0="1" arg1="5" />
+      <binding widget="self.mix2ana7_pan" path="/Mixer/pan" arg0="1" arg1="6" />
+      <binding widget="self.mix2ana8_pan" path="/Mixer/pan" arg0="1" arg1="7" />
+      <binding widget="self.mix2aes1_pan" path="/Mixer/pan" arg0="1" arg1="8" />
+      <binding widget="self.mix2aes2_pan" path="/Mixer/pan" arg0="1" arg1="9" />
+      <binding widget="self.mix2spdif1_pan" path="/Mixer/pan" arg0="1" arg1="10" />
+      <binding widget="self.mix2spdif2_pan" path="/Mixer/pan" arg0="1" arg1="11" />
+      <binding widget="self.mix2adat1_pan" path="/Mixer/pan" arg0="1" arg1="12" />
+      <binding widget="self.mix2adat2_pan" path="/Mixer/pan" arg0="1" arg1="13" />
+      <binding widget="self.mix2adat3_pan" path="/Mixer/pan" arg0="1" arg1="14" />
+      <binding widget="self.mix2adat4_pan" path="/Mixer/pan" arg0="1" arg1="15" />
+      <binding widget="self.mix2adat5_pan" path="/Mixer/pan" arg0="1" arg1="16" />
+      <binding widget="self.mix2adat6_pan" path="/Mixer/pan" arg0="1" arg1="17" />
+      <binding widget="self.mix2adat7_pan" path="/Mixer/pan" arg0="1" arg1="18" />
+      <binding widget="self.mix2adat8_pan" path="/Mixer/pan" arg0="1" arg1="19" />
+      <binding widget="self.mix3ana1_pan" path="/Mixer/pan" arg0="2" arg1="0" />
+      <binding widget="self.mix3ana2_pan" path="/Mixer/pan" arg0="2" arg1="1" />
+      <binding widget="self.mix3ana3_pan" path="/Mixer/pan" arg0="2" arg1="2" />
+      <binding widget="self.mix3ana4_pan" path="/Mixer/pan" arg0="2" arg1="3" />
+      <binding widget="self.mix3ana5_pan" path="/Mixer/pan" arg0="2" arg1="4" />
+      <binding widget="self.mix3ana6_pan" path="/Mixer/pan" arg0="2" arg1="5" />
+      <binding widget="self.mix3ana7_pan" path="/Mixer/pan" arg0="2" arg1="6" />
+      <binding widget="self.mix3ana8_pan" path="/Mixer/pan" arg0="2" arg1="7" />
+      <binding widget="self.mix3aes1_pan" path="/Mixer/pan" arg0="2" arg1="8" />
+      <binding widget="self.mix3aes2_pan" path="/Mixer/pan" arg0="2" arg1="9" />
+      <binding widget="self.mix3spdif1_pan" path="/Mixer/pan" arg0="2" arg1="10" />
+      <binding widget="self.mix3spdif2_pan" path="/Mixer/pan" arg0="2" arg1="11" />
+      <binding widget="self.mix3adat1_pan" path="/Mixer/pan" arg0="2" arg1="12" />
+      <binding widget="self.mix3adat2_pan" path="/Mixer/pan" arg0="2" arg1="13" />
+      <binding widget="self.mix3adat3_pan" path="/Mixer/pan" arg0="2" arg1="14" />
+      <binding widget="self.mix3adat4_pan" path="/Mixer/pan" arg0="2" arg1="15" />
+      <binding widget="self.mix3adat5_pan" path="/Mixer/pan" arg0="2" arg1="16" />
+      <binding widget="self.mix3adat6_pan" path="/Mixer/pan" arg0="2" arg1="17" />
+      <binding widget="self.mix3adat7_pan" path="/Mixer/pan" arg0="2" arg1="18" />
+      <binding widget="self.mix3adat8_pan" path="/Mixer/pan" arg0="2" arg1="19" />
+      <binding widget="self.mix4ana1_pan" path="/Mixer/pan" arg0="3" arg1="0" />
+      <binding widget="self.mix4ana2_pan" path="/Mixer/pan" arg0="3" arg1="1" />
+      <binding widget="self.mix4ana3_pan" path="/Mixer/pan" arg0="3" arg1="2" />
+      <binding widget="self.mix4ana4_pan" path="/Mixer/pan" arg0="3" arg1="3" />
+      <binding widget="self.mix4ana5_pan" path="/Mixer/pan" arg0="3" arg1="4" />
+      <binding widget="self.mix4ana6_pan" path="/Mixer/pan" arg0="3" arg1="5" />
+      <binding widget="self.mix4ana7_pan" path="/Mixer/pan" arg0="3" arg1="6" />
+      <binding widget="self.mix4ana8_pan" path="/Mixer/pan" arg0="3" arg1="7" />
+      <binding widget="self.mix4aes1_pan" path="/Mixer/pan" arg0="3" arg1="8" />
+      <binding widget="self.mix4aes2_pan" path="/Mixer/pan" arg0="3" arg1="9" />
+      <binding widget="self.mix4spdif1_pan" path="/Mixer/pan" arg0="3" arg1="10" />
+      <binding widget="self.mix4spdif2_pan" path="/Mixer/pan" arg0="3" arg1="11" />
+      <binding widget="self.mix4adat1_pan" path="/Mixer/pan" arg0="3" arg1="12" />
+      <binding widget="self.mix4adat2_pan" path="/Mixer/pan" arg0="3" arg1="13" />
+      <binding widget="self.mix4adat3_pan" path="/Mixer/pan" arg0="3" arg1="14" />
+      <binding widget="self.mix4adat4_pan" path="/Mixer/pan" arg0="3" arg1="15" />
+      <binding widget="self.mix4adat5_pan" path="/Mixer/pan" arg0="3" arg1="16" />
+      <binding widget="self.mix4adat6_pan" path="/Mixer/pan" arg0="3" arg1="17" />
+      <binding widget="self.mix4adat7_pan" path="/Mixer/pan" arg0="3" arg1="18" />
+      <binding widget="self.mix4adat8_pan" path="/Mixer/pan" arg0="3" arg1="19" />
+    </group>
+    <group name="Controls" line="244">
+      <binding widget="self.ana1_trimgain" path="/Mixer/Control/Ana1_trimgain" />
+      <binding widget="self.ana2_trimgain" path="/Mixer/Control/Ana2_trimgain" />
+      <binding widget="self.ana3_trimgain" path="/Mixer/Control/Ana3_trimgain" />
+      <binding widget="self.ana4_trimgain" path="/Mixer/Control/Ana4_trimgain" />
+      <binding widget="self.ana5_trimgain" path="/Mixer/Control/Ana5_trimgain" />
+      <binding widget="self.ana6_trimgain" path="/Mixer/Control/Ana6_trimgain" />
+      <binding widget="self.ana7_trimgain" path="/Mixer/Control/Ana7_trimgain" />
+      <binding widget="self.ana8_trimgain" path="/Mixer/Control/Ana8_trimgain" />
+      <binding widget="self.spdif1_trimgain" path="/Mixer/Control/Spdif1_trimgain" />
+      <binding widget="self.spdif2_trimgain" path="/Mixer/Control/Spdif2_trimgain" />
+    </group>
+    <group name="ChannelBinarySwitches" line="257">
+      <binding widget="self.mix1ana1_mute" path="/Mixer/mute" arg0="0" arg1="0" />
+      <binding widget="self.mix1ana2_mute" path="/Mixer/mute" arg0="0" arg1="1" />
+      <binding widget="self.mix1ana3_mute" path="/Mixer/mute" arg0="0" arg1="2" />
+      <binding widget="self.mix1ana4_mute" path="/Mixer/mute" arg0="0" arg1="3" />
+      <binding widget="self.mix1ana5_mute" path="/Mixer/mute" arg0="0" arg1="4" />
+      <binding widget="self.mix1ana6_mute" path="/Mixer/mute" arg0="0" arg1="5" />
+      <binding widget="self.mix1ana7_mute" path="/Mixer/mute" arg0="0" arg1="6" />
+      <binding widget="self.mix1ana8_mute" path="/Mixer/mute" arg0="0" arg1="7" />
+      <binding widget="self.mix1aes1_mute" path="/Mixer/mute" arg0="0" arg1="8" />
+      <binding widget="self.mix1aes2_mute" path="/Mixer/mute" arg0="0" arg1="9" />
+      <binding widget="self.mix1spdif1_mute" path="/Mixer/mute" arg0="0" arg1="10" />
+      <binding widget="self.mix1spdif2_mute" path="/Mixer/mute" arg0="0" arg1="11" />
+      <binding widget="self.mix1adat1_mute" path="/Mixer/mute" arg0="0" arg1="12" />
+      <binding widget="self.mix1adat2_mute" path="/Mixer/mute" arg0="0" arg1="13" />
+      <binding widget="self.mix1adat3_mute" path="/Mixer/mute" arg0="0" arg1="14" />
+      <binding widget="self.mix1adat4_mute" path="/Mixer/mute" arg0="0" arg1="15" />
+      <binding widget="self.mix1adat5_mute" path="/Mixer/mute" arg0="0" arg1="16" />
+      <binding widget="self.mix1adat6_mute" path="/Mixer/mute" arg0="0" arg1="17" />
+      <binding widget="self.mix1adat7_mute" path="/Mixer/mute" arg0="0" arg1="18" />
+      <binding widget="self.mix1adat8_mute" path="/Mixer/mute" arg0="0" arg1="19" />
+      <binding widget="self.mix1ana1_solo" path="/Mixer/solo" arg0="0" arg1="0" />
+      <binding widget="self.mix1ana2_solo" path="/Mixer/solo" arg0="0" arg1="1" />
+      <binding widget="self.mix1ana3_solo" path="/Mixer/solo" arg0="0" arg1="2" />
+      <binding widget="self.mix1ana4_solo" path="/Mixer/solo" arg0="0" arg1="3" />
+      <binding widget="self.mix1ana5_solo" path="/Mixer/solo" arg0="0" arg1="4" />
+      <binding widget="self.mix1ana6_solo" path="/Mixer/solo" arg0="0" arg1="5" />
+      <binding widget="self.mix1ana7_solo" path="/Mixer/solo" arg0="0" arg1="6" />
+      <binding widget="self.mix1ana8_solo" path="/Mixer/solo" arg0="0" arg1="7" />
+      <binding widget="self.mix1aes1_solo" path="/Mixer/solo" arg0="0" arg1="8" />
+      <binding widget="self.mix1aes2_solo" path="/Mixer/solo" arg0="0" arg1="9" />
+      <binding widget="self.mix1spdif1_solo" path="/Mixer/solo" arg0="0" arg1="10" />
+      <binding widget="self.mix1spdif2_solo" path="/Mixer/solo" arg0="0" arg1="11" />
+      <binding widget="self.mix1adat1_solo" path="/Mixer/solo" arg0="0" arg1="12" />
+      <binding widget="self.mix1adat2_solo" path="/Mixer/solo" arg0="0" arg1="13" />
+      <binding widget="self.mix1adat3_solo" path="/Mixer/solo" arg0="0" arg1="14" />
+      <binding widget="self.mix1adat4_solo" path="/Mixer/solo" arg0="0" arg1="15" />
+      <binding widget="self.mix1adat5_solo" path="/Mixer/solo" arg0="0" arg1="16" />
+      <binding widget="self.mix1adat6_solo" path="/Mixer/solo" arg0="0" arg1="17" />
+      <binding widget="self.mix1adat7_solo" path="/Mixer/solo" arg0="0" arg1="18" />
+      <binding widget="self.mix1adat8_solo" path="/Mixer/solo" arg0="0" arg1="19" />
+      <binding widget="self.mix2ana1_mute" path="/Mixer/mute" arg0="1" arg1="0" />
+      <binding widget="self.mix2ana2_mute" path="/Mixer/mute" arg0="1" arg1="1" />
+      <binding widget="self.mix2ana3_mute" path="/Mixer/mute" arg0="1" arg1="2" />
+      <binding widget="self.mix2ana4_mute" path="/Mixer/mute" arg0="1" arg1="3" />
+      <binding widget="self.mix2ana5_mute" path="/Mixer/mute" arg0="1" arg1="4" />
+      <binding widget="self.mix2ana6_mute" path="/Mixer/mute" arg0="1" arg1="5" />
+      <binding widget="self.mix2ana7_mute" path="/Mixer/mute" arg0="1" arg1="6" />
+      <binding widget="self.mix2ana8_mute" path="/Mixer/mute" arg0="1" arg1="7" />
+      <binding widget="self.mix2aes1_mute" path="/Mixer/mute" arg0="1" arg1="8" />
+      <binding widget="self.mix2aes2_mute" path="/Mixer/mute" arg0="1" arg1="9" />
+      <binding widget="self.mix2spdif1_mute" path="/Mixer/mute" arg0="1" arg1="10" />
+      <binding widget="self.mix2spdif2_mute" path="/Mixer/mute" arg0="1" arg1="11" />
+      <binding widget="self.mix2adat1_mute" path="/Mixer/mute" arg0="1" arg1="12" />
+      <binding widget="self.mix2adat2_mute" path="/Mixer/mute" arg0="1" arg1="13" />
+      <binding widget="self.mix2adat3_mute" path="/Mixer/mute" arg0="1" arg1="14" />
+      <binding widget="self.mix2adat4_mute" path="/Mixer/mute" arg0="1" arg1="15" />
+      <binding widget="self.mix2adat5_mute" path="/Mixer/mute" arg0="1" arg1="16" />
+      <binding widget="self.mix2adat6_mute" path="/Mixer/mute" arg0="1" arg1="17" />
+      <binding widget="self.mix2adat7_mute" path="/Mixer/mute" arg0="1" arg1="18" />
+      <binding widget="self.mix2adat8_mute" path="/Mixer/mute" arg0="1" arg1="19" />
+      <binding widget="self.mix2ana1_solo" path="/Mixer/solo" arg0="1" arg1="0" />
+      <binding widget="self.mix2ana2_solo" path="/Mixer/solo" arg0="1" arg1="1" />
+      <binding widget="self.mix2ana3_solo" path="/Mixer/solo" arg0="1" arg1="2" />
+      <binding widget="self.mix2ana4_solo" path="/Mixer/solo" arg0="1" arg1="3" />
+      <binding widget="self.mix2ana5_solo" path="/Mixer/solo" arg0="1" arg1="4" />
+      <binding widget="self.mix2ana6_solo" path="/Mixer/solo" arg0="1" arg1="5" />
+      <binding widget="self.mix2ana7_solo" path="/Mixer/solo" arg0="1" arg1="6" />
+      <binding widget="self.mix2ana8_solo" path="/Mixer/solo" arg0="1" arg1="7" />
+      <binding widget="self.mix2aes1_solo" path="/Mixer/solo" arg0="1" arg1="8" />
+      <binding widget="self.mix2aes2_solo" path="/Mixer/solo" arg0="1" arg1="9" />
+      <binding widget="self.mix2spdif1_solo" path="/Mixer/solo" arg0="1" arg1="10" />
+      <binding widget="self.mix2spdif2_solo" path="/Mixer/solo" arg0="1" arg1="11" />
+      <binding widget="self.mix2adat1_solo" path="/Mixer/solo" arg0="1" arg1="12" />
+      <binding widget="self.mix2adat2_solo" path="/Mixer/solo" arg0="1" arg1="13" />
+      <binding widget="self.mix2adat3_solo" path="/Mixer/solo" arg0="1" arg1="14" />
+      <binding widget="self.mix2adat4_solo" path="/Mixer/solo" arg0="1" arg1="15" />
+      <binding widget="self.mix2adat5_solo" path="/Mixer/solo" arg0="1" arg1="16" />
+      <binding widget="self.mix2adat6_solo" path="/Mixer/solo" arg0="1" arg1="17" />
+      <binding widget="self.mix2adat7_solo" path="/Mixer/solo" arg0="1" arg1="18" />
+      <binding widget="self.mix2adat8_solo" path="/Mixer/solo" arg0="1" arg1="19" />
+      <binding widget="self.mix3ana1_mute" path="/Mixer/mute" arg0="2" arg1="0" />
+      <binding widget="self.mix3ana2_mute" path="/Mixer/mute" arg0="2" arg1="1" />
+      <binding widget="self.mix3ana3_mute" path="/Mixer/mute" arg0="2" arg1="2" />
+      <binding widget="self.mix3ana4_mute" path="/Mixer/mute" arg0="2" arg1="3" />
+      <binding widget="self.mix3ana5_mute" path="/Mixer/mute" arg0="2" arg1="4" />
+      <binding widget="self.mix3ana6_mute" path="/Mixer/mute" arg0="2" arg1="5" />
+      <binding widget="self.mix3ana7_mute" path="/Mixer/mute" arg0="2" arg1="6" />
+      <binding widget="self.mix3ana8_mute" path="/Mixer/mute" arg0="2" arg1="7" />
+      <binding widget="self.mix3aes1_mute" path="/Mixer/mute" arg0="2" arg1="8" />
+      <binding widget="self.mix3aes2_mute" path="/Mixer/mute" arg0="2" arg1="9" />
+      <binding widget="self.mix3spdif1_mute" path="/Mixer/mute" arg0="2" arg1="10" />
+      <binding widget="self.mix3spdif2_mute" path="/Mixer/mute" arg0="2" arg1="11" />
+      <binding widget="self.mix3adat1_mute" path="/Mixer/mute" arg0="2" arg1="12" />
+      <binding widget="self.mix3adat2_mute" path="/Mixer/mute" arg0="2" arg1="13" />
+      <binding widget="self.mix3adat3_mute" path="/Mixer/mute" arg0="2" arg1="14" />
+      <binding widget="self.mix3adat4_mute" path="/Mixer/mute" arg0="2" arg1="15" />
+      <binding widget="self.mix3adat5_mute" path="/Mixer/mute" arg0="2" arg1="16" />
+      <binding widget="self.mix3adat6_mute" path="/Mixer/mute" arg0="2" arg1="17" />
+      <binding widget="self.mix3adat7_mute" path="/Mixer/mute" arg0="2" arg1="18" />
+      <binding widget="self.mix3adat8_mute" path="/Mixer/mute" arg0="2" arg1="19" />
+      <binding widget="self.mix3ana1_solo" path="/Mixer/solo" arg0="2" arg1="0" />
+      <binding widget="self.mix3ana2_solo" path="/Mixer/solo" arg0="2" arg1="1" />
+      <binding widget="self.mix3ana3_solo" path="/Mixer/solo" arg0="2" arg1="2" />
+      <binding widget="self.mix3ana4_solo" path="/Mixer/solo" arg0="2" arg1="3" />
+      <binding widget="self.mix3ana5_solo" path="/Mixer/solo" arg0="2" arg1="4" />
+      <binding widget="self.mix3ana6_solo" path="/Mixer/solo" arg0="2" arg1="5" />
+      <binding widget="self.mix3ana7_solo" path="/Mixer/solo" arg0="2" arg1="6" />
+      <binding widget="self.mix3ana8_solo" path="/Mixer/solo" arg0="2" arg1="7" />
+      <binding widget="self.mix3aes1_solo" path="/Mixer/solo" arg0="2" arg1="8" />
+      <binding widget="self.mix3aes2_solo" path="/Mixer/solo" arg0="2" arg1="9" />
+      <binding widget="self.mix3spdif1_solo" path="/Mixer/solo" arg0="2" arg1="10" />
+      <binding widget="self.mix3spdif2_solo" path="/Mixer/solo" arg0="2" arg1="11" />
+      <binding widget="self.mix3adat1_solo" path="/Mixer/solo" arg0="2" arg1="12" />
+      <binding widget="self.mix3adat2_solo" path="/Mixer/solo" arg0="2" arg1="13" />
+      <binding widget="self.mix3adat3_solo" path="/Mixer/solo" arg0="2" arg1="14" />
+      <binding widget="self.mix3adat4_solo" path="/Mixer/solo" arg0="2" arg1="15" />
+      <binding widget="self.mix3adat5_solo" path="/Mixer/solo" arg0="2" arg1="16" />
+      <binding widget="self.mix3adat6_solo" path="/Mixer/solo" arg0="2" arg1="17" />
+      <binding widget="self.mix3adat7_solo" path="/Mixer/solo" arg0="2" arg1="18" />
+      <binding widget="self.mix3adat8_solo" path="/Mixer/solo" arg0="2" arg1="19" />
+      <binding widget="self.mix4ana1_mute" path="/Mixer/mute" arg0="3" arg1="0" />
+      <binding widget="self.mix4ana2_mute" path="/Mixer/mute" arg0="3" arg1="1" />
+      <binding widget="self.mix4ana3_mute" path="/Mixer/mute" arg0="3" arg1="2" />
+      <binding widget="self.mix4ana4_mute" path="/Mixer/mute" arg0="3" arg1="3" />
+      <binding widget="self.mix4ana5_mute" path="/Mixer/mute" arg0="3" arg1="4" />
+      <binding widget="self.mix4ana6_mute" path="/Mixer/mute" arg0="3" arg1="5" />
+      <binding widget="self.mix4ana7_mute" path="/Mixer/mute" arg0="3" arg1="6" />
+      <binding widget="self.mix4ana8_mute" path="/Mixer/mute" arg0="3" arg1="7" />
+      <binding widget="self.mix4aes1_mute" path="/Mixer/mute" arg0="3" arg1="8" />
+      <binding widget="self.mix4aes2_mute" path="/Mixer/mute" arg0="3" arg1="9" />
+      <binding widget="self.mix4spdif1_mute" path="/Mixer/mute" arg0="3" arg1="10" />
+      <binding widget="self.mix4spdif2_mute" path="/Mixer/mute" arg0="3" arg1="11" />
+      <binding widget="self.mix4adat1_mute" path="/Mixer/mute" arg0="3" arg1="12" />
+      <binding widget="self.mix4adat2_mute" path="/Mixer/mute" arg0="3" arg1="13" />
+      <binding widget="self.mix4adat3_mute" path="/Mixer/mute" arg0="3" arg1="14" />
+      <binding widget="self.mix4adat4_mute" path="/Mixer/mute" arg0="3" arg1="15" />
+      <binding widget="self.mix4adat5_mute" path="/Mixer/mute" arg0="3" arg1="16" />
+      <binding widget="self.mix4adat6_mute" path="/Mixer/mute" arg0="3" arg1="17" />
+      <binding widget="self.mix4adat7_mute" path="/Mixer/mute" arg0="3" arg1="18" />
+      <binding widget="self.mix4adat8_mute" path="/Mixer/mute" arg0="3" arg1="19" />
+      <binding widget="self.mix4ana1_solo" path="/Mixer/solo" arg0="3" arg1="0" />
+      <binding widget="self.mix4ana2_solo" path="/Mixer/solo" arg0="3" arg1="1" />
+      <binding widget="self.mix4ana3_solo" path="/Mixer/solo" arg0="3" arg1="2" />
+      <binding widget="self.mix4ana4_solo" path="/Mixer/solo" arg0="3" arg1="3" />
+      <binding widget="self.mix4ana5_solo" path="/Mixer/solo" arg0="3" arg1="4" />
+      <binding widget="self.mix4ana6_solo" path="/Mixer/solo" arg0="3" arg1="5" />
+      <binding widget="self.mix4ana7_solo" path="/Mixer/solo" arg0="3" arg1="6" />
+      <binding widget="self.mix4ana8_solo" path="/Mixer/solo" arg0="3" arg1="7" />
+      <binding widget="self.mix4aes1_solo" path="/Mixer/solo" arg0="3" arg1="8" />
+      <binding widget="self.mix4aes2_solo" path="/Mixer/solo" arg0="3" arg1="9" />
+      <binding widget="self.mix4spdif1_solo" path="/Mixer/solo" arg0="3" arg1="10" />
+      <binding widget="self.mix4spdif2_solo" path="/Mixer/solo" arg0="3" arg1="11" />
+      <binding widget="self.mix4adat1_solo" path="/Mixer/solo" arg0="3" arg1="12" />
+      <binding widget="self.mix4adat2_solo" path="/Mixer/solo" arg0="3" arg1="13" />
+      <binding widget="self.mix4adat3_solo" path="/Mixer/solo" arg0="3" arg1="14" />
+      <binding widget="self.mix4adat4_solo" path="/Mixer/solo" arg0="3" arg1="15" />
+      <binding widget="self.mix4adat5_solo" path="/Mixer/solo" arg0="3" arg1="16" />
+      <binding widget="self.mix4adat6_solo" path="/Mixer/solo" arg0="3" arg1="17" />
+      <binding widget="self.mix4adat7_solo" path="/Mixer/solo" arg0="3" arg1="18" />
+      <binding widget="self.mix4adat8_solo" path="/Mixer/solo" arg0="3" arg1="19" />
+    </group>
+    <group name="BinarySwitches" line="423">
+      <binding widget="self.mix1_mute" path="/Mixer/Mix1/Mix_mute" />
+      <binding widget="self.mix2_mute" path="/Mixer/Mix2/Mix_mute" />
+      <binding widget="self.mix3_mute" path="/Mixer/Mix3/Mix_mute" />
+      <binding widget="self.mix4_mute" path="/Mixer/Mix4/Mix_mute" />
+      <binding widget="self.ana1_pad" path="/Mixer/Control/Ana1_pad" />
+      <binding widget="self.ana2_pad" path="/Mixer/Control/Ana2_pad" />
+      <binding widget="self.ana3_pad" path="/Mixer/Control/Ana3_pad" />
+      <binding widget="self.ana4_pad" path="/Mixer/Control/Ana4_pad" />
+      <binding widget="self.ana5_pad" path="/Mixer/Control/Ana5_pad" />
+      <binding widget="self.ana6_pad" path="/Mixer/Control/Ana6_pad" />
+      <binding widget="self.ana7_pad" path="/Mixer/Control/Ana7_pad" />
+      <binding widget="self.ana8_pad" path="/Mixer/Control/Ana8_pad" />
+      <binding widget="self.ana1_invert" path="/Mixer/Control/Ana1_invert" />
+      <binding widget="self.ana2_invert" path="/Mixer/Control/Ana2_invert" />
+      <binding widget="self.ana3_invert" path="/Mixer/Control/Ana3_invert" />
+      <binding widget="self.ana4_invert" path="/Mixer/Control/Ana4_invert" />
+      <binding widget="self.ana5_invert" path="/Mixer/Control/Ana5_invert" />
+      <binding widget="self.ana6_invert" path="/Mixer/Control/Ana6_invert" />
+      <binding widget="self.ana7_invert" path="/Mixer/Control/Ana7_invert" />
+      <binding widget="self.ana8_invert" path="/Mixer/Control/Ana8_invert" />
+      <binding widget="self.spdif1_invert" path="/Mixer/Control/Spdif1_invert" />
+      <binding widget="self.spdif2_invert" path="/Mixer/Control/Spdif2_invert" />
+      <binding widget="self.ana1_level" path="/Mixer/Control/Ana1_level" />
+      <binding widget="self.ana2_level" path="/Mixer/Control/Ana2_level" />
+      <binding widget="self.ana3_level" path="/Mixer/Control/Ana3_level" />
+      <binding widget="self.ana4_level" path="/Mixer/Control/Ana4_level" />
+      <binding widget="self.ana5_level" path="/Mixer/Control/Ana5_level" />
+      <binding widget="self.ana6_level" path="/Mixer/Control/Ana6_level" />
+      <binding widget="self.ana7_level" path="/Mixer/Control/Ana7_level" />
+      <binding widget="self.ana8_level" path="/Mixer/Control/Ana8_level" />
+      <binding widget="self.ana1_boost" path="/Mixer/Control/Ana1_boost" />
+      <binding widget="self.ana2_boost" path="/Mixer/Control/Ana2_boost" />
+      <binding widget="self.ana3_boost" path="/Mixer/Control/Ana3_boost" />
+      <binding widget="self.ana4_boost" path="/Mixer/Control/Ana4_boost" />
+      <binding widget="self.ana5_boost" path="/Mixer/Control/Ana5_boost" />
+      <binding widget="self.ana6_boost" path="/Mixer/Control/Ana6_boost" />
+      <binding widget="self.ana7_boost" path="/Mixer/Control/Ana7_boost" />
+      <binding widget="self.ana8_boost" path="/Mixer/Control/Ana8_boost" />
+    </group>
+    <group name="Selectors" line="465">
+      <binding widget="self.mix1_dest" path="/Mixer/Mix1/Mix_dest" />
+      <binding widget="self.mix2_dest" path="/Mixer/Mix2/Mix_dest" />
+      <binding widget="self.mix3_dest" path="/Mixer/Mix3/Mix_dest" />
+      <binding widget="self.mix4_dest" path="/Mixer/Mix4/Mix_dest" />
+      <binding widget="self.phones_src" path="/Mixer/Control/Phones_src" />
+      <binding widget="self.optical_in_mode" path="/Mixer/Control/OpticalIn_mode" />
+      <binding widget="self.optical_out_mode" path="/Mixer/Control/OpticalOut_mode" />
+      <binding widget="self.meter_src_ctrl" path="/Mixer/Control/Meter_src" />
+      <binding widget="self.aesebu_meter_ctrl" path="/Mixer/Control/Meter_aesebu_src" />
+      <binding widget="self.peakhold_time_ctrl" path="/Mixer/Control/Meter_peakhold_time" />
+      <binding widget="self.cliphold_time_ctrl" path="/Mixer/Control/Meter_cliphold_time" />
+    </group>
+  </source_bindings>
+</profile>
