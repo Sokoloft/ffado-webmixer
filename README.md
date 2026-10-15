@@ -146,3 +146,13 @@ Additional modules handle device identification, profile loading, control conver
 The frontend is built with HTML, CSS, and JavaScript; the backend uses Flask and Python. Device-specific interpretation is defined through XML profiles so that mixer behavior does not need to be hardcoded for every interface.
 
 Contributions, bug reports, and device-profile improvements are welcome. When reporting hardware issues, include the interface model, FFADO version, relevant logs, and the control that behaves unexpectedly.
+
+## License
+
+FFADO WebMixer is free and open-source software licensed under the **GNU General Public License, version 2 or version 3 (GPL-2.0-or-GPL-3.0)**.
+
+This project incorporates code derived from [FFADO](https://ffado.org/), the Free FireWire Audio Drivers project.
+
+FFADO and its original contributors retain their respective copyrights. All FFADO-derived code remains subject to its original licensing terms.
+
+See [LICENSE](LICENSE) for the full license text.

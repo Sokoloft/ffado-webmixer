@@ -22,6 +22,6 @@ def register(app):
 
     @app.post("/api/open-github")
     def open_github():
-        if not webbrowser.open("https://github.com"):
+        if not webbrowser.open("https://github.com/Sokoloft/ffado-webmixer"):
             return jsonify(error="Could not launch the default browser"), 503
         return jsonify(ok=True)
