@@ -1,8 +1,11 @@
 <?xml version='1.0' encoding='utf-8'?>
 <device family="motu" model_id="3" name="MOTU Ultralite" extends="common.xml">
-  <hide_col pattern="AES/EBU *" />
-  <hide_col pattern="ADAT *" />
-  <hide_dest pattern="ADAT *" />
+  <!-- The original UltraLite has neither AES/EBU nor ADAT hardware.
+       Match both human-readable names and compact labels from FFADO. -->
+  <hide_col pattern="AES*" />
+  <hide_col pattern="ADAT*" />
+  <hide_dest pattern="AES/EBU*" />
+  <hide_dest pattern="ADAT*" />
   <dest_name index="6" value="MainOut" />
   <dest_output index="6" value="main" />
 </device>

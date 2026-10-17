@@ -23,7 +23,10 @@ The application uses Python, Flask, and FFADO's D-Bus control interface. A pyweb
 - Use built-in color themes or add your own CSS themes, including accent color customization.
 - Open the interface in a native desktop window or from a browser on your network.
 - Try the interface without FireWire hardware using demo mode.
-- Access QjackCtl integration where available.
+- Enable QjackCtl support in **Settings → General** to reveal a dedicated **QjackCtl** tab with Graph and Patchbay controls.
+- Open the dedicated **In/Out** dialog for hardware routing. MOTU pre-Mk3 devices
+  show mix-bus-to-output assignment, while supported DICE devices expose their
+  mixer-gain and crossbar controls separately.
 
 ## Requirements
 
@@ -84,7 +87,7 @@ Select an output or bus to view and adjust its mix. Drag faders to change levels
 
 Channel strips can be renamed and rearranged to suit your workflow. Minimized strips take less room, and hidden minimized strips can be excluded from view. Compatible channels can be linked into stereo pairs. The application preserves interface preferences between sessions; changes to hardware mixer controls are sent to FFADO.
 
-Use the **settings** button to choose a theme and adjust available interface options. The browser version also includes a fullscreen control. The desktop client can remember its window dimensions for the next launch.
+Use the **settings** button to choose a theme and adjust available interface options. In **General**, enable QjackCtl support to show a dedicated integration tab; it is disabled by default. **About** displays the server URL with buttons to open the mixer in your browser or show a scannable QR code. Closing the QR view returns to About. The browser version also includes a fullscreen control. The desktop client can remember its window dimensions for the next launch.
 
 ## Configuration and custom themes
 
@@ -156,3 +159,11 @@ This project incorporates code derived from [FFADO](https://ffado.org/), the Fre
 FFADO and its original contributors retain their respective copyrights. All FFADO-derived code remains subject to its original licensing terms.
 
 See [LICENSE](LICENSE) for the full license text.
+### QR code for the web interface
+
+Settings → About shows a QR-code button next to the server URL. It opens a QR-only
+view in the same application window; X or Escape returns to the About tab. The
+code contains the server's LAN URL, so the scanning phone/tablet must be able to
+reach the host on the network (including TCP port 5000). QR generation works
+without internet access or an additional Python dependency. The bundled
+JavaScript QR generator is MIT-licensed (see `ffado_webmixer/assets/static/QR-LICENSE.txt`).

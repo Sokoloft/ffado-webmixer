@@ -72,7 +72,7 @@ def walk(bus, path):
 
 def interrogate_device(bus, device_path):
     """Discover the mixer layout and capabilities for one FFADO device."""
-    matrices, controls = [], []
+    matrices, controls, routers = [], [], []
     for path, kinds in walk(bus, device_path):
         if "MatrixMixer" in kinds:
             matrices.append({
@@ -84,6 +84,8 @@ def interrogate_device(bus, device_path):
             m = matrices[-1]
             m["row_names"] = [str(try_call(bus, path, "MatrixMixer", "getRowName", dbus.Int32(i), default="")) for i in range(m["rows"])]
             m["col_names"] = [str(try_call(bus, path, "MatrixMixer", "getColName", dbus.Int32(i), default="")) for i in range(m["cols"])]
+        elif "CrossbarRouter" in kinds:
+            routers.append({"path": path})
         elif "Container" not in kinds:
             kind = next((k for k in VALUE_KINDS if k in kinds), None)
             if kind:
@@ -114,6 +116,7 @@ def interrogate_device(bus, device_path):
     # Runtime inventory only: no role classification or channel interpretation.
     # The profile layer decides how to turn this into a mixer.
     result["matrices"] = matrices
+    result["routers"] = routers
     return result
 
 

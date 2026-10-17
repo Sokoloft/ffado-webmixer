@@ -1,5 +1,6 @@
 <?xml version='1.0' encoding='utf-8'?>
 <profile family="motu" schema_version="1">
+  <mixer_matrix path="/Mixer/fader" row_role="outputs" col_role="inputs" coefficient="linear" />
   <match vendor_id="498" />
   <info name="model_element" path="Info/Model" />
   <info name="rate_element" path="Info/SampleRate" />

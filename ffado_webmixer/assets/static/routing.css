@@ -1,0 +1,57 @@
+/* FFADO hardware gain matrix and crossbar router; shared theme variables. */
+#routerbox { border: 1px solid var(--border-color); border-radius: 6px; background: var(--sidebar-box-background); padding: 4px; }
+#routingButton { width: 34px; height: 34px; padding: 0; border: 0; border-radius: 4px; background: transparent; color: var(--text-secondary); cursor: pointer; }
+#routingButton:hover { background: var(--button-hover-background); color: var(--text-primary); }
+#routingButton svg { display: block; margin: auto; }
+#routingOverlay { position: fixed; inset: 0; z-index: 110; display: flex; align-items: center; justify-content: center; padding: 12px; background: rgba(4, 5, 7, .8); }
+#routingDialog { display: flex; flex-direction: column; width: min(1280px, 100%); max-height: 95dvh; min-height: 270px; overflow: hidden; border: 1px solid var(--border-color); border-radius: 8px; background: var(--channel-background); color: var(--text-primary); box-shadow: 0 18px 60px rgba(0,0,0,.55); }
+.routing-head { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; padding: 12px; background: var(--dialog-header-background); border-bottom: 1px solid var(--border-color); }
+.routing-head strong { margin-right: auto; }
+.routing-tabs { display: flex; gap: 4px; }
+.routing-head button, #routingEditor button { background: var(--button-background); border: 1px solid var(--border-color); color: var(--text-primary); border-radius: 4px; padding: 8px 12px; cursor: pointer; }
+.routing-head button:hover, #routingEditor button:hover { background: var(--button-hover-background); }
+.routing-head button.routing-active { border-color: var(--accent-color); color: var(--accent-color); }
+#routingHint { padding: 8px 12px; color: var(--text-secondary); font-size: 12px; }
+.routing-pane { flex: 1; min-height: 0; overflow-y: auto; }
+.routing-scroll { width: 100%; max-height: min(65dvh, 680px); overflow: auto; }
+#routingGrid { border-spacing: 3px; border-collapse: separate; font-size: 12px; }
+#routingGrid th { position: sticky; top: 0; background: var(--sidebar-background); padding: 7px; max-width: 160px; min-width: 78px; white-space: normal; font-weight: 500; z-index: 1; }
+#routingGrid th:first-child { left: 0; z-index: 3; min-width: 115px; }
+#routingGrid tbody th { position: sticky; left: 0; z-index: 2; text-align: left; }
+#routingGrid td { padding: 0; text-align: center; }
+#routingGrid td button { width: 86px; min-height: 34px; background: var(--control-background); color: var(--text-primary); border: 1px solid var(--border-color); border-radius: 3px; cursor: pointer; white-space: nowrap; }
+#routingGrid td button.route-signal { background: var(--selected-output-background); border-color: var(--accent-color); }
+#routingGrid td button.route-selected { outline: 2px solid var(--accent-color); outline-offset: 1px; }
+#routingGrid td button:hover { border-color: var(--accent-color); }
+#routingEditor { display: flex; align-items: center; flex-wrap: wrap; gap: 10px; padding: 12px; border-top: 1px solid var(--border-color); }
+#routingEditor[hidden] { display: none; }
+#routingCellLabel { font-size: 12px; flex: 1 1 160px; }
+#routingLevel { flex: 2 1 210px; accent-color: var(--accent-color); }
+#routingLevelLabel { min-width: 66px; text-align: center; }
+#routingApply { border-color: var(--accent-color) !important; }
+.routing-groups { overflow: auto; max-height: 75dvh; padding: 12px; display: grid; grid-template-columns: repeat(auto-fit, minmax(215px, 1fr)); gap: 12px; }
+.route-group { border: 1px solid var(--group-border-color); border-radius: 5px; padding: 10px; min-width: 0; background: var(--sidebar-background); }
+.route-group h3 { color: var(--text-secondary); font-size: 12px; letter-spacing: .05em; margin: 0 0 8px; }
+.route-row { display: flex; flex-direction: column; margin: 8px 0; gap: 3px; font-size: 12px; }
+.route-row label { color: var(--text-secondary); }
+.route-row select { width: 100%; min-width: 0; padding: 7px; border: 1px solid var(--border-color); border-radius: 4px; color: var(--text-primary); background: var(--control-background); }
+.route-row select:focus { outline: 1px solid var(--accent-color); }
+@media(max-width:650px) { .routing-head { gap: 6px; } .routing-head strong { flex-basis: 100%; } #routingGrid td button { width: 72px; } }
+.read-only .track { pointer-events: none; opacity: .35; }
+
+/* MOTU mix destinations: selectors, not gain faders. A column has one active row. */
+#routingBusGrid { border-collapse: separate; border-spacing: 4px; margin: 10px; font-size: 13px; }
+#routingBusGrid th { position: sticky; top: 0; min-width: 105px; padding: 9px; background: var(--sidebar-background); font-weight: 500; z-index: 1; }
+#routingBusGrid th:first-child { left: 0; z-index: 3; text-align: left; min-width: 140px; }
+#routingBusGrid tbody th { position: sticky; left: 0; z-index: 2; text-align: left; }
+#routingBusGrid td { padding: 0; text-align: center; }
+#routingBusGrid .bus-route-cell { display: inline-flex; align-items: center; justify-content: center;
+  width: 76px; min-height: 38px; border-radius: 5px; border: 1px solid var(--border-color);
+  color: var(--text-secondary); background: var(--control-background); cursor: pointer; }
+#routingBusGrid .bus-route-cell:hover { border-color: var(--accent-color); }
+#routingBusGrid .bus-route-cell:focus-visible { outline: 2px solid var(--accent-color); outline-offset: 2px; }
+#routingBusGrid .bus-route-cell.route-assigned { color: var(--accent-color);
+  background: var(--selected-output-background); border-color: var(--accent-color); font-weight: 700; }
+#routingBusGrid .bus-route-cell:disabled { cursor: wait; opacity: .55; }
+#routingBusGrid .bus-route-cell.route-assigned:disabled { opacity: .8; }
+@media(max-width:650px) { #routingBusGrid th { min-width: 80px; padding: 6px; } #routingBusGrid .bus-route-cell { width: 57px; } }

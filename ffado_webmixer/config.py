@@ -1,10 +1,11 @@
-"""Persist webmixer preferences only; FFADO hardware is discovered live."""
+"""Persist ffado-webmixer preferences only; FFADO hardware is discovered live."""
 import json
 from pathlib import Path
 
 DEFAULT_SETTINGS = {
     "hide_minimized": False,
     "skip_loading_screen": False,
+    "enable_qjackctl": False,
     "mix": 0,
     "output": "",
     "side_width": 0,

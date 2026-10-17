@@ -1,5 +1,6 @@
 <?xml version='1.0' encoding='utf-8'?>
 <profile family="motu_mark3" schema_version="2">
+  <mixer_matrix path="/Mixer/fader" row_role="outputs" col_role="inputs" coefficient="linear" />
   <discovery source="motu_mark3.py" status="source-derived">
     <element path="/Mixer/Info/IsStreaming" kind="unknown" />
     <element path="/Mixer/Info/Model" kind="unknown" />

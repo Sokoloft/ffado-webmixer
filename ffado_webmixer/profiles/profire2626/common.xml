@@ -1,5 +1,6 @@
 <?xml version='1.0' encoding='utf-8'?>
 <profile family="profire2626" schema_version="2">
+  <mixer_matrix path="/EAP/MatrixMixer" row_role="inputs" col_role="outputs" coefficient="dice_db" unity="16384" />
   <discovery source="profire2626.py" status="source-derived">
     <element path="/EAP/Settings/VolumeKnob/Line1Line2" kind="unknown" />
     <element path="/EAP/Settings/VolumeKnob/Line3Line4" kind="unknown" />

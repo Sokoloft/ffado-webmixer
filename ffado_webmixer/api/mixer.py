@@ -181,3 +181,72 @@ def register(app, backend, description, config, broadcast):
         )
 
         return jsonify(ok=True)
+
+    # FFADO mixer coefficients and EAP crossbar routing are independent.
+    # Never treat router endpoints as gain controls.
+    @app.get("/api/matrix")
+    def matrix_snapshot():
+        try:
+            return jsonify(backend.matrix_snapshot())
+        except (AttributeError, ValueError) as exc:
+            return jsonify(error=str(exc)), 400
+        except Exception as exc:
+            return jsonify(error=str(exc)), 500
+
+    @app.post("/api/matrix")
+    def matrix_set():
+        try:
+            body = request.get_json(force=True)
+            row, col = int(body["input"]), int(body["output"])
+            backend.matrix_set(row, col, body["value"])
+        except (ValueError, KeyError, TypeError, AttributeError) as exc:
+            return jsonify(error=str(exc)), 400
+        except Exception as exc:
+            return jsonify(error=str(exc)), 500
+        broadcast({"type": "matrix", "input": row, "output": col, "value": body["value"]})
+        return jsonify(ok=True)
+
+    @app.get("/api/router")
+    def router_snapshot():
+        try:
+            return jsonify(backend.router_snapshot())
+        except (AttributeError, ValueError) as exc:
+            return jsonify(error=str(exc)), 400
+        except Exception as exc:
+            return jsonify(error=str(exc)), 500
+
+    @app.post("/api/router")
+    def router_set():
+        try:
+            body = request.get_json(force=True)
+            backend.router_set(str(body["destination"]), str(body["source"]))
+        except (ValueError, KeyError, TypeError, AttributeError) as exc:
+            return jsonify(error=str(exc)), 400
+        except Exception as exc:
+            return jsonify(error=str(exc)), 500
+        broadcast({"type": "routing", "destination": body["destination"], "source": body["source"]})
+        return jsonify(ok=True)
+
+    # Pre-mark3 MOTU: each Mix_dest control routes one entire mix bus.
+    # This endpoint does not touch mixer crosspoint gains.
+    @app.get("/api/bus-routing")
+    def bus_routing_snapshot():
+        try:
+            return jsonify(backend.bus_routing_snapshot())
+        except (AttributeError, ValueError) as exc:
+            return jsonify(error=str(exc)), 400
+        except Exception as exc:
+            return jsonify(error=str(exc)), 500
+
+    @app.post("/api/bus-routing")
+    def bus_routing_set():
+        try:
+            body = request.get_json(force=True)
+            bus_id, value = str(body["bus"]), int(body["value"])
+            backend.bus_routing_set(bus_id, value)
+        except (ValueError, KeyError, TypeError, AttributeError) as exc:
+            return jsonify(error=str(exc)), 400
+        except Exception as exc:
+            return jsonify(error=str(exc)), 500
+        broadcast({"type": "destination", "out": bus_id, "value": value})
+        return jsonify(ok=True)

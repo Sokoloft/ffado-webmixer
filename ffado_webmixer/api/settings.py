@@ -60,6 +60,11 @@ def register(app, config, broadcast):
                 msg["hide_minimized"]
             )
 
+        if "enable_qjackctl" in msg:
+            if not isinstance(msg["enable_qjackctl"], bool):
+                return jsonify(ok=False, error="enable_qjackctl must be a boolean"), 400
+            config.settings["enable_qjackctl"] = msg["enable_qjackctl"]
+
         if "skip_loading_screen" in msg:
             config.settings["skip_loading_screen"] = bool(msg["skip_loading_screen"])
 

@@ -1,5 +1,6 @@
 <?xml version='1.0' encoding='utf-8'?>
 <profile family="saffire_dice" schema_version="2">
+  <mixer_matrix path="/EAP/MatrixMixer" row_role="inputs" col_role="outputs" coefficient="dice_db" unity="16384" />
   <discovery source="saffire_dice.py" status="source-derived">
     <element path="/EAP/Monitoring/GlobalMute/State" kind="unknown" />
     <element path="/EAP/Monitoring/GlobalDim/State" kind="unknown" />

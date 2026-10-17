@@ -61,6 +61,11 @@ class FfadoHelper:
             self._proxies[key] = dbus.Interface(obj, NS + kind)
         return self._proxies[key]
 
+    # ---- FFADO EAP CrossbarRouter (exact methods from control-interface.xml) ----
+    def router_call(self, path, method, *args):
+        with self._lock:
+            return self._call(path, "CrossbarRouter", method, *args)
+
     # ---- matrix mixer cells (fader / mute / pan / solo ...) ----
     def get_cell(self, path, row, col):
         with self._lock:
@@ -86,4 +91,4 @@ class FfadoHelper:
 
     def select(self, path, index, kind="Enum"):
         with self._lock:
-            self._call(path, kind, "select", dbus.Int32(index))
+            self._call(path, kind, "select", dbus.Boolean(index) if kind == "Boolean" else dbus.Int32(index))

@@ -1,5 +1,7 @@
 var row = document.getElementById("row");
 var FEATURES = {};
+var FADER_ALLOWED = true;
+var MUTE_ALLOWED = true;
 var OUTPUTS = [];
 var MIXES = [];
 var currentMix = 0;       // which bus the channel strips show
@@ -14,7 +16,9 @@ function post(url, body) {
                       body: JSON.stringify(body) });
 }
 function send(strip, control, value) {
-  post("/api/set", { strip: strip, control: control, value: value, mix: currentMix });
+  return post("/api/set", { strip: strip, control: control, value: value, mix: currentMix })
+    .then(function (r) { return r.json().then(function (d) { if (!r.ok || d.error) throw Error(d.error || "FFADO rejected the change"); }); })
+    .catch(function (e) { toast("Mixer change failed: " + e.message); });
 }
 // Drags fire many events; send at most one request per 50 ms per key, always ending on the latest value.
 var pendingVals = {}, sendTimers = {};
@@ -264,6 +268,8 @@ function buildStrip(id, data, pinned, minimized, partner) {
   q(".stereorow").hidden = !stereo;
   if (stereo) invertEl.title = "Polarity of both channels";
   soloEl.hidden = !FEATURES.solo;
+  q(".mute").hidden = !MUTE_ALLOWED;
+  q(".faderwrap").classList.toggle("read-only", !FADER_ALLOWED);
   q(".gainrow").hidden = !FEATURES.gain;
   invertEl.hidden = !FEATURES.invert;
   q(".gaininv").hidden = !FEATURES.gain && !FEATURES.invert;
@@ -323,9 +329,9 @@ function buildStrip(id, data, pinned, minimized, partner) {
   }
 
   // fader, solo, mute. On a stereo strip these go to the left channel and the server moves the right one too.
-  var fader = makeFader(q(".track"), q(".handle"), q(".fval"), function (v) { sendThrottled(id, "fader", v); });
+  var fader = makeFader(q(".track"), q(".handle"), q(".fval"), function (v) { if (FADER_ALLOWED) sendThrottled(id, "fader", v); });
   soloEl.addEventListener("click", function () { send(id, "solo", el.classList.toggle("soloed")); });
-  q(".mute").addEventListener("click", function () { send(id, "mute", el.classList.toggle("muted")); });
+  q(".mute").addEventListener("click", function () { if (MUTE_ALLOWED) send(id, "mute", el.classList.toggle("muted")); });
   q(".unlink").addEventListener("click", function () { unlinkStrip(id); });
 
   // pin / minimize / drag
@@ -355,7 +361,7 @@ function buildStrip(id, data, pinned, minimized, partner) {
   setPinned(el, pinned);
   setMinimized(el, !!minimized);
   renderPan();
-  fader.set(data.fader);
+  fader.set(Number.isFinite(data.fader) ? data.fader : 0);
   return el;
 }
 
@@ -433,11 +439,27 @@ try { applyTheme(localStorage.getItem("ffado-theme") || "dark"); } catch (_) { a
 var gear = document.getElementById("gear"), overlay = document.getElementById("overlay");
 var dialog = document.getElementById("dialog");
 var hideBox = document.getElementById("hideMin");
-var destBus = document.getElementById("destBus"), destTo = document.getElementById("destTo");
-var destMsg = document.getElementById("destMsg"), lastDest = null, destToken = 0;
-
-var TABS = ["general", "inout", "theme", "about"], currentTab = "general";
+var qjackctlEnabled = false;
+var TABS = ["general", "theme", "about"], currentTab = "general";
+var jackEnableBox = document.getElementById("enableQjackctl");
+function setQjackctlEnabled(enabled) {
+  qjackctlEnabled = !!enabled;
+  jackEnableBox.checked = qjackctlEnabled;
+  var tab = document.getElementById("tab-qjackctl");
+  var pane = document.getElementById("pane-qjackctl");
+  tab.hidden = !qjackctlEnabled;
+  pane.hidden = !qjackctlEnabled;
+  if (!qjackctlEnabled) {
+    pane.classList.add("off");
+    tab.classList.remove("active");
+    tab.setAttribute("aria-selected", "false");
+    tab.tabIndex = -1;
+  }
+  TABS = qjackctlEnabled ? ["general", "qjackctl", "theme", "about"] : ["general", "theme", "about"];
+  if (!qjackctlEnabled && currentTab === "qjackctl") showTab("general");
+}
 function showTab(name) {
+  if (name === "qjackctl" && !qjackctlEnabled) name = "general";
   currentTab = name;
   TABS.forEach(function (t) {
     var on = t === name, tab = document.getElementById("tab-" + t);
@@ -446,8 +468,8 @@ function showTab(name) {
     tab.tabIndex = on ? 0 : -1;
     document.getElementById("pane-" + t).classList.toggle("off", !on);
   });
-  if (name === "inout") { fillDestBuses(); }   // read the current values each time the tab opens
   if (name === "about") loadAbout();
+  if (name === "qjackctl") checkJackStatus();
 }
 Array.prototype.forEach.call(document.querySelectorAll(".tab"), function (tab) {
   tab.addEventListener("click", function () { showTab(tab.dataset.tab); });
@@ -466,23 +488,36 @@ var jackMsg = document.getElementById("jackMsg");
 var jackButtons = document.getElementById("jackButtons");
 var jackRefresh = document.getElementById("jackRefresh");
 function checkJackStatus() {
+  if (!qjackctlEnabled) return;
   jackRefresh.hidden = true;
   showJackMessage("Checking QjackCtl...", false);
   fetch("/api/qjackctl/status", { cache: "no-store" }).then(function (r) {
     if (!r.ok) throw new Error("Status unavailable");
     return r.json();
   }).then(function (status) {
+    if (!qjackctlEnabled) return;
     jackButtons.hidden = !status.running;
     jackRefresh.hidden = !!status.running;
     showJackMessage(status.running ? JACK_HINT : "QjackCtl not running. Launch it and check again.", !status.running);
   }).catch(function () {
+    if (!qjackctlEnabled) return;
     jackButtons.hidden = true;
     jackRefresh.hidden = false;
     showJackMessage("Unable to check QjackCtl status. Try again.", true);
   });
 }
 jackRefresh.addEventListener("click", checkJackStatus);
-checkJackStatus();
+jackEnableBox.addEventListener("change", function () {
+  var oldValue = qjackctlEnabled;
+  var newValue = jackEnableBox.checked;
+  setQjackctlEnabled(newValue);
+  post("/api/settings", { enable_qjackctl: newValue }).then(function (response) {
+    if (!response.ok) throw Error("Could not save QjackCtl setting");
+  }).catch(function (error) {
+    setQjackctlEnabled(oldValue);
+    toast(error.message);
+  });
+});
 function showJackMessage(text, isError) {
   jackMsg.textContent = text;
   jackMsg.classList.toggle("err", !!isError);
@@ -502,6 +537,64 @@ Array.prototype.forEach.call(document.querySelectorAll(".dlgbtn[data-window]"), 
   });
 });
 
+// URL shown in About and encoded in the offline QR code must always match.
+var mixerPageUrl = "";
+var qrDialog = document.getElementById("qrDialog");
+var qrCodeEl = document.getElementById("qrCode");
+var qrErrorEl = document.getElementById("qrError");
+var aboutShowQR = document.getElementById("aboutShowQR");
+function renderMixerQR(url) {
+  qrCodeEl.replaceChildren();
+  qrErrorEl.hidden = true;
+  if (!url) throw Error("The mixer web page URL is unavailable.");
+  var qr = new FFADOQRCode.Code(0, FFADOQRCode.Ecc.M);
+  qr.addData(url);
+  qr.make();
+  var count = qr.getModuleCount();
+  var quiet = 4;
+  var size = count + quiet * 2;
+  // Build a single SVG path; fill the whole canvas white for reliable scanning
+  // against the dark and light application themes.
+  var path = [];
+  for (var y = 0; y < count; y++) {
+    for (var x = 0; x < count; x++) {
+      if (qr.isDark(y, x)) path.push("M" + (x + quiet) + " " + (y + quiet) + "h1v1h-1z");
+    }
+  }
+  var ns = "http://www.w3.org/2000/svg";
+  var svg = document.createElementNS(ns, "svg");
+  svg.setAttribute("viewBox", "0 0 " + size + " " + size);
+  svg.setAttribute("shape-rendering", "crispEdges");
+  var bg = document.createElementNS(ns, "rect");
+  bg.setAttribute("width", size);
+  bg.setAttribute("height", size);
+  bg.setAttribute("fill", "#fff");
+  svg.appendChild(bg);
+  var dots = document.createElementNS(ns, "path");
+  dots.setAttribute("d", path.join(""));
+  dots.setAttribute("fill", "#000");
+  svg.appendChild(dots);
+  qrCodeEl.appendChild(svg);
+}
+function openMixerQR() {
+  showTab("about");
+  dialog.hidden = true;
+  qrDialog.hidden = false;
+  qrCodeEl.replaceChildren();
+  try { renderMixerQR(mixerPageUrl); }
+  catch (error) { qrErrorEl.textContent = "Could not create QR code: " + error.message; qrErrorEl.hidden = false; }
+  document.getElementById("qrClose").focus();
+}
+function closeMixerQR() {
+  if (qrDialog.hidden) return;
+  qrDialog.hidden = true;
+  dialog.hidden = false;
+  // The settings dialog was not closed; return to its previous About tab.
+  aboutShowQR.focus();
+}
+aboutShowQR.addEventListener("click", openMixerQR);
+document.getElementById("qrClose").addEventListener("click", closeMixerQR);
+
 function loadAbout() {
   fetch("/api/about").then(function (r) { return r.json(); }).then(function (a) {
     document.getElementById("aboutName").textContent = a.name;
@@ -509,6 +602,13 @@ function loadAbout() {
     document.getElementById("aboutMode").textContent = a.mode || "-";
     document.getElementById("aboutDevice").textContent = a.device || "-";
     document.getElementById("aboutAddress").textContent = a.address || "-";
+    var openMixer = document.getElementById("aboutOpenMixer");
+    // Use the exact same server URL for the browser button and QR code.
+    mixerPageUrl = /^https?:\/\/[^/]+/i.test(a.address || "")
+      ? (a.address.endsWith("/") ? a.address : a.address + "/") : "";
+    openMixer.hidden = !mixerPageUrl;
+    aboutShowQR.hidden = !mixerPageUrl;
+    if (mixerPageUrl) openMixer.href = mixerPageUrl;
   });
 }
 
@@ -519,6 +619,7 @@ function openSettings() {
   dialog.focus();
 }
 function closeSettings() {
+  if (!qrDialog.hidden) { closeMixerQR(); return; }
   overlay.hidden = true;
   gear.classList.remove("open");
   gear.focus();
@@ -528,52 +629,6 @@ document.getElementById("dlgClose").addEventListener("click", closeSettings);
 overlay.addEventListener("mousedown", function (e) { if (e.target === overlay) closeSettings(); });   // click outside the box
 document.addEventListener("keydown", function (e) { if (e.key === "Escape" && !overlay.hidden) closeSettings(); });
 
-// where a bus is sent: pick a bus, pick its destination
-function fillDestBuses() {
-  var buses = OUTPUTS.filter(function (o) { return o.mix !== null && o.destination; });
-  document.getElementById("destFields").hidden = !buses.length;
-  document.getElementById("destNone").hidden = !!buses.length;
-  if (!buses.length) return;
-  // open on the bus you're working with: the active output if it's a bus, otherwise the bus the strips show
-  var keep = (buses.filter(function (o) { return o.id === currentOut; })[0] ||
-              buses.filter(function (o) { return o.mix === currentMix; })[0] || buses[0]).id;
-  destBus.innerHTML = "";
-  buses.forEach(function (o) {
-    var opt = document.createElement("option");
-    opt.value = o.id; opt.textContent = o.name;
-    destBus.appendChild(opt);
-  });
-  destBus.value = keep;
-  loadDestination();
-}
-function loadDestination() {
-  var id = destBus.value, token = ++destToken;
-  destMsg.textContent = ""; destMsg.classList.remove("err");
-  if (!id) return;
-  fetch("/api/destination?out=" + encodeURIComponent(id)).then(function (r) { return r.json(); }).then(function (d) {
-    if (token !== destToken) return;
-    destTo.innerHTML = "";
-    if (d.error) { destMsg.textContent = d.error; destMsg.classList.add("err"); return; }
-    d.options.forEach(function (o) {
-      var opt = document.createElement("option"), out = o.output && OUTPUTS.filter(function (x) { return x.id === o.output; })[0];
-      opt.value = o.value;
-      if (out) opt.dataset.output = out.id;                   // a destination that is really an output shows that output's name
-      opt.textContent = out ? out.name : o.name;
-      destTo.appendChild(opt);
-    });
-    destTo.value = d.value;
-    lastDest = d.value;
-  });
-}
-destBus.addEventListener("change", loadDestination);
-destTo.addEventListener("change", function () {
-  var id = destBus.value, value = parseInt(destTo.value, 10);
-  destMsg.textContent = ""; destMsg.classList.remove("err");
-  post("/api/destination", { out: id, value: value }).then(function (r) { return r.json(); }).then(function (d) {
-    if (d.error) { destTo.value = lastDest; destMsg.textContent = d.error; destMsg.classList.add("err"); }
-    else lastDest = value;
-  });
-});
 var skipLoadingScreenBox = document.getElementById("skipLoadingScreen");
 skipLoadingScreenBox.addEventListener("change", function () {
   post("/api/settings", { skip_loading_screen: skipLoadingScreenBox.checked });
@@ -589,7 +644,11 @@ var masterToken = 0;
 var masterFader = makeFader(document.getElementById("masterTrack"), document.getElementById("masterHandle"),
   document.getElementById("masterVal"), function (v) {
     var out = currentOut;
-    throttled("out|" + out, v, function (x) { post("/api/output", { out: out, control: "fader", value: x }); });
+    throttled("out|" + out, v, function (x) {
+      post("/api/output", { out: out, control: "fader", value: x })
+        .then(function (r) { return r.json().then(function (d) { if (!r.ok || d.error) throw Error(d.error || "Unable to set output"); }); })
+        .catch(function (e) { toast("Output change failed: " + e.message); });
+    });
   });
 document.getElementById("masterMute").addEventListener("click", function () {
   var want = !masterEl.classList.contains("muted");
@@ -608,8 +667,6 @@ function applyOutputName(id, name) {             // update the button, the label
   Array.prototype.forEach.call(document.querySelectorAll(".outbtn"), function (b) {
     if (b.dataset.id === id) { b.firstChild.textContent = name; b.title = name; }
   });
-  Array.prototype.forEach.call(destBus.options, function (opt) { if (opt.value === id) opt.textContent = name; });
-  Array.prototype.forEach.call(destTo.options, function (opt) { if (opt.dataset.output === id) opt.textContent = name; });
   if (id === currentOut) showMasterName(name);
 }
 masterName.addEventListener("change", function () {
@@ -652,6 +709,17 @@ function markOutputs() {
   });
 }
 function selectOutput(o) {
+  // DICE devices have monitor line outputs but no separate bus-master faders.
+  // Clicking a non-controllable bus selects its matrix without hiding the
+  // physical monitor's master fader.
+  if (!o.controllable && o.mix !== null && OUTPUTS.some(function (x) { return x.mix === null && x.controllable; })) {
+    var changed = currentMix !== o.mix;
+    currentMix = o.mix;
+    markOutputs();
+    post("/api/settings", { output: currentOut, mix: currentMix });
+    if (changed) loadMix();
+    return;
+  }
   currentOut = o.id;
   var busChanged = o.mix !== null && o.mix !== currentMix;     // Main/Phones leave the channel strips alone
   if (o.mix !== null) currentMix = o.mix;
@@ -801,6 +869,7 @@ function applyLayout() {                         // order / pinned / minimized c
 }
 
 function onSyncEvent(ev) {
+  if (window.routingSyncEvent) window.routingSyncEvent(ev);
   if (ev.origin === CLIENT_ID) return;           // our own change coming back
   var el;
   if (ev.type === "strip") {
@@ -815,10 +884,10 @@ function onSyncEvent(ev) {
   } else if (ev.type === "output") {
     if (ev.out !== currentOut) return;
     if (ev.control === "fader") masterFader.set(ev.value); else loadMaster();   // Main/Phones mute can move the level
-  } else if (ev.type === "destination") {
-    if (!overlay.hidden && currentTab === "inout" && destBus.value === ev.out) loadDestination();
   } else if (ev.type === "layout") {
     if (ev.mix === currentMix) applyLayout();     // another bus's arrangement doesn't concern this page
+  } else if (ev.type === "matrix") {
+    if (ev.output === currentMix) loadMix();
   } else if (ev.type === "stereo") {
     if (!row.querySelector(".dragging")) loadMix();   // pairs changed: redraw the strips
   }
@@ -840,7 +909,10 @@ Promise.all([
 ]).then(function (res) {
   var info = res[0], settings = res[1];
   FEATURES = info.features || {};
+  FADER_ALLOWED = !info.fader || !!info.fader.writable;
+  MUTE_ALLOWED = !info.mute || !!info.mute.writable;
   MIXES = info.mixes || [];
+  if (window.configureRouting) window.configureRouting(info);
   OUTPUTS = (info.outputs || []).map(function (o) {
     return { id: o.id, name: o.name, baseName: o.base_name || o.name, mix: (o.mix === null || o.mix === undefined) ? null : o.mix, controllable: o.controllable,
              destination: !!o.destination };
@@ -850,9 +922,12 @@ Promise.all([
   applyTheme(settings.theme || "dark");
   hideBox.checked = !!settings.hide_minimized;
   skipLoadingScreenBox.checked = !!settings.skip_loading_screen;
+  setQjackctlEnabled(!!settings.enable_qjackctl);
   row.classList.toggle("hide-min", hideBox.checked);
 
-  var sel = OUTPUTS.filter(function (o) { return o.id === settings.output; })[0] || OUTPUTS[0];
+  var sel = OUTPUTS.filter(function (o) { return o.id === settings.output && o.controllable; })[0] ||
+            OUTPUTS.filter(function (o) { return o.mix === null && o.controllable; })[0] ||
+            OUTPUTS.filter(function (o) { return o.id === settings.output; })[0] || OUTPUTS[0];
   currentOut = sel ? sel.id : "";
   if (sel && sel.mix !== null) currentMix = sel.mix;
   else if (settings.mix && settings.mix < MIXES.length) currentMix = settings.mix;
@@ -872,6 +947,15 @@ document.getElementById("aboutGithub").addEventListener("click", function (event
   fetch("/api/open-github", { method: "POST" }).catch(function (error) {
     console.error("Could not open GitHub:", error);
   });
+});
+
+// In the desktop client, request the host's default browser instead of navigating inside pywebview.
+document.getElementById("aboutOpenMixer").addEventListener("click", function (event) {
+  if (!window.pywebview) return;
+  event.preventDefault();
+  fetch("/api/open-mixer", { method: "POST" }).then(function (response) {
+    if (!response.ok) throw Error("Could not open the mixer in the system browser");
+  }).catch(function (error) { toast(error.message); });
 });
 
 // Hide the fullscreen control in pywebview, regardless of screen size.

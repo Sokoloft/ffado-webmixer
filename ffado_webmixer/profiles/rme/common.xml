@@ -1,5 +1,6 @@
 <?xml version='1.0' encoding='utf-8'?>
 <profile family="rme" schema_version="2">
+  <mixer_matrix path="/Mixer/InputFaders" row_role="outputs" col_role="inputs" coefficient="rme_db" unity="16384" />
   <discovery source="rme.py" status="source-derived">
     <element path="/Control/Phantom" kind="unknown" />
     <element path="/Control/Chan3_opt_instr" kind="unknown" />

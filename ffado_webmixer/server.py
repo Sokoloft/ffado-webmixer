@@ -64,7 +64,7 @@ def create_app(backend, description, config, about=None):
     mixer_routes.register(app, backend, description, config, broadcast)
     settings_routes.register(app, config, broadcast)
     event_routes.register(app, hub)
-    integration_routes.register(app)
+    integration_routes.register(app, config, lambda: f"http://{lan_ip()}:{PORT}/")
     stereo_routes.register(app, backend, description, config, broadcast)
     return app
 

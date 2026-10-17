@@ -23,6 +23,8 @@ def _common(path):
               'controls': {}, 'models': {}, 'rate_rules': [], 'destinations': [],
               'discovery_paths': [], 'model_constants': {}, 'source_bindings': []}
     result['family'] = root.get('family')
+    matrix_hint = root.find('mixer_matrix')
+    result['mixer_matrix'] = dict(matrix_hint.attrib) if matrix_hint is not None else {}
     result['discovery_paths'] = [x.get('path') for x in root.findall('./discovery/element')]
     for constant in root.findall('./model_constants/constant'):
         name, value = constant.get('name'), constant.get('value')
