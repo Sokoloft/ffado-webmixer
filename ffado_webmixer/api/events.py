@@ -2,11 +2,15 @@ import json
 import queue
 from flask import Response
 
-def register(app, hub):
+def register(app, hub, device_manager=None):
     @app.get("/api/events")
     def events():
         """Server-sent events: one long-lived response per open page."""
-        client = hub.subscribe()
+        # Resolve the selected GUID before streaming; the session proxy must
+        # never be accessed from the SSE generator after its request context
+        # has finished. Only forward events for this device.
+        selected = device_manager.current_guid if device_manager else None
+        client = hub.subscribe(selected)
 
         def stream():
             try:

@@ -2,8 +2,8 @@
 <profile family="motu" schema_version="1">
   <mixer_matrix path="/Mixer/fader" row_role="outputs" col_role="inputs" coefficient="linear" />
   <match vendor_id="498" />
-  <info name="model_element" path="Info/Model" />
-  <info name="rate_element" path="Info/SampleRate" />
+  <info name="model_element" path="Mixer/Info/Model" />
+  <info name="rate_element" path="Mixer/Info/SampleRate" />
   <controls>
     <control name="fader" type="fader" min="0" max="128" />
     <control name="pan" type="knob" min="-64" max="64" />

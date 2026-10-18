@@ -40,7 +40,13 @@ def change_stereo(msg, mix, backend, description, config, broadcast):
         if dragged not in visible or target not in visible:
             return jsonify(error="unknown channel"), 400
 
-        left, right = sorted((dragged, target))      # lower channel number is the left side
+        left, right = sorted((dragged, target))      # zero-based even = channel 1/3/5 (left)
+        try:
+            left_index=int(left.split('/')[1]); right_index=int(right.split('/')[1])
+        except (ValueError, IndexError):
+            return jsonify(error='Invalid input pair'), 400
+        if left_index % 2 != 0 or right_index != left_index+1:
+            return jsonify(error='Only adjacent odd(L)/even(R) hardware inputs can be linked'), 400
 
         # The right channel takes the left one's settings, on every bus, and the pair is panned hard left / right.
         for bus in mixes:

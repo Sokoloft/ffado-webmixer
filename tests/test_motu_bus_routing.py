@@ -23,6 +23,7 @@ from ffado_webmixer.mixer import Mixer
 from ffado_webmixer.profiles.resolver import (resolve_mixer, resolve_controls, visible_columns,
                                               destination_options)
 from ffado_webmixer.profiles.loader import _common
+from ffado_webmixer.profiles.capabilities import activate_internal_model
 from pathlib import Path
 
 GUID = '/org/ffado/Control/DeviceManager/0001f2000007b2ca'
@@ -71,7 +72,7 @@ class FakeHardware:
 
 def make_motu():
     device = setup_device()
-    profile = _common(PROFILE)
+    profile = activate_internal_model({**_common(PROFILE), "capabilities":{"status":"requires_internal_model"}}, 3)
     model = resolve_mixer(device, profile)
     controls = resolve_controls(device, profile, model['matrices'], model['columns'], model['rows'])
     mixer = Mixer.__new__(Mixer)

@@ -5,6 +5,7 @@ libffado/src/dice/dice_eap.cpp, EAP::Mixer). Other families normally use
 rows=output buses, columns=inputs. A CrossbarRouter is not a gain matrix.
 """
 import re
+from .capabilities import enabled, declared_path, declared_mixer_hint
 
 ROLE_WORDS = (("fader", ("fader", "gain", "volume", "level")),
               ("pan", ("pan",)), ("mute", ("mute",)), ("solo", ("solo",)))
@@ -43,36 +44,37 @@ def resolve_mixer(device, profile):
     primary = None
     transpose = False
     mode = "linear"
-    hint = profile.get("mixer_matrix", {})
+    hint = declared_mixer_hint(profile)
     if hint:
         primary = at(hint.get("path", "__unused__"))
         if primary:
             transpose = hint.get("row_role") == "inputs"
             mode = hint.get("coefficient", "linear")
-    if primary is None and (family in ("saffire_dice", "generic_dice_eap", "profire2626") or any(
-            m["path"].endswith("/EAP/MatrixMixer") for m in matrices)):
-        primary = at("/EAP/MatrixMixer")
-        if primary:
-            transpose = True
-            mode = "dice_db"
+    # No family-name fallback: a model must declare its precise matrix path,
+    # orientation, and coefficient convention in its source-derived XML.
+    # Having the same-looking D-Bus node is not enough to enable writes.
     if primary is None:
-        primary = at("/Mixer/fader") or at("/Mixer/InputFaders") or at("/Mixer/PlaybackFaders")
-    if primary is None:
-        primary = next((m for m in matrices if re.search(r"(?:faders?|levels?|gains?)$", m["name"], re.I)), None)
-    if primary is None:
-        # Fallback to a display-only matrix; never pretend it is a fader.
-        primary = max(matrices, key=lambda m: m["rows"] * m["cols"])
-        mode = "unmapped"
+        # Don't invent topology from a similarly sized/named D-Bus matrix.
+        # Hardware endpoints remain inspectable with FFADO diagnostics.
+        return None
     chosen = [m for m in matrices if m["rows"] == primary["rows"] and m["cols"] == primary["cols"]]
-    roles = {}
-    if mode != "unmapped":
-        roles["fader"] = primary["path"]
-        for m in chosen:
-            if m is primary:
+    roles = {'fader':primary['path']} if mode != 'unmapped' else {}
+    # MOTU's independent named fader/pan/mute/solo matrices are explicitly
+    # documented in motu.py and src/motu/motu_mixer.cpp.
+    if family == 'motu':
+        for role in ('pan', 'mute', 'solo'):
+            if not enabled(profile, 'matrix_'+role):
                 continue
-            role = _role(m["name"])
-            if role in ("mute", "solo", "pan") and role not in roles:
-                roles[role] = m["path"]
+            candidate = at(declared_path(profile, 'matrix_'+role))
+            if candidate and candidate in chosen:
+                roles[role] = candidate['path']
+    if family == 'rme' and mode != 'unmapped':
+        for role in ('mute', 'invert'):
+            if not enabled(profile, 'matrix_'+role):
+                continue
+            candidate=at(declared_path(profile, 'matrix_'+role))
+            if candidate and candidate in chosen:
+                roles[role]=candidate['path']
     row_names = primary.get("row_names", [])
     col_names = primary.get("col_names", [])
     if transpose:
@@ -98,62 +100,68 @@ def bus_name(row_name):
 
 
 def match_outputs(device, mixes, profile=None):
-    """Resolve live output endpoints using discovered labels."""
-    controls = [c for c in device["controls"] if c["kind"] in VALUE_KINDS]
-    def find(pred):
-        return next((c for c in controls if pred(c["label"].lower())), None)
+    """Map only source-declared scalar controls; never infer roles from labels."""
+    family = (profile or {}).get('family', '')
+    controls = {c['path'].rsplit('/DeviceManager/', 1)[-1].split('/', 1)[-1]: c
+                for c in device.get('controls', [])}
+    def get(suffix, kind=None):
+        c = controls.get(suffix.lstrip('/'))
+        return c if c and (kind is None or c['kind'] == kind) else None
     outputs = {}
-    family = (profile or {}).get("family", "")
-    # Focusrite's monitoring level controls are scalar Discrete elements.
-    # Use only endpoints discovered on the connected device, never invented paths.
-    if family == "saffire_dice":
-        by_suffix = {c["path"].split("/EAP/Monitoring/")[-1]: c for c in controls
-                     if "/EAP/Monitoring/" in c["path"]}
-        for i in range(1, 11):
-            fader = by_suffix.get(f"LineOut/Volume{i}")
-            if fader and fader["kind"] == "Discrete":
-                outputs[f"line/{i}"] = {
-                    "id": f"line/{i}", "name": f"Line Out {i}", "mix": None,
-                    "fader": fader, "mute": by_suffix.get(f"LineOut/Mute{i}"),
-                    "dest": None, "spec": {"min": -40, "max": 0, "writable": True},
-                }
-    for out_id, name, word in (("main", "Main", "main"), ("phones", "Phones", "phones")):
-        fader = find(lambda label, w=word: w in label and "fader" in label)
-        if fader:
-            outputs[out_id] = {"id": out_id, "name": name, "mix": None, "fader": fader, "mute": None, "dest": None}
-    for i, row in enumerate(mixes):
-        prefix = row.lower() + " "
-        fader = find(lambda label, p=prefix: label.startswith(p) and "fader" in label[len(p):])
-        mute = find(lambda label, p=prefix: label.startswith(p) and "mute" in label[len(p):])
-        dest = find(lambda label, p=prefix: label.startswith(p) and "dest" in label[len(p):])
-        if family == "motu":
-            # libffado/src/motu/motu_mixer.cpp publishes these named Discrete
-            # elements. Their getValue/setValue select the *destination* of a
-            # whole mix bus; they are not matrix gain coefficients. Labels vary
-            # between FFADO versions, but the source-defined paths do not.
-            suffix = f"/Mixer/Mix{i + 1}/Mix_dest"
-            dest = next((c for c in controls
-                         if c["path"].endswith(suffix) and c["kind"] == "Discrete"), None)
-        outputs[f"bus/{i}"] = {"id": f"bus/{i}", "name": bus_name(row), "mix": i, "fader": fader, "mute": mute, "dest": dest}
+    if family == 'saffire_dice' and enabled(profile, 'monitor_line_volume'):
+        count = int(profile['capabilities']['features']['monitor_line_volume'].get('count', '0'))
+        for i in range(1, count+1):
+            fader = get(declared_path(profile, 'monitor_line_volume').replace('{n}',str(i)), 'Discrete')
+            if fader:
+                outputs[f'line/{i}'] = {
+                    'id':f'line/{i}', 'name':f'Line Out {i}', 'mix':None,
+                    'fader':fader, 'mute':get(declared_path(profile, 'monitor_line_mute').replace('{n}',str(i)), 'Boolean') if enabled(profile, 'monitor_line_mute') else None,
+                    'dest':None, 'spec':{'min':-40,'max':0,'writable':True}}
+    if family == 'motu' and enabled(profile, 'output_level'):
+        extra = profile['capabilities']['features']['output_level'].get('extra_paths', '').split(',')
+        for out_id,name,path in (('main','Main','Mainout_fader'),('phones','Phones','Phones_fader')):
+            if '/Mixer/'+path not in extra:
+                continue
+            fader=get(f'Mixer/{path}','Discrete')
+            if fader:
+                outputs[out_id]={'id':out_id,'name':name,'mix':None,'fader':fader,
+                                 'mute':None,'dest':None}
+    for i,row in enumerate(mixes):
+        if family == 'motu' and enabled(profile, 'output_level'):
+            base=f'Mixer/Mix{i+1}/Mix_'
+            fader=get(declared_path(profile, 'output_level').replace('{n}',str(i+1)), 'Discrete')
+            mute=get(declared_path(profile, 'bus_output_mute').replace('{n}',str(i+1))) if enabled(profile, 'bus_output_mute') else None
+            dest=get(declared_path(profile, 'bus_destination').replace('{n}',str(i+1)), 'Discrete') if enabled(profile, 'bus_destination') else None
+        else:
+            fader=mute=dest=None
+        outputs[f'bus/{i}']={'id':f'bus/{i}', 'name':bus_name(row), 'mix':i,
+                             'fader':fader,'mute':mute,'dest':dest}
     return outputs
 
 
-def match_channel_controls(device, columns):
-    """Associate independent scalar endpoints with their physical input."""
-    found = {}
-    for control in device["controls"]:
-        if control["kind"] not in VALUE_KINDS:
-            continue
-        label = control["label"].lower()
-        for col, name in enumerate(columns):
-            prefix = name.lower() + " "
-            if not label.startswith(prefix):
+def match_channel_controls(device, columns, profile=None):
+    """Only known MOTU per-channel Discrete controls from motu.py."""
+    if (profile or {}).get('family') != 'motu' or not (enabled(profile, 'channel_trim') or enabled(profile, 'channel_invert')):
+        return {}
+    controls={c['path'].split('/Mixer/Control/')[-1]:c for c in device.get('controls', [])
+              if '/Mixer/Control/' in c['path']}
+    import re
+    result={}
+    for i,name in enumerate(columns):
+        match=re.fullmatch(r'(?:Analog|SPDIF)\s*(\d+)',name,re.I)
+        if not match: continue
+        prefix=('Ana' if name.lower().startswith('analog') else 'Spdif')+match.group(1)
+        for role,suffix in (('gain','_trimgain'),('invert','_invert')):
+            if not enabled(profile, 'channel_trim' if role=='gain' else 'channel_invert'):
                 continue
-            rest = label[len(prefix):]
-            for role, words in CHANNEL_WORDS.items():
-                if any(word in rest for word in words):
-                    found.setdefault(col, {}).setdefault(role, control)
-    return found
+            feature_name = 'channel_trim' if role == 'gain' else 'channel_invert'
+            feature = profile['capabilities']['features'][feature_name]
+            templates = [feature.get('path','')] + [v for v in feature.get('extra_paths','').split(',') if v]
+            allowed = {template.replace('{n}', match.group(1)) for template in templates}
+            c=controls.get(prefix+suffix)
+            if c and any(c['path'].endswith(path) for path in allowed):
+                result.setdefault(i,{})[role]=c
+    return result
 
 
 def visible_columns(profile, model, columns, sample_rate=None):
@@ -200,7 +208,7 @@ def resolve_controls(device, profile, matrices, columns, mixes):
             spec = {"type": "rme_db", "min": 0, "max": 32768}
         binary = role in ("mute", "solo", "invert")
         roles[role] = (path, dict(spec or {"type": "toggle" if binary else "unknown"}, writable=bool(spec) or binary))
-    channels = match_channel_controls(device, columns)
+    channels = match_channel_controls(device, columns, profile)
     channel_specs = {}
     for role in CHANNEL_WORDS:
         spec = specs.get(role) or DEFAULT_CONTROLS.get(role)

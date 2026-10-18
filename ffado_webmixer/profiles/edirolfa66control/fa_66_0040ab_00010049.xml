@@ -2,5 +2,30 @@
 <device family="edirolfa66control" name="FA-66" extends="common.xml" identity_source="ffado_configuration">
   <match vendor_id="0x40ab" configuration_model_id="0x10049" />
   <identity vendor="EDIROL" driver="BEBOB" ffado_mixer="EdirolFa66Control" />
-  <capabilities mode="discovered-controls-only" />
+  <capabilities schema="2" status="identity_only" source="configuration" note="FFADO identifies this model, but no verified webmixer control mapping exists.">
+    <feature name="matrix_gain" state="unmapped" />
+    <feature name="matrix_pan" state="unmapped" />
+    <feature name="matrix_mute" state="unmapped" />
+    <feature name="matrix_solo" state="unmapped" />
+    <feature name="matrix_invert" state="unmapped" />
+    <feature name="matrix_playback" state="unmapped" />
+    <feature name="matrix_output" state="unmapped" />
+    <feature name="crossbar_routing" state="unmapped" />
+    <feature name="peak_metering" state="unmapped" />
+    <feature name="software_mute_solo" state="unmapped" />
+    <feature name="stereo_bus_link" state="unmapped" />
+    <feature name="bus_destination" state="unmapped" />
+    <feature name="monitor_line_volume" state="unmapped" />
+    <feature name="monitor_line_mute" state="unmapped" />
+    <feature name="monitor_global_mute" state="unmapped" />
+    <feature name="monitor_global_dim" state="unmapped" />
+    <feature name="output_level" state="unmapped" />
+    <feature name="channel_trim" state="unmapped" />
+    <feature name="channel_invert" state="unmapped" />
+    <feature name="device_settings" state="unmapped" />
+    <feature name="hardware_nickname" state="unmapped" />
+    <feature name="scalar_volume" state="source_only" source="support/mixer-qt4/ffado/mixer/edirolfa66control.py" path="/Mixer/Feature_Volume_{n}" />
+    <feature name="scalar_selector" state="unmapped" />
+    <feature name="bus_output_mute" state="unmapped" />
+  </capabilities>
 </device>

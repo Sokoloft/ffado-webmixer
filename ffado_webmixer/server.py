@@ -1,6 +1,6 @@
 """Flask application assembly; route handlers live in api/."""
 import socket
-from flask import Flask, jsonify, request, send_from_directory, send_file
+from flask import Flask, jsonify, request, send_from_directory, send_file, session
 from .themes import theme_path
 from .services.events import Hub
 from .api import mixer as mixer_routes, settings as settings_routes, events as event_routes, integrations as integration_routes, stereo as stereo_routes
@@ -20,13 +20,56 @@ def lan_ip():
     finally:
         sock.close()
 
-def create_app(backend, description, config, about=None):
+def create_app(backend, description, config, about=None, device_manager=None):
     about = about or {}
     app = Flask(__name__, static_folder="assets/static", static_url_path="/static")
     hub = Hub()
+    if device_manager:
+        import secrets
+        app.secret_key = secrets.token_hex(32)
 
     def broadcast(event):
+        event['device'] = device_manager.current_guid if device_manager else None
         hub.publish(event, request.headers.get("X-Client-Id", ""))
+
+    @app.get('/api/devices')
+    def devices():
+        return jsonify({'selected': device_manager.current_guid,
+                        'devices': device_manager.list_devices()}) if device_manager else jsonify({'devices': []})
+
+    @app.post('/api/device')
+    def select_device():
+        if not device_manager:
+            return jsonify(error='Device switching unavailable'), 400
+        guid = str((request.get_json(silent=True) or {}).get('guid', ''))
+        if guid not in device_manager.devices:
+            return jsonify(error='Unknown FFADO device'), 400
+        session['ffado_device'] = guid
+        return jsonify(ok=True, selected=guid)
+
+    @app.post('/api/device-alias')
+    def device_alias():
+        if not device_manager:
+            return jsonify(error='No device manager'), 400
+        name=str((request.get_json(silent=True) or {}).get('name','')).strip()[:48]
+        config.settings['device_alias'] = name
+        config.save()
+        return jsonify(ok=True)
+
+
+    @app.before_request
+    def reject_stale_device_write():
+        # An old browser tab or an in-flight fader throttle must not suddenly
+        # write to a *different* FireWire unit after device switching.
+        if not device_manager or not request.path.startswith('/api/'):
+            return None
+        # The initial discovery endpoints are intentionally device-independent.
+        if request.path in ('/api/devices', '/api/device'):
+            return None
+        expected = request.headers.get('X-FFADO-Device')
+        if expected and expected != device_manager.current_guid:
+            return jsonify(error='Selected mixer changed in another tab; reload this page'), 409
+        return None
 
     @app.after_request
     def no_cache(response):
@@ -56,15 +99,16 @@ def create_app(backend, description, config, about=None):
                 "name": about.get("name", "Mixer"),
                 "version": str(about.get("version", "")),
                 "mode": about.get("mode", ""),
-                "device": description.get("device", ""),
+                "device": backend.describe().get("device", ""),
                 "address": f"http://{lan_ip()}:{PORT}",
             }
         )
 
     mixer_routes.register(app, backend, description, config, broadcast)
     settings_routes.register(app, config, broadcast)
-    event_routes.register(app, hub)
-    integration_routes.register(app, config, lambda: f"http://{lan_ip()}:{PORT}/")
+    event_routes.register(app, hub, device_manager)
+    integration_routes.register(app, config, lambda: f"http://{lan_ip()}:{PORT}/",
+                                debug=bool(device_manager and device_manager.debug))
     stereo_routes.register(app, backend, description, config, broadcast)
     return app
 

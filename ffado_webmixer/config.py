@@ -1,5 +1,7 @@
 """Persist ffado-webmixer preferences only; FFADO hardware is discovered live."""
 import json
+from copy import deepcopy
+import threading
 from pathlib import Path
 
 DEFAULT_SETTINGS = {
@@ -20,7 +22,8 @@ class Config:
         # With no path (demo mode) nothing is read or written.
         self.path = Path(path) if path else None
 
-        self.settings = dict(DEFAULT_SETTINGS)
+        self.settings = deepcopy(DEFAULT_SETTINGS)
+        self._save_lock = threading.RLock()
 
         # Names given to channels and outputs in the web UI (channel id, or "out:<id>" -> name).
         self.names = {}
@@ -79,24 +82,22 @@ class Config:
     def save(self):
         if self.path is None:
             return
-
-        data = {
-            "settings": self.settings,
-            "names": self.names,
-            "stereo": self.stereo,
-            "layouts": self.layouts,
-            "mute_memory": self.mute_memory,
-        }
-
-        if self.legacy_layout:
-            data["layout"] = self.legacy_layout
-
-
-        # Write to a temporary file first so an interrupted save can't leave a half-written config.
-        self.path.parent.mkdir(parents=True, exist_ok=True)
-        temporary = self.path.with_name(self.path.name + ".tmp")
-        temporary.write_text(json.dumps(data, indent=2), encoding="utf-8")
-        temporary.replace(self.path)
+        # Flask handles browser requests concurrently. A single stable temp
+        # name is safe only when writes for this config are serialized.
+        with self._save_lock:
+            data = {
+                "settings": self.settings,
+                "names": self.names,
+                "stereo": self.stereo,
+                "layouts": self.layouts,
+                "mute_memory": self.mute_memory,
+            }
+            if self.legacy_layout:
+                data["layout"] = self.legacy_layout
+            self.path.parent.mkdir(parents=True, exist_ok=True)
+            temporary = self.path.with_name(self.path.name + ".tmp")
+            temporary.write_text(json.dumps(data, indent=2), encoding="utf-8")
+            temporary.replace(self.path)
 
     # ---------- layouts (per bus) ----------
     def layout_for(self, mix):

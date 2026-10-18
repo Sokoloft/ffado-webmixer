@@ -5,10 +5,13 @@ source-derived device-specific metadata; missing controls stay unavailable.
 """
 from .profile_loader import (load_profile, resolve_mixer, resolve_controls,
                              visible_columns, destination_options, bus_name, CHANNEL_WORDS)
-from .helper import FfadoHelper
 from .controls import to_percent, from_percent, pan_to_ui, pan_from_ui
-from .interrogate import discover
+from .profiles.capabilities import enabled, probe_allowed, activate_internal_model, declared_path
+from .peak_metering import meter_config, channel_destinations, normalize_peak
+from .gain import UNITY, has_db_scale, scale as gain_scale, raw_to_db, db_to_raw, raw_to_ui, ui_to_raw
 from functools import wraps
+from copy import deepcopy
+from .soft_mute import MuteJournal
 import math
 
 
@@ -28,25 +31,54 @@ def load_device_info(config=None):
     The live D-Bus tree supplies the actual available paths and matrix dimensions.
     """
     print("Interrogating connected FFADO hardware...")
+    from .interrogate import discover
     return discover()
 
 
 class Mixer:
-    def __init__(self, config, device_index=0):
+    def __init__(self, config, device_index=0, device=None, helper=None):
         self.config = config
-        data = load_device_info()
-        self.device = data["devices"][device_index]
-        self.helper = FfadoHelper()
+        self.device = device if device is not None else load_device_info()["devices"][device_index]
+        if helper is None:
+            from .helper import FfadoHelper
+            helper = FfadoHelper()
+        self.helper = helper
         self.profile = self._find_profile()
+        # MOTU pre-mk3 ConfigROM only identifies the generation. Ask FFADO for
+        # its internal model enum before permitting any model-specific writes.
+        model_suffix = self.profile.get('model_element')
+        # Discovery already read the authoritative Info/Model on pre-mk3
+        # MOTU hardware. Do not lose it if the metadata endpoint is absent
+        # from a later inventory (e.g. a transient introspection failure).
+        self.model = self.device.get('internal_model_id')
+        if self.model is None:
+            self.model = self._info(model_suffix)
+        try:
+            self.profile = activate_internal_model(self.profile, self.model)
+        except ValueError as exc:
+            raise RuntimeError(str(exc)) from exc
         mixer = resolve_mixer(self.device, self.profile)
-        if mixer is None:
-            raise RuntimeError("Selected FFADO device exposes no matrix mixer")
+        if mixer is None or not mixer["matrices"].get("fader"):
+            raise RuntimeError("No source-mapped writable gain matrix for this model")
         self.mixes, self.columns = mixer["rows"], mixer["columns"]
         self.matrix = mixer
+        if has_db_scale(mixer["mode"]) and str(self.profile.get("mixer_matrix", {}).get("unity")) != str(UNITY):
+            raise RuntimeError("Hardware profile is missing the source-defined 16384-count dB unity coefficient")
+        router_suffix = declared_path(self.profile, "crossbar_routing")
         self.router_path = next((r["path"] for r in self.device.get("routers", [])
-                                 if r["path"].endswith("/EAP/Router")), None)
+                                 if router_suffix and r["path"].endswith(router_suffix)), None)
+        # The meter's hardware encoding and channel mapping must be present
+        # on the exact resolved model profile; never infer from family name.
+        self.meter_spec = meter_config(self.profile, self.matrix)
+        self.meter_channels = channel_destinations(self.device, self.matrix, self.meter_spec)
+        self._has_metering = None
         self._matrix_mutes = {}  # (bus, channel) -> original coefficient, for soft mute
-        self.model = self._info(self.profile.get("model_element"))
+        self._user_mutes = set()
+        self._solos = {}  # mix -> set of soloed channel indices
+        self._recovery_journal = None
+        self._pending_recovery = {}
+        self._mute_fault = None
+        self._pending_output_recovery = set()
         resolved = resolve_controls(self.device, self.profile, mixer["matrices"], self.columns, self.mixes)
         self.roles = resolved["roles"]
         self.out_spec = resolved["output_spec"]
@@ -54,6 +86,9 @@ class Mixer:
         self.chan = resolved["channels"]
         self.chan_specs = resolved["channel_specs"]
         self.mute_memory = config.mute_memory
+        self.guid = self.device['guid']
+        self.nickname_path = next((c for c in self.device.get('controls', [])
+            if c['path'].endswith('/Generic/Nickname') and c['kind'] == 'Text'), None)
 
     # ---------- matrix orientation and native levels ----------
     def _coordinates(self, mix, col):
@@ -71,17 +106,13 @@ class Mixer:
 
     def _to_ui(self, raw, spec):
         raw = float(raw)
-        if spec.get("type") in ("dice_db", "rme_db"):
-            if not math.isfinite(raw) or raw <= 16:
-                return 0
-            db = 20 * math.log10(raw / 16384.0)
-            return round(max(0, min(100, (db + 60) * (100 / 66))))
+        if has_db_scale(spec.get("type")):
+            return raw_to_ui(raw, spec["type"])
         return to_percent(raw, spec.get("min", 0), spec.get("max", 1)) if math.isfinite(raw) else 0
 
     def _from_ui(self, ui, spec):
-        if spec.get("type") in ("dice_db", "rme_db"):
-            pct = max(0, min(100, float(ui)))
-            return 0 if pct == 0 else round(16384 * 10 ** (((pct * 66 / 100) - 60) / 20))
+        if has_db_scale(spec.get("type")):
+            return ui_to_raw(ui, spec["type"])
         return from_percent(ui, spec.get("min", 0), spec.get("max", 1))
 
     # ---------- profile / discovered controls ----------
@@ -110,6 +141,8 @@ class Mixer:
                 spec = self.chan_specs[role]
                 features[role] = {"writable": spec["writable"], "min": spec.get("min", 0), "max": spec.get("max", 1)}
         return {
+            "guid": getattr(self, 'guid', self.device.get('guid', '')),
+            "profile": self.profile.get("device_profile"),
             "device": model.get("name") or self.profile.get("device_name") or f"FFADO device {self.device['guid']}",
             "mixes": [{"id": i, "name": bus_name(n)} for i, n in enumerate(self.mixes)],
             "outputs": [{"id": o["id"], "name": o["name"], "mix": o["mix"], "controllable": o["fader"] is not None,
@@ -117,20 +150,332 @@ class Mixer:
                         for o in self.outputs.values()],
             "fader": {"writable": fader.get("writable", False)},
             "mute": {"writable": bool(self.roles.get("mute") or self._soft_mute())},
+            "solo": {"writable": bool(self.roles.get("solo") or self._soft_mute())},
+            "gain_scale": gain_scale(self.matrix["mode"]),
+            "peak_metering": bool(self.router_path and self.meter_spec and self.meter_channels),
+            "peak_meter": {"encoding": self.meter_spec["format"], "calibrated_dbfs": False,
+                            "unit": self.meter_spec["unit"]} if self.router_path and self.meter_spec and self.meter_channels else None,
             "matrix": {"available": "fader" in self.roles, "path": self.matrix["path"],
                        "mode": self.matrix["mode"]},
             "router": bool(self.router_path),
-            "bus_routing": bool(self.profile.get("family") == "motu" and
+            "bus_routing": bool(enabled(self.profile, "bus_destination") and
                                 self._dest_options() and
                                 any(out["dest"] is not None for out in self.outputs.values())),
             "features": features,
+            "hardware_capabilities": self.profile.get('capabilities', {}),
             "controls": {role: spec for role, (_, spec) in self.roles.items()},
             "globals": [c for c in self.device["controls"] if not c["path"].endswith(("/Info/Model", "/Info/IsStreaming"))],
         }
 
     def _soft_mute(self):
-        return self.matrix["mode"] == "dice_db" and "mute" not in self.roles
+        return enabled(self.profile, "software_mute_solo") and "mute" not in self.roles
 
+    def attach_mute_recovery(self, *, debug=False):
+        """Called after DeviceManager assigns this GUID's persistent config.
+
+        A crash journal is *never* replayed automatically. Restoring an old
+        nonzero gain can cause unexpected loud output after a power cycle.
+        """
+        self._recovery_journal = MuteJournal(self.config.path, self.guid,
+                                            self.matrix['path'], enabled=not debug)
+        try:
+            self._pending_recovery = self._recovery_journal.load()
+        except (OSError, ValueError, KeyError, TypeError) as exc:
+            self._mute_fault = f'Cannot read software-mute recovery journal: {exc}'
+            self._recovery_corrupt = True
+            self._pending_recovery = {}
+        # Existing emulated Main/Phones mutes were saved by older releases.
+        # Do not restore them automatically on startup: levels may be unsafe.
+        self._pending_output_recovery = set(self.mute_memory)
+        if self._pending_recovery:
+            print(f"FFADO mixer {self.guid}: {len(self._pending_recovery)} muted "
+                  "matrix levels from an interrupted session. "
+                  "Restore or discard in the web interface before changing mute/solo.")
+
+    def mute_recovery_status(self):
+        with self.helper.transaction():
+            pending = sorted(self._pending_recovery)
+            outputs = sorted(getattr(self, '_pending_output_recovery', set()))
+            return {'pending': len(pending) + len(outputs), 'guid': self.guid,
+                    'channels': [{'bus': mix + 1, 'input': col + 1}
+                                 for mix, col in pending],
+                    'outputs': outputs, 'fault': self._mute_fault,
+                    'corrupt': bool(getattr(self, '_recovery_corrupt', False))}
+
+    def resolve_mute_recovery(self, action):
+        if action not in ('restore', 'discard'):
+            raise ValueError('Recovery action must be restore or discard')
+        with self.helper.transaction():
+            if not self._recovery_journal:
+                raise ValueError('No recovery journal is configured')
+            if getattr(self, '_recovery_corrupt', False):
+                if action == 'restore':
+                    raise ValueError('Unreadable recovery journal cannot be restored safely')
+                if self._recovery_journal.path:
+                    self._recovery_journal.path.unlink(missing_ok=True)
+                self._recovery_corrupt = False
+                self._mute_fault = None
+            if action == 'discard':
+                # Keep current hardware settings untouched; discard only saved levels.
+                self._recovery_journal.write({})
+                count = len(self._pending_recovery) + len(self._pending_output_recovery)
+                self._pending_recovery.clear()
+                for out_id in list(self._pending_output_recovery):
+                    self.mute_memory.pop(out_id, None)
+                self._pending_output_recovery.clear()
+                self._save_mute_memory()
+                self._mute_fault = None
+                return {'restored': 0, 'discarded': count, 'failed': 0}
+            restored = skipped = failed = 0
+            # Never overwrite a nonzero hardware value (somebody changed it).
+            for key, saved in list(self._pending_recovery.items()):
+                try:
+                    mix, col = key
+                    current = self._get_cell(self.roles['fader'][0], mix, col)
+                    if not self._is_zero(current):
+                        skipped += 1
+                    elif not self._is_zero(saved):
+                        self._set_cell(self.roles['fader'][0], mix, col, saved)
+                        self._verify_cell(mix, col, saved)
+                        restored += 1
+                    else:
+                        skipped += 1
+                    del self._pending_recovery[key]
+                    self._recovery_journal.write(self._pending_recovery)
+                except Exception as exc:
+                    failed += 1
+                    self._mute_fault = f'Recovery of bus {key[0]+1}, input {key[1]+1}: {exc}'
+            for out_id in list(self._pending_output_recovery):
+                try:
+                    out = self._output(out_id)
+                    fader = out['fader']
+                    spec = out.get('spec', self.out_spec)
+                    saved = self.mute_memory[out_id]
+                    current = self.helper.get_value(fader['path'], fader['kind'])
+                    if float(current) > float(spec['min']):
+                        skipped += 1
+                    else:
+                        self.helper.set_value(fader['path'], fader['kind'], saved)
+                        self._verify_output(out, saved)
+                        restored += 1
+                    del self.mute_memory[out_id]
+                    self._save_mute_memory()
+                    self._pending_output_recovery.remove(out_id)
+                except Exception as exc:
+                    failed += 1
+                    self._mute_fault = f'Output recovery for {out_id}: {exc}'
+            if not failed:
+                self._mute_fault = None
+            return {'restored': restored, 'discarded': skipped, 'failed': failed,
+                    'pending': len(self._pending_recovery) + len(self._pending_output_recovery)}
+
+    @staticmethod
+    def _is_zero(value):
+        return abs(float(value)) <= 0.000001
+
+    def _verify_cell(self, mix, col, expected):
+        actual = self._get_cell(self.roles['fader'][0], mix, col)
+        if not math.isfinite(float(actual)) or abs(float(actual) - float(expected)) > (1 if self.matrix['mode'] == 'dice_db' else 0.00001):
+            raise IOError(f'FFADO readback mismatch at bus {mix + 1}, input {col + 1}: '
+                          f'expected {expected}, received {actual}')
+        return actual
+
+    def _save_soft_mutes(self):
+        if getattr(self, "_recovery_journal", None):
+            # Include all currently suppressed cells. Write BEFORE muting so a
+            # power loss during the D-Bus call leaves the restoration target.
+            self._recovery_journal.write(self._matrix_mutes)
+
+    def _require_recovery_resolved(self):
+        if getattr(self, '_recovery_corrupt', False):
+            raise RuntimeError('Software mute recovery journal is unreadable or mismatched; '
+                               'correct it before using gain/mute controls')
+        if getattr(self, "_pending_recovery", None) or getattr(self, '_pending_output_recovery', set()):
+            raise RuntimeError('Previous software mute was interrupted. Restore or '
+                               'discard pending levels before editing the matrix.')
+
+    def _cell_base(self, mix, col):
+        key = (mix, col)
+        if key in self._matrix_mutes:
+            return self._matrix_mutes[key]
+        return self._get_cell(self.roles['fader'][0], mix, col)
+
+    def _silenced(self, mix, col):
+        solos = self._solos.get(mix, set())
+        return (mix, col) in self._user_mutes or bool(solos and col not in solos)
+
+    def _external_override(self, mix, col, raw):
+        """External nonzero write wins. Never restore over it later."""
+        key = (mix, col)
+        if key in self._matrix_mutes and not self._is_zero(raw):
+            del self._matrix_mutes[key]
+            self._user_mutes.discard(key)
+            # Solo can no longer be trusted for this bus; drop its logical state
+            # and restore the *other* suppressed inputs without re-muting this one.
+            if self._solos.get(mix):
+                self._solos.pop(mix, None)
+                for other in range(len(self.columns)):
+                    other_key = (mix, other)
+                    if other_key in self._matrix_mutes and other_key not in self._user_mutes:
+                        self._restore_cell(mix, other)
+            self._save_soft_mutes()
+            self._mute_fault = f'External mixer change detected at bus {mix + 1}, input {col + 1}; mute/solo cancelled for that channel.'
+            return True
+        return False
+
+    def _restore_cell(self, mix, col):
+        key = (mix, col)
+        if key not in self._matrix_mutes:
+            return
+        saved = self._matrix_mutes[key]
+        current = self._get_cell(self.roles['fader'][0], mix, col)
+        if not self._is_zero(current):
+            self._external_override(mix, col, current)
+            return
+        if not self._is_zero(saved):
+            self._set_cell(self.roles['fader'][0], mix, col, saved)
+            self._verify_cell(mix, col, saved)
+        # Only release the recovery journal entry after verified restoration.
+        del self._matrix_mutes[key]
+        self._save_soft_mutes()
+
+    def _reconcile_cell(self, mix, col):
+        """Read/modify/verify with a durable journal and external-change guard."""
+        path = self.roles['fader'][0]
+        key = (mix, col)
+        current = self._get_cell(path, mix, col)
+        if self._external_override(mix, col, current):
+            return
+        if self._silenced(mix, col):
+            if key not in self._matrix_mutes:
+                self._matrix_mutes[key] = current
+                try:
+                    self._save_soft_mutes()  # persist BEFORE the zero write
+                except BaseException:
+                    del self._matrix_mutes[key]
+                    raise
+            if not self._is_zero(current):
+                self._set_cell(path, mix, col, 0)
+                self._verify_cell(mix, col, 0)
+        else:
+            self._restore_cell(mix, col)
+
+    def shutdown_soft_mutes(self):
+        """Best-effort clean-exit restoration; failures retain the journal."""
+        if not getattr(self, '_recovery_journal', None) or self._pending_recovery or self._pending_output_recovery or getattr(self, '_recovery_corrupt', False):
+            return
+        with self.helper.transaction():
+            self._solos.clear()
+            self._user_mutes.clear()
+            for mix, col in list(self._matrix_mutes):
+                try:
+                    self._restore_cell(mix, col)
+                except Exception as exc:
+                    print(f'FFADO: could not restore bus {mix+1}, input {col+1}: {exc}')
+            for out_id in list(self.mute_memory):
+                try:
+                    out = self._output(out_id)
+                    fader = out['fader']
+                    spec = out.get('spec', self.out_spec)
+                    current = self.helper.get_value(fader['path'], fader['kind'])
+                    saved = self.mute_memory[out_id]
+                    if float(current) <= float(spec['min']):
+                        self.helper.set_value(fader['path'], fader['kind'], saved)
+                        self._verify_output(out, saved)
+                    del self.mute_memory[out_id]
+                    self._save_mute_memory()
+                except Exception as exc:
+                    print(f'FFADO: could not restore output {out_id}: {exc}')
+
+    def _write_gain_cell(self, mix, col, raw):
+        """All matrix/fader/stereo gain edits share the same recovery guard."""
+        self._require_recovery_resolved()
+        key = (mix, col)
+        path = self.roles['fader'][0]
+        if self._soft_mute() and key in self._matrix_mutes:
+            current = self._get_cell(path, mix, col)
+            if not self._external_override(mix, col, current):
+                old = self._matrix_mutes[key]
+                self._matrix_mutes[key] = raw
+                try: self._save_soft_mutes()
+                except BaseException:
+                    self._matrix_mutes[key] = old
+                    raise
+                return True  # saved for unmute; actual hardware stays zero
+        self._set_cell(path, mix, col, raw)
+        return False
+
+    def write_bus_balance(self, bus, col, value):
+        """Source-derived stereo bus balance: FFADO matrixmixer.py formulas."""
+        if 'fader' not in self.roles or not 0 <= bus < len(self.mixes) - 1 or bus % 2:
+            raise ValueError('Stereo balance requires an odd/even output pair')
+        value = max(-1., min(1., float(value)))
+        with self.helper.transaction():
+            self._require_recovery_resolved()
+            left, right = self._cell_base(bus, col), self._cell_base(bus + 1, col)
+            total = float(left) + float(right)
+            lnew = round(total * (1 - value) / 2)
+            rnew = round(total - lnew)
+            for m, raw in ((bus, lnew), (bus+1, rnew)):
+                self._write_gain_cell(m, col, raw)
+
+    def read_bus_balance(self, bus, col):
+        left, right = self._cell_base(bus, col), self._cell_base(bus+1, col)
+        return round((right - left) / (right + left), 2) if left + right else 0
+
+    def read_stereo_level(self, bus, col):
+        if bus % 2 or bus + 1 >= len(self.mixes):
+            raise ValueError('Invalid left bus index')
+        v0=self._cell_base(bus,col)
+        v1=self._cell_base(bus+1,col)
+        return self._to_ui((v0+v1)/2., self.roles['fader'][1])
+
+    def write_stereo_level(self, bus, col, ui):
+        if bus % 2 or bus + 1 >= len(self.mixes):
+            raise ValueError('Invalid left bus index')
+        spec=self.roles['fader'][1]
+        with self.helper.transaction():
+            self._require_recovery_resolved()
+            left=self._cell_base(bus,col)
+            right=self._cell_base(bus+1,col)
+            balance=(right-left)/(right+left) if (right+left) else 0
+            total=2 * self._from_ui(ui,spec)
+            new=(round(total*(1-balance)/2),round(total*(1+balance)/2))
+            for m,v in ((bus,new[0]),(bus+1,new[1])):
+                self._write_gain_cell(m, col, v)
+
+    def peak_snapshot(self):
+        """Read only the source-declared DICE EAP router peaks.
+
+        Destination names and column indexes come directly from FFADO's
+        matrix row labels. Meters are pre-mixer router destination readings,
+        not per-bus or post-fader measurements.
+        """
+        empty = {'available': False, 'channels': {}, 'destinations': {},
+                 'meter': self.meter_spec, 'guid': self.guid}
+        if not self.router_path or not self.meter_spec or not self.meter_channels:
+            return empty
+        if self._has_metering is None:
+            self._has_metering = bool(self.helper.router_call(self.router_path, 'hasPeakMetering'))
+        if not self._has_metering:
+            return empty
+        values = self.helper.router_call(self.router_path, 'getPeakValues')
+        raw_destinations = {}
+        clean_destinations = {}
+        for name, raw in values:
+            item = normalize_peak(raw, self.meter_spec)
+            if item is not None:
+                raw_destinations[str(name)] = item['raw']
+                clean_destinations[str(name)] = item
+        channels = {index: {'destination': dest, **clean_destinations[dest]}
+                    for index, dest in self.meter_channels.items()
+                    if dest in clean_destinations}
+        return {'available': True, 'guid': self.guid, 'meter': self.meter_spec,
+                'channels': channels, 'destination_levels': clean_destinations,
+                'destinations': raw_destinations}
+
+
+    @serialized_output
     def read_mix(self, mix):
         if not 0 <= mix < len(self.mixes):
             raise ValueError("mix out of range")
@@ -141,12 +486,14 @@ class Mixer:
                 path, spec = self.roles["fader"]
                 raw = self._get_cell(path, mix, col)
                 saved = self._matrix_mutes.get((mix, col))
-                if saved is not None and raw != 0:
-                    del self._matrix_mutes[(mix, col)]
+                if saved is not None and self._soft_mute() and not self._is_zero(raw):
+                    with self.helper.transaction():
+                        self._external_override(mix, col, raw)
                     saved = None
                 entry["fader"] = self._to_ui(saved if saved is not None else raw, spec) if spec["writable"] else 0
                 if self._soft_mute():
-                    entry["mute"] = raw == 0
+                    entry["mute"] = (mix, col) in getattr(self, '_user_mutes', set()) or raw == 0
+                    entry["solo"] = col in getattr(self, '_solos', {}).get(mix, set())
             if "pan" in self.roles:
                 path, spec = self.roles["pan"]
                 raw = self._get_cell(path, mix, col)
@@ -182,19 +529,43 @@ class Mixer:
             self.helper.set_value(target["path"], target["kind"], raw)
             return
 
-        if self._soft_mute() and control == "mute" and "fader" in self.roles:
+        if self._soft_mute() and control in ("mute", "solo") and "fader" in self.roles:
+            if not hasattr(self, '_user_mutes'): self._user_mutes = set()
+            if not hasattr(self, '_solos'): self._solos = {}
             with self.helper.transaction():
-                path = self.roles["fader"][0]
-                old = self._get_cell(path, mix, col)
-                key = (mix, col)
-                if value and old > 0:
-                    self._matrix_mutes[key] = old
-                    self._set_cell(path, mix, col, 0)
-                elif not value and old == 0:
-                    restore = self._matrix_mutes.pop(key, None)
-                    if restore is None:
-                        raise ValueError("No saved gain for this muted crosspoint; raise its fader to restore audio")
-                    self._set_cell(path, mix, col, restore)
+                self._require_recovery_resolved()
+                # Detect externally changed cells before changing logical state.
+                for key in list(self._matrix_mutes):
+                    self._external_override(*key, self._get_cell(self.roles['fader'][0], *key))
+                prior_mutes = set(self._user_mutes)
+                prior_solos = deepcopy(self._solos)
+                try:
+                    if control == 'mute':
+                        if value: self._user_mutes.add((mix, col))
+                        else: self._user_mutes.discard((mix, col))
+                        self._reconcile_cell(mix, col)
+                    else:
+                        solos = self._solos.setdefault(mix, set())
+                        if value: solos.add(col)
+                        else: solos.discard(col)
+                        if not solos: self._solos.pop(mix, None)
+                        for index in range(len(self.columns)):
+                            self._reconcile_cell(mix, index)
+                    self._mute_fault = None
+                except Exception as exc:
+                    self._user_mutes = prior_mutes
+                    self._solos = prior_solos
+                    # Best-effort rollback to the previous logical state.
+                    # Any hardware writes that cannot be undone keep a journal.
+                    rollback_errors = []
+                    for key in list(self._matrix_mutes):
+                        if key[0] == mix:
+                            try: self._reconcile_cell(*key)
+                            except Exception as failure: rollback_errors.append(str(failure))
+                    self._mute_fault = f'Mute/solo failed: {exc}'
+                    if rollback_errors:
+                        self._mute_fault += '; rollback incomplete: ' + '; '.join(rollback_errors)
+                    raise RuntimeError(self._mute_fault) from exc
             return
         if control not in ("fader", "pan", "mute", "solo") or control not in self.roles:
             raise ValueError(f"{control} is not controllable on this device")
@@ -205,15 +576,30 @@ class Mixer:
             raise ValueError("mix out of range")
         lo, hi = spec.get("min", 0), spec.get("max", 1)
         if control == "fader":
-            if self._soft_mute() and (mix, col) in self._matrix_mutes:
-                self._matrix_mutes[(mix, col)] = self._from_ui(value, spec)
-                return
+            if self._soft_mute():
+                with self.helper.transaction():
+                    self._require_recovery_resolved()
+                    key = (mix, col)
+                    if key in self._matrix_mutes:
+                        actual = self._get_cell(path, mix, col)
+                        if not self._external_override(mix, col, actual):
+                            old = self._matrix_mutes[key]
+                            self._matrix_mutes[key] = self._from_ui(value, spec)
+                            try: self._save_soft_mutes()
+                            except BaseException:
+                                self._matrix_mutes[key] = old
+                                raise
+                            return
             raw = self._from_ui(value, spec)
         elif control == "pan":
             raw = pan_from_ui(value, lo, hi)
         else:
             raw = 1 if value else 0
-        self._set_cell(path, mix, col, raw)
+        if control == 'fader' and self._soft_mute():
+            with self.helper.transaction():
+                self._write_gain_cell(mix, col, raw)
+        else:
+            self._set_cell(path, mix, col, raw)
 
 
     def _read_scalar(self, control):
@@ -227,24 +613,65 @@ class Mixer:
         return self.helper.set_value(control["path"], control["kind"], value)
 
     # ---------- matrix and crossbar router API ----------
+    def _matrix_raw(self, mix, col):
+        """Read effective gain, respecting external hardware changes."""
+        key = (mix, col)
+        actual = self._get_cell(self.roles['fader'][0], mix, col)
+        if self._soft_mute() and key in self._matrix_mutes:
+            if not self._external_override(mix, col, actual):
+                return self._matrix_mutes[key]
+        return actual
+
     def matrix_snapshot(self):
         if "fader" not in self.roles:
             raise ValueError("No writable gain matrix exposed for this device")
         path, spec = self.roles["fader"]
+        mode = spec.get("type")
         with self.helper.transaction():
-            values = [[self._to_ui(self._get_cell(path, mix, col), spec)
-                       for mix in range(len(self.mixes))] for col in range(len(self.columns))]
-        return {"inputs": self.columns, "outputs": self.mixes, "values": values,
+            raw_values = [[self._matrix_raw(mix, col) for mix in range(len(self.mixes))]
+                          for col in range(len(self.columns))]
+        values = [[self._to_ui(raw, spec) for raw in row] for row in raw_values]
+        data = {"inputs": self.columns, "outputs": self.mixes, "values": values,
                 "mode": self.matrix["mode"]}
+        if has_db_scale(mode):
+            data["gain_scale"] = gain_scale(mode)
+            data["db_values"] = [[None if (db := raw_to_db(raw, mode)) is None
+                                   else round(db, 3) for raw in row] for row in raw_values]
+        return data
 
-    def matrix_set(self, input_index, output_index, value):
+    def matrix_set(self, input_index, output_index, value=None, *, db=None, use_db=False):
+        """Write one matrix cell. Old percentage clients remain supported.
+
+        New clients submit {db: -12.3} or {db: null} for precise levels and
+        silence; these values never round-trip through a percentage scale.
+        """
         if "fader" not in self.roles or not self.roles["fader"][1]["writable"]:
             raise ValueError("No writable gain matrix on this device")
         if not (0 <= input_index < len(self.columns) and 0 <= output_index < len(self.mixes)):
             raise ValueError("Invalid mixer matrix coordinate")
-        if not isinstance(value, (int, float)) or not math.isfinite(value) or not 0 <= value <= 100:
-            raise ValueError("Mixer gain must be between 0 and 100")
-        self.write(output_index, f"ch/{input_index:02d}", "fader", value)
+        path, spec = self.roles['fader']
+        mode = spec.get('type')
+        if use_db:
+            if not has_db_scale(mode):
+                raise ValueError("This hardware profile does not support dB matrix edits")
+            raw = db_to_raw(db, mode)
+        else:
+            if not isinstance(value, (int, float)) or not math.isfinite(value) or not 0 <= value <= 100:
+                raise ValueError("Mixer gain must be between 0 and 100")
+            raw = self._from_ui(value, spec)
+        key = (output_index, input_index)
+        with self.helper.transaction():
+            deferred = self._write_gain_cell(output_index, input_index, raw)
+            # If soft-muted, the effective level is the intended restored
+            # value, not the silent physical crosspoint.
+            applied = self._matrix_raw(output_index, input_index)
+        result = {"ok": True, "value": self._to_ui(applied, spec),
+                  "deferred": deferred}
+        if has_db_scale(mode):
+            native_db = raw_to_db(applied, mode)
+            result.update(db=None if native_db is None else round(native_db, 3),
+                          native=int(applied))
+        return result
 
     def router_snapshot(self):
         if not self.router_path:
@@ -266,12 +693,12 @@ class Mixer:
             if (source and source not in sources) or destination not in destinations:
                 raise ValueError("Source or destination is not available")
             before = str(self.helper.router_call(self.router_path, "getSourceForDestination", destination))
-            if before == source:
+            if before == source or (not source and before.startswith('Mute:')):
                 return
             # Match FFADO's OutputSwitcher: disconnect the previous route,
             # then connect the requested source. Disconnection mutes only
             # this destination; it does not clear the whole router.
-            if before:
+            if before and not before.startswith('Mute:'):
                 if not self.helper.router_call(self.router_path, "setConnectionState", before, destination, False):
                     raise ValueError("FFADO could not disconnect the previous route")
             if source:
@@ -280,6 +707,8 @@ class Mixer:
                         self.helper.router_call(self.router_path, "setConnectionState", before, destination, True)
                     raise ValueError("FFADO rejected that routing connection")
             actual = str(self.helper.router_call(self.router_path, "getSourceForDestination", destination))
+            if not source and actual.startswith('Mute:'):
+                return  # FFADO's RouterConfig::muteRoute sets Mute:00, not empty.
             if actual != source:
                 raise IOError("FFADO routing readback did not match the requested connection")
 
@@ -291,8 +720,8 @@ class Mixer:
         for that bus. Other buses may use the same destination. There is no
         general per-output crossbar exposed on this hardware.
         """
-        if self.profile.get("family") != "motu":
-            raise ValueError("This device uses a different routing interface")
+        if not enabled(self.profile, "bus_destination"):
+            raise ValueError("No bus destination routing mapped for this device")
         options = self._dest_options()
         if not options:
             raise ValueError("No device-specific routing destinations are known")
@@ -310,8 +739,8 @@ class Mixer:
     def bus_routing_set(self, bus_id, value):
         # Reuse the single bus's validated FFADO Discrete write and ensure the
         # hardware value was actually changed, rather than merely replying OK.
-        if self.profile.get("family") != "motu":
-            raise ValueError("This device uses a different routing interface")
+        if not enabled(self.profile, "bus_destination"):
+            raise ValueError("No bus destination routing mapped for this device")
         with self.helper.transaction():
             out = self._dest_output(bus_id)
             self.write_destination(bus_id, int(value))
@@ -321,7 +750,7 @@ class Mixer:
 
     # ---------- where a bus is sent (Disabled, Phones, Analog 1-2 ...) ----------
     def _dest_options(self, current=None):
-        return destination_options(self.profile, self.model, current)
+        return destination_options(self.profile, self.model, current) if enabled(self.profile, "bus_destination") else []
 
     def _dest_output(self, out_id):
         out = self.outputs.get(out_id)
@@ -350,6 +779,14 @@ class Mixer:
     def _save_mute_memory(self):
         self.config.save()
 
+    def _verify_output(self, out, expected):
+        fader = out['fader']
+        actual = self.helper.get_value(fader['path'], fader['kind'])
+        if not math.isfinite(float(actual)) or abs(float(actual) - float(expected)) > 0.00001:
+            raise IOError(f'FFADO rejected output level for {out["name"]}: '
+                          f'expected {expected}, received {actual}')
+        return actual
+
     @serialized_output
     def read_output(self, out_id):
         out = self._output(out_id)
@@ -370,6 +807,7 @@ class Mixer:
             return {"name": out["name"], "level": norm(saved), "mute": True, "emulated_mute": True}
         if saved is not None:                                      # level raised elsewhere: no longer muted
             del self.mute_memory[out_id]
+            getattr(self, '_pending_output_recovery', set()).discard(out_id)
             self._save_mute_memory()
         return {"name": out["name"], "level": norm(raw), "mute": False, "emulated_mute": True}
 
@@ -383,24 +821,62 @@ class Mixer:
         lo, hi = spec["min"], spec["max"]
         emulated = out["mute"] is None
 
+        if emulated and getattr(self, '_pending_output_recovery', set()) and out_id in self._pending_output_recovery:
+            raise RuntimeError('This output has a pending mute recovery. Restore or keep current levels first.')
         if control == "fader":
             raw = from_percent(value, lo, hi)
-            if emulated and out_id in self.mute_memory:                # muted: remember the new position, stay silent
-                self.mute_memory[out_id] = raw
-                self._save_mute_memory()
-                return
-            self.helper.set_value(fader["path"], fader["kind"], raw)
-        elif control == "mute" and not emulated:                   # buses have a real mute parameter
+            if emulated and out_id in self.mute_memory:
+                old = self.mute_memory[out_id]
+                actual = self.helper.get_value(fader['path'], fader['kind'])
+                if float(actual) > float(lo):
+                    # External device adjustment overrides our saved mute.
+                    del self.mute_memory[out_id]
+                    self._save_mute_memory()
+                else:
+                    self.mute_memory[out_id] = raw
+                    try: self._save_mute_memory()
+                    except BaseException:
+                        self.mute_memory[out_id] = old
+                        raise
+                    return
+            self.helper.set_value(fader['path'], fader['kind'], raw)
+            self._verify_output(out, raw)
+        elif control == "mute" and not emulated:
             self._write_scalar(out["mute"], bool(value))
+            if bool(self._read_scalar(out["mute"])) != bool(value):
+                raise IOError('FFADO did not acknowledge output mute change')
         elif control == "mute":
             muted = out_id in self.mute_memory
-            if value and not muted:                                # mute: remember the level, drop the output to zero
-                self.mute_memory[out_id] = self.helper.get_value(fader["path"], fader["kind"])
+            if value and not muted:
+                current = self.helper.get_value(fader['path'], fader['kind'])
+                self.mute_memory[out_id] = current
+                try: self._save_mute_memory()  # persist before lowering output
+                except BaseException:
+                    del self.mute_memory[out_id]
+                    raise
+                try:
+                    self.helper.set_value(fader['path'], fader['kind'], lo)
+                    self._verify_output(out, lo)
+                except Exception:
+                    # If it never reached zero, release the saved state; if
+                    # silence did apply, keep it for retry/recovery.
+                    actual = self.helper.get_value(fader['path'], fader['kind'])
+                    if float(actual) > float(lo):
+                        del self.mute_memory[out_id]
+                        self._save_mute_memory()
+                    raise
+            elif not value and muted:
+                current = self.helper.get_value(fader['path'], fader['kind'])
+                if float(current) > float(lo):
+                    # Someone else modified the output. Do not overwrite it.
+                    del self.mute_memory[out_id]
+                    self._save_mute_memory()
+                    return
+                restore = self.mute_memory[out_id]
+                self.helper.set_value(fader['path'], fader['kind'], restore)
+                self._verify_output(out, restore)
+                # Only remove the saved level AFTER a verified write.
+                del self.mute_memory[out_id]
                 self._save_mute_memory()
-                self.helper.set_value(fader["path"], fader["kind"], lo)
-            elif not value and muted:                              # unmute: put the remembered level back
-                restore = self.mute_memory.pop(out_id)
-                self._save_mute_memory()
-                self.helper.set_value(fader["path"], fader["kind"], restore)
         else:
             raise ValueError(f"{control} is not controllable on an output")

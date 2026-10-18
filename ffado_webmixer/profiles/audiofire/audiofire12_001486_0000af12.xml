@@ -2,5 +2,30 @@
 <device family="audiofire" name="AudioFire12" extends="common.xml" identity_source="ffado_configuration">
   <match vendor_id="0x1486" configuration_model_id="0xaf12" />
   <identity vendor="Echo" driver="FIREWORKS" ffado_mixer="AudioFire" />
-  <capabilities mode="discovered-controls-only" />
+  <capabilities schema="2" status="identity_only" source="support/mixer-qt4/ffado/mixer/audiofire.py" note="FFADO exposes FireWorks controls; webmixer needs source-specific scaling/orientation mapping.">
+    <feature name="matrix_gain" state="source_only" source="support/mixer-qt4/ffado/mixer/audiofire.py" path="/Mixer/MonitorGain" />
+    <feature name="matrix_pan" state="source_only" source="support/mixer-qt4/ffado/mixer/audiofire.py" path="/Mixer/MonitorPan" />
+    <feature name="matrix_mute" state="source_only" source="support/mixer-qt4/ffado/mixer/audiofire.py" path="/Mixer/MonitorMute" />
+    <feature name="matrix_solo" state="source_only" source="support/mixer-qt4/ffado/mixer/audiofire.py" path="/Mixer/MonitorSolo" />
+    <feature name="matrix_invert" state="unmapped" />
+    <feature name="matrix_playback" state="unmapped" />
+    <feature name="matrix_output" state="unmapped" />
+    <feature name="crossbar_routing" state="unmapped" />
+    <feature name="peak_metering" state="unmapped" />
+    <feature name="software_mute_solo" state="unmapped" />
+    <feature name="stereo_bus_link" state="unmapped" />
+    <feature name="bus_destination" state="unmapped" />
+    <feature name="monitor_line_volume" state="unmapped" />
+    <feature name="monitor_line_mute" state="unmapped" />
+    <feature name="monitor_global_mute" state="unmapped" />
+    <feature name="monitor_global_dim" state="unmapped" />
+    <feature name="output_level" state="unmapped" />
+    <feature name="channel_trim" state="unmapped" />
+    <feature name="channel_invert" state="unmapped" />
+    <feature name="device_settings" state="unmapped" />
+    <feature name="hardware_nickname" state="unmapped" />
+    <feature name="scalar_volume" state="unmapped" />
+    <feature name="scalar_selector" state="unmapped" />
+    <feature name="bus_output_mute" state="unmapped" />
+  </capabilities>
 </device>

@@ -5,13 +5,61 @@ def register(app, backend, description, config, broadcast):
     @app.get("/api/describe")
     def describe():
         # Output names (Main, Phones, buses) can be renamed in the UI; saved names win.
-        result = dict(description)
+        result = dict(backend.describe())
+        result['stereo_buses'] = config.settings.get('stereo_buses', [])
         result["outputs"] = [
             dict(output, base_name=output["name"], name=config.names.get("out:" + output["id"], output["name"]))
-            for output in description.get("outputs", [])
+            for output in result.get("outputs", [])
         ]
 
         return jsonify(result)
+
+    @app.get('/api/mute-recovery')
+    def mute_recovery_status():
+        if not hasattr(backend, 'mute_recovery_status'):
+            return jsonify(pending=0, channels=[], fault=None)
+        return jsonify(backend.mute_recovery_status())
+
+    @app.post('/api/mute-recovery')
+    def mute_recovery_action():
+        if not hasattr(backend, 'resolve_mute_recovery'):
+            return jsonify(error='This device has no software-mute recovery'), 400
+        try:
+            action = (request.get_json(force=True) or {}).get('action')
+            result = backend.resolve_mute_recovery(action)
+        except ValueError as exc:
+            return jsonify(error=str(exc)), 400
+        except Exception as exc:
+            return jsonify(error=str(exc)), 500
+        broadcast({'type':'mute-recovery'})
+        return jsonify(result)
+
+    @app.get('/api/peaks')
+    def get_peaks():
+        try:
+            return jsonify(backend.peak_snapshot())
+        except (ValueError, AttributeError) as exc:
+            return jsonify(available=False, error=str(exc)), 400
+        except Exception as exc:
+            return jsonify(available=False, error=str(exc)), 500
+
+    @app.post('/api/bus-stereo')
+    def bus_stereo():
+        try:
+            data=request.get_json(force=True)
+            left=int(data.get('left',-1)); value=bool(data.get('linked',False))
+            if left % 2 or left < 0 or left+1 >= len(backend.mixes):
+                raise ValueError('Select a consecutive odd/even bus pair')
+            if not backend.describe().get('matrix',{}).get('available'):
+                raise ValueError('No linked bus gain matrix is supported')
+            pairs=config.settings.setdefault('stereo_buses',[])
+            if value and left not in pairs: pairs.append(left)
+            elif not value and left in pairs: pairs.remove(left)
+            config.save()
+        except (ValueError,TypeError,KeyError) as exc:
+            return jsonify(error=str(exc)),400
+        broadcast({'type':'bus-stereo','left':left,'linked':value})
+        return jsonify(ok=True)
 
     @app.get("/api/state")
     def get_state():
@@ -22,6 +70,12 @@ def register(app, backend, description, config, broadcast):
         except Exception as exc:
             return jsonify(error=str(exc)), 500
 
+        if hasattr(backend, 'matrix') and backend.matrix['mode'] in ('dice_db','rme_db'):
+            if mix in config.settings.get('stereo_buses', []):
+                for strip_id, entry in mixer_state.items():
+                    col=int(strip_id.split('/')[-1])
+                    entry['pan'] = backend.read_bus_balance(mix, col)
+                    entry['fader'] = backend.read_stereo_level(mix, col)
         for strip_id, entry in mixer_state.items():
             entry["name"] = config.names.get(
                 strip_id,
@@ -37,6 +91,10 @@ def register(app, backend, description, config, broadcast):
                     first["name"] = pair_name(first["name"], second["name"])
 
                 first["input"] = pair_name(first["input"], second["input"])
+                # A linked stereo strip displays the balance of its two sides.
+                # Hard-left/hard-right corresponds to centered stereo balance.
+                if 'pan' in first and 'pan' in second:
+                    first['pan'] = (float(first['pan']) + float(second['pan'])) / 2
                 first["partner"] = right
                 second["partner_of"] = left
 
@@ -68,6 +126,53 @@ def register(app, backend, description, config, broadcast):
             return jsonify(ok=True)
 
         pair = config.pair_of(strip) if control in MIRRORED else None
+        if control == 'pan' and config.pair_of(strip):
+            # Stereo pan shifts the L/R image without collapsing both channels
+            # to one identical pan position. Center = hard L and hard R.
+            left, right = config.pair_of(strip)
+            try:
+                position = float(value)
+                if not -1 <= position <= 1:
+                    raise ValueError('Stereo pan must be between -1 and 1')
+                mix = int(msg.get('mix', 0))
+                left_pan = -1 + 2 * max(0, position)
+                right_pan = 1 + 2 * min(0, position)
+                if hasattr(backend, 'matrix') and backend.matrix['mode'] in ('dice_db', 'rme_db') and (mix - mix % 2) in config.settings.get('stereo_buses', []):
+                    for channel, pan_value in ((left, left_pan), (right, right_pan)):
+                        backend.write_bus_balance(mix - mix % 2, int(channel.split('/')[-1]), pan_value)
+                else:
+                    for channel, pan_value in ((left, left_pan), (right, right_pan)):
+                        backend.write(mix, channel, 'pan', pan_value)
+            except (ValueError, TypeError, KeyError, IndexError) as exc:
+                return jsonify(error=str(exc)), 400
+            except Exception as exc:
+                return jsonify(error=str(exc)), 500
+            broadcast({'type': 'strip', 'mix': mix, 'strip': left, 'control': 'pan', 'value': position})
+            return jsonify(ok=True)
+        if control == 'fader' and hasattr(backend, 'matrix') and backend.matrix['mode'] in ('dice_db','rme_db'):
+            bus=int(msg.get('mix',0))
+            if bus in config.settings.get('stereo_buses', []):
+                try:
+                    for channel in pair or [strip]:
+                        backend.write_stereo_level(bus,int(channel.split('/')[-1]),float(value))
+                except (ValueError,TypeError) as exc:
+                    return jsonify(error=str(exc)),400
+                except Exception as exc:
+                    return jsonify(error=str(exc)),500
+                broadcast({'type':'strip','mix':bus,'strip':strip,'control':'fader','value':value})
+                return jsonify(ok=True)
+        if control == 'pan' and hasattr(backend, 'matrix') and backend.matrix['mode'] in ('dice_db','rme_db'):
+            mix=int(msg.get('mix',0))
+            left = mix - 1 if mix % 2 else mix
+            if left in config.settings.get('stereo_buses', []):
+                try:
+                    backend.write_bus_balance(left, int(strip.split('/')[-1]), float(value))
+                except (ValueError,TypeError,IndexError) as exc:
+                    return jsonify(error=str(exc)),400
+                except Exception as exc:
+                    return jsonify(error=str(exc)),500
+                broadcast({'type':'strip','mix':left,'strip':strip,'control':'pan','value':value})
+                return jsonify(ok=True)
 
         try:
             written = 0
@@ -198,13 +303,17 @@ def register(app, backend, description, config, broadcast):
         try:
             body = request.get_json(force=True)
             row, col = int(body["input"]), int(body["output"])
-            backend.matrix_set(row, col, body["value"])
+            if "db" in body:
+                result = backend.matrix_set(row, col, db=body["db"], use_db=True)
+            else:
+                result = backend.matrix_set(row, col, body["value"])
         except (ValueError, KeyError, TypeError, AttributeError) as exc:
             return jsonify(error=str(exc)), 400
         except Exception as exc:
             return jsonify(error=str(exc)), 500
-        broadcast({"type": "matrix", "input": row, "output": col, "value": body["value"]})
-        return jsonify(ok=True)
+        broadcast({"type": "matrix", "input": row, "output": col,
+                   "value": result["value"], "db": result.get("db")})
+        return jsonify(result)
 
     @app.get("/api/router")
     def router_snapshot():

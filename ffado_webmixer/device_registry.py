@@ -1,6 +1,7 @@
-"""Resolve device mixer families from FFADO's installed configuration.
+"""Resolve models with the exact FFADO configuration device definitions.
 
-FFADO's configuration is authoritative. No device database is bundled here.
+Source snapshot is bundled for offline reproducibility; installed/user entries
+can override it. D-Bus matrices are not used to guess hardware identity.
 """
 import logging
 import shlex
@@ -9,6 +10,7 @@ from pathlib import Path
 
 LOG = logging.getLogger(__name__)
 SYSTEM_CONFIG = Path('/usr/share/libffado/configuration')
+BUNDLED_CONFIG = Path(__file__).parent / 'profiles' / 'ffado_configuration'
 USER_CONFIG = Path('~/.ffado/configuration')
 
 
@@ -70,7 +72,7 @@ def parse_configuration(path):
 def configured_devices(system_path=SYSTEM_CONFIG, user_path=USER_CONFIG):
     """Apply per-user definitions over system definitions, like FFADO DeviceList."""
     devices = {}
-    for path in (system_path, user_path):
+    for path in (BUNDLED_CONFIG, system_path, user_path):
         try:
             definitions = parse_configuration(path)
         except (OSError, ValueError) as exc:
@@ -102,4 +104,5 @@ def resolve_device(device, definitions=None):
         'vendor_name': entry.get('vendorname', device.get('vendor_name')),
         'model_name': entry.get('modelname', device.get('model_name')),
         'configuration_model_id': model,
+        'configured': bool(entry),
     }

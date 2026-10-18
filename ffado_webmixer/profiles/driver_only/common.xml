@@ -1,0 +1,4 @@
+<?xml version='1.0' encoding='utf-8'?>
+<profile family="driver_only" schema_version="2">
+  <documentation>Identity only: FFADO configuration has no mixer module for these models.</documentation>
+</profile>

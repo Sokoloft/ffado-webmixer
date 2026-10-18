@@ -1,4 +1,5 @@
 import time
+import os
 from pathlib import Path
 from urllib.parse import urlencode
 from urllib.request import urlopen
@@ -26,6 +27,10 @@ def wait_until_ready():
 
 
 def run_window(title, theme='dark', skip_loading_screen=False, config=None):
+    # Qt on Plasma Wayland uses desktopFileName for task-manager grouping.
+    # Use an identity distinct from FFADO's Qt mixer; the supplied desktop
+    # launcher must be installed with the matching basename.
+    os.environ['QT_WAYLAND_APP_ID'] = 'ffado-webmixer'
     mixer_url = f'http://127.0.0.1:{PORT}/'
     params = {'theme': theme}
     user_css = USER_THEMES / f'{theme}.css'
@@ -46,6 +51,24 @@ def run_window(title, theme='dark', skip_loading_screen=False, config=None):
         background_color='#17191d',
     )
 
+
+    def set_desktop_identity():
+        try:
+            from PyQt6.QtGui import QGuiApplication
+            app = QGuiApplication.instance()
+            if app:
+                app.setDesktopFileName('ffado-webmixer')
+        except (ImportError, RuntimeError, AttributeError):
+            # Browser/webview backend without Qt: taskbar grouping is handled
+            # by the desktop environment instead.
+            pass
+
+    # Set the desktopFileName as early as the Qt backend allows: waiting until
+    # shown is often too late for Plasma to match the initial Wayland surface.
+    before_show = getattr(window.events, 'before_show', None)
+    if before_show is not None:
+        before_show += set_desktop_identity
+    window.events.shown += set_desktop_identity  # fallback for older pywebview
 
     if config is not None:
         def save_window_size():

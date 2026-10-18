@@ -47,3 +47,30 @@ not been verified with a connected UltraLite.
 `support/mixer-qt4/ffado/mixer/motu.py` in the uploaded FFADO source,
 `initValues_g2()` and Mix_dest selectors; `src/motu/motu_controls.cpp`
 `MixDest::setValue()`.
+
+## Startup regression: `FFADO internal model ID was not available`
+
+The capability-system update initially queried `/Mixer/Info/Model` during
+hardware identification but left that control out of the subsequent inventory
+because the stored metadata path lacked `Mixer/`. This update corrects the
+path and retains the verified model ID between discovery and mixer creation.
+
+For a quick check, launch webmixer normally with the UltraLite connected.
+The model should open as **MOTU Ultralite**, with Mix 1–4 present.
+No `--debug` argument is needed for actual hardware.
+
+If startup still fails, do not alter the XML profile or guess an ID. Attach
+webmixer's complete terminal output and the output of this **read-only** command
+(run as the same desktop user who starts `ffado-dbus-server`):
+
+```bash
+dbus-send --session --print-reply \
+  --dest=org.ffado.Control \
+  /org/ffado/Control/DeviceManager/0001f2000007b2ca/Mixer/Info/Model \
+  org.ffado.Control.Element.Discrete.getValue
+```
+
+For this UltraLite, the expected result is an integer `3`. If that command
+fails, include the complete error; it will help distinguish an unavailable
+D-Bus control from a webmixer-side profile problem. `--debug motuultralite`
+only tests an offline fixture and cannot confirm a physical D-Bus connection.

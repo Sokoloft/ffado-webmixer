@@ -1,18 +1,23 @@
-# Runtime FFADO discovery and XML interpretation
+# Exact FFADO model resolution
 
-- `interrogate.py` inventories ConfigRom identity, scalar endpoints and live matrix paths/dimensions/names. It does not select or classify a mixer.
-- `device_registry.py` maps FFADO ConfigRom identity to its configured mixer family.
-- `profile_loader.py` loads the XML family/model profile and resolves the live matrix inventory into mixer roles and channel topology.
-- `mixer.py` reads/writes only those live endpoints and applies profile ranges.
-- `config.json` stores only application/user settings; hardware topology is not persisted.
+`device_registry.py` parses the source `ffado_configuration` to identify devices
+with exact vendor/model IDs and FFADO's own MOTU/RME normalization rules.
+`profiles/loader.py` selects an explicit model XML and reads the strict v2
+capability contract in `profiles/capabilities.py`.
 
-Unknown families retain generic role inference; device-specific advanced controls are not invented.
+`interrogate.py` reads ConfigROM first and inventories **only source-declared,
+model-mapped D-Bus paths**. For MOTU pre-mk3, it reads `/Mixer/Info/Model`
+*before* probing the model-specific matrix and controls. It does not infer
+hardware capabilities from matrix dimensions, D-Bus naming or label similarity.
 
-## Native matrix orientation (source-derived)
+`profiles/resolver.py` verifies the declared matrix/roles are present and maps
+FFADO's actual dimensions/labels to the UI. A missing or unsupported matrix
+returns no mixer rather than selecting the largest discovered matrix.
 
-- DICE EAP (`src/dice/dice_eap.cpp`, `support/mixer-qt4/ffado/mixer/generic_dice_eap.py`): `/EAP/MatrixMixer` rows are mixer **inputs**, columns are mixer **outputs**. `Mixer._coordinates` transposes to the webmixer's output-bus/strip convention. Its gain coefficient is linear (`0` silent, `16384` unity); convert to FFADO's -60..+6 dB UI scale rather than using 0..1 or 0..100 raw values.
-- MOTU: `/Mixer/fader` is an ordinary output-row/input-column fader matrix.
-- RME: FFADO uses `/Mixer/InputFaders` and `/Mixer/PlaybackFaders` with `Columns_are_inputs`; additional submixes must be implemented from verified source mappings.
-- EAP `/EAP/Router` is **not** a gain matrix. It implements `org.ffado.Control.Element.CrossbarRouter` with named sources/destinations. It is rendered in a separate routing tab.
-- Saffire PRO 26 `/EAP/Monitoring/LineOut/Volume1..6` are discrete monitor levels in the native range -40..0, and `/EAP/Monitoring/LineOut/Mute1..6` are Boolean (`selected`/`select`, not `getValue`/`setValue`). These are individual line outputs, **not** a global master volume.
-- Other unidentified matrices are deliberately not classified as writable faders. Real hardware verification remains necessary.
+`mixer.py` handles live reads/writes, checks the resolved capabilities and
+exposes the current model contract under `/api/describe.hardware_capabilities`.
+`debug_backend.py` uses a synthetic backend and makes **no real D-Bus calls**;
+fixtures are available only for models with declared mapped matrices.
+
+See [CAPABILITIES.md](CAPABILITIES.md) for model coverage, statuses, source
+attribution, and instructions for adding safely mapped controls.

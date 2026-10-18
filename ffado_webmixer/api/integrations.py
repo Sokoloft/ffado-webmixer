@@ -4,16 +4,16 @@ from flask import jsonify, request
 from .. import qjackctl
 
 
-def register(app, config, mixer_url):
+def register(app, config, mixer_url, debug=False):
     @app.get("/api/qjackctl/status")
     def qjackctl_status():
-        if not config.settings.get("enable_qjackctl", False):
+        if debug or not config.settings.get("enable_qjackctl", False):
             return jsonify(enabled=False, running=False)
         return jsonify(enabled=True, running=qjackctl.is_running())
 
     @app.post("/api/qjackctl")
     def open_qjackctl():
-        if not config.settings.get("enable_qjackctl", False):
+        if debug or not config.settings.get("enable_qjackctl", False):
             return jsonify(error="QjackCtl support is disabled in General settings"), 403
         window = request.get_json(force=True).get("window")
         try:

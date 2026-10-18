@@ -15,6 +15,7 @@
 </head>
 <body>
 <div id="main">
+  <div id="deviceTabs" role="tablist" aria-label="Connected FireWire interfaces" hidden></div>
   <div id="row"></div>
 </div>
 
@@ -44,6 +45,14 @@
   </div>
 </aside>
 
+<div id="muteRecovery" role="alert" hidden>
+  <div id="muteRecoveryText"></div>
+  <div class="mute-recovery-actions">
+    <button id="muteRestore" type="button" title="Restore prior levels only if still zero on the hardware">Restore levels</button>
+    <button id="muteDiscard" type="button" title="Forget earlier levels; leave hardware unchanged">Keep current levels</button>
+  </div>
+</div>
+
 <div id="toast" hidden></div>
 
 <div id="overlay" hidden>
@@ -65,6 +74,7 @@
       <label class="hidemin"><input type="checkbox" id="hideMin">Hide minimized strips <span id="minCount"></span></label>
       <label class="hidemin"><input type="checkbox" id="skipLoadingScreen">Skip loading screen</label>
       <label class="hidemin"><input type="checkbox" id="enableQjackctl">Enable QjackCtl support</label>
+      <div class="field device-alias-field"><label for="deviceAlias">Device alias</label><input id="deviceAlias" maxlength="48" placeholder="Optional local name" aria-label="Local device nickname"><button id="saveDeviceAlias" class="dlgbtn" type="button">Save</button></div>
     </div>
 
     <div class="pane off" id="pane-qjackctl" role="tabpanel" aria-labelledby="tab-qjackctl" hidden>
@@ -158,11 +168,34 @@
       <div class="routing-scroll"><table id="routingGrid" aria-label="Input gain into each mixer output"></table></div>
       <div id="routingEditor" hidden>
         <span id="routingCellLabel"></span>
-        <input id="routingLevel" type="range" min="0" max="100" step="1" aria-label="Selected matrix gain">
+        <div id="routingKnob" role="slider" tabindex="0" aria-label="Matrix gain knob" aria-valuemin="-60" aria-valuemax="6" aria-valuenow="0" title="Drag vertically, scroll or press arrow keys to change gain"><span class="routing-knob-needle"></span></div>
+        <input id="routingLevel" type="range" min="0" max="100" step="0.01" aria-label="Selected matrix gain">
+        <label id="routingDbLabel" for="routingDb">Gain</label><input id="routingDb" type="number" step="0.1" min="-60" max="6" value="0" aria-label="Matrix gain in dB">
         <output id="routingLevelLabel"></output>
         <button type="button" id="routingSilence">−∞</button>
         <button type="button" id="routingUnity">0 dB</button>
+        <label for="routingPreset" id="routingPresetLabel">Preset</label>
+        <select id="routingPreset" aria-label="Select a matrix gain preset">
+          <option value="" selected>Choose…</option>
+          <option value="6">+6 dB</option>
+          <option value="3">+3 dB</option>
+          <option value="0">0 dB</option>
+          <option value="-3">−3 dB</option>
+          <option value="-6">−6 dB</option>
+          <option value="-10">−10 dB</option>
+          <option value="-15">−15 dB</option>
+          <option value="-20">−20 dB</option>
+          <option value="-25">−25 dB</option>
+          <option value="-30">−30 dB</option>
+          <option value="-35">−35 dB</option>
+          <option value="-40">−40 dB</option>
+          <option value="-45">−45 dB</option>
+          <option value="-50">−50 dB</option>
+          <option value="-55">−55 dB</option>
+          <option value="silence">−∞ dB</option>
+        </select>
         <button type="button" id="routingApply">Apply</button>
+        <small class="matrix-hotkey-help">Knob: 0 = unity, M = silence, ↑↓ = 0.1 dB, Shift+↑↓ = 1 dB. Double-click a cell to preview unity; Apply commits.</small>
       </div>
     </div>
     <div id="routingCrossbar" class="routing-pane" hidden>
@@ -172,6 +205,7 @@
 </div>
 <script src="/static/routing.js"></script>
 <script src="/static/qrcode.js"></script>
+<script src="/static/peak-metering.js"></script>
 <script src="/static/index.js"></script>
 </body>
 </html>

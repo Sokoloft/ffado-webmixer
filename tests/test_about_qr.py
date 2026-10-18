@@ -27,7 +27,7 @@ def test_version_is_full_semver_string():
     assignments = [node for node in tree.body if isinstance(node, ast.Assign)
                    and any(isinstance(t, ast.Name) and t.id == 'APP_VERSION' for t in node.targets)]
     assert len(assignments) == 1
-    assert ast.literal_eval(assignments[0].value) == "1.0.1"
+    assert ast.literal_eval(assignments[0].value) == "1.1.0-dev"
 
 
 def test_about_has_qr_button_and_replacement_dialog():

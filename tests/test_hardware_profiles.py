@@ -27,6 +27,9 @@ if "dbus" not in sys.modules:
 
 from ffado_webmixer.mixer import Mixer
 from ffado_webmixer.profiles.resolver import resolve_mixer, resolve_controls
+from ffado_webmixer.profiles.capabilities import parse_capabilities
+from xml.etree import ElementTree as ET
+from pathlib import Path
 
 GUID = "/org/ffado/Control/DeviceManager/00130e04048014ef"
 MATRIX = GUID + "/EAP/MatrixMixer"
@@ -77,7 +80,9 @@ class Hardware:
 
 def make_mixer():
     d = device()
-    profile = {"family": "saffire_dice", "controls": {}}
+    profile = {"family": "saffire_dice", "controls": {}, "mixer_matrix":
+               {"path": "/EAP/MatrixMixer", "row_role": "inputs", "coefficient": "dice_db"}}
+    profile['capabilities'] = parse_capabilities(ET.parse(Path(__file__).resolve().parents[1] / 'ffado_webmixer/profiles/saffire_dice/saffire_pro_26_00130e_00000012.xml').getroot())
     model = resolve_mixer(d, profile)
     ctrl = resolve_controls(d, profile, model["matrices"], model["columns"], model["rows"])
     mixer = Mixer.__new__(Mixer)
@@ -117,7 +122,7 @@ class TestDICE(unittest.TestCase):
         self.assertNotEqual(m.helper.cells[(1, 2)], 16384)
         self.assertEqual(m.helper.cells[(2, 1)], 16384)  # reversed coordinate untouched
         self.assertGreater(m.helper.cells[(1, 2)], 0)
-        self.assertEqual(m.read_mix(2)["ch/01"]["fader"], 50)
+        self.assertAlmostEqual(m.read_mix(2)["ch/01"]["fader"], 50, delta=0.02)
 
     def test_virtual_mute_restores_gain(self):
         m = make_mixer()
@@ -159,15 +164,16 @@ class TestDICE(unittest.TestCase):
         d = device()
         d["matrices"][0]["path"] = GUID + "/Unrecognized/Matrix"
         r = resolve_mixer(d, {"family": "unknown"})
-        self.assertEqual(r["matrices"], {})
-        self.assertEqual(r["mode"], "unmapped")
+        self.assertIsNone(r)
 
     def test_motu_orientation(self):
         d = device()
         d["matrices"] = [{"path": GUID + "/Mixer/fader", "name": "fader", "rows": 4, "cols": 20,
                           "row_names": [f"Mix {i}" for i in range(4)],
                           "col_names": [f"Analog {i}" for i in range(20)]}]
-        r = resolve_mixer(d, {"family": "motu"})
+        r = resolve_mixer(d, {"family": "motu", "mixer_matrix":
+                              {"path": "/Mixer/fader", "row_role": "outputs", "coefficient": "linear"},
+                              "capabilities": parse_capabilities(ET.parse(Path(__file__).resolve().parents[1] / "ffado_webmixer/profiles/motu/motu_ultralite.xml").getroot())})
         self.assertFalse(r["transposed"])
         self.assertEqual(len(r["rows"]), 4)
         self.assertEqual(len(r["columns"]), 20)

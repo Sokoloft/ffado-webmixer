@@ -55,3 +55,36 @@
 #routingBusGrid .bus-route-cell:disabled { cursor: wait; opacity: .55; }
 #routingBusGrid .bus-route-cell.route-assigned:disabled { opacity: .8; }
 @media(max-width:650px) { #routingBusGrid th { min-width: 80px; padding: 6px; } #routingBusGrid .bus-route-cell { width: 57px; } }
+
+#routingDb { color:var(--text-primary); background:var(--control-background); border:1px solid var(--border-color); border-radius:4px; padding:7px; width:78px; font:inherit; }
+
+#routingKnob { flex:none; position:relative; border-radius:50%; height:47px; width:47px;
+  border:3px solid var(--border-color); cursor:ns-resize;
+  background:radial-gradient(circle at center,var(--control-background) 49%,var(--button-background) 51%);
+  box-shadow:inset 0 1px 5px #0005; touch-action:none; }
+#routingKnob:focus-visible { outline:2px solid var(--accent-color); }
+.routing-knob-needle { display:block; height:43%; width:3px; background:var(--accent-color);
+  border-radius:2px; position:absolute; bottom:50%; left:calc(50% - 1.5px);
+  transform-origin:bottom center; transform:rotate(-135deg); }
+.matrix-hotkey-help { font-size:11px; color:var(--text-secondary); }
+
+/* DICE EAP per-destination router metering, visible only when FFADO supplies
+   an actual peak for that named destination (never guessed from strip index). */
+.route-peak { position:relative; display:block; width:100%; height:15px; padding:0; cursor:pointer; border:1px solid var(--border-color);
+  border-radius:3px; background:var(--control-background); overflow:hidden; }
+.route-peak-fill { position:absolute; left:0; top:0; height:100%; width:0;
+  background:linear-gradient(to right,#43b581 65%,#e6b450 84%,#e05454 100%); }
+.route-peak-db { position:absolute; right:5px; top:0; line-height:15px;
+  font-size:10px; font-variant-numeric:tabular-nums; color:var(--text-primary); text-shadow:0 1px 2px #000; }
+
+.route-peak-hold { position:absolute; top:0; bottom:0; left:0; width:2px;
+  background:var(--text-primary); pointer-events:none; }
+.route-peak-clip { position:absolute; right:0; top:0; bottom:0; width:3px;
+  background:transparent; pointer-events:none; }
+.route-peak.clipping .route-peak-clip { background:#ff3434; }
+.route-peak:focus-visible { outline:2px solid var(--accent-color); outline-offset:2px; }
+
+/* Native dB matrix presets are selected without crowding the dialog. */
+#routingPreset { background:var(--control-background); color:var(--text-primary);
+  border:1px solid var(--border-color); border-radius:4px; padding:7px; min-width:105px; }
+#routingDb { width:85px; }

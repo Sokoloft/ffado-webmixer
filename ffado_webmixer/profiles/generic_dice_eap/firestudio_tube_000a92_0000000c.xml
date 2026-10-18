@@ -2,5 +2,30 @@
 <device family="generic_dice_eap" name="Firestudio Tube" extends="common.xml" identity_source="ffado_configuration">
   <match vendor_id="0xa92" configuration_model_id="0xc" />
   <identity vendor="Presonus" driver="DICE" ffado_mixer="Generic_Dice_EAP" />
-  <capabilities mode="discovered-controls-only" />
+  <capabilities schema="2" status="mapped" source="support/mixer-qt4/ffado/mixer/generic_dice_eap.py">
+    <feature name="matrix_gain" state="mapped" source="support/mixer-qt4/ffado/mixer/generic_dice_eap.py" path="/EAP/MatrixMixer" />
+    <feature name="matrix_pan" state="unmapped" />
+    <feature name="matrix_mute" state="unmapped" />
+    <feature name="matrix_solo" state="unmapped" />
+    <feature name="matrix_invert" state="unmapped" />
+    <feature name="matrix_playback" state="unmapped" />
+    <feature name="matrix_output" state="unmapped" />
+    <feature name="crossbar_routing" state="mapped" source="support/mixer-qt4/ffado/mixer/generic_dice_eap.py" path="/EAP/Router" />
+    <feature name="peak_metering" state="optional" source="support/mixer-qt4/ffado/widgets/crossbarrouter.py" path="/EAP/Router" format="dice_eap_peak12" channel_map="matrix_input_router_destination" />
+    <feature name="software_mute_solo" state="mapped" source="ffado-webmixer:matrix-zero-emulation" path="/EAP/MatrixMixer" />
+    <feature name="stereo_bus_link" state="mapped" source="support/mixer-qt4/ffado/widgets/matrixmixer.py" path="/EAP/MatrixMixer" />
+    <feature name="bus_destination" state="unmapped" />
+    <feature name="monitor_line_volume" state="unmapped" />
+    <feature name="monitor_line_mute" state="unmapped" />
+    <feature name="monitor_global_mute" state="unmapped" />
+    <feature name="monitor_global_dim" state="unmapped" />
+    <feature name="output_level" state="unmapped" />
+    <feature name="channel_trim" state="unmapped" />
+    <feature name="channel_invert" state="unmapped" />
+    <feature name="device_settings" state="unmapped" />
+    <feature name="hardware_nickname" state="optional" source="support/mixer-qt4/ffado/mixer/generic_dice_eap.py" path="/Generic/Nickname" />
+    <feature name="scalar_volume" state="unmapped" />
+    <feature name="scalar_selector" state="unmapped" />
+    <feature name="bus_output_mute" state="unmapped" />
+  </capabilities>
 </device>

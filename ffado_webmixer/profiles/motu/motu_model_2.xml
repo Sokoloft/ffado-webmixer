@@ -1,0 +1,29 @@
+<?xml version='1.0' encoding='utf-8'?>
+<device family="motu" model_id="2" name="MOTU Traveler" extends="common.xml">
+  <capabilities schema="2" status="mapped" source="src/motu/motu_mixer.cpp">
+    <feature name="matrix_gain" state="mapped" source="src/motu/motu_mixer.cpp" path="/Mixer/fader" />
+    <feature name="matrix_pan" state="mapped" source="src/motu/motu_mixer.cpp" path="/Mixer/pan" />
+    <feature name="matrix_mute" state="mapped" source="src/motu/motu_mixer.cpp" path="/Mixer/mute" />
+    <feature name="matrix_solo" state="mapped" source="src/motu/motu_mixer.cpp" path="/Mixer/solo" />
+    <feature name="matrix_invert" state="unmapped" />
+    <feature name="matrix_playback" state="unmapped" />
+    <feature name="matrix_output" state="unmapped" />
+    <feature name="crossbar_routing" state="unmapped" />
+    <feature name="peak_metering" state="unmapped" />
+    <feature name="software_mute_solo" state="unmapped" />
+    <feature name="stereo_bus_link" state="unmapped" />
+    <feature name="bus_destination" state="mapped" source="support/mixer-qt4/ffado/mixer/motu.py" path="/Mixer/Mix{n}/Mix_dest" count="4" />
+    <feature name="monitor_line_volume" state="unmapped" />
+    <feature name="monitor_line_mute" state="unmapped" />
+    <feature name="monitor_global_mute" state="unmapped" />
+    <feature name="monitor_global_dim" state="unmapped" />
+    <feature name="output_level" state="mapped" source="support/mixer-qt4/ffado/mixer/motu.py" path="/Mixer/Mix{n}/Mix_fader" count="4" extra_paths="/Mixer/Mainout_fader,/Mixer/Phones_fader" />
+    <feature name="channel_trim" state="mapped" source="support/mixer-qt4/ffado/mixer/motu.py" path="/Mixer/Control/Ana{n}_trimgain" count="8" extra_paths="/Mixer/Control/Spdif{n}_trimgain" extra_count="2" />
+    <feature name="channel_invert" state="mapped" source="support/mixer-qt4/ffado/mixer/motu.py" path="/Mixer/Control/Ana{n}_invert" count="8" extra_paths="/Mixer/Control/Spdif{n}_invert" extra_count="2" />
+    <feature name="device_settings" state="unmapped" />
+    <feature name="hardware_nickname" state="unmapped" />
+    <feature name="scalar_volume" state="unmapped" />
+    <feature name="scalar_selector" state="unmapped" />
+    <feature name="bus_output_mute" state="mapped" source="support/mixer-qt4/ffado/mixer/motu.py" path="/Mixer/Mix{n}/Mix_mute" count="4" />
+  </capabilities>
+</device>

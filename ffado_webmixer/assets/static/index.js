@@ -4,6 +4,9 @@ var FADER_ALLOWED = true;
 var MUTE_ALLOWED = true;
 var OUTPUTS = [];
 var MIXES = [];
+var GAIN_SCALE = null;
+var STEREO_BUSES = [];
+var ACTIVE_DEVICE = null;
 var currentMix = 0;       // which bus the channel strips show
 var currentOut = "";      // which output the master fader controls (Main, Phones or a bus)
 
@@ -12,13 +15,20 @@ function fmtGain(v) { return (v >= 0 ? "+" : "") + v; }
 // ---- server calls ----
 var CLIENT_ID = Math.random().toString(36).slice(2) + Date.now().toString(36);
 function post(url, body) {
-  return fetch(url, { method: "POST", headers: { "Content-Type": "application/json", "X-Client-Id": CLIENT_ID },
+  return fetch(url, { method: "POST", headers: { "Content-Type": "application/json", "X-Client-Id": CLIENT_ID,
+                                 "X-FFADO-Device": ACTIVE_DEVICE || "" },
                       body: JSON.stringify(body) });
 }
+// Device-specific reads must never silently return another unit when two
+// tabs of the same browser share a session cookie and one changes devices.
+function deviceFetch(url) {
+  return fetch(url, {cache: "no-store", headers: ACTIVE_DEVICE ? {"X-FFADO-Device": ACTIVE_DEVICE} : {}});
+}
+
 function send(strip, control, value) {
   return post("/api/set", { strip: strip, control: control, value: value, mix: currentMix })
     .then(function (r) { return r.json().then(function (d) { if (!r.ok || d.error) throw Error(d.error || "FFADO rejected the change"); }); })
-    .catch(function (e) { toast("Mixer change failed: " + e.message); });
+    .catch(function (e) { toast("Mixer change failed: " + e.message); loadMuteRecovery(); loadMix(); });
 }
 // Drags fire many events; send at most one request per 50 ms per key, always ending on the latest value.
 var pendingVals = {}, sendTimers = {};
@@ -33,6 +43,39 @@ function throttled(key, value, fn) {
 function sendThrottled(strip, control, value) {
   throttled(strip + "|" + control, value, function (v) { send(strip, control, v); });
 }
+
+// Interrupted software mute/solo is journaled per FireWire GUID. No automatic
+// restoration: recovering nonzero gains after a reboot could be dangerously loud.
+function loadMuteRecovery() {
+  deviceFetch('/api/mute-recovery').then(r => r.json()).then(data => {
+    var bar = document.getElementById('muteRecovery');
+    var message = document.getElementById('muteRecoveryText');
+    bar.hidden = !data.pending && !data.fault;
+    if (data.pending) {
+      message.textContent = data.pending + ' channel/output level(s) were saved by an interrupted mute/solo session. ' +
+        'Restoring may raise output volume. Lower monitor levels before choosing Restore; ' +
+        'Keep current levels only forgets the saved gains.';
+    } else if (data.fault) {
+      message.textContent = data.fault + (data.corrupt ?
+        ' The journal cannot be safely restored. Keep current levels discards the unreadable record.' :
+        ' Keep current levels dismisses this warning without writing to the hardware.');
+    }
+    bar.querySelector('.mute-recovery-actions').hidden = !data.pending && !data.fault && !data.corrupt;
+    document.getElementById('muteRestore').hidden = !data.pending || !!data.corrupt;
+  }).catch(e => console.warn('Could not check mute recovery:', e));
+}
+function muteRecoveryAction(action) {
+  if (action === 'restore' && !window.confirm('Restore previously muted channel levels? ' +
+      'This may make the speakers louder. Lower your monitoring volume first.')) return;
+  post('/api/mute-recovery', {action: action}).then(r => r.json().then(data => {
+    if (!r.ok || data.error) throw Error(data.error || 'Recovery failed');
+    if (data.failed) toast(data.failed + ' gain(s) could not be restored. Try again after checking FFADO.');
+    loadMuteRecovery();
+    loadMix();
+  })).catch(e => toast('Recovery failed: ' + e.message));
+}
+document.getElementById('muteRestore').addEventListener('click', () => muteRecoveryAction('restore'));
+document.getElementById('muteDiscard').addEventListener('click', () => muteRecoveryAction('discard'));
 
 // ---- mouse wheel: one notch = one step. Returns +1 (wheel up), -1 (wheel down) or 0 (not enough yet;
 // trackpads send many small deltas, so they are accumulated). Shift+wheel arrives as deltaX in browsers.
@@ -51,7 +94,7 @@ function wheelDir(e, acc) {
 function isPinned(el) { return el.classList.contains("pinned"); }
 function isMin(el) { return el.classList.contains("minimized"); }
 function saveLayout() {
-  var layout = Array.prototype.map.call(row.children, function (s) {
+  var layout = Array.prototype.map.call(row.querySelectorAll(":scope > .strip"), function (s) {
     return { id: s.dataset.id, pinned: isPinned(s), minimized: isMin(s) };
   });
   return post("/api/layout?mix=" + currentMix, layout);   // each bus keeps its own order / pins / minimized
@@ -135,7 +178,6 @@ function startDrag(el, e) {
     var over = t.closest(".strip");
     if (over && over !== el && over.parentNode === row) {
       var r = over.getBoundingClientRect(), frac = (ev.clientX - r.left) / r.width;
-      if (canLink(el, over) && frac > 0.25 && frac < 0.75) { setLinkTarget(over); return; }   // hover = link candidate
       setLinkTarget(null);
       place(el, over, frac > 0.5);
     } else {
@@ -154,22 +196,28 @@ function startDrag(el, e) {
     var target = linkTarget;
     setLinkTarget(null);
     var saved = saveLayout();
-    if (target) linkStrips(el.dataset.id, target.dataset.id, saved);
+    // Stereo link is handled by the explicit buttons between odd/even strips.
   }
   document.addEventListener("pointermove", move);
   document.addEventListener("pointerup", up);
   document.addEventListener("pointercancel", up);
 }
 
-// ---- a fader: drag the handle; the value is a whole number 0..100 ----
+// ---- a fader: precise fractional level where FFADO declares native dB gain ----
 function makeFader(track, handle, label, onChange) {
   var value = 0, dragging = false;
   function render() {
     handle.style.top = (100 - value) + "%";
-    label.textContent = value === 0 ? "\u221E" : value;      // 0 reads as the infinity symbol
+    if (GAIN_SCALE && (GAIN_SCALE.mode === "dice_db" || GAIN_SCALE.mode === "rme_db")) {
+      var db = value === 0 ? null : GAIN_SCALE.min_db + value * (GAIN_SCALE.max_db - GAIN_SCALE.min_db) / 100;
+      label.textContent = db === null ? "−∞ dB" : (db > 0 ? "+" : "") + db.toFixed(1) + " dB";
+    } else {
+      label.textContent = value === 0 ? "−∞" : value;
+    }
   }
   function setValue(v) {
-    value = Math.min(100, Math.max(0, Math.round(v)));
+    var precise = GAIN_SCALE && (GAIN_SCALE.mode === "dice_db" || GAIN_SCALE.mode === "rme_db");
+    value = Math.min(100, Math.max(0, precise ? Math.round(v * 10000) / 10000 : Math.round(v)));
     render();
     onChange(value);
   }
@@ -196,9 +244,9 @@ function makeFader(track, handle, label, onChange) {
   track.parentNode.addEventListener("wheel", function (e) {
     e.preventDefault();
     var dir = wheelDir(e, acc);
-    if (dir) setValue(value + dir * (e.shiftKey ? 1 : 2));
+    if (dir) setValue(value + dir * (GAIN_SCALE ? (e.shiftKey ? 0.15 : 0.75) : (e.shiftKey ? 1 : 2)));
   }, { passive: false });
-  return { set: function (v) { if (dragging) return; value = Math.min(100, Math.max(0, Math.round(v))); render(); } };
+  return { set: function (v) { if (dragging) return; value = Math.min(100, Math.max(0, GAIN_SCALE ? Number(v) : Math.round(v))); render(); } };
 }
 
 // ---- a gain box: shown as +20, typed as 20 or +20; Up/Down arrows and the mouse wheel nudge it ----
@@ -248,14 +296,15 @@ function buildStrip(id, data, pinned, minimized, partner) {
       '<button class="invert" title="Polarity (invert)">\u00D8</button></div>' +
     '<div class="panrow"><div class="caprow"><span>PAN</span><span class="panval">0</span></div>' +
       '<input class="pan" type="range" min="-100" max="100" step="1" value="0" title="Double-click to center"></div>' +
-    '<div class="stereorow" hidden><div class="caprow"><span>STEREO</span><span class="stval">L+R</span></div>' +
-      '<div class="stereobtns"><button class="unlink" title="Split this pair back into two channels">Unlink</button></div></div>' +
+
     '<input class="name" maxlength="16" spellcheck="false" title="Rename">' +
     '<button class="btn solo">Solo</button>' +
     '<div class="fval"></div>' +
-    '<div class="faderwrap"><div class="track"><div class="handle"></div></div></div>' +
+    '<div class="faderwrap"><div class="track"><div class="handle"></div></div>' +
+      '<button type="button" class="peak-meter" hidden title="FFADO router peak" aria-label="Clear peak and clip hold"><span class="peak-bar"></span><span class="peak-hold"></span><span class="peak-clip"></span></button></div>' +
     '<button class="btn mute">Mute</button>' +
-    '<div class="inname" title="Hardware input"></div>';
+    '<div class="inname" title="Hardware input"></div>' +
+    (stereo ? '<button class="unlink" type="button" title="Unlink stereo channels" aria-label="Unlink stereo channels">' + '&#x26D3;' + '</button>' : '');
 
   var q = function (sel) { return el.querySelector(sel); };
   var nameEl = q(".name"), invertEl = q(".invert");
@@ -264,10 +313,9 @@ function buildStrip(id, data, pinned, minimized, partner) {
   var missing = function (v) { return v === undefined || v === null; };
 
   // which controls this device offers (and which this particular channel has)
-  q(".panrow").hidden = !FEATURES.pan || stereo;          // a stereo pair is fixed hard left / right
-  q(".stereorow").hidden = !stereo;
+  q(".panrow").hidden = !FEATURES.pan && !STEREO_BUSES.includes(currentMix);
   if (stereo) invertEl.title = "Polarity of both channels";
-  soloEl.hidden = !FEATURES.solo;
+  soloEl.hidden = !FEATURES.solo && !(FEATURES.software_solo);
   q(".mute").hidden = !MUTE_ALLOWED;
   q(".faderwrap").classList.toggle("read-only", !FADER_ALLOWED);
   q(".gainrow").hidden = !FEATURES.gain;
@@ -300,14 +348,14 @@ function buildStrip(id, data, pinned, minimized, partner) {
   invertEl.disabled = !!FEATURES.invert && !FEATURES.invert.writable;
   invertEl.addEventListener("click", function () { send(id, "invert", invertEl.classList.toggle("on")); });
 
-  // pan (single channels only)
+  // Pan for mono strips and stereo-pair balance (handled as L/R by the API).
   function renderPan() {
     var p = Math.round(pan * 100);
     panEl.value = p;
     panVal.textContent = p === 0 ? "0" : (p < 0 ? "L" + (-p) : "R" + p);
   }
-  if (FEATURES.pan) {
-    panEl.disabled = !FEATURES.pan.writable;
+  if (FEATURES.pan || STEREO_BUSES.includes(currentMix)) {
+    panEl.disabled = STEREO_BUSES.includes(currentMix) ? false : !FEATURES.pan.writable;
     panEl.addEventListener("input", function () {
       pan = parseInt(panEl.value, 10) / 100;
       renderPan();
@@ -330,13 +378,23 @@ function buildStrip(id, data, pinned, minimized, partner) {
 
   // fader, solo, mute. On a stereo strip these go to the left channel and the server moves the right one too.
   var fader = makeFader(q(".track"), q(".handle"), q(".fval"), function (v) { if (FADER_ALLOWED) sendThrottled(id, "fader", v); });
-  soloEl.addEventListener("click", function () { send(id, "solo", el.classList.toggle("soloed")); });
-  q(".mute").addEventListener("click", function () { if (MUTE_ALLOWED) send(id, "mute", el.classList.toggle("muted")); });
-  q(".unlink").addEventListener("click", function () { unlinkStrip(id); });
+  function toggleHardware(control, on) {
+    post('/api/set', { strip:id, control:control, value:on, mix:currentMix })
+      .then(r => r.json().then(d => { if (!r.ok || d.error) throw Error(d.error || 'Hardware write failed'); }))
+      .then(() => el.classList.toggle(control === 'solo' ? 'soloed' : 'muted', on))
+      .catch(e => { toast(control + ': ' + e.message); loadMix(); });
+  }
+  soloEl.addEventListener("click", function () { toggleHardware('solo', !el.classList.contains('soloed')); });
+  q(".mute").addEventListener("click", function () { if (MUTE_ALLOWED) toggleHardware('mute', !el.classList.contains('muted')); });
+  if (stereo) q(".unlink").addEventListener("click", function () { unlinkStrip(id); });
 
   // pin / minimize / drag
   q(".pin").addEventListener("click", function () { setPinned(el, !isPinned(el)); saveLayout(); });
-  q(".eye").addEventListener("click", function () { setMinimized(el, !isMin(el)); saveLayout(); });
+  q(".eye").addEventListener("click", function () {
+    setMinimized(el, !isMin(el));
+    if (lastStripState) renderLinkButtons(lastStripState);
+    saveLayout();
+  });
   q(".grip").addEventListener("pointerdown", function (e) { startDrag(el, e); });
   q(".vname").addEventListener("pointerdown", function (e) { startDrag(el, e); });
 
@@ -689,7 +747,7 @@ function loadMaster() {
   if (masterEl.hidden) return;
   masterHardwareName.textContent = out.baseName;
   var token = ++masterToken;
-  return fetch("/api/output?out=" + encodeURIComponent(currentOut)).then(function (r) { return r.json(); }).then(function (o) {
+  return deviceFetch("/api/output?out=" + encodeURIComponent(currentOut)).then(function (r) { return r.json(); }).then(function (o) {
     if (token !== masterToken || o.error) return;
     showMasterName(o.name);
     masterFader.set(o.level);
@@ -703,7 +761,7 @@ function markOutputs() {
   Array.prototype.forEach.call(document.querySelectorAll(".outbtn"), function (b) {
     var o = OUTPUTS.filter(function (x) { return x.id === b.dataset.id; })[0];
     b.classList.toggle("active", b.dataset.id === currentOut);
-    var shows = !busActive && o.mix !== null && o.mix === currentMix;
+    var shows = !busActive && o.mix !== null && (o.mix === currentMix || (STEREO_BUSES.includes(currentMix) && o.mix === currentMix+1));
     b.classList.toggle("shows", shows);
     b.title = shows ? o.name + " (the channel strips are showing this bus)" : o.name;
   });
@@ -714,7 +772,7 @@ function selectOutput(o) {
   // physical monitor's master fader.
   if (!o.controllable && o.mix !== null && OUTPUTS.some(function (x) { return x.mix === null && x.controllable; })) {
     var changed = currentMix !== o.mix;
-    currentMix = o.mix;
+    currentMix = STEREO_BUSES.includes(o.mix - o.mix % 2) ? o.mix - o.mix % 2 : o.mix;
     markOutputs();
     post("/api/settings", { output: currentOut, mix: currentMix });
     if (changed) loadMix();
@@ -722,7 +780,7 @@ function selectOutput(o) {
   }
   currentOut = o.id;
   var busChanged = o.mix !== null && o.mix !== currentMix;     // Main/Phones leave the channel strips alone
-  if (o.mix !== null) currentMix = o.mix;
+  if (o.mix !== null) currentMix = STEREO_BUSES.includes(o.mix - o.mix % 2) ? o.mix - o.mix % 2 : o.mix;
   markOutputs();
   post("/api/settings", { output: currentOut, mix: currentMix });
   if (busChanged) loadMix();
@@ -747,6 +805,19 @@ function buildOutputs() {
       btn.title = o.name;
       btn.addEventListener("click", function () { selectOutput(o); });
       group.querySelector(".groupgrid").appendChild(btn);
+      if (g[0] === 'Buses' && o.mix !== null && o.mix % 2 === 1 && GAIN_SCALE) {
+        var left = o.mix - 1, linked = STEREO_BUSES.includes(left);
+        var link = document.createElement('button');
+        link.type='button'; link.className='bus-pair-link' + (linked ? ' is-linked' : '');
+        link.textContent = linked ? '🔗 Bus ' + (left+1) + '+' + (left+2) : '↔ Link ' + (left+1) + '+' + (left+2);
+        link.title = 'Toggle stereo bus link for pair ' + (left+1) + '/' + (left+2);
+        link.onclick = () => post('/api/bus-stereo',{left:left,linked:!linked})
+           .then(r => r.json().then(d => { if (!r.ok || d.error) throw Error(d.error || 'Bus link failed'); }))
+           .then(() => deviceFetch('/api/describe').then(r => r.json()))
+           .then(info => { STEREO_BUSES=info.stereo_buses||[]; buildOutputs(); loadMix(); })
+           .catch(e => toast(e.message));
+        group.querySelector('.groupgrid').appendChild(link);
+      }
     });
     box.appendChild(group);
   });
@@ -807,7 +878,9 @@ window.addEventListener("resize", function () {                // keep a saved w
 });
 
 // ---- render the strips for the selected bus ----
+var lastStripState = null;
 function renderStrips(state, layout) {
+  lastStripState = state;
   row.innerHTML = "";
   var placed = {};
   function make(id, pinned, minimized) {
@@ -825,20 +898,78 @@ function renderStrips(state, layout) {
     if (placed[id] || state[id].partner_of) return;
     row.appendChild(make(id, true, false));
   });
+  renderLinkButtons(state);
   updateMinCount();
+}
+// Pair hardware channels (1+2, 3+4...) only. Never link arbitrary faders.
+function renderLinkButtons(state) {
+  // Link controls belong to the odd-numbered (left) strip, never between strips.
+  // Linked pairs already have the same lower-right control in buildStrip().
+  row.querySelectorAll('.strip > .link-toggle').forEach(b => b.remove());
+  var ids = Object.keys(state).filter(id => /^ch\/\d+$/.test(id));
+  ids.filter(id => parseInt(id.split('/')[1], 10) % 2 === 0).forEach(left => {
+    var ix = parseInt(left.split('/')[1], 10);
+    var right = 'ch/' + String(ix + 1).padStart(2, '0');
+    if (!state[right] || state[left].partner === right) return;
+    var el = Array.from(row.querySelectorAll(':scope > .strip')).find(x => x.dataset.id === left);
+    // A visible odd strip can toggle its adjacent channel without a spacer.
+    // Minimized odd strips hide the control through CSS.
+    if (!el) return;
+    var b = document.createElement('button');
+    b.className = 'unlink link-toggle';
+    b.type = 'button';
+    b.title = 'Link channel ' + (ix+1) + ' (L) with ' + (ix+2) + ' (R)';
+    b.innerHTML = '&#x26D3;';
+    b.setAttribute('aria-label', b.title);
+    b.addEventListener('click', () => linkStrips(left, right, Promise.resolve()));
+    el.appendChild(b);
+  });
 }
 var loadToken = 0;
 function loadMix() {
   var token = ++loadToken;                 // ignore out-of-order replies when clicking quickly
   return Promise.all([
-    fetch("/api/state?mix=" + currentMix).then(function (r) { return r.json(); }),
-    fetch("/api/layout?mix=" + currentMix).then(function (r) { return r.json(); })
+    deviceFetch("/api/state?mix=" + currentMix).then(function (r) { return r.json(); }),
+    deviceFetch("/api/layout?mix=" + currentMix).then(function (r) { return r.json(); })
   ]).then(function (res) {
     if (token !== loadToken) return;
     if (res[0].error) { row.textContent = "Could not read the mixer: " + res[0].error; return; }
     renderStrips(res[0], res[1]);
+    loadMuteRecovery();
   });
 }
+
+// Device tabs are per browser session. Saved names are stored by GUID.
+function loadDevices() {
+  fetch('/api/devices').then(r=>r.json()).then(data => {
+    var tabs=document.getElementById('deviceTabs'); tabs.replaceChildren();
+    tabs.hidden = !data.devices || data.devices.length < 2;
+    (data.devices || []).forEach(d => {
+      var b=document.createElement('button'); b.type='button';
+      b.className='device-tab' + (data.selected===d.guid ? ' active':'');
+      b.textContent=d.name; b.title=d.model + ' · ' + d.guid;
+      b.setAttribute('role','tab'); b.setAttribute('aria-selected', String(data.selected===d.guid));
+      b.addEventListener('click', () => {
+        if (data.selected===d.guid || b.disabled) return;
+        b.disabled = true;
+        post('/api/device',{guid:d.guid}).then(r=>r.json().then(v=>{
+          if (!r.ok || v.error) throw Error(v.error||'Device selection failed');
+          location.reload();
+        })).catch(e=>{ b.disabled = false; toast(e.message); });
+      });
+      tabs.appendChild(b);
+    });
+    var chosen=(data.devices||[]).find(d=>d.guid===data.selected);
+    var alias=document.getElementById('deviceAlias'); if (alias && chosen) alias.value=chosen.alias||'';
+  }).catch(e=>toast('Device discovery: '+e.message));
+}
+document.getElementById('saveDeviceAlias').addEventListener('click', () => {
+  var name=document.getElementById('deviceAlias').value.trim();
+  post('/api/device-alias',{name:name}).then(r=>r.json().then(d=>{
+    if (!r.ok || d.error) throw Error(d.error || 'Cannot save alias');
+    loadDevices();
+  })).catch(e=>toast(e.message));
+});
 
 // ---- live sync: changes made on other pages arrive here ----
 function stripEl(id) {                          // a stereo strip answers to both of its channels
@@ -847,8 +978,8 @@ function stripEl(id) {                          // a stereo strip answers to bot
 
 function applyLayout() {                         // order / pinned / minimized changed on another page
   if (row.querySelector(".dragging")) return;    // don't yank a strip out of the user's hand
-  fetch("/api/layout?mix=" + currentMix).then(function (r) { return r.json(); }).then(function (layout) {
-    var current = Array.prototype.slice.call(row.children), byId = {}, used = [], ordered = [];
+  deviceFetch("/api/layout?mix=" + currentMix).then(function (r) { return r.json(); }).then(function (layout) {
+    var current = Array.prototype.slice.call(row.querySelectorAll(':scope > .strip')), byId = {}, used = [], ordered = [];
     current.forEach(function (c) {
       byId[c.dataset.id] = c;
       if (c.dataset.partner) byId[c.dataset.partner] = c;
@@ -865,10 +996,12 @@ function applyLayout() {                         // order / pinned / minimized c
     if (ordered.some(function (el, i) { return el !== current[i]; })) {
       ordered.forEach(function (el) { row.appendChild(el); });
     }
+    if (lastStripState) renderLinkButtons(lastStripState);
   });
 }
 
 function onSyncEvent(ev) {
+  if (ev.device && ACTIVE_DEVICE && ev.device !== ACTIVE_DEVICE) return;
   if (window.routingSyncEvent) window.routingSyncEvent(ev);
   if (ev.origin === CLIENT_ID) return;           // our own change coming back
   var el;
@@ -888,6 +1021,10 @@ function onSyncEvent(ev) {
     if (ev.mix === currentMix) applyLayout();     // another bus's arrangement doesn't concern this page
   } else if (ev.type === "matrix") {
     if (ev.output === currentMix) loadMix();
+  } else if (ev.type === "bus-stereo") {
+    deviceFetch('/api/describe').then(r => r.json()).then(info => {
+      STEREO_BUSES = info.stereo_buses || []; buildOutputs(); loadMix();
+    });
   } else if (ev.type === "stereo") {
     if (!row.querySelector(".dragging")) loadMix();   // pairs changed: redraw the strips
   }
@@ -904,11 +1041,16 @@ function startSync() {
 }
 
 Promise.all([
-  fetch("/api/describe").then(function (r) { return r.json(); }),
-  fetch("/api/settings").then(function (r) { return r.json(); })
+  deviceFetch("/api/describe").then(function (r) { return r.json(); }),
+  deviceFetch("/api/settings").then(function (r) { return r.json(); })
 ]).then(function (res) {
   var info = res[0], settings = res[1];
   FEATURES = info.features || {};
+  GAIN_SCALE = info.gain_scale || null;
+  ACTIVE_DEVICE = info.guid || null;
+  window.activeFfadoDevice = ACTIVE_DEVICE;
+  STEREO_BUSES = info.stereo_buses || [];
+  if (info.solo && info.solo.writable && !FEATURES.solo) FEATURES.software_solo = true;
   FADER_ALLOWED = !info.fader || !!info.fader.writable;
   MUTE_ALLOWED = !info.mute || !!info.mute.writable;
   MIXES = info.mixes || [];
@@ -929,16 +1071,28 @@ Promise.all([
             OUTPUTS.filter(function (o) { return o.mix === null && o.controllable; })[0] ||
             OUTPUTS.filter(function (o) { return o.id === settings.output; })[0] || OUTPUTS[0];
   currentOut = sel ? sel.id : "";
-  if (sel && sel.mix !== null) currentMix = sel.mix;
+  if (sel && sel.mix !== null) currentMix = STEREO_BUSES.includes(sel.mix - sel.mix % 2) ? sel.mix - sel.mix % 2 : sel.mix;
   else if (settings.mix && settings.mix < MIXES.length) currentMix = settings.mix;
   else currentMix = MIXES.length ? MIXES[0].id : 0;
 
   buildOutputs();
+  loadDevices();
+  loadMuteRecovery();
   markOutputs();
   loadMaster();            // shows the master box right away; the saved width is measured with it in place
   if (settings.side_width > 0) setSideWidth(settings.side_width, sideLimits());
+  if (info.peak_metering) startPeakPolling();
   return loadMix();
 }).then(startSync);
+
+// Read only source-mapped, hardware-provided DICE router destination peaks.
+// FFADOPeakDisplay handles async polling and peak/clip hold separately.
+var activePeakDisplay = null;
+function startPeakPolling() {
+  if (activePeakDisplay) activePeakDisplay.stop();
+  activePeakDisplay = new FFADOPeakDisplay(row, ACTIVE_DEVICE);
+  activePeakDisplay.start();
+}
 
 // A browser tab for web users; the OS default browser for the desktop client.
 document.getElementById("aboutGithub").addEventListener("click", function (event) {

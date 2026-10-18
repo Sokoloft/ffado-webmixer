@@ -1,0 +1,31 @@
+<?xml version='1.0' encoding='utf-8'?>
+<device family="driver_only" name="FCA202" extends="common.xml" identity_source="ffado_configuration">
+  <match vendor_id="0x1564" configuration_model_id="0xfc22" />
+  <identity vendor="Behringer" driver="OXFORD" ffado_mixer="" />
+  <capabilities schema="2" status="identity_only" source="configuration" note="FFADO configuration defines no mixer module for this model; hardware mixer controls are not yet source-mapped.">
+    <feature name="bus_destination" state="unmapped" />
+    <feature name="bus_output_mute" state="unmapped" />
+    <feature name="channel_invert" state="unmapped" />
+    <feature name="channel_trim" state="unmapped" />
+    <feature name="crossbar_routing" state="unmapped" />
+    <feature name="device_settings" state="unmapped" />
+    <feature name="hardware_nickname" state="unmapped" />
+    <feature name="matrix_gain" state="unmapped" />
+    <feature name="matrix_invert" state="unmapped" />
+    <feature name="matrix_mute" state="unmapped" />
+    <feature name="matrix_output" state="unmapped" />
+    <feature name="matrix_pan" state="unmapped" />
+    <feature name="matrix_playback" state="unmapped" />
+    <feature name="matrix_solo" state="unmapped" />
+    <feature name="monitor_global_dim" state="unmapped" />
+    <feature name="monitor_global_mute" state="unmapped" />
+    <feature name="monitor_line_mute" state="unmapped" />
+    <feature name="monitor_line_volume" state="unmapped" />
+    <feature name="output_level" state="unmapped" />
+    <feature name="peak_metering" state="unmapped" />
+    <feature name="scalar_selector" state="unmapped" />
+    <feature name="scalar_volume" state="unmapped" />
+    <feature name="software_mute_solo" state="unmapped" />
+    <feature name="stereo_bus_link" state="unmapped" />
+  </capabilities>
+</device>

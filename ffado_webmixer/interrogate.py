@@ -120,18 +120,122 @@ def interrogate_device(bus, device_path):
     return result
 
 
+def identify_device(bus, device_path):
+    """Read ConfigROM only; no topology guesses or recursive D-Bus scan."""
+    rom = device_path + '/ConfigRom'
+    return {'device':device_path, 'guid':device_path.rsplit('/',1)[1],
+            'vendor_id':int(try_call(bus,rom,'ConfigRomX','getVendorId',default=0)),
+            'model_id':int(try_call(bus,rom,'ConfigRomX','getModelId',default=0)),
+            'unit_version':try_call(bus,rom,'ConfigRomX','getUnitVersion'),
+            'vendor_name':str(try_call(bus,rom,'ConfigRomX','getVendorName',default='')),
+            'model_name':str(try_call(bus,rom,'ConfigRomX','getModelName',default='')),
+            'matrices':[], 'controls':[], 'routers':[]}
+
+
+def inventory_profile(bus, device, profile):
+    """Query only the exact paths declared by source-derived XML profiles.
+
+    All subsequent runtime dimensions/labels are provided by FFADO itself, but
+    we *never* decide what a matrix means from its dimensions or its label.
+    """
+    base = device['device']
+    from .profiles.capabilities import enabled, probe_allowed
+    paths = set()
+    # Fixed source bindings and D-Bus monitor controls for mapped features.
+    # Other discovery paths in common.xml are archival, not executable.
+    for f in profile.get('capabilities', {}).get('features', {}).values():
+        if f.get('state') not in ('mapped', 'optional'): continue
+        for extra in f.get('extra_paths','').split(','):
+            if not extra: continue
+            if '{n}' in extra:
+                for n in range(1, int(f.get('extra_count','0'))+1):
+                    paths.add(extra.replace('{n}',str(n)))
+            elif '{' not in extra:
+                paths.add(extra)
+        suffix=f.get('path','')
+        if '{n}' in suffix:
+            for n in range(1,int(f.get('count','0'))+1):
+                paths.add(suffix.replace('{n}',str(n)))
+        elif '{' not in suffix:
+            paths.add(suffix)
+    # The MOTU internal model ID is needed to activate its device profile.
+    if profile.get('model_element'):
+        paths.add('/'+profile['model_element'].lstrip('/'))
+    if profile.get('rate_element'):
+        paths.add('/'+profile['rate_element'].lstrip('/'))
+    matrix_path = profile.get('mixer_matrix',{}).get('path')
+    if matrix_path: paths.add(matrix_path)
+    # Source-binding lists document FFADO controls, but do not authorize
+    # extra D-Bus endpoints without an explicit model feature.
+    # These are exact supplemental paths in the corresponding FFADO mixer code.
+    if probe_allowed(profile, 'hardware_nickname'):
+        paths.add('/Generic/Nickname')
+    for suffix in sorted(paths):
+        if not suffix or not suffix.startswith('/') or '%' in suffix:
+            continue
+        path = base + suffix
+        try:
+            interfaces, _ = introspect(bus, path)
+        except dbus.exceptions.DBusException:
+            continue
+        kinds = {i[len(NS):] for i in interfaces if i.startswith(NS)}
+        if 'MatrixMixer' in kinds:
+            rows = int(try_call(bus,path,'MatrixMixer','getRowCount',default=0))
+            cols = int(try_call(bus,path,'MatrixMixer','getColCount',default=0))
+            if not rows or not cols: continue
+            device['matrices'].append({
+                'path':path, 'name':path.rsplit('/',1)[-1], 'rows':rows, 'cols':cols,
+                'row_names':[str(try_call(bus,path,'MatrixMixer','getRowName',dbus.Int32(i),default='')) for i in range(rows)],
+                'col_names':[str(try_call(bus,path,'MatrixMixer','getColName',dbus.Int32(i),default='')) for i in range(cols)]})
+        elif 'CrossbarRouter' in kinds:
+            device['routers'].append({'path':path})
+        else:
+            kind=next((k for k in VALUE_KINDS if k in kinds),None)
+            if not kind: continue
+            info={'path':path,'kind':kind,
+                  'label':str(try_call(bus,path,'Element','getLabel',default='')),
+                  'name':str(try_call(bus,path,'Element','getName',default=''))}
+            if kind=='Continuous':
+                info['min']=try_call(bus,path,kind,'getMinimum')
+                info['max']=try_call(bus,path,kind,'getMaximum')
+            device['controls'].append(info)
+    return device
+
+
 def discover():
-    """Interrogate FFADO and return what the app needs to know about the connected device(s)."""
+    """Exact ConfigROM identity -> matching FFADO profile -> declared D-Bus paths."""
+    from .profiles.loader import load_profile
     bus = dbus.SessionBus()
-    device_paths = get_device_paths(bus)
-    if not device_paths:
-        raise RuntimeError("No FFADO devices found. Is ffado-dbus-server running?")
+    paths = get_device_paths(bus)
+    if not paths:
+        raise RuntimeError('No FFADO devices found. Is ffado-dbus-server running?')
+    devices=[]
+    for path in paths:
+        device=identify_device(bus,path)
+        profile=load_profile(device)
+        if not profile.get('device_profile'):
+            devices.append(device)
+            continue
+        # FFADO's pre-mk3 MOTU ConfigROM entries identify only the generation.
+        # Ask for /Mixer/Info/Model FIRST. Unknown values must not trigger an
+        # inventory of an unrelated model's fader or destination controls.
+        if profile.get('capabilities', {}).get('status') == 'requires_internal_model':
+            from .profiles.capabilities import activate_internal_model
+            model_path=device['device'] + '/Mixer/Info/Model'
+            model=try_call(bus,model_path,'Discrete','getValue')
+            try:
+                profile=activate_internal_model(profile,model)
+                # Reuse the verified FFADO model ID later. It was read before
+                # any model-specific mixer endpoints were inventoried.
+                device['internal_model_id'] = profile['internal_model_id']
+            except ValueError:
+                devices.append(device)
+                continue
+        if profile.get('capabilities', {}).get('status') == 'mapped':
+            inventory_profile(bus,device,profile)
+        devices.append(device)
+    return {'devices':devices}
 
-    devices = [interrogate_device(bus, p) for p in device_paths]
-    if not any(d["matrices"] for d in devices):
-        raise RuntimeError("FFADO devices found, but none expose a matrix mixer.")
-    return {"devices": devices}
 
-
-if __name__ == "__main__":
+if __name__ == '__main__':
     print(json.dumps(discover(), indent=2))

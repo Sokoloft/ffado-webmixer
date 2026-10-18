@@ -11,13 +11,19 @@ However, there is no need thus this project turned into `ffado-webmixer`
 
 The application uses Python, Flask, and FFADO's D-Bus control interface. A pywebview desktop client is available for local use; the same mixer can also run without a desktop window for access from another computer, tablet, or phone.
 
-> **Project status:** Device features depend on the connected interface and its FFADO support. XML profiles help interpret device-specific controls; not every control is available on every device.
+> **Project status:** Device selection uses exact source-derived FFADO identities and explicit model-level capability declarations. The catalogue identifies more devices than the application can currently control: an identity-only profile deliberately exposes **no guessed writable mixer**. Actual hardware control additionally requires matching D-Bus endpoints. See [`ffado_webmixer/profiles/CAPABILITIES.md`](ffado_webmixer/profiles/CAPABILITIES.md).
 
 ## Features
 
 - Control supported mixer levels, gain, pan, mute, solo, and polarity/invert functions where available.
 - Select available outputs and buses, with a master fader for the selected destination.
-- Link compatible channels into stereo pairs.
+- Link odd/even hardware input channels (1/2, 3/4, ...) using explicit link buttons, rather than dragging them together.
+- Link consecutive output buses on supported gain matrices and use per-channel stereo balance.
+- Show DICE/RME mixer gain in dB rather than raw percentages; soft mute and solo where supported.
+- Show real, matched DICE EAP router-destination peak meters when exposed by FFADO.
+- Recover interrupted software mute/solo safely using per-device gain journals, explicit restore/discard controls, and verified hardware readback.
+- Switch among multiple connected, source-profiled FFADO interfaces by FireWire GUID, with optional local aliases.
+- Edit supported DICE/RME matrix coefficients with a rotary control, numeric dB entry, and presets.
 - Rename, reorder, pin, minimize, and hide channel strips.
 - Remember mixer layout, names, stereo links, selected theme, and other interface preferences.
 - Use built-in color themes or add your own CSS themes, including accent color customization.
@@ -61,6 +67,73 @@ http://192.168.1.100:5000/
 
 The server may be reachable by other devices on your network. Only expose it on networks you trust; the mixer provides controls for real hardware.
 
+### Source-defined offline debug mode
+
+To open a named hardware profile without talking to D-Bus:
+
+```bash
+python main.py --debug profire2626 --headless
+python main.py --debug saffirepro26
+python main.py --debug motuultralite
+python main.py --debug list
+```
+
+**No FFADO D-Bus operations occur in this mode.** Intended methods and their
+arguments are printed as `"[DEBUG would call D-Bus]"` to the console. Mixer
+values and dimensions are simulated for testing the UI, not authoritative
+hardware capabilities. No persistent configuration files are written.
+
+### Multiple FireWire interfaces and KDE Plasma
+
+Recognized FFADO devices appear in tabs. Each physical GUID has independent
+mixer state, local aliases, layouts, and mute-recovery data. Identical display
+names show a short GUID suffix until individually renamed. Separate browser
+profiles can select separate units; tabs in the same browser profile share a
+session cookie, so changing devices in one tab requires reloading the other.
+Old-tab requests are rejected rather than sent to the wrong device.
+
+For a source checkout on Plasma, an optional developer launcher can be installed
+without root or changes to FFADO/JACK:
+
+```bash
+python packaging/desktop_integration.py --python /path/to/.venv/bin/python
+python packaging/desktop_integration.py --check
+# To uninstall the app launcher/icon only:
+python packaging/desktop_integration.py --remove
+```
+
+See [`TESTING_MULTIPLE_DEVICES_KDE.md`](TESTING_MULTIPLE_DEVICES_KDE.md) for
+a full three-device verification and diagnostic checklist. Live hotplug device
+re-enumeration is not supported; restart webmixer after FFADO changes units.
+
+### Exact hardware profile matching
+
+The included `ffado_webmixer/profiles/ffado_configuration` is a snapshot of
+the FFADO source `configuration` registry; local FFADO definitions may override
+entries. A ConfigROM vendor/model (and the relevant unit-version overrides for
+MOTU/RME) selects a specific model XML. Live D-Bus supplies only real values,
+available paths, and matrix dimensions; **an unknown model is never assigned a
+guessed writable matrix**. A model in the registry is not automatically fully
+supported unless its control profile includes an explicit mixer mapping.
+
+**Model-level capability catalogue:** the source-backed schema v2 declares each
+model's gain matrices, input/output orientation, routing, mute/solo, monitoring,
+peak meters, nickname support, and other feature states. `mapped` permits only
+specified D-Bus endpoints, `optional` requires live probing, `source_only`
+records known FFADO functionality not implemented in webmixer, and `unmapped`
+never implies hardware absence. The catalogue covers **101 distinct FFADO
+configuration identities** plus **five MOTU pre-mk3 internal model variants**;
+this is an identification/coverage count, **not 106 working mixers**. Unknown or
+identity-only devices do not receive generic matrix heuristics. See
+[`CAPABILITIES.md`](ffado_webmixer/profiles/CAPABILITIES.md) and
+[`TESTING_CAPABILITIES.md`](TESTING_CAPABILITIES.md).
+
+Each interface's layout, stereo links and aliases are kept in
+`~/.config/ffado-webmixer/devices/<guid>.json`; the original `config.json` is
+kept as an initial migration source and for desktop-window preferences.
+
+See `TESTING_V1_1.md` for live-hardware validation and known limitations.
+
 ### Demo mode
 
 ```bash
@@ -85,7 +158,7 @@ python main.py --help
 
 Select an output or bus to view and adjust its mix. Drag faders to change levels; use the controls available on each strip for gain, pan, mute, solo, or polarity as supported by the device. The master strip controls the currently selected destination.
 
-Channel strips can be renamed and rearranged to suit your workflow. Minimized strips take less room, and hidden minimized strips can be excluded from view. Compatible channels can be linked into stereo pairs. The application preserves interface preferences between sessions; changes to hardware mixer controls are sent to FFADO.
+Channel strips can be renamed and rearranged to suit your workflow. Minimized strips take less room, and hidden minimized strips can be excluded from view. Odd/even channels can be linked with the button between their strips; dragging is for reordering only. The application preserves interface preferences between sessions; changes to hardware mixer controls are sent to FFADO.
 
 Use the **settings** button to choose a theme and adjust available interface options. In **General**, enable QjackCtl support to show a dedicated integration tab; it is disabled by default. **About** displays the server URL with buttons to open the mixer in your browser or show a scannable QR code. Closing the QR view returns to About. The browser version also includes a fullscreen control. The desktop client can remember its window dimensions for the next launch.
 
