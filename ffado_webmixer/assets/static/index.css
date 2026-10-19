@@ -184,8 +184,11 @@ html { background: var(--page-background); }
     display: grid; place-items: center; width: 20px; height: 20px; padding: 0;
     border: 0; border-radius: 4px; background: transparent;
     color: var(--stereo-color); font-size: 15px; line-height: 1; cursor: pointer; }
+  .strip .unlink svg { display: block; width: 16px; height: 16px; }
   .strip .unlink:hover { background: var(--button-hover-background); }
   .strip .unlink:focus-visible { outline: 2px solid var(--accent-color); }
+  .strip.stereo-pending { outline: 2px solid var(--stereo-color); outline-offset: -3px; }
+  .strip.stereo-pending > .link-toggle { background: var(--stereo-target-background); color: var(--stereo-color); }
   .strip.link-target { outline: 2px dashed var(--stereo-color); outline-offset: -4px; background: var(--stereo-target-background); }
   .strip.link-target::after { content: "Link as stereo"; position: absolute; left: 6px; right: 6px; top: 50%; margin-top: -16px;
                               padding: 8px 4px; border-radius: 4px; background: rgba(40, 34, 60, .94); color: var(--stereo-color);
@@ -313,7 +316,7 @@ html.pywebview-client #fullscreenbox { display: none; }
   #fullscreenButton { width: 40px; height: 40px; }
 }
 
-/* Explicit odd(L)/even(R) stereo links and source-defined device tabs. */
+/* Arbitrary ordered input stereo links and source-defined device tabs. */
 #deviceTabs { display:flex; gap:6px; flex:none; overflow-x:auto; padding:8px 12px 0; border-bottom:1px solid var(--border-color); }
 .device-tab { border:1px solid var(--border-color); padding:7px 12px; border-radius:5px 5px 0 0; white-space:nowrap; background:var(--button-background); color:var(--text-primary); cursor:pointer; }
 .device-tab.active { border-color:var(--accent-color); color:var(--accent-color); background:var(--sidebar-background); }
@@ -322,12 +325,22 @@ html.pywebview-client #fullscreenbox { display: none; }
 .device-alias-field { margin-top:16px; padding-top:12px; border-top:1px solid var(--border-color); }
 #deviceAlias { width:125px; min-width:0; color:var(--text-primary); background:var(--control-background); border:1px solid var(--border-color); padding:7px; }
 .device-alias-field .dlgbtn { flex:none; padding:7px 9px; margin:0; }
-.peak-meter { position:relative; display:block; flex:none; width:9px; height:calc(100% - 26px); align-self:center; padding:0; cursor:pointer; background:var(--control-background); border:1px solid var(--border-color); border-radius:3px; overflow:hidden; }
+/* Genuine DICE router-destination peaks beside the fader; stereo has L/R
+   lanes in the user-selected order. Never display simulated post-fader levels. */
+.peak-meter { position:relative; display:flex; gap:2px; flex:none; width:12px;
+  height:calc(100% - 26px); align-self:center; padding:1px; cursor:pointer;
+  background:var(--control-background); border:1px solid var(--border-color);
+  border-radius:3px; overflow:hidden; box-sizing:border-box; }
+.peak-meter.stereo-meter { width:22px; }
 .peak-meter:focus-visible { outline:2px solid var(--accent-color); outline-offset:2px; }
-.peak-bar { position:absolute; bottom:0; width:100%; height:0; background:linear-gradient(to top,#43b581 55%,#e6b450 80%,#e05454 95%); }
-.peak-hold { position:absolute; left:0; right:0; height:2px; bottom:0; background:var(--text-primary); pointer-events:none; }
+.peak-lane { position:relative; flex:1; min-width:0; height:100%; overflow:hidden;
+  background:var(--control-background); border-radius:1px; }
+.peak-bar { position:absolute; bottom:0; left:0; right:0; height:0;
+  background:linear-gradient(to top,#43b581 55%,#e6b450 80%,#e05454 95%); }
+.peak-hold { position:absolute; left:0; right:0; height:2px; bottom:0;
+  background:var(--text-primary); pointer-events:none; }
 .peak-clip { height:3px; position:absolute; top:0; left:0; right:0; background:transparent; }
-.peak-meter.clipping .peak-clip { background:#ff3434; }
+.peak-lane.clipping .peak-clip { background:#ff3434; }
 
 /* Interrupted mute/solo recovery — visible without opening Settings. */
 #muteRecovery { position: fixed; z-index: 110; top: 14px; left: 50%; transform: translateX(-50%);
@@ -339,3 +352,6 @@ html.pywebview-client #fullscreenbox { display: none; }
 .mute-recovery-actions button { cursor: pointer; padding: 6px 10px; border: 1px solid var(--border-color);
   border-radius: 4px; color: var(--text-primary); background: var(--button-background); }
 .mute-recovery-actions button:hover { background: var(--button-hover-background); }
+
+/* Linked inputs with different matrix gains: one strip shows the louder side. */
+.fval.level-mismatch { font-size: 11px; font-weight: 600; text-decoration: underline dotted; text-underline-offset: 3px; }

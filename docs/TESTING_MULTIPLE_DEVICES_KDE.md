@@ -1,4 +1,4 @@
-# Three interfaces + KDE Plasma: v1.1.0-dev validation
+# Three interfaces + KDE Plasma: v1.1.1 development build validation
 
 This is a **test and data-collection guide**, not a claim of verified physical
 three-device operation. The code-level tests use simulated, independent ProFire

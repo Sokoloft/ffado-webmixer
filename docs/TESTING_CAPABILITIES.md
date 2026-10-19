@@ -1,4 +1,4 @@
-# Testing source-defined device capabilities (v1.1.0-dev)
+# Testing source-defined device capabilities (v1.1.1 development build)
 
 ## Offline checks (without FFADO or hardware)
 

@@ -13,17 +13,20 @@ The application uses Python, Flask, and FFADO's D-Bus control interface. A pyweb
 
 > **Project status:** Device selection uses exact source-derived FFADO identities and explicit model-level capability declarations. The catalogue identifies more devices than the application can currently control: an identity-only profile deliberately exposes **no guessed writable mixer**. Actual hardware control additionally requires matching D-Bus endpoints. See [`ffado_webmixer/profiles/CAPABILITIES.md`](ffado_webmixer/profiles/CAPABILITIES.md).
 
+**Current version: 1.1.1 (development branch).** This is not a stable-release designation. [Changelog](docs/CHANGELOG.md) · [Test and developer documentation](docs/README.md).
+
 ## Features
 
-- Control supported mixer levels, gain, pan, mute, solo, and polarity/invert functions where available.
+- Control digital mixer volume, pan, mute, solo, and polarity/invert functions where available; hardware input gain/trim is a separate control when the device exposes it.
 - Select available outputs and buses, with a master fader for the selected destination.
-- Link odd/even hardware input channels (1/2, 3/4, ...) using explicit link buttons, rather than dragging them together.
-- Link consecutive output buses on supported gain matrices and use per-channel stereo balance.
-- Show DICE/RME mixer gain in dB rather than raw percentages; soft mute and solo where supported.
-- Show real, matched DICE EAP router-destination peak meters when exposed by FFADO.
+- Link **any two input channels** using the bottom-right chain-link buttons. First click selects **Left**, second click selects **Right** (for example, channel 2 then channel 5). Clicking the first again cancels. **Pairs are independent for each output bus**; dragging strips only reorders them.
+- Reject conflicting stereo pairs with an explicit message and preserve previous pairs and strip layouts on invalid operations. Pair changes from simultaneous browser clients are serialized.
+- Link consecutive output buses on supported mixer matrices and use per-channel stereo balance.
+- Show DICE/RME digital mixer **volume** in dB rather than raw percentages; soft mute and solo where supported.
+- Show real, matched DICE EAP router-destination peak meters beside channel faders when exposed by FFADO. Arbitrary stereo pairs display **separate Left/Right lanes** with independent hold and near-full-scale warnings. These are router readings, not verified post-fader dBFS.
 - Recover interrupted software mute/solo safely using per-device gain journals, explicit restore/discard controls, and verified hardware readback.
 - Switch among multiple connected, source-profiled FFADO interfaces by FireWire GUID, with optional local aliases.
-- Edit supported DICE/RME matrix coefficients with a rotary control, numeric dB entry, and presets.
+- Edit supported matrix coefficients with a **rotary control in every crosspoint cell**, plus the existing precise numeric dB editor and presets (where dB hardware mapping is available). Each drag writes once on release; wheel and keyboard changes are grouped before writing.
 - Rename, reorder, pin, minimize, and hide channel strips.
 - Remember mixer layout, names, stereo links, selected theme, and other interface preferences.
 - Use built-in color themes or add your own CSS themes, including accent color customization.
@@ -32,7 +35,7 @@ The application uses Python, Flask, and FFADO's D-Bus control interface. A pyweb
 - Enable QjackCtl support in **Settings → General** to reveal a dedicated **QjackCtl** tab with Graph and Patchbay controls.
 - Open the dedicated **In/Out** dialog for hardware routing. MOTU pre-Mk3 devices
   show mix-bus-to-output assignment, while supported DICE devices expose their
-  mixer-gain and crossbar controls separately.
+  mixer-volume and crossbar controls separately.
 
 ## Requirements
 
@@ -102,7 +105,7 @@ python packaging/desktop_integration.py --check
 python packaging/desktop_integration.py --remove
 ```
 
-See [`TESTING_MULTIPLE_DEVICES_KDE.md`](TESTING_MULTIPLE_DEVICES_KDE.md) for
+See [[`TESTING_MULTIPLE_DEVICES_KDE.md`](docs/TESTING_MULTIPLE_DEVICES_KDE.md)](docs/TESTING_MULTIPLE_DEVICES_KDE.md) for
 a full three-device verification and diagnostic checklist. Live hotplug device
 re-enumeration is not supported; restart webmixer after FFADO changes units.
 
@@ -126,13 +129,18 @@ configuration identities** plus **five MOTU pre-mk3 internal model variants**;
 this is an identification/coverage count, **not 106 working mixers**. Unknown or
 identity-only devices do not receive generic matrix heuristics. See
 [`CAPABILITIES.md`](ffado_webmixer/profiles/CAPABILITIES.md) and
-[`TESTING_CAPABILITIES.md`](TESTING_CAPABILITIES.md).
+[[`TESTING_CAPABILITIES.md`](docs/TESTING_CAPABILITIES.md)](docs/TESTING_CAPABILITIES.md).
 
 Each interface's layout, stereo links and aliases are kept in
 `~/.config/ffado-webmixer/devices/<guid>.json`; the original `config.json` is
 kept as an initial migration source and for desktop-window preferences.
+**Input pairs are now stored separately for each bus** in `stereo_by_mix`. An
+older `stereo` list remains as the initial fallback for buses not yet edited;
+unlinking in one bus overrides only that bus, without affecting other buses.
+Hidden Right-channel layout entries are retained, so unlinking restores each
+channel's previous pin/minimize/position settings on that bus.
 
-See `TESTING_V1_1.md` for live-hardware validation and known limitations.
+See [`TESTING_V1_1.md`](docs/TESTING_V1_1.md) for live-hardware validation and known limitations.
 
 ### Demo mode
 
@@ -154,11 +162,20 @@ To see command-line options:
 python main.py --help
 ```
 
+
+### Volume vs. gain terminology
+
+**Volume** in the web interface is the digital mixer level: channel and master faders, and writable mixer matrix crosspoint rotary/numeric controls. These controls attenuate or boost a routed signal; they do not adjust an analog microphone preamp.
+
+The separate **Input Gain** box is shown only when a device declares a writable gain/trim/preamp control. It is not part of the digital matrix volume. On the ProFire 2626, microphone preamp gain is adjusted on the hardware; the webmixer does not invent a software preamp control.
+
+The public API, FFADO XML capability names, D-Bus mappings, and internal Python/JS field identifiers (for example `gain`, `gain_scale`, `matrix_gain`, and `fader`) are deliberately unchanged for compatibility. Existing configuration and third-party callers should continue working. See [[`TESTING_VOLUME_TERMINOLOGY.md`](docs/TESTING_VOLUME_TERMINOLOGY.md)](docs/TESTING_VOLUME_TERMINOLOGY.md) for a browser and hardware checklist.
+
 ## Using the mixer
 
-Select an output or bus to view and adjust its mix. Drag faders to change levels; use the controls available on each strip for gain, pan, mute, solo, or polarity as supported by the device. The master strip controls the currently selected destination.
+Select an output or bus to view and adjust its mix. Drag faders to change digital mixer **volume**; use the controls available on each strip for pan, mute, solo, polarity or separate hardware input gain/trim as supported by the device. The master strip controls the currently selected destination.
 
-Channel strips can be renamed and rearranged to suit your workflow. Minimized strips take less room, and hidden minimized strips can be excluded from view. Odd/even channels can be linked with the button between their strips; dragging is for reordering only. The application preserves interface preferences between sessions; changes to hardware mixer controls are sent to FFADO.
+Channel strips can be renamed and rearranged to suit your workflow. Minimized strips take less room, and hidden minimized strips can be excluded from view. Any two unpaired channels can be linked with the chain-link buttons at the bottom-right of each strip: first click selects Left and second click selects Right. Dragging is for reordering only. The application preserves interface preferences between sessions; changes to hardware mixer controls are sent to FFADO.
 
 Use the **settings** button to choose a theme and adjust available interface options. In **General**, enable QjackCtl support to show a dedicated integration tab; it is disabled by default. **About** displays the server URL with buttons to open the mixer in your browser or show a scannable QR code. Closing the QR view returns to About. The browser version also includes a fullscreen control. The desktop client can remember its window dimensions for the next launch.
 
@@ -187,6 +204,10 @@ The theme filename, without `.css`, is its identifier. User themes with the same
 
 ```text
 main.py                         Application entry point
+README.md                       GitHub project overview
+docs/                           Changelog and hardware/testing guides
+packaging/                      KDE desktop integration helpers
+tests/                          Regression test suite
 ffado_webmixer/
 ├── api/                         Flask API endpoints
 ├── assets/
@@ -206,6 +227,44 @@ ffado_webmixer/
 ```
 
 Additional modules handle device identification, profile loading, control conversion, and QjackCtl integration. See the documentation inside `ffado_webmixer/` and `ffado_webmixer/profiles/` for implementation details.
+
+### Documentation location and patch upgrades
+
+All testing guides and the development changelog now live in [`docs/`](docs/README.md). The top-level `README.md` stays at the root so GitHub displays the project overview. New hardware testing notes should be added under `docs/`, not at the root.
+
+If you **extract the patch ZIP over an older checkout**, ZIP extraction won't delete the old root-level Markdown files automatically. After extracting the patch, run:
+
+```bash
+python packaging/migrate_legacy_docs.py
+```
+
+The cleanup helper removes only root-level guides that exactly match their original 1.1.0-dev contents and already have replacements in `docs/`. If you edited a guide locally, it is left alone for manual merging. A clean checkout of the full release ZIP does not need this migration step.
+
+
+### Matrix and strip readback
+
+When DICE/RME output buses are stereo-linked, the strip's level and pan are
+derived from the same pair of FFADO matrix coefficients. If stereo-linked
+inputs have unequal effective levels, the combined strip shows `MAX` and
+provides both channel levels in a tooltip. The arbitrary-input-pair update
+keeps link/unlink operations **routing-neutral**: no matrix coefficients are
+copied, no silent crosspoint is activated, and a pair can be 2→5 or 7→3.
+On linked DICE/RME output buses, a pair's **balance** adjusts only the existing
+Left-input→Left-output and Right-input→Right-output coefficients. Custom
+crosspoints remain unchanged; disconnected diagonal routes stay disconnected.
+A temporary in-memory balance reference allows recovering from full L/R; an
+independent matrix edit invalidates that reference. The initial PAN readout
+uses the same peak-normalized diagonal balance as the stereo-input write
+calculation, so current hardware values appear as soon as the pair is linked.
+If both diagonal routes are silent, PAN shows **—** instead of a false center;
+use the matrix editor to connect a route. If custom cross-routes are active,
+PAN shows `*` and a warning tooltip because a single balance percentage does
+not fully describe the stereo matrix. Hardware validation is still required.
+See [matrix/strip synchronization tests](docs/TESTING_MATRIX_STRIP_SYNC.md),
+[arbitrary stereo routing tests](docs/TESTING_ARBITRARY_STEREO.md),
+[bus-isolated stereo regression](docs/TESTING_STEREO_BUS_VISIBILITY.md),
+[stereo validation checks](docs/TESTING_STEREO_PAIR_VALIDATION.md), and
+[initial pan readback testing](docs/TESTING_INITIAL_PAN.md).
 
 ## Troubleshooting
 

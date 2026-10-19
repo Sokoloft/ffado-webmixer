@@ -1,5 +1,6 @@
 from flask import jsonify, request
 from ..services.stereo import MIRRORED, pair_name
+from ..mixer import input_pair_balance_from_raw
 
 def register(app, backend, description, config, broadcast):
     @app.get("/api/describe")
@@ -65,17 +66,17 @@ def register(app, backend, description, config, broadcast):
     def get_state():
         mix = request.args.get("mix", 0, type=int)
 
+        stereo_bus = (hasattr(backend, 'matrix') and
+                      backend.matrix['mode'] in ('dice_db', 'rme_db') and
+                      mix in config.settings.get('stereo_buses', []))
         try:
-            mixer_state = backend.read_mix(mix)
+            # Read both bus legs within one hardware transaction. This keeps
+            # the strip level and pan consistent with the matrix editor.
+            mixer_state = backend.read_mix(mix, stereo_bus=True) if stereo_bus else backend.read_mix(mix)
+        except ValueError as exc:
+            return jsonify(error=str(exc)), 400
         except Exception as exc:
             return jsonify(error=str(exc)), 500
-
-        if hasattr(backend, 'matrix') and backend.matrix['mode'] in ('dice_db','rme_db'):
-            if mix in config.settings.get('stereo_buses', []):
-                for strip_id, entry in mixer_state.items():
-                    col=int(strip_id.split('/')[-1])
-                    entry['pan'] = backend.read_bus_balance(mix, col)
-                    entry['fader'] = backend.read_stereo_level(mix, col)
         for strip_id, entry in mixer_state.items():
             entry["name"] = config.names.get(
                 strip_id,
@@ -83,7 +84,7 @@ def register(app, backend, description, config, broadcast):
             )
 
         # A stereo pair is drawn as one strip, kept on the left channel.
-        for left, right in config.stereo:
+        for left, right in config.pairs_for(mix):
             if left in mixer_state and right in mixer_state:
                 first, second = mixer_state[left], mixer_state[right]
 
@@ -91,13 +92,54 @@ def register(app, backend, description, config, broadcast):
                     first["name"] = pair_name(first["name"], second["name"])
 
                 first["input"] = pair_name(first["input"], second["input"])
-                # A linked stereo strip displays the balance of its two sides.
-                # Hard-left/hard-right corresponds to centered stereo balance.
-                if 'pan' in first and 'pan' in second:
+                # One visual fader cannot faithfully report two different
+                # matrix levels. Show the louder side, and expose both values
+                # with an explicit mismatch indication instead of silently
+                # pretending that only the left channel exists.
+                if 'fader' in first and 'fader' in second:
+                    left_level, right_level = float(first['fader']), float(second['fader'])
+                    first['fader'] = max(left_level, right_level)
+                    first['pair_faders'] = [left_level, right_level]
+                    first['pair_mismatch'] = abs(left_level - right_level) > 0.15
+                if stereo_bus and '_matrix_raw' in first and '_matrix_raw' in second:
+                    # For an ordered input pair, pan means *input balance*:
+                    # Left channel's path to Left bus vs Right channel's path
+                    # to Right bus. Do not infer this from summing four routes,
+                    # which can hide a stereo-to-mono crossfeed.
+                    left_level = first['_matrix_raw'][0]
+                    right_level = second['_matrix_raw'][1]
+                    # The linked input pair uses peak-normalized diagonal
+                    # attenuation, unlike the sum-normalized mono bus pan.
+                    # Read the current hardware values on EVERY /api/state:
+                    # linking must immediately show the current balance.
+                    first['pan'] = input_pair_balance_from_raw(left_level, right_level)
+                    first['pan_available'] = first['pan'] is not None
+                    notes = []
+                    if not first['pan_available']:
+                        notes.append('Both diagonal stereo routes are disconnected. '
+                                     'Connect a route in the matrix before adjusting balance.')
+                    elif left_level <= 16 or right_level <= 16:
+                        notes.append('One diagonal route is disconnected. '
+                                     'Balance cannot reconnect it; use the matrix editor.')
+                    # The knob represents the *ordered diagonals*, not an
+                    # entire 2x2 matrix. Mark a derived balance as partial
+                    # when custom cross-routes contribute additional sound.
+                    first['pan_partial'] = (first['_matrix_raw'][1] > 16 or
+                                            second['_matrix_raw'][0] > 16)
+                    if first['pan_partial']:
+                        notes.append('Cross-routes are also active. The balance '
+                                     'shows diagonal levels only; inspect the matrix for actual stereo routing.')
+                    if notes:
+                        first['pan_note'] = ' '.join(notes)
+                    else:
+                        first.pop('pan_note', None)
+                elif 'pan' in first and 'pan' in second:
                     first['pan'] = (float(first['pan']) + float(second['pan'])) / 2
                 first["partner"] = right
                 second["partner_of"] = left
 
+        for entry in mixer_state.values():
+            entry.pop('_matrix_raw', None)  # private native sum, never a UI control
         return jsonify(mixer_state)
 
     @app.post("/api/set")
@@ -125,11 +167,12 @@ def register(app, backend, description, config, broadcast):
 
             return jsonify(ok=True)
 
-        pair = config.pair_of(strip) if control in MIRRORED else None
-        if control == 'pan' and config.pair_of(strip):
+        mix = int(msg.get('mix', 0))
+        pair = config.pair_of(strip, mix) if control in MIRRORED else None
+        if control == 'pan' and config.pair_of(strip, mix):
             # Stereo pan shifts the L/R image without collapsing both channels
             # to one identical pan position. Center = hard L and hard R.
-            left, right = config.pair_of(strip)
+            left, right = config.pair_of(strip, mix)
             try:
                 position = float(value)
                 if not -1 <= position <= 1:
@@ -137,10 +180,16 @@ def register(app, backend, description, config, broadcast):
                 mix = int(msg.get('mix', 0))
                 left_pan = -1 + 2 * max(0, position)
                 right_pan = 1 + 2 * min(0, position)
-                if hasattr(backend, 'matrix') and backend.matrix['mode'] in ('dice_db', 'rme_db') and (mix - mix % 2) in config.settings.get('stereo_buses', []):
-                    for channel, pan_value in ((left, left_pan), (right, right_pan)):
-                        backend.write_bus_balance(mix - mix % 2, int(channel.split('/')[-1]), pan_value)
+                if (hasattr(backend, 'matrix') and
+                        backend.matrix['mode'] in ('dice_db', 'rme_db') and
+                        (mix - mix % 2) in config.settings.get('stereo_buses', [])):
+                    if mix % 2:
+                        raise ValueError('Select the left stereo output bus to adjust an input pair')
+                    backend.write_input_pair_balance(mix,
+                        int(left.split('/')[-1]), int(right.split('/')[-1]), position)
                 else:
+                    # On non-matrix mixers, only call actual source-defined pan
+                    # controls. Linking itself never touches hardware controls.
                     for channel, pan_value in ((left, left_pan), (right, right_pan)):
                         backend.write(mix, channel, 'pan', pan_value)
             except (ValueError, TypeError, KeyError, IndexError) as exc:

@@ -1,8 +1,9 @@
-# Peak-metering test and diagnostic report (v1.1.0-dev)
+# Peak-metering test and diagnostic report (v1.1.1 development build)
 
-This release adds source-mapped DICE EAP router-destination meters, a 1.6-second
-peak hold, a 4-second near-full-scale warning hold, and click-to-clear meter
-holds. Meters in the **In/Out → Crossbar router** panel represent the router's
+The original DICE EAP meter support exposed source-mapped router-destination
+levels. This release refines the **channel-strip** presentation with a separate
+Left and Right meter for every linked stereo pair, while retaining 1.6-second
+peak holds, 4-second near-full-scale warning holds, and click-to-clear.  Meters in the **In/Out → Crossbar router** panel represent the router's
 actual destination names; strip meters appear only if the profile's FFADO
 matrix input name maps to a metered router destination.
 
@@ -30,14 +31,37 @@ which may be pre-mixer or a different signal path than the visible fader.
    remains for about 1.6 seconds; red near-full-scale indication persists for
    about 4 seconds when the hardware actually reports the highest code.
    Click a meter to clear its hold; a sustained full-scale signal may relatch.
-5. Link an odd/even input pair. The stereo strip displays the **higher** of
-   the two genuine input-router readings; it does not invent a stereo signal.
-6. Switch between several FFADO devices. Each browser-selected device should
+5. Link **any two channels** (for example, channel 2 Left + channel 5 Right,
+   or channel 8 Left + channel 3 Right). The stereo strip shows **two
+   independent lanes** in the selected Left/Right order. The old single
+   maximum-peak display has been replaced, so unequal stereo levels remain
+   visible. Confirm that a spike on one channel does not spike the other.
+6. Verify the **1.6-second hold and 4-second near-full-scale warnings are
+   independent per lane**. Clicking the enclosing meter clears both holds.
+   Changing buses must not swap the channels' Left/Right positions or invent
+   readings for unmetered channels.
+7. Switch between several FFADO devices. Each browser-selected device should
    show only that unit's meter data. Unsupported devices such as the original
    MOTU UltraLite must not display fabricated peak meters.
-7. Try `python main.py --debug profire2626 --headless` for *synthetic UI tests
+8. Try `python main.py --debug profire2626 --headless` for *synthetic UI tests
    only*. This mode never opens FFADO D-Bus and deliberately returns example
    12-bit readings; it must not be used as proof of hardware behavior.
+
+## Limitations and interpretation
+
+- Strip meters reflect the **actual FFADO DICE EAP router destination** for
+  each mapped matrix input. They are not verified post-fader signals; no
+  pre/post selector is offered because FFADO does not expose separate,
+  proven pre- and post-fader readings through this endpoint.
+- Only strips with a real matching FFADO `Mixer/In:XX` destination display
+  levels. A stereo pair with only one metered channel shows only that lane;
+  the other lane stays hidden rather than duplicating it.
+- If `destination_levels` are present in `/api/peaks` but `channels` is empty,
+  we still need **actual FFADO matrix row names and a verified mapping** from
+  the tester before adding meters to those strips. Do not substitute the
+  sequential strip number for an undocumented router mapping.
+- The hold and near-full-scale warnings are derived from FFADO's 12-bit code,
+  **not a verified calibrated digital clipping indicator**.
 
 ## If any meter is missing, stuck, wrong, or the app reports an error
 

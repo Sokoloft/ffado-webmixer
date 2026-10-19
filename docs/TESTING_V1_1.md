@@ -1,4 +1,4 @@
-# ffado-webmixer 1.1.0-dev — hardware and debug testing
+# ffado-webmixer 1.1.1 development build — hardware and debug testing
 
 This build contains broad changes to discovery, profile matching, routing, and
 mixer behavior. **Use a low monitor level and do not test on a live performance.**
@@ -54,9 +54,12 @@ without such a profile will be reported as unsupported instead of guessing.
    appears in a separate tab and each tab displays the correct name/profile.
    Give duplicate models unique local aliases in Settings; switch between them
    and verify settings and faders stay isolated.
-2. **Stereo input pairs.** Press the small button between channels 1/2, 3/4,
-   etc. (odd-numbered input = left, even = right). Confirm one strip replaces
-   the pair and that unlink restores both. Dragging strips should reorder,
+2. **Stereo input pairs.** Press the link button in the lower right of any
+   unpaired fader to select **Left**, then the button on any *other* unpaired
+   fader to select **Right** (e.g. channel 2 Left, channel 5 Right). Verify
+   the merged strip preserves this order even after refreshing, that clicking
+   the first button twice cancels, and that unlink restores both without
+   writing any mixer gain or pan coefficients. Dragging strips should reorder,
    *not* link them.
 3. **Stereo bus pairs.** Link Bus 1/2, Bus 3/4, etc. In the linked bus, check
    that a fader changes both mixer-output gain coefficients and pan/balance

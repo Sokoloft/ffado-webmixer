@@ -1,6 +1,7 @@
-/* Live FFADO DICE EAP router-destination peaks. No invented meters for other
- * families. Peak/near-clip holds are browser-only and never write to FFADO.
- * Decoder lives in peak_metering.py; this module handles display and polling.
+/* FFADO DICE EAP router-destination peaks displayed beside input strips.
+ * These are router destination readings, NOT post-fader or calibrated dBFS.
+ * One lane per real input. An arbitrary stereo pair keeps its Left/Right order.
+ * All controls here are read-only; tapping a meter clears browser-only holds.
  */
 (function (root) {
   "use strict";
@@ -8,7 +9,15 @@
   const CLIP_HOLD_MS = 4000;
   const POLL_MS = 150;
   const FALLBACK_MS = 1000;
-  const FLOOR_DB = -60;
+
+  function validSample(item) {
+    return item && typeof item.destination === 'string' &&
+      Number.isFinite(item.level) && item.level >= 0 && item.level <= 1 &&
+      (item.db === null || Number.isFinite(item.db));
+  }
+  function sampleText(item) {
+    return `${item.destination}: ${item.db === null ? '−∞' : item.db.toFixed(1)} dB`;
+  }
 
   class PeakDisplay {
     constructor(row, guid, fetcher) {
@@ -19,14 +28,14 @@
       this.states = new Map();
       this.timer = null;
       this.stopped = true;
-      this.hadMeters = false;
+      this.generation = 0;
       this.onVisibility = () => {
         if (document.hidden) {
           this.states.clear();
           this.hideAll();
         } else if (!this.stopped) {
           clearTimeout(this.timer);
-          this.timer = setTimeout(() => this.poll(), 0);
+          this.schedule(0);
         }
       };
     }
@@ -36,87 +45,107 @@
     start() {
       if (!this.stopped) return;
       this.stopped = false;
+      ++this.generation;
       document.addEventListener('visibilitychange', this.onVisibility);
       this.poll();
     }
     stop() {
       this.stopped = true;
+      ++this.generation;  // discard requests started before stop/restart
       clearTimeout(this.timer);
+      this.timer = null;
       document.removeEventListener('visibilitychange', this.onVisibility);
       this.states.clear();
       this.hideAll();
     }
     schedule(delay) {
+      clearTimeout(this.timer);
       if (!this.stopped) this.timer = setTimeout(() => this.poll(), delay);
     }
     async poll() {
       if (this.stopped) return;
       if (document.hidden) { this.schedule(FALLBACK_MS); return; }
+      const generation = this.generation;
       try {
         const response = await this.fetcher('/api/peaks');
         if (!response.ok) throw Error('peak request failed');
         const data = await response.json();
-        if (this.stopped) return;
+        if (this.stopped || generation !== this.generation) return;
         if (data.guid && this.guid && data.guid !== this.guid) {
-          // Per-browser selected device changed: never display another unit.
+          // Never expose peaks from a different FireWire device.
           this.states.clear(); this.hideAll(); this.schedule(FALLBACK_MS); return;
         }
         if (!data.available || !data.channels) {
-          this.states.clear(); this.hideAll();
-          // Probe unsupported hardware only once per page; a reload retries.
-          this.stop(); return;
+          this.stop(); // Unsupported FFADO interface: no fabricated meters.
+          return;
         }
         this.render(data, performance.now());
         document.dispatchEvent(new CustomEvent('ffado-peaks', {detail:data}));
         this.schedule(POLL_MS);
       } catch (error) {
+        if (this.stopped || generation !== this.generation) return;
         this.states.clear(); this.hideAll(); this.schedule(FALLBACK_MS);
       }
     }
     render(data, now) {
       const active = new Set();
+      const channels = data.channels || {};
       this.row.querySelectorAll('.strip').forEach(el => {
         const meter = el.querySelector('.peak-meter');
         if (!meter) return;
-        const col = (el.dataset.id || '').split('/')[1];
-        const partner = (el.dataset.partner || '').split('/')[1];
-        const inputs = [data.channels[col]];
-        if (partner !== undefined) inputs.push(data.channels[partner]);
-        const samples = inputs.filter(item => item && Number.isFinite(item.level) && item.level >= 0 && item.level <= 1);
-        if (!samples.length) { meter.hidden = true; return; }
-        const sample = samples.reduce((a, b) => a.level >= b.level ? a : b);
-        const near = samples.some(item => item.near_full_scale);
-        const key = el.dataset.id + (el.dataset.partner ? '+' + el.dataset.partner : '');
-        active.add(key);
-        let state = this.states.get(key);
-        if (!state) {
-          state = {held: sample.level, holdUntil: 0, clipUntil: 0};
-          this.states.set(key, state);
-        }
-        if (sample.level >= state.held || now >= state.holdUntil) {
-          state.held = sample.level;
-          state.holdUntil = now + HOLD_MS;
-        }
-        if (near) state.clipUntil = now + CLIP_HOLD_MS;
-        meter.hidden = false;
-        meter.querySelector('.peak-bar').style.height = (sample.level * 100).toFixed(2) + '%';
-        meter.querySelector('.peak-hold').style.bottom = (state.held * 100).toFixed(2) + '%';
-        meter.classList.toggle('clipping', now < state.clipUntil);
-        const db = sample.db === null ? '−∞' : `${sample.db.toFixed(1)}`;
-        const names = samples.map(s => s.destination).join(' / ');
-        meter.title = `${names}: ${db} dB (relative to FFADO full scale; not calibrated dBFS). ` +
-                      'Meter is at the router destination before mixer gain. Click to clear peak/clip hold.';
+        const left = (el.dataset.id || '').split('/')[1];
+        const right = el.dataset.partner ? el.dataset.partner.split('/')[1] : null;
+        const lanes = [{side: 'left', channel: left}];
+        if (right !== null) lanes.push({side: 'right', channel: right});
+        const details = [];
+        let any = false;
+        lanes.forEach(({side, channel}) => {
+          const lane = meter.querySelector(`.peak-lane[data-side="${side}"]`);
+          if (!lane) return;
+          const item = channels[channel];
+          if (!validSample(item)) { lane.hidden = true; return; }
+          any = true;
+          lane.hidden = false;
+          const key = `${el.dataset.id}|${side}|${channel}|${item.destination}`;
+          active.add(key);
+          let state = this.states.get(key);
+          if (!state) {
+            state = {held: item.level, holdUntil: now + HOLD_MS, clipUntil: 0};
+            this.states.set(key, state);
+          }
+          if (item.level >= state.held || now >= state.holdUntil) {
+            state.held = item.level;
+            state.holdUntil = now + HOLD_MS;
+          }
+          if (item.near_full_scale) state.clipUntil = now + CLIP_HOLD_MS;
+          lane.querySelector('.peak-bar').style.height = (item.level * 100).toFixed(2) + '%';
+          lane.querySelector('.peak-hold').style.bottom = (state.held * 100).toFixed(2) + '%';
+          lane.classList.toggle('clipping', now < state.clipUntil);
+          const text = `${right !== null ? (side === 'left' ? 'Left · ' : 'Right · ') : ''}${sampleText(item)}`;
+          lane.title = text;
+          details.push(text);
+        });
+        meter.hidden = !any;
+        if (!any) return;
+        meter.classList.toggle('stereo-meter', right !== null);
+        meter.title = `${details.join(' / ')}. FFADO router destination (not post-fader or calibrated dBFS). Click to clear holds.`;
+        meter.setAttribute('aria-label', `Clear peak holds: ${details.join('; ')}. FFADO router destination readings, not measured post-fader.`);
         meter.onclick = () => {
-          // Clear hold; a still-overloaded channel can immediately relatch.
-          state.holdUntil = 0; state.held = 0; state.clipUntil = 0;
-          meter.classList.remove('clipping');
-          meter.querySelector('.peak-hold').style.bottom = '0%';
+          // Clears only this strip's holds; steady peaks can relatch immediately.
+          for (const {side, channel} of lanes) {
+            for (const key of this.states.keys()) {
+              if (key.startsWith(`${el.dataset.id}|${side}|${channel}|`)) this.states.delete(key);
+            }
+            const lane = meter.querySelector(`.peak-lane[data-side="${side}"]`);
+            if (!lane) continue;
+            lane.classList.remove('clipping');
+            lane.querySelector('.peak-hold').style.bottom = '0%';
+          }
         };
       });
       for (const key of this.states.keys()) if (!active.has(key)) this.states.delete(key);
     }
   }
   root.FFADOPeakDisplay = PeakDisplay;
-  // Pure class export for offline validation; no Node dependency at runtime.
   if (typeof module !== 'undefined' && module.exports) module.exports = PeakDisplay;
 })(typeof window !== 'undefined' ? window : globalThis);

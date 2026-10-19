@@ -37,8 +37,8 @@
     <div id="outbox" hidden></div>
     <div id="masterbox" hidden><div id="master" class="strip master">
       <input class="mname" id="masterName" maxlength="16" spellcheck="false" autocomplete="off" title="Click to rename">
-      <div class="fval" id="masterVal"></div>
-      <div class="faderwrap"><div class="track" id="masterTrack"><div class="handle" id="masterHandle"></div></div></div>
+      <div class="fval" id="masterVal" title="Output volume"></div>
+      <div class="faderwrap"><div class="track" id="masterTrack" title="Output volume"><div class="handle" id="masterHandle"></div></div></div>
       <button class="btn mute" id="masterMute">Mute</button>
       <div class="inname">Output</div>
     </div></div>
@@ -165,17 +165,17 @@
       <div class="routing-scroll"><table id="routingBusGrid" aria-label="Assign each mix bus to a hardware output"></table></div>
     </div>
     <div id="routingMatrix" class="routing-pane">
-      <div class="routing-scroll"><table id="routingGrid" aria-label="Input gain into each mixer output"></table></div>
+      <div class="routing-scroll"><table id="routingGrid" aria-label="Input volume into each mixer output"></table></div>
       <div id="routingEditor" hidden>
         <span id="routingCellLabel"></span>
-        <div id="routingKnob" role="slider" tabindex="0" aria-label="Matrix gain knob" aria-valuemin="-60" aria-valuemax="6" aria-valuenow="0" title="Drag vertically, scroll or press arrow keys to change gain"><span class="routing-knob-needle"></span></div>
-        <input id="routingLevel" type="range" min="0" max="100" step="0.01" aria-label="Selected matrix gain">
-        <label id="routingDbLabel" for="routingDb">Gain</label><input id="routingDb" type="number" step="0.1" min="-60" max="6" value="0" aria-label="Matrix gain in dB">
+        <div id="routingKnob" role="slider" tabindex="0" aria-label="Mixer volume knob" aria-valuemin="-60" aria-valuemax="6" aria-valuenow="0" title="Drag vertically, scroll or press arrow keys to adjust mixer volume"><span class="routing-knob-needle"></span></div>
+        <input id="routingLevel" type="range" min="0" max="100" step="0.01" aria-label="Selected mixer volume">
+        <label id="routingDbLabel" for="routingDb">Volume</label><input id="routingDb" type="number" step="0.1" min="-60" max="6" value="0" aria-label="Mixer volume in dB">
         <output id="routingLevelLabel"></output>
         <button type="button" id="routingSilence">−∞</button>
         <button type="button" id="routingUnity">0 dB</button>
         <label for="routingPreset" id="routingPresetLabel">Preset</label>
-        <select id="routingPreset" aria-label="Select a matrix gain preset">
+        <select id="routingPreset" aria-label="Select a mixer volume preset">
           <option value="" selected>Choose…</option>
           <option value="6">+6 dB</option>
           <option value="3">+3 dB</option>

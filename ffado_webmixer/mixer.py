@@ -15,6 +15,32 @@ from .soft_mute import MuteJournal
 import math
 
 
+
+def input_pair_balance_from_raw(left, right):
+    """Read the ordered Left/Right input balance from DICE/RME diagonals.
+
+    ``write_input_pair_balance`` attenuates the quieter diagonal leg
+    relative to the louder one, *not* by preserving the sum of the legs.
+    The familiar (R-L)/(R+L) formula is correct for a mono input panned
+    across two buses, but is NOT the inverse for a linked input pair.
+
+    The hardware's <=16 native coefficient is its silence sentinel.  If
+    both diagonal routes are silent the stereo balance is unknowable; do
+    not display a fabricated centered pan.
+    """
+    left, right = float(left), float(right)
+    if not math.isfinite(left) or not math.isfinite(right) or left < 0 or right < 0:
+        raise ValueError('Invalid FFADO stereo matrix coefficient')
+    left = left if left > 16 else 0.0
+    right = right if right > 16 else 0.0
+    peak = max(left, right)
+    if not peak:
+        return None
+    # This is the inverse of write_input_pair_balance's piecewise
+    # attenuation: pan=-1 leaves only Left; pan=+1 leaves only Right.
+    return round((right - left) / peak, 4)
+
+
 def serialized_output(method):
     """Keep output mute read/modify/write sequences atomic across API threads."""
     @wraps(method)
@@ -419,6 +445,81 @@ class Mixer:
             for m, raw in ((bus, lnew), (bus+1, rnew)):
                 self._write_gain_cell(m, col, raw)
 
+    def forget_input_pair_balance(self, left, right, bus=None):
+        """Discard this bus's temporary balance reference on link/unlink.
+
+        ``bus=None`` is retained for callers explicitly clearing all buses.
+        """
+        affected = {int(left.split('/')[-1]), int(right.split('/')[-1])}
+        with self.helper.transaction():
+            cache = getattr(self, '_input_pair_balance_cache', {})
+            for key in list(cache):
+                if (bus is None or key[0] == bus) and affected.intersection(key[1:]):
+                    del cache[key]
+
+    def write_input_pair_balance(self, bus, left_col, right_col, value):
+        """Balance two input channels without ever making new matrix routes.
+
+        A linked *input* pair differs from one mono input panned into two
+        outputs. Left input goes to the left output, Right input to the right
+        output; custom crosspoints must remain exactly as the user configured.
+        Only the two diagonal coefficients are eligible for adjustment.
+
+        Keep a volatile route mask/reference so returning from a hard-L/R
+        balance can restore a side this control itself just attenuated to zero.
+        External edits invalidate that reference; a route that was already
+        disconnected when balance was first touched remains disconnected.
+        """
+        if (not 0 <= bus < len(self.mixes) - 1 or bus % 2 or
+                left_col == right_col or
+                not all(0 <= col < len(self.columns) for col in (left_col, right_col)) or
+                self.matrix['mode'] not in ('dice_db', 'rme_db')):
+            raise ValueError('Stereo input balance requires two distinct inputs and a linked output pair')
+        value = float(value)
+        if not math.isfinite(value) or not -1 <= value <= 1:
+            raise ValueError('Stereo balance must be between -1 and 1')
+        with self.helper.transaction():
+            self._require_recovery_resolved()
+            current = (float(self._matrix_raw(bus, left_col)),
+                       float(self._matrix_raw(bus + 1, right_col)))
+            cache = getattr(self, '_input_pair_balance_cache', None)
+            if cache is None:
+                cache = self._input_pair_balance_cache = {}
+            key = (bus, left_col, right_col)
+            remembered = cache.get(key)
+            # Exact comparisons are intentional: coefficients are integers on
+            # DICE/RME, and all our writes are verified by their readbacks.
+            if remembered is None or remembered['last'] != current:
+                remembered = {'enabled': (current[0] > 0, current[1] > 0),
+                              'reference': max(current), 'last': current}
+            peak = remembered['reference']
+            left = round(peak * (1 - max(0., value))) if remembered['enabled'][0] else 0
+            right = round(peak * (1 + min(0., value))) if remembered['enabled'][1] else 0
+            target = (left, right)
+            attempted = []
+            try:
+                for point, old, new in (((bus, left_col), current[0], left),
+                                        ((bus + 1, right_col), current[1], right)):
+                    if old != new:
+                        # Record before writing: even failed readback can mean
+                        # the hardware accepted the new coefficient.
+                        attempted.append((point, old))
+                        self._write_gain_cell(*point, new)
+            except Exception as exc:
+                cache.pop(key, None)
+                errors = []
+                for point, old in reversed(attempted):
+                    try:
+                        self._write_gain_cell(*point, old)
+                    except Exception as rollback_exc:
+                        errors.append(str(rollback_exc))
+                if errors:
+                    raise RuntimeError('Stereo input balance failed; hardware rollback '
+                                       'may be incomplete: ' + '; '.join(errors)) from exc
+                raise
+            remembered['last'] = target
+            cache[key] = remembered
+
     def read_bus_balance(self, bus, col):
         left, right = self._cell_base(bus, col), self._cell_base(bus+1, col)
         return round((right - left) / (right + left), 2) if left + right else 0
@@ -428,7 +529,7 @@ class Mixer:
             raise ValueError('Invalid left bus index')
         v0=self._cell_base(bus,col)
         v1=self._cell_base(bus+1,col)
-        return self._to_ui((v0+v1)/2., self.roles['fader'][1])
+        return self._to_ui(max(v0, v1), self.roles['fader'][1])
 
     def write_stereo_level(self, bus, col, ui):
         if bus % 2 or bus + 1 >= len(self.mixes):
@@ -439,10 +540,24 @@ class Mixer:
             left=self._cell_base(bus,col)
             right=self._cell_base(bus+1,col)
             balance=(right-left)/(right+left) if (right+left) else 0
-            total=2 * self._from_ui(ui,spec)
-            new=(round(total*(1-balance)/2),round(total*(1+balance)/2))
+            # The strip displays the louder matrix leg, not the average.
+            # Preserve the current L/R balance when moving that strip.
+            peak = self._from_ui(ui, spec)
+            old_peak = max(left, right)
+            if old_peak > 0:
+                new = (round(peak * left / old_peak), round(peak * right / old_peak))
+            else:
+                # A completely disconnected input has no existing L/R route.
+                # Moving its strip must not activate BOTH outputs and create
+                # unintended mono crossfeed. Connect it in the matrix first.
+                return  # no pre-existing path: never create one from a fader
             for m,v in ((bus,new[0]),(bus+1,new[1])):
                 self._write_gain_cell(m, col, v)
+            # An independent fader edit changes a pair's balance reference.
+            cache = getattr(self, '_input_pair_balance_cache', {})
+            for key in list(cache):
+                if key[0] == bus and col in key[1:]:
+                    del cache[key]
 
     def peak_snapshot(self):
         """Read only the source-declared DICE EAP router peaks.
@@ -476,7 +591,15 @@ class Mixer:
 
 
     @serialized_output
-    def read_mix(self, mix):
+    def read_mix(self, mix, *, stereo_bus=False):
+        """Read a bus and (optionally) its linked right bus in one transaction.
+
+        A linked bus derives its fader and balance from the *same* pair of
+        native matrix coefficients. No coefficients are changed by a read.
+        """
+        if stereo_bus and (mix % 2 or mix + 1 >= len(self.mixes) or
+                           self.matrix["mode"] not in ("dice_db", "rme_db")):
+            raise ValueError("Stereo state requires a supported left output bus")
         if not 0 <= mix < len(self.mixes):
             raise ValueError("mix out of range")
         out = {}
@@ -491,10 +614,26 @@ class Mixer:
                         self._external_override(mix, col, raw)
                     saved = None
                 entry["fader"] = self._to_ui(saved if saved is not None else raw, spec) if spec["writable"] else 0
+                if stereo_bus:
+                    # Matrix editor, stereo fader, and balance must all use
+                    # effective hardware/saved-mute coefficients, not a cached
+                    # fader from the left bus or two independent API reads.
+                    left = float(self._matrix_raw(mix, col))
+                    right = float(self._matrix_raw(mix + 1, col))
+                    entry["fader"] = self._to_ui(max(left, right), spec)
+                    entry["pan"] = (round((right - left) / (right + left), 4)
+                                    if max(left, right) > 16 else None)
+                    entry["pan_available"] = entry["pan"] is not None
+                    entry["matrix_legs"] = {
+                        "left_db": raw_to_db(left, self.matrix["mode"]),
+                        "right_db": raw_to_db(right, self.matrix["mode"]),
+                    }
+                    # Used only by the API when combining two linked inputs.
+                    entry["_matrix_raw"] = [left, right]
                 if self._soft_mute():
                     entry["mute"] = (mix, col) in getattr(self, '_user_mutes', set()) or raw == 0
                     entry["solo"] = col in getattr(self, '_solos', {}).get(mix, set())
-            if "pan" in self.roles:
+            if "pan" in self.roles and not stereo_bus:
                 path, spec = self.roles["pan"]
                 raw = self._get_cell(path, mix, col)
                 lo, hi = spec.get("min", 0), spec.get("max", 1)
@@ -662,6 +801,12 @@ class Mixer:
         key = (output_index, input_index)
         with self.helper.transaction():
             deferred = self._write_gain_cell(output_index, input_index, raw)
+            # The user explicitly edited a matrix cell. Don't later revive a
+            # route based on a stale balance gesture's remembered coefficients.
+            cache = getattr(self, '_input_pair_balance_cache', {})
+            for pair in list(cache):
+                if (output_index, input_index) in ((pair[0],pair[1]), (pair[0]+1,pair[2])):
+                    del cache[pair]
             # If soft-muted, the effective level is the intended restored
             # value, not the silent physical crosspoint.
             applied = self._matrix_raw(output_index, input_index)

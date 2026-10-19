@@ -1,4 +1,4 @@
-# v1.1.0-dev — Matrix gain precision testing
+# v1.1.1 development build — Matrix gain precision testing
 
 This update modifies **mixer gain coefficients** only where the exact source-defined FFADO profile declares a DICE EAP or RME matrix. It does **not** change the MOTU UltraLite bus-to-output assignment grid.
 
@@ -16,7 +16,7 @@ Open the local mixer page. In **In/Out → Mixer matrix**, choose a cell and ent
 
 Test the **−∞**, **0 dB**, **−6 dB**, **+3 dB**, **+6 dB** presets. Verify that the cell displays a value rounded to one decimal after applying it. Changes can differ by a small fraction at low levels because FFADO stores **integer native coefficients**.
 
-Double-click a cell to select 0 dB in the editor; **Apply** is still required to change the device. Keyboard shortcuts when the knob is focused: `0` for 0 dB, `M` for silence, arrow keys in 0.1 dB increments, Shift+arrows in 1 dB increments.
+Double-click a matrix-cell knob to select 0 dB in the editor; **Apply** is still required to change the device. Keyboard shortcuts when the inline knob or detailed editor knob is focused: `0` for 0 dB, `M` for silence, arrow keys in 0.1 dB increments, Shift+arrows in 1 dB increments.
 
 ## On a real DICE / RME interface
 

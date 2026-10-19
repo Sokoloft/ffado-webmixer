@@ -1,6 +1,6 @@
-# v1.1.0-dev — Software mute/solo resilience and recovery
+# v1.1.1 development build — Software mute/solo resilience and recovery
 
-This guide is for the **current** v1.1.0-dev application with the software
+This guide is for the **current** v1.1.1 development build application with the software
 mute/solo safety patch. This change does **not** add mute hardware registers or
 alter device routing. It safeguards gain-matrix muting on exact-profile DICE/RME
 hardware, plus previously emulated output mutes on models such as MOTU.

@@ -88,3 +88,34 @@
 #routingPreset { background:var(--control-background); color:var(--text-primary);
   border:1px solid var(--border-color); border-radius:4px; padding:7px; min-width:105px; }
 #routingDb { width:85px; }
+
+/* One directly manipulable hardware gain knob per crosspoint. The value is
+   always visible; a click also opens the precise numeric/preset editor. */
+#routingGrid td .matrix-cell-control {
+  display: flex; flex-direction: column; justify-content: center; align-items: center;
+  gap: 5px; width: 79px; min-height: 83px; padding: 7px 4px;
+  cursor: ns-resize; touch-action: none; user-select: none;
+}
+#routingGrid td .matrix-cell-control:disabled { cursor: progress; opacity: .65; }
+#routingGrid td .matrix-cell-control:focus-visible { outline: 2px solid var(--accent-color); outline-offset: 2px; }
+.matrix-cell-dial {
+  display: block; position: relative; box-sizing: border-box; width: 43px; height: 43px;
+  border: 3px solid var(--border-color); border-radius: 50%;
+  background: radial-gradient(circle at center, var(--control-background) 49%, var(--button-background) 51%);
+  box-shadow: inset 0 1px 5px #0004; pointer-events: none;
+}
+.matrix-cell-needle {
+  position: absolute; bottom: 50%; left: calc(50% - 1.5px);
+  display: block; height: 40%; width: 3px; border-radius: 2px;
+  background: var(--accent-color); transform-origin: bottom center;
+  transform: rotate(-135deg); pointer-events: none;
+}
+.matrix-cell-value {
+  display: block; font-size: 11px; font-variant-numeric: tabular-nums;
+  white-space: nowrap; pointer-events: none;
+}
+@media(max-width:650px) {
+  #routingGrid td .matrix-cell-control { width: 67px; min-height: 77px; padding: 6px 2px; }
+  .matrix-cell-dial { width: 39px; height: 39px; }
+  .matrix-cell-value { font-size: 10px; }
+}

@@ -45,6 +45,7 @@ class DeviceManager:
                 if guid == self.order[0]:
                     config.names = deepcopy(settings.names)
                     config.stereo = deepcopy(settings.stereo)
+                    config.stereo_by_mix = deepcopy(settings.stereo_by_mix)
                     config.layouts = deepcopy(settings.layouts)
                     config.legacy_layout = deepcopy(settings.legacy_layout)
                     config.mute_memory = deepcopy(settings.mute_memory)

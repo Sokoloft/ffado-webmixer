@@ -206,7 +206,7 @@ def test_three_device_routes_and_stale_client_isolation(monkeypatch, tmp_path):
         config.load()
         manager = DeviceManager([a,b,c], config, debug=True)
         app = create_app(SelectedBackend(manager), a.describe(), SelectedConfig(manager),
-                         device_manager=manager, about={'version':'1.1.0-dev'})
+                         device_manager=manager, about={'version':'1.1.1'})
 
         def call(method, path, *, header=None, body=None):
             request.method, request.path = method, path

@@ -24,12 +24,17 @@ class Config:
 
         self.settings = deepcopy(DEFAULT_SETTINGS)
         self._save_lock = threading.RLock()
+        # Serialize stereo checks and commits across simultaneous browser tabs.
+        self._pair_lock = threading.RLock()
 
         # Names given to channels and outputs in the web UI (channel id, or "out:<id>" -> name).
         self.names = {}
 
-        # Stereo pairs [[left, right], ...]. Global: a pair is the same on every bus.
+        # Old configs stored one stereo pair list for every bus. Keep that as
+        # a read-only fallback so existing user settings migrate without
+        # losing links. New edits are always per-bus and override the fallback.
         self.stereo = []
+        self.stereo_by_mix = {}
 
         # Strip order / pinned / minimized, kept separately for every bus (bus id -> list of entries).
         self.layouts = {}
@@ -70,7 +75,12 @@ class Config:
 
         self.settings.update(saved.get("settings", {}))
         self.names.update(saved.get("names", {}))
-        self.stereo[:] = saved.get("stereo", [])
+        self.stereo[:] = self._clean_pairs(saved.get("stereo", []))
+        raw_bus_pairs = saved.get("stereo_by_mix", {})
+        if isinstance(raw_bus_pairs, dict):
+            self.stereo_by_mix.update({str(k): self._clean_pairs(v)
+                                       for k, v in raw_bus_pairs.items()
+                                       if str(k).isdigit()})
         self.layouts.update(saved.get("layouts", {}))
         self.legacy_layout = saved.get("layout", [])
         self.mute_memory.update(saved.get("mute_memory", {}))
@@ -88,7 +98,8 @@ class Config:
             data = {
                 "settings": self.settings,
                 "names": self.names,
-                "stereo": self.stereo,
+                "stereo": self.stereo,  # old global pairs: fallback for unedited buses
+                "stereo_by_mix": self.stereo_by_mix,
                 "layouts": self.layouts,
                 "mute_memory": self.mute_memory,
             }
@@ -109,66 +120,91 @@ class Config:
 
         return saved
 
-    # ---------- stereo pairs (global) ----------
-    def pair_of(self, strip):
-        """[left, right] if this channel is in a stereo pair, else None."""
-        for pair in self.stereo:
+    # ---------- stereo pairs (per output mix/bus) ----------
+    @staticmethod
+    def _clean_pairs(pairs):
+        """Never let a broken/old config hide the same channel twice.
+
+        Keep the first valid pair, including its Left -> Right ordering.  A
+        malformed or overlapping later entry cannot create an inconsistent UI.
+        """
+        if not isinstance(pairs, list):
+            return []
+        cleaned, seen = [], set()
+        for pair in pairs:
+            if not isinstance(pair, (list, tuple)) or len(pair) != 2:
+                continue
+            left, right = pair
+            if (not isinstance(left, str) or not isinstance(right, str)
+                    or not left.strip() or not right.strip() or left == right
+                    or left in seen or right in seen):
+                continue
+            cleaned.append([left, right])
+            seen.update((left, right))
+        return cleaned
+
+    def pairs_for(self, mix):
+        """Validated snapshot of the ordered [Left, Right] pairs on this bus.
+
+        A legacy global list is the initial value for uncustomized buses. An
+        explicit [] overrides it. Callers never mutate the underlying list.
+        """
+        with self._pair_lock:
+            return self._clean_pairs(self.stereo_by_mix.get(str(mix), self.stereo))
+
+    def pair_of(self, strip, mix=0):
+        """Pair containing ``strip`` on one bus, or None."""
+        for pair in self.pairs_for(mix):
             if strip in pair:
                 return pair
-
         return None
 
-    def partner_of(self, strip):
-        pair = self.pair_of(strip)
+    def partner_of(self, strip, mix=0):
+        pair = self.pair_of(strip, mix)
+        return (pair[1] if strip == pair[0] else pair[0]) if pair else None
 
-        if pair is None:
-            return None
+    def link(self, left, right, mix=0):
+        with self._pair_lock:
+            if not isinstance(left, str) or not isinstance(right, str) or not left.strip() or not right.strip() or left == right:
+                raise ValueError('Choose two different input channels')
+            pairs = self.pairs_for(mix)
+            if any(left in pair or right in pair for pair in pairs):
+                raise ValueError('One or both channels are already in a stereo pair on this bus. Unlink first.')
+            self.stereo_by_mix[str(mix)] = pairs + [[left, right]]
 
-        return pair[1] if strip == pair[0] else pair[0]
+    def unlink(self, strip, mix=0):
+        with self._pair_lock:
+            pairs = self.pairs_for(mix)
+            if not any(strip in pair for pair in pairs):
+                raise ValueError('This channel is not in a stereo pair on this bus')
+            self.stereo_by_mix[str(mix)] = [pair for pair in pairs if strip not in pair]
 
-    def link(self, left, right):
-        self.stereo.append([left, right])
+    def place_pair_in_layout(self, mix, left, right, target=None):
+        """Pairing is visual: retain both saved layout entries, even Right.
 
-    def unlink(self, strip):
-        self.stereo[:] = [pair for pair in self.stereo if strip not in pair]
+        /api/state marks the Right channel as hidden while paired. Keeping its
+        original pin, minimize and position data means unlink restores exactly
+        that bus's layout, without ever changing another bus's visibility.
+        """
+        return None
 
-    def place_pair_in_layout(self, mix, left, right, target):
-        """After linking: the pair takes the slot of the strip it was dropped on (in this bus's layout)."""
-        entries = [dict(entry) for entry in self.layout_for(mix)]
-        ids = [entry["id"] for entry in entries]
+    def spread_unlinked(self, left, right, mix=0):
+        """Repair old layouts that deleted Right; touch only the active bus.
 
-        if target not in ids:
+        Newly linked layouts already retain the Right channel, so their order
+        and minimized/pinned settings should remain untouched after unlinking.
+        """
+        key = str(mix)
+        entries = self.layouts.get(key)
+        if entries is None:
+            if not self.legacy_layout:
+                return
+            entries = [dict(entry) for entry in self.legacy_layout]
+        ids = [entry.get('id') for entry in entries]
+        if right in ids or left not in ids:
             return
-
-        slot = entries[ids.index(target)]
-        merged = []
-
-        for entry in entries:
-            if entry["id"] == target:
-                merged.append({"id": left, "pinned": slot["pinned"], "minimized": False})
-            elif entry["id"] not in (left, right):
-                merged.append(entry)
-
-        self.layouts[str(mix)] = merged
-
-    def spread_unlinked(self, left, right):
-        """After unlinking: the right channel goes back to sitting directly after the left one, on every bus."""
-        for key, entries in self.layouts.items():
-            ids = [entry["id"] for entry in entries]
-
-            if left not in ids:
-                continue
-
-            slot = entries[ids.index(left)]
-            rebuilt = []
-
-            for entry in entries:
-                if entry["id"] == right:
-                    continue
-
-                rebuilt.append(entry)
-
-                if entry["id"] == left:
-                    rebuilt.append({"id": right, "pinned": slot["pinned"], "minimized": False})
-
-            self.layouts[key] = rebuilt
+        entries = [dict(entry) for entry in entries]
+        index = ids.index(left)
+        entries.insert(index + 1, {'id': right, 'pinned': entries[index].get('pinned', True),
+                                   'minimized': False})
+        self.layouts[key] = entries

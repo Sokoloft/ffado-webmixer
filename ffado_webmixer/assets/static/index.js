@@ -54,7 +54,7 @@ function loadMuteRecovery() {
     if (data.pending) {
       message.textContent = data.pending + ' channel/output level(s) were saved by an interrupted mute/solo session. ' +
         'Restoring may raise output volume. Lower monitor levels before choosing Restore; ' +
-        'Keep current levels only forgets the saved gains.';
+        'Keep current levels only forgets saved mixer volume levels.';
     } else if (data.fault) {
       message.textContent = data.fault + (data.corrupt ?
         ' The journal cannot be safely restored. Keep current levels discards the unreadable record.' :
@@ -69,7 +69,7 @@ function muteRecoveryAction(action) {
       'This may make the speakers louder. Lower your monitoring volume first.')) return;
   post('/api/mute-recovery', {action: action}).then(r => r.json().then(data => {
     if (!r.ok || data.error) throw Error(data.error || 'Recovery failed');
-    if (data.failed) toast(data.failed + ' gain(s) could not be restored. Try again after checking FFADO.');
+    if (data.failed) toast(data.failed + ' mixer volume level(s) could not be restored. Try again after checking FFADO.');
     loadMuteRecovery();
     loadMix();
   })).catch(e => toast('Recovery failed: ' + e.message));
@@ -113,6 +113,10 @@ var EYE_OPEN = '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stro
   'stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12z"/>' +
   '<circle cx="12" cy="12" r="3"/></svg>';
 var EYE_SHUT = EYE_OPEN.replace("</svg>", '<path d="M3 3l18 18"/></svg>');
+var CHAIN_LINK_SVG = '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" ' +
+  'stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' +
+  '<path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/>' +
+  '<path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>';
 var PIN_SVG = '<svg viewBox="0 0 24 24" width="14" height="14"><path fill="currentColor" ' +
   'd="M9 3h6l-1 6 3 3v2h-4v7l-1 1-1-1v-7H7v-2l3-3z"/></svg>';
 
@@ -141,47 +145,93 @@ function place(el, over, after) {
   if (over) row.insertBefore(el, after ? over.nextSibling : over);
   else row.appendChild(el);
 }
-// Dropping a strip on the MIDDLE of another one links them as a stereo pair. Near either edge it reorders as before.
-function canLink(a, b) {
-  return a !== b && !isMin(a) && !isMin(b) && !a.classList.contains("stereo") && !b.classList.contains("stereo");
-}
-function linkStrips(dragged, target, saved) {
-  Promise.resolve(saved).then(function () {          // the new order is saved first, so the pair lands in the right slot
-    return post("/api/stereo?mix=" + currentMix, { action: "link", dragged: dragged, target: target });
-  }).then(function (r) { return r.json(); }).then(function (res) {
-    if (res.error) toast("Couldn't link: " + res.error);
-    loadMix();
+// Link buttons are available on every mono channel. First click picks Left,
+// second click picks Right, regardless of number or saved strip order.
+var pendingStereoLeft = null;
+var pendingStereoMix = null;
+var stereoLinkBusy = false;
+// Disable all pair controls while a mutation is in flight. A quick second
+// click or an unlink from another strip must never submit a competing action.
+function setStereoLinkBusy(busy) {
+  stereoLinkBusy = busy;
+  row.querySelectorAll('.strip .link-toggle, .strip.stereo .unlink').forEach(function (button) {
+    button.disabled = busy;
   });
 }
-function unlinkStrip(id) {
-  post("/api/stereo?mix=" + currentMix, { action: "unlink", id: id })
-    .then(function (r) { return r.json(); }).then(function (res) {
-      if (res.error) toast("Couldn't unlink: " + res.error);
+function stereoResponse(r) {
+  return r.json().then(function (res) {
+    if (!r.ok || res.error) throw Error(res.error || 'Stereo operation rejected');
+    return res;
+  });
+}
+function linkStrips(left, right) {
+  if (stereoLinkBusy) return Promise.resolve();
+  var bus = currentMix;
+  pendingStereoLeft = null;
+  setStereoLinkBusy(true);
+  return post("/api/stereo?mix=" + bus, {action:"link", dragged:left, target:right})
+    .then(stereoResponse)
+    .catch(function (error) { toast("Couldn't link: " + error.message); })
+    .then(function () { if (bus === currentMix) return loadMix(); })
+    .finally(function () { setStereoLinkBusy(false); });
+}
+function chooseStereoChannel(id) {
+  if (stereoLinkBusy) return;
+  // The old bus remains on screen briefly during a bus change. Do not let
+  // the user accidentally create a pair on a different bus in that window.
+  if (lastStripMix !== null && lastStripMix !== currentMix) return;
+  if (!lastStripState || !lastStripState[id] ||
+      lastStripState[id].partner || lastStripState[id].partner_of) {
+    pendingStereoLeft = null;
+    toast('Channel is already paired or unavailable. Refreshing mixer.');
+    loadMix();
+    return;
+  }
+  if (pendingStereoMix !== currentMix) {
+    pendingStereoLeft = null;
+    pendingStereoMix = currentMix;
+  }
+  if (pendingStereoLeft === id) {
+    pendingStereoLeft = null;
+  } else if (pendingStereoLeft === null) {
+    pendingStereoLeft = id;
+    var number = parseInt(id.split('/')[1], 10);
+    toast('Left: ' + (Number.isNaN(number) ? id : number + 1) + '. Choose the Right channel.');
+  } else {
+    var left = pendingStereoLeft;
+    if (!lastStripState[left] || lastStripState[left].partner || lastStripState[left].partner_of) {
+      pendingStereoLeft = null;
+      toast('Left channel is no longer available. Select it again.');
       loadMix();
-    });
+      return;
+    }
+    linkStrips(left, id);
+  }
+  if (lastStripState) renderLinkButtons(lastStripState);
+}
+function unlinkStrip(id) {
+  if (stereoLinkBusy) return Promise.resolve();
+  var bus = currentMix;
+  setStereoLinkBusy(true);
+  return post("/api/stereo?mix=" + bus, {action:"unlink", id: id})
+    .then(stereoResponse)
+    .catch(function (error) { toast("Couldn't unlink: " + error.message); })
+    .then(function () { if (bus === currentMix) return loadMix(); })
+    .finally(function () { setStereoLinkBusy(false); });
 }
 
 function startDrag(el, e) {
   if (isPinned(el)) return;
   e.preventDefault();
   el.classList.add("dragging");
-  var linkTarget = null;
-  function setLinkTarget(t) {
-    if (t === linkTarget) return;
-    if (linkTarget) linkTarget.classList.remove("link-target");
-    linkTarget = t;
-    if (t) t.classList.add("link-target");
-  }
   function move(ev) {
     var t = document.elementFromPoint(ev.clientX, ev.clientY);
     if (!t) return;
     var over = t.closest(".strip");
     if (over && over !== el && over.parentNode === row) {
       var r = over.getBoundingClientRect(), frac = (ev.clientX - r.left) / r.width;
-      setLinkTarget(null);
       place(el, over, frac > 0.5);
     } else {
-      setLinkTarget(null);
       if (!over && t === row) {
         var last = row.lastElementChild;
         if (last && ev.clientX > last.getBoundingClientRect().right) place(el, null, true);
@@ -193,10 +243,7 @@ function startDrag(el, e) {
     document.removeEventListener("pointerup", up);
     document.removeEventListener("pointercancel", up);
     el.classList.remove("dragging");
-    var target = linkTarget;
-    setLinkTarget(null);
-    var saved = saveLayout();
-    // Stereo link is handled by the explicit buttons between odd/even strips.
+    saveLayout();  // dragging only reorders; linking uses bottom-right buttons
   }
   document.addEventListener("pointermove", move);
   document.addEventListener("pointerup", up);
@@ -285,31 +332,40 @@ function buildStrip(id, data, pinned, minimized, partner) {
   var el = document.createElement("div");
   el.className = "strip" + (stereo ? " stereo" : "") + (data.mute ? " muted" : "") + (data.solo ? " soloed" : "");
   el.dataset.id = id;
-  if (stereo) el.dataset.partner = pid;
+  if (stereo) {
+    el.dataset.partner = pid;
+    el.title = 'Stereo inputs — Left: ' + (data.input || id) + ', Right: ' + (partner.input || pid);
+  }
   el.innerHTML =
     '<div class="grip">::::</div>' +
     '<button class="pin">' + PIN_SVG + '</button>' +
     '<button class="eye"></button>' +
     '<div class="vname"></div>' +
-    '<div class="gaininv"><div class="gainrow"><div class="cap">GAIN</div>' +
-      '<div class="gainboxes"><input class="gain" type="text" inputmode="numeric" autocomplete="off" spellcheck="false"></div></div>' +
+    '<div class="gaininv"><div class="gainrow" title="Hardware input gain/trim, separate from digital mixer volume"><div class="cap">INPUT GAIN</div>' +
+      '<div class="gainboxes"><input class="gain" type="text" inputmode="numeric" autocomplete="off" spellcheck="false" aria-label="Hardware input gain"></div></div>' +
       '<button class="invert" title="Polarity (invert)">\u00D8</button></div>' +
     '<div class="panrow"><div class="caprow"><span>PAN</span><span class="panval">0</span></div>' +
       '<input class="pan" type="range" min="-100" max="100" step="1" value="0" title="Double-click to center"></div>' +
 
     '<input class="name" maxlength="16" spellcheck="false" title="Rename">' +
     '<button class="btn solo">Solo</button>' +
-    '<div class="fval"></div>' +
-    '<div class="faderwrap"><div class="track"><div class="handle"></div></div>' +
-      '<button type="button" class="peak-meter" hidden title="FFADO router peak" aria-label="Clear peak and clip hold"><span class="peak-bar"></span><span class="peak-hold"></span><span class="peak-clip"></span></button></div>' +
+    '<div class="fval" title="Digital mixer volume"></div>' +
+    '<div class="faderwrap"><div class="track" title="Digital mixer volume"><div class="handle"></div></div>' +
+      '<button type="button" class="peak-meter" hidden title="FFADO router destination peak (not post-fader)" aria-label="Clear peak holds">' +
+        '<span class="peak-lane" data-side="left"><span class="peak-bar"></span><span class="peak-hold"></span><span class="peak-clip"></span></span>' +
+        (stereo ? '<span class="peak-lane" data-side="right"><span class="peak-bar"></span><span class="peak-hold"></span><span class="peak-clip"></span></span>' : '') +
+      '</button></div>' +
     '<button class="btn mute">Mute</button>' +
     '<div class="inname" title="Hardware input"></div>' +
-    (stereo ? '<button class="unlink" type="button" title="Unlink stereo channels" aria-label="Unlink stereo channels">' + '&#x26D3;' + '</button>' : '');
+    (stereo ? '<button class="unlink" type="button" title="Unlink stereo channels" aria-label="Unlink stereo channels">' + CHAIN_LINK_SVG + '</button>' : '');
 
   var q = function (sel) { return el.querySelector(sel); };
   var nameEl = q(".name"), invertEl = q(".invert");
   var panEl = q(".pan"), panVal = q(".panval"), soloEl = q(".solo");
-  var pan = data.pan || 0;
+  // Do not turn an unavailable hardware balance (null) into fake center.
+  var panAvailable = data.pan !== null && data.pan !== undefined &&
+    Number.isFinite(Number(data.pan)) && data.pan_available !== false;
+  var pan = panAvailable ? Number(data.pan) : 0;
   var missing = function (v) { return v === undefined || v === null; };
 
   // which controls this device offers (and which this particular channel has)
@@ -350,18 +406,36 @@ function buildStrip(id, data, pinned, minimized, partner) {
 
   // Pan for mono strips and stereo-pair balance (handled as L/R by the API).
   function renderPan() {
+    if (!panAvailable) {
+      panEl.value = 0;  // slider needs a numeric coordinate; never show center
+      panVal.textContent = "—";
+      return;
+    }
     var p = Math.round(pan * 100);
     panEl.value = p;
-    panVal.textContent = p === 0 ? "0" : (p < 0 ? "L" + (-p) : "R" + p);
+    panVal.textContent = (p === 0 ? "0" : (p < 0 ? "L" + (-p) : "R" + p)) +
+      (data.pan_partial ? "*" : "");
   }
   if (FEATURES.pan || STEREO_BUSES.includes(currentMix)) {
-    panEl.disabled = STEREO_BUSES.includes(currentMix) ? false : !FEATURES.pan.writable;
+    panEl.disabled = !panAvailable ||
+      (STEREO_BUSES.includes(currentMix) ? false : !FEATURES.pan.writable);
+    if (data.pan_note) {
+      panEl.title = data.pan_note;
+      panVal.title = data.pan_note;
+    } else if (!panAvailable) {
+      panEl.title = "Hardware balance is unavailable";
+      panVal.title = panEl.title;
+    }
     panEl.addEventListener("input", function () {
+      if (panEl.disabled) return;
       pan = parseInt(panEl.value, 10) / 100;
       renderPan();
       sendThrottled(id, "pan", pan);
     });
-    panEl.addEventListener("dblclick", function () { pan = 0; renderPan(); send(id, "pan", 0); });
+    panEl.addEventListener("dblclick", function () {
+      if (panEl.disabled) return;
+      pan = 0; renderPan(); send(id, "pan", 0);
+    });
     var panAcc = { v: 0 };
     panEl.addEventListener("wheel", function (e) {              // wheel over the bar: 5 per notch, 1 with Shift
       if (panEl.disabled) return;
@@ -386,7 +460,11 @@ function buildStrip(id, data, pinned, minimized, partner) {
   }
   soloEl.addEventListener("click", function () { toggleHardware('solo', !el.classList.contains('soloed')); });
   q(".mute").addEventListener("click", function () { if (MUTE_ALLOWED) toggleHardware('mute', !el.classList.contains('muted')); });
-  if (stereo) q(".unlink").addEventListener("click", function () { unlinkStrip(id); });
+  if (stereo) {
+    q(".unlink").title = 'Unlink — Left: ' + (data.input || id) + ', Right: ' + (partner.input || pid);
+    q(".unlink").disabled = stereoLinkBusy;
+    q(".unlink").addEventListener("click", function () { unlinkStrip(id); });
+  }
 
   // pin / minimize / drag
   q(".pin").addEventListener("click", function () { setPinned(el, !isPinned(el)); saveLayout(); });
@@ -409,7 +487,15 @@ function buildStrip(id, data, pinned, minimized, partner) {
     else if (control === "solo") el.classList.toggle("soloed", !!value);
     else if (control === "invert") invertEl.classList.toggle("on", !!value);
     else if (control === "gain") { if (gain1) gain1.set(value); }
-    else if (control === "pan") { if (!panDragging) { pan = value; renderPan(); } }
+    else if (control === "pan") {
+      if (!panDragging) {
+        panAvailable = value !== null && value !== undefined && Number.isFinite(Number(value));
+        pan = panAvailable ? Number(value) : 0;
+        panEl.disabled = !panAvailable ||
+          (STEREO_BUSES.includes(currentMix) ? false : !FEATURES.pan.writable);
+        renderPan();
+      }
+    }
     else if (control === "name") {
       if (stripId && stripId !== id) return;          // the right channel's own name isn't shown on a stereo strip
       if (document.activeElement !== nameEl) { nameEl.value = value; lastName = value; q(".vname").textContent = vertical(value); }
@@ -420,6 +506,23 @@ function buildStrip(id, data, pinned, minimized, partner) {
   setMinimized(el, !!minimized);
   renderPan();
   fader.set(Number.isFinite(data.fader) ? data.fader : 0);
+  if (stereo && data.pair_mismatch) {
+    // The label represents the louder linked input. Do not imply both
+    // crosspoint gains match when one was edited independently in the matrix.
+    var valueLabel = q(".fval");
+    valueLabel.textContent = "MAX " + valueLabel.textContent;
+    valueLabel.classList.add("level-mismatch");
+    if (Array.isArray(data.pair_faders)) {
+      var labelFor = function (v) {
+        if (!GAIN_SCALE) return String(Math.round(v));
+        if (!v) return "−∞ dB";
+        var db = GAIN_SCALE.min_db + v * (GAIN_SCALE.max_db - GAIN_SCALE.min_db) / 100;
+        return db.toFixed(1) + " dB";
+      };
+      valueLabel.title = "Linked inputs differ: left " + labelFor(data.pair_faders[0]) +
+        ", right " + labelFor(data.pair_faders[1]) + ". The fader shows the louder input.";
+    }
+  }
   return el;
 }
 
@@ -775,7 +878,7 @@ function selectOutput(o) {
     currentMix = STEREO_BUSES.includes(o.mix - o.mix % 2) ? o.mix - o.mix % 2 : o.mix;
     markOutputs();
     post("/api/settings", { output: currentOut, mix: currentMix });
-    if (changed) loadMix();
+    if (changed) { pendingStereoLeft = null; loadMix(); }
     return;
   }
   currentOut = o.id;
@@ -783,7 +886,7 @@ function selectOutput(o) {
   if (o.mix !== null) currentMix = STEREO_BUSES.includes(o.mix - o.mix % 2) ? o.mix - o.mix % 2 : o.mix;
   markOutputs();
   post("/api/settings", { output: currentOut, mix: currentMix });
-  if (busChanged) loadMix();
+  if (busChanged) { pendingStereoLeft = null; loadMix(); }
   loadMaster();
 }
 function buildOutputs() {
@@ -879,8 +982,10 @@ window.addEventListener("resize", function () {                // keep a saved w
 
 // ---- render the strips for the selected bus ----
 var lastStripState = null;
+var lastStripMix = null;
 function renderStrips(state, layout) {
   lastStripState = state;
+  lastStripMix = currentMix;
   row.innerHTML = "";
   var placed = {};
   function make(id, pinned, minimized) {
@@ -889,8 +994,7 @@ function renderStrips(state, layout) {
   }
   layout.forEach(function (entry) {
     var id = entry.id, d = state[id];
-    if (d && d.partner_of) { id = d.partner_of; d = state[id]; }     // a stereo pair sits where its first channel is listed
-    if (!d || placed[id]) return;                                     // not visible right now, or already drawn
+    if (!d || d.partner_of || placed[id]) return; // Right is hidden; Left retains its own position                                     // not visible right now, or already drawn
     placed[id] = true;
     row.appendChild(make(id, entry.pinned !== false, !!entry.minimized));
   });
@@ -901,32 +1005,40 @@ function renderStrips(state, layout) {
   renderLinkButtons(state);
   updateMinCount();
 }
-// Pair hardware channels (1+2, 3+4...) only. Never link arbitrary faders.
+// Each mono strip gets its own link button at the lower right. A pending
+// first click is highlighted as Left; all other unpaired channels can be Right.
 function renderLinkButtons(state) {
-  // Link controls belong to the odd-numbered (left) strip, never between strips.
-  // Linked pairs already have the same lower-right control in buildStrip().
   row.querySelectorAll('.strip > .link-toggle').forEach(b => b.remove());
-  var ids = Object.keys(state).filter(id => /^ch\/\d+$/.test(id));
-  ids.filter(id => parseInt(id.split('/')[1], 10) % 2 === 0).forEach(left => {
-    var ix = parseInt(left.split('/')[1], 10);
-    var right = 'ch/' + String(ix + 1).padStart(2, '0');
-    if (!state[right] || state[left].partner === right) return;
-    var el = Array.from(row.querySelectorAll(':scope > .strip')).find(x => x.dataset.id === left);
-    // A visible odd strip can toggle its adjacent channel without a spacer.
-    // Minimized odd strips hide the control through CSS.
-    if (!el) return;
+  row.querySelectorAll('.strip.stereo-pending').forEach(el => el.classList.remove('stereo-pending'));
+  if (pendingStereoLeft && (!state[pendingStereoLeft] ||
+      state[pendingStereoLeft].partner || state[pendingStereoLeft].partner_of)) {
+    pendingStereoLeft = null;
+  }
+  row.querySelectorAll(':scope > .strip').forEach(el => {
+    var id = el.dataset.id;
+    if (!state[id] || state[id].partner || state[id].partner_of) return;
+    var selected = pendingStereoLeft === id;
+    el.classList.toggle('stereo-pending', selected);
     var b = document.createElement('button');
     b.className = 'unlink link-toggle';
     b.type = 'button';
-    b.title = 'Link channel ' + (ix+1) + ' (L) with ' + (ix+2) + ' (R)';
-    b.innerHTML = '&#x26D3;';
+    b.title = selected ? 'Cancel Left selection' :
+      (pendingStereoLeft ? 'Select channel as Right' : 'Select channel as Left');
+    b.innerHTML = CHAIN_LINK_SVG;
     b.setAttribute('aria-label', b.title);
-    b.addEventListener('click', () => linkStrips(left, right, Promise.resolve()));
+    b.setAttribute('aria-pressed', String(selected));
+    b.disabled = stereoLinkBusy;
+    b.addEventListener('click', () => chooseStereoChannel(id));
     el.appendChild(b);
   });
 }
 var loadToken = 0;
 function loadMix() {
+  // An unfinished Left selection belongs to the bus it was clicked on.
+  if (pendingStereoMix !== currentMix) {
+    pendingStereoLeft = null;
+    pendingStereoMix = currentMix;
+  }
   var token = ++loadToken;                 // ignore out-of-order replies when clicking quickly
   return Promise.all([
     deviceFetch("/api/state?mix=" + currentMix).then(function (r) { return r.json(); }),
@@ -938,6 +1050,8 @@ function loadMix() {
     loadMuteRecovery();
   });
 }
+
+window.refreshMatrixStrips = loadMix;
 
 // Device tabs are per browser session. Saved names are stored by GUID.
 function loadDevices() {
@@ -1003,11 +1117,23 @@ function applyLayout() {                         // order / pinned / minimized c
 function onSyncEvent(ev) {
   if (ev.device && ACTIVE_DEVICE && ev.device !== ACTIVE_DEVICE) return;
   if (window.routingSyncEvent) window.routingSyncEvent(ev);
-  if (ev.origin === CLIENT_ID) return;           // our own change coming back
+  // Matrix writes change derived fader and pan values, including our own writes.
+  // Always re-read the affected bus; a single crosspoint can change both.
+  if (ev.type === "matrix") {
+    if (ev.output === currentMix ||
+        (STEREO_BUSES.includes(currentMix) && ev.output === currentMix + 1)) loadMix();
+    return;
+  }
+  if (ev.origin === CLIENT_ID) return;           // our own non-matrix change coming back
   var el;
   if (ev.type === "strip") {
     var shared = ev.control === "gain" || ev.control === "invert";    // belong to the channel, not to one bus
     if (!shared && ev.mix !== currentMix) return;
+    // Another client's posted fader/pan value is not necessarily the native
+    // FFADO readback, especially with a linked stereo bus or linked inputs.
+    // Re-derive both controls from actual coefficients rather than replaying
+    // the optimistic command value as though it were hardware state.
+    if (ev.control === "fader" || ev.control === "pan") { loadMix(); return; }
     el = stripEl(ev.strip);
     if (el) el._apply(ev.control, ev.value, ev.strip);
   } else if (ev.type === "name") {
@@ -1019,14 +1145,13 @@ function onSyncEvent(ev) {
     if (ev.control === "fader") masterFader.set(ev.value); else loadMaster();   // Main/Phones mute can move the level
   } else if (ev.type === "layout") {
     if (ev.mix === currentMix) applyLayout();     // another bus's arrangement doesn't concern this page
-  } else if (ev.type === "matrix") {
-    if (ev.output === currentMix) loadMix();
   } else if (ev.type === "bus-stereo") {
     deviceFetch('/api/describe').then(r => r.json()).then(info => {
       STEREO_BUSES = info.stereo_buses || []; buildOutputs(); loadMix();
     });
   } else if (ev.type === "stereo") {
-    if (!row.querySelector(".dragging")) loadMix();   // pairs changed: redraw the strips
+    if (ev.mix !== undefined && ev.mix !== currentMix) return;
+    if (!row.querySelector(".dragging")) loadMix();   // only this bus's pairs changed
   }
 }
 

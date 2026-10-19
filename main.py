@@ -7,7 +7,7 @@ from ffado_webmixer.config import Config
 
 
 APP_NAME = "ffado-webmixer"
-APP_VERSION = "1.1.0-dev"
+APP_VERSION = "1.1.1"
 
 ROOT = Path(__file__).parent
 CONFIG_DIR = Path.home() / ".config" / "ffado-webmixer"
