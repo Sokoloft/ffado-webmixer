@@ -1,5 +1,44 @@
 # Peak-metering test and diagnostic report (v1.1.1 development build)
 
+## Saffire PRO 26 missing-meter regression (October 20, 2026)
+
+The Saffire PRO 26 user's video shows live `Mixer/In:01` and `Mixer/In:02` peaks in
+**In/Out → Crossbar router**, while the corresponding early channel strips are
+unmetered. This was **not a missing hardware metering path**: `read_mix()` emits
+zero-padded strip identifiers (`ch/00`, `ch/01`, ...), but `peak_snapshot()` emits
+unpadded JSON channel indexes (`"0"`, `"1"`, ...). The JavaScript attempted to
+look up `"00"` and `"01"`, so all indices 0–9 were dropped. Indices 10+
+matched by coincidence. Earlier JavaScript tests used non-realistic padded
+JSON keys; they now exercise the actual backend format.
+
+This update fixes lookup for all FFADO DICE profiles sharing that code. We
+tested simulated meter data from **all 16 current model fixtures** with
+source-declared EAP metering, and tested backend-produced JSON through the
+actual JavaScript renderer. No real device was connected in these tests.
+A strip **still remains unmetered** when the router has no peak data for its
+actual declared `Mixer/In:XX` destination; the code never copies a different
+channel, substitutes `Anlg/In` source peaks, or invents post-fader readings.
+
+### Fast read-only hardware verification
+
+1. Open the Saffire PRO 26 mixer and the **Crossbar router** tab. With safe
+   signal levels, verify that `Mixer/In:01` and `Mixer/In:02` show genuine peak
+   activity.
+2. Close the router dialog. The first two channel strips should now show
+   corresponding activity beside their faders (even when the visible strip
+   label is `Anlg/In:01` or `Anlg/In:02`, which names the router source).
+3. Check remaining channels 3–10, then channels 11–18. Only strips whose
+   own router destinations supply peaks are expected to meter.
+4. Optionally pair inputs 2 then 5; verify the two independent Left/Right
+   meters match their own router destinations. Pairing does not change routing.
+5. Repeat on another DICE device, if available. Compare with FFADO's own
+   Crossbar Router; do **not** change routing to make missing peaks appear.
+6. If a destination meters in the Crossbar but the same strip does not,
+   collect the read-only `/api/peaks` response below and send it with a
+   screenshot and the name of that destination.
+
+## Previous channel-strip refinements
+
 The original DICE EAP meter support exposed source-mapped router-destination
 levels. This release refines the **channel-strip** presentation with a separate
 Left and Right meter for every linked stereo pair, while retaining 1.6-second

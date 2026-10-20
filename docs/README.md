@@ -8,6 +8,7 @@ Documentation lives in this folder so the repository root stays focused on the a
 
 ## Testing and verification guides
 
+- [Adaptive bus selector: two columns for small mixers, extra columns for ProFire-style devices](TESTING_ADAPTIVE_BUS_GRID.md)
 - [Priority 2: arbitrary input stereo pairs and safe routing (v1.1.1 development build)](TESTING_ARBITRARY_STEREO.md)
 - [Testing source-defined device capabilities (v1.1.1 development build)](TESTING_CAPABILITIES.md)
 - [v1.1.1 development build — Matrix gain precision testing](TESTING_GAIN_PRECISION.md)

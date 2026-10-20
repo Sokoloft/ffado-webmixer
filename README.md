@@ -19,6 +19,7 @@ The application uses Python, Flask, and FFADO's D-Bus control interface. A pyweb
 
 - Control digital mixer volume, pan, mute, solo, and polarity/invert functions where available; hardware input gain/trim is a separate control when the device exposes it.
 - Select available outputs and buses, with a master fader for the selected destination.
+- Automatically expand the bus selector leftward into more columns for devices with many buses (such as the ProFire 2626), while keeping small mixers such as the UltraLite at two columns or fewer. Stereo-bus link buttons stay with their corresponding bus pair.
 - Link **any two input channels** using the bottom-right chain-link buttons. First click selects **Left**, second click selects **Right** (for example, channel 2 then channel 5). Clicking the first again cancels. **Pairs are independent for each output bus**; dragging strips only reorders them.
 - Reject conflicting stereo pairs with an explicit message and preserve previous pairs and strip layouts on invalid operations. Pair changes from simultaneous browser clients are serialized.
 - Link consecutive output buses on supported mixer matrices and use per-channel stereo balance.
@@ -265,6 +266,9 @@ See [matrix/strip synchronization tests](docs/TESTING_MATRIX_STRIP_SYNC.md),
 [bus-isolated stereo regression](docs/TESTING_STEREO_BUS_VISIBILITY.md),
 [stereo validation checks](docs/TESTING_STEREO_PAIR_VALIDATION.md), and
 [initial pan readback testing](docs/TESTING_INITIAL_PAN.md).
+For the responsive bus selector and safe spacing below routing/settings controls, see
+[adaptive bus-grid testing](docs/TESTING_ADAPTIVE_BUS_GRID.md) and
+[bus toolbar clearance testing](docs/TESTING_BUS_TOOLBAR_CLEARANCE.md).
 
 ## Troubleshooting
 

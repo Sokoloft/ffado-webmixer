@@ -15,6 +15,15 @@
       Number.isFinite(item.level) && item.level >= 0 && item.level <= 1 &&
       (item.db === null || Number.isFinite(item.db));
   }
+  // Mixer /api/state strip IDs are zero-padded (ch/00, ch/01, ...), but
+  // /api/peaks.channels uses decimal JSON keys ('0', '1', ...). Always map
+  // numeric channel indices, never literal padded strings or display names.
+  function channelKey(stripId) {
+    const match = /^ch\/(\d+)$/.exec(stripId || '');
+    if (!match) return null;
+    const index = Number(match[1]);
+    return Number.isSafeInteger(index) ? String(index) : null;
+  }
   function sampleText(item) {
     return `${item.destination}: ${item.db === null ? '−∞' : item.db.toFixed(1)} dB`;
   }
@@ -93,8 +102,8 @@
       this.row.querySelectorAll('.strip').forEach(el => {
         const meter = el.querySelector('.peak-meter');
         if (!meter) return;
-        const left = (el.dataset.id || '').split('/')[1];
-        const right = el.dataset.partner ? el.dataset.partner.split('/')[1] : null;
+        const left = channelKey(el.dataset.id);
+        const right = el.dataset.partner ? channelKey(el.dataset.partner) : null;
         const lanes = [{side: 'left', channel: left}];
         if (right !== null) lanes.push({side: 'right', channel: right});
         const details = [];
@@ -102,7 +111,7 @@
         lanes.forEach(({side, channel}) => {
           const lane = meter.querySelector(`.peak-lane[data-side="${side}"]`);
           if (!lane) return;
-          const item = channels[channel];
+          const item = channel === null ? null : channels[channel];
           if (!validSample(item)) { lane.hidden = true; return; }
           any = true;
           lane.hidden = false;

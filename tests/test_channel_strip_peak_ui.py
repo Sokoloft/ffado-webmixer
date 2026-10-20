@@ -12,7 +12,7 @@ def test_stereo_lanes_created_in_user_selected_left_right_order():
     assert 'data-side="left"' in JS
     assert 'data-side="right"' in JS
     assert 'el.dataset.partner = pid' in JS
-    assert 'const right = el.dataset.partner ? el.dataset.partner.split' in METERS
+    assert 'const right = el.dataset.partner ? channelKey(el.dataset.partner) : null;' in METERS
     assert "{side: 'left', channel: left}" in METERS
     assert "lanes.push({side: 'right', channel: right})" in METERS
     assert '.peak-meter.stereo-meter' in CSS
@@ -20,10 +20,12 @@ def test_stereo_lanes_created_in_user_selected_left_right_order():
 
 
 def test_no_artificial_post_fader_or_unmapped_channels():
-    assert 'const item = channels[channel]' in METERS
+    assert 'const item = channel === null ? null : channels[channel];' in METERS
     assert 'if (!validSample(item)) { lane.hidden = true; return; }' in METERS
     assert "not post-fader" in METERS
     assert 'router destination' in METERS.lower()
+    assert '.peak-meter[hidden] { display:none; }' in CSS
+    assert 'return Number.isSafeInteger(index) ? String(index) : null;' in METERS
     assert "MIXER_INPUT.fullmatch(router_destination)" in BACKEND
     assert "'full_scale': 4096" in BACKEND
     assert "calibrated_dbfs': False" in BACKEND

@@ -1,13 +1,17 @@
 """Offline test of source-defined DICE peak fields and mappings."""
 import contextlib
 import io
+import json
+import os
+import shutil
+import subprocess
 import math
 import re
 import unittest
 from pathlib import Path
 from xml.etree import ElementTree as ET
 from ffado_webmixer.config import Config
-from ffado_webmixer.debug_backend import make_debug_mixer
+from ffado_webmixer.debug_backend import make_debug_mixer, fixture_names
 from ffado_webmixer.peak_metering import meter_config, channel_destinations, normalize_peak
 from ffado_webmixer.profiles.capabilities import parse_capabilities
 
@@ -74,6 +78,57 @@ class PeakProfilesTest(unittest.TestCase):
         self.assertEqual(calls.count('hasPeakMetering'),1)
         self.assertEqual(calls.count('getPeakValues'),2)
         self.assertTrue(again['available'])
+
+    def test_each_dice_model_uses_real_backend_keys_with_padded_strip_ids(self):
+        """Protect all DICE EAP model profiles from the Saffire video regression.
+
+        Python uses 0..17 as JSON keys while /api/state strip IDs are
+        ch/00..ch/17. Test with the actual peak_snapshot serialization and
+        (when node is installed) render that response with the real JS class.
+        No physical D-Bus connection or simulator-only wire format is used.
+        """
+        profiles = 0
+        for model in fixture_names():
+            p = self.fixture(model)
+            if p.meter_spec is None:
+                continue
+            profiles += 1
+            with self.subTest(model=model):
+                self.assertTrue(p.describe()['peak_metering'])
+                names = p.meter_channels
+                # FFADO supplies only named destinations; source names in
+                # parentheses must never be substituted for destinations.
+                self.assertEqual(names['0'], 'Mixer/In:01')
+                self.assertEqual(names['9'], 'Mixer/In:10')
+                self.assertEqual(names['10'], 'Mixer/In:11')
+                self.assertEqual(names['17'], 'Mixer/In:18')
+                def router(path, method, *args):
+                    if method == 'hasPeakMetering':
+                        return True
+                    if method == 'getPeakValues':
+                        return [(destination, 1024 + int(index) * 100)
+                                for index, destination in names.items()]
+                    raise AssertionError(f'Unexpected peak request: {method}')
+                p.helper.router_call = router
+                with contextlib.redirect_stdout(io.StringIO()):
+                    strip_state = p.read_mix(0)
+                    snapshot = p.peak_snapshot()
+                for index in range(18):
+                    self.assertIn(f'ch/{index:02d}', strip_state)
+                    self.assertIn(str(index), snapshot['channels'])
+                    if index < 10:
+                        self.assertNotIn(f'{index:02d}', snapshot['channels'])
+                    self.assertEqual(snapshot['channels'][str(index)]['destination'],
+                                     f'Mixer/In:{index+1:02d}')
+                self.assertEqual(snapshot['guid'], p.guid)
+                self.assertFalse(snapshot['meter']['calibrated_dbfs'])
+                if shutil.which('node'):
+                    env = dict(os.environ, FFADO_BACKEND_PEAK_JSON=json.dumps(snapshot))
+                    result = subprocess.run(['node', 'tests/peak_display_test.cjs'],
+                                            cwd=Path(__file__).parents[1], env=env,
+                                            capture_output=True, text=True, timeout=20)
+                    self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertGreaterEqual(profiles, 16)
 
     def test_no_backend_meter_for_unmapped_motu(self):
         p=self.fixture('motuultralite')

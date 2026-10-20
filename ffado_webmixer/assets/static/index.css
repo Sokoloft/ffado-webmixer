@@ -11,7 +11,7 @@ html { background: var(--page-background); }
   #row { display: flex; gap: 6px; align-items: stretch; flex: 1; min-height: 0; padding: 10px 12px 12px; overflow: auto; }
 
   /* ---- right side: settings, output buttons, master fader ---- */
-  #side { box-sizing: border-box; flex: none; display: flex; flex-direction: column; position: relative;
+  #side { --bus-toolbar-gap: 28px; box-sizing: border-box; flex: none; display: flex; flex-direction: column; position: relative;
           background: var(--sidebar-background); border-left: 1px solid var(--border-color); }
   #splitter { position: absolute; left: -5px; top: 0; bottom: 0; width: 11px; z-index: 6;
               cursor: col-resize; touch-action: none; }
@@ -93,9 +93,14 @@ html { background: var(--page-background); }
   .hidemin input { vertical-align: middle; margin-right: 6px; }
   .hidemin span { color: var(--text-secondary); }
 
-  .sidebody { flex: 1; min-height: 0; display: flex; justify-content: flex-end; gap: 10px; padding: 0 10px 12px; }
+  /* Keep the bus picker physically below the routing/settings toolbar, even
+     when the adaptive grid grows vertically in a maximized window. Reserve
+     this space *inside* the height budget used by the grid layout script. */
+  .sidebody { flex: 1; min-height: 0; min-width: 0; box-sizing: border-box;
+              display: flex; justify-content: flex-end; gap: 10px;
+              padding: var(--bus-toolbar-gap) 10px 12px; }
   /* one outer box, pinned to the bottom, holding two nested groups: Outputs and Buses */
-  #outbox { flex: none; align-self: flex-end; max-height: 100%; overflow-y: auto; display: flex; flex-direction: column; gap: 10px;
+  #outbox { flex: none; align-self: flex-end; box-sizing: border-box; max-height: 100%; overflow-y: auto; display: flex; flex-direction: column; align-items: flex-end; gap: 10px;
             padding: 10px; border: 1px solid var(--border-color); border-radius: 6px; background: var(--sidebar-box-background); }
   #masterbox, #gearbox { border: 1px solid var(--border-color); border-radius: 6px; background: var(--sidebar-box-background); }
   #masterbox { flex: none; display: flex; flex-direction: column; padding: 10px; }
@@ -106,7 +111,11 @@ html { background: var(--page-background); }
                 text-transform: uppercase; color: var(--text-secondary); }
   .groupgrid { --btn-w: 68px; --cols: 2; display: grid; grid-template-columns: repeat(var(--cols), var(--btn-w));
                grid-auto-rows: 48px; gap: 8px; }
-  #side.narrow .groupgrid { --cols: 1; }                    /* bar dragged narrower than two columns need */
+  /* The bus grid may use 4+ columns when many buses must fit vertically.
+     Outputs stay in their own (at most two-column) group at the right. */
+  #outbox .outgroup { flex: none; }
+  #outbox .busgrid { --cols: 2; }
+  #side.narrow .groupgrid { --cols: 1 !important; }                    /* bar dragged narrower than two columns need */
   .outbtn { position: relative; display: flex; align-items: center; justify-content: center; padding: 0 5px; border: 1px solid var(--border-color); border-radius: 4px; background: var(--button-background);
             color: var(--text-primary); font-size: 14px; cursor: pointer; }
   .olabel { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden;
@@ -278,6 +287,7 @@ html { background: var(--page-background); }
     .grouptitle { margin-bottom: 6px; }
   }
   @media (max-width: 700px) {
+    #side { --bus-toolbar-gap: 20px; }
     .groupgrid { --btn-w: 58px; }
     .strip.master { width: 88px; }
   }
@@ -320,6 +330,10 @@ html.pywebview-client #fullscreenbox { display: none; }
 #deviceTabs { display:flex; gap:6px; flex:none; overflow-x:auto; padding:8px 12px 0; border-bottom:1px solid var(--border-color); }
 .device-tab { border:1px solid var(--border-color); padding:7px 12px; border-radius:5px 5px 0 0; white-space:nowrap; background:var(--button-background); color:var(--text-primary); cursor:pointer; }
 .device-tab.active { border-color:var(--accent-color); color:var(--accent-color); background:var(--sidebar-background); }
+.bus-pair-tile { display: grid; grid-column: span 2; grid-row: span 2;
+                 grid-template-columns: repeat(2, var(--btn-w)); grid-template-rows: repeat(2, minmax(0, 1fr)); gap: 8px; }
+#side.narrow .bus-pair-tile { grid-column: 1; grid-row: span 3;
+                              grid-template-columns: var(--btn-w); grid-template-rows: repeat(3, minmax(0, 1fr)); }
 .bus-pair-link { grid-column:1 / -1; background:var(--button-background); color:var(--text-secondary); border:1px solid var(--border-color); border-radius:4px; cursor:pointer; font-size:11px; padding:5px; }
 .bus-pair-link.is-linked { color:var(--accent-color); border-color:var(--accent-color); }
 .device-alias-field { margin-top:16px; padding-top:12px; border-top:1px solid var(--border-color); }
@@ -331,6 +345,7 @@ html.pywebview-client #fullscreenbox { display: none; }
   height:calc(100% - 26px); align-self:center; padding:1px; cursor:pointer;
   background:var(--control-background); border:1px solid var(--border-color);
   border-radius:3px; overflow:hidden; box-sizing:border-box; }
+.peak-meter[hidden] { display:none; }
 .peak-meter.stereo-meter { width:22px; }
 .peak-meter:focus-visible { outline:2px solid var(--accent-color); outline-offset:2px; }
 .peak-lane { position:relative; flex:1; min-width:0; height:100%; overflow:hidden;

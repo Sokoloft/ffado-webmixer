@@ -897,9 +897,10 @@ function buildOutputs() {
     var members = OUTPUTS.filter(g[1]);
     if (!members.length) return;
     var group = document.createElement("div");
-    group.className = "outgroup";
-    group.innerHTML = '<div class="grouptitle">' + g[0] + '</div><div class="groupgrid"></div>';
-    members.forEach(function (o) {
+    group.className = "outgroup" + (g[0] === "Buses" ? " bus-group" : "");
+    group.innerHTML = '<div class="grouptitle">' + g[0] + '</div><div class="groupgrid' + (g[0] === "Buses" ? " busgrid" : "") + '"></div>';
+    var grid = group.querySelector(".groupgrid");
+    function makeOutputButton(o) {
       var btn = document.createElement("button");
       btn.className = "outbtn" + (o.mix !== null ? " bus" : "");
       btn.dataset.id = o.id;
@@ -907,53 +908,142 @@ function buildOutputs() {
       btn.firstChild.textContent = o.name;
       btn.title = o.name;
       btn.addEventListener("click", function () { selectOutput(o); });
-      group.querySelector(".groupgrid").appendChild(btn);
-      if (g[0] === 'Buses' && o.mix !== null && o.mix % 2 === 1 && GAIN_SCALE) {
-        var left = o.mix - 1, linked = STEREO_BUSES.includes(left);
-        var link = document.createElement('button');
-        link.type='button'; link.className='bus-pair-link' + (linked ? ' is-linked' : '');
-        link.textContent = linked ? '🔗 Bus ' + (left+1) + '+' + (left+2) : '↔ Link ' + (left+1) + '+' + (left+2);
-        link.title = 'Toggle stereo bus link for pair ' + (left+1) + '/' + (left+2);
-        link.onclick = () => post('/api/bus-stereo',{left:left,linked:!linked})
-           .then(r => r.json().then(d => { if (!r.ok || d.error) throw Error(d.error || 'Bus link failed'); }))
-           .then(() => deviceFetch('/api/describe').then(r => r.json()))
-           .then(info => { STEREO_BUSES=info.stereo_buses||[]; buildOutputs(); loadMix(); })
-           .catch(e => toast(e.message));
-        group.querySelector('.groupgrid').appendChild(link);
+      return btn;
+    }
+    function makeBusLink(left) {
+      var linked = STEREO_BUSES.includes(left);
+      var link = document.createElement('button');
+      link.type = 'button'; link.className = 'bus-pair-link' + (linked ? ' is-linked' : '');
+      link.textContent = linked ? '🔗 Bus ' + (left+1) + '+' + (left+2) : '↔ Link ' + (left+1) + '+' + (left+2);
+      link.title = 'Toggle stereo bus link for pair ' + (left+1) + '/' + (left+2);
+      link.onclick = () => post('/api/bus-stereo',{left:left,linked:!linked})
+         .then(r => r.json().then(d => { if (!r.ok || d.error) throw Error(d.error || 'Bus link failed'); }))
+         .then(() => deviceFetch('/api/describe').then(r => r.json()))
+         .then(info => { STEREO_BUSES=info.stereo_buses||[]; buildOutputs(); loadMix(); })
+         .catch(e => toast(e.message));
+      return link;
+    }
+    // Keep each stereo-bus link directly below its two bus buttons, even in
+    // a six-column layout. Otherwise the link can wrap away from its pair.
+    var byMix = {};
+    members.forEach(function (o) { if (o.mix !== null) byMix[o.mix] = o; });
+    var rendered = {};
+    members.forEach(function (o) {
+      if (rendered[o.id]) return;
+      var leftMix = o.mix !== null ? o.mix - o.mix % 2 : -1;
+      var left = byMix[leftMix], right = byMix[leftMix + 1];
+      if (g[0] === 'Buses' && GAIN_SCALE && left && right) {
+        var tile = document.createElement('div');
+        tile.className = 'bus-pair-tile';
+        tile.appendChild(makeOutputButton(left));
+        tile.appendChild(makeOutputButton(right));
+        tile.appendChild(makeBusLink(leftMix));
+        grid.appendChild(tile);
+        rendered[left.id] = rendered[right.id] = true;
+      } else {
+        grid.appendChild(makeOutputButton(o));
+        rendered[o.id] = true;
       }
     });
     box.appendChild(group);
   });
   box.hidden = OUTPUTS.length < 2;
+  scheduleBusGridLayout();
 }
 
-// ---- resizable right bar ----
-// Drag the handle on its left edge. The master fader, bus box and cog keep their size; extra width is empty
-// space, and below the width two columns need, the Outputs/Buses buttons fall back to a single column.
+// ---- adaptive buses and resizable right bar ----
+// The output and master controls remain in place on the right. A busy bus
+// panel grows towards the left, within the desktop's available sidebar width.
+// Small mixers (<= 8 bus entries) intentionally never exceed two columns.
 var side = document.getElementById("side");
 var splitter = document.getElementById("splitter");
+var busGridFrame = 0;
 
+// Bus pair cards take two columns and two rows, so the native CSS Grid
+// measurement determines the right number of columns for any mixture of
+// paired and unpaired bus entries. No assumptions about router data are made.
 function sideLimits() {
+  var busGrid = document.querySelector("#outbox .busgrid");
+  var savedColumns = busGrid ? busGrid.style.getPropertyValue("--cols") : "";
   var wasNarrow = side.classList.contains("narrow"), wasWidth = side.style.width;
+  // Measure the actual minimum two-column sidebar, not the currently expanded
+  // bus grid. The drag handle must still shrink it to one column if requested.
+  if (busGrid) busGrid.style.setProperty("--cols", "2");
   side.classList.remove("narrow");
   side.style.width = "";
-  var two = side.getBoundingClientRect().width;               // what the content needs with two columns
+  var two = side.getBoundingClientRect().width;
   var btn = document.querySelector(".outbtn"), grid = document.querySelector(".groupgrid");
   var hasButtons = !!btn && !document.getElementById("outbox").hidden;
-  var one = hasButtons ? two - btn.offsetWidth - (parseFloat(getComputedStyle(grid).columnGap) || 8) : two;
+  var step = hasButtons ? btn.offsetWidth + (parseFloat(getComputedStyle(grid).columnGap) || 8) : 76;
+  var one = hasButtons ? two - step : two;
   if (wasWidth) side.style.width = wasWidth;
   side.classList.toggle("narrow", wasNarrow);
-  return { two: two, min: Math.ceil(one), max: Math.max(two, Math.min(window.innerWidth * 0.6, 800)), buttons: hasButtons };
+  if (busGrid) {
+    if (savedColumns) busGrid.style.setProperty("--cols", savedColumns);
+    else busGrid.style.removeProperty("--cols");
+  }
+  return { two: two, min: Math.ceil(one), max: Math.max(two, Math.min(window.innerWidth * 0.6, 800)),
+           buttons: hasButtons, step: step };
+}
+function layoutBusGrid() {
+  var grid = document.querySelector("#outbox .busgrid");
+  var box = document.getElementById("outbox");
+  if (!grid || box.hidden) return;
+  var busCount = grid.querySelectorAll(".outbtn.bus").length;
+  var lim = sideLimits();
+  if (side.classList.contains("narrow")) {
+    grid.style.setProperty("--cols", "1");
+    return;
+  }
+  // Saved / manually resized sidebar widths take precedence. With the default
+  // width, only grow as far as 60vw or 800px (whichever is smaller).
+  var width = side.style.width ? Math.min(parseFloat(side.style.width), lim.max) : lim.max;
+  var maxCols = Math.max(2, 2 + Math.floor((width - lim.two + 0.5) / lim.step));
+  maxCols = Math.min(maxCols, busCount, 12);
+  grid.style.setProperty("--cols", "2");
+  if (busCount <= 8 || maxCols < 3) return;
+
+  var body = side.querySelector(".sidebody");
+  if (!body || body.clientHeight <= 0) return;
+  // Read the actual CSS Grid height. This includes two-row stereo pair
+  // cards, irregular bus counts, and mobile/short-window CSS media queries.
+  var initialHeight = grid.getBoundingClientRect().height;
+  // clientHeight includes the reserved toolbar clearance and bottom padding.
+  // Subtract both so a tall bus grid cannot consume that safety gap.
+  var bodyStyle = getComputedStyle(body);
+  var verticalPadding = (parseFloat(bodyStyle.paddingTop) || 0) +
+                        (parseFloat(bodyStyle.paddingBottom) || 0);
+  var usableHeight = Math.max(0, body.clientHeight - verticalPadding);
+  var remaining = usableHeight - (box.scrollHeight - initialHeight);
+  if (initialHeight <= remaining + 1) return; // two columns already fit
+  var selected = 2;
+  // With pair cards, even column counts keep each Left/Right + link together.
+  var hasLinks = !!grid.querySelector(".bus-pair-tile");
+  for (var columns = hasLinks ? 4 : 3; columns <= maxCols; columns += hasLinks ? 2 : 1) {
+    selected = columns;
+    grid.style.setProperty("--cols", String(columns));
+    if (grid.getBoundingClientRect().height <= remaining + 1) break;
+  }
+  grid.style.setProperty("--cols", String(selected));
+}
+function scheduleBusGridLayout() {
+  if (busGridFrame) cancelAnimationFrame(busGridFrame);
+  busGridFrame = requestAnimationFrame(function () {
+    busGridFrame = 0;
+    layoutBusGrid();
+  });
 }
 function setSideWidth(w, lim) {
   w = Math.round(Math.max(lim.min, Math.min(lim.max, w)));
   side.style.width = w + "px";
   side.classList.toggle("narrow", lim.buttons && w < lim.two - 0.5);
+  layoutBusGrid();
   return w;
 }
 function resetSideWidth() {
   side.style.width = "";
   side.classList.remove("narrow");
+  scheduleBusGridLayout();
 }
 splitter.addEventListener("pointerdown", function (e) {
   e.preventDefault();
@@ -978,7 +1068,20 @@ splitter.addEventListener("dblclick", function () {
 });
 window.addEventListener("resize", function () {                // keep a saved width inside the new window
   if (side.style.width) setSideWidth(parseFloat(side.style.width), sideLimits());
+  scheduleBusGridLayout();
 });
+// A change in available height also changes how many bus columns are needed.
+// Ignore width-only changes: those are handled by the splitter and window resize.
+if (window.ResizeObserver) {
+  var observedSideBodyHeight = null;
+  new ResizeObserver(function (entries) {
+    var height = entries[0].contentRect.height;
+    if (height !== observedSideBodyHeight) {
+      observedSideBodyHeight = height;
+      scheduleBusGridLayout();
+    }
+  }).observe(side.querySelector(".sidebody"));
+}
 
 // ---- render the strips for the selected bus ----
 var lastStripState = null;

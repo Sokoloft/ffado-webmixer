@@ -2,6 +2,14 @@
 
 ## 1.1.1 — development branch (2026-10-19)
 
+- **Fixed missing Saffire PRO 26 and other DICE channel-strip meters**: `/api/state` uses zero-padded strip IDs (`ch/00`–`ch/09`), while `/api/peaks.channels` uses unpadded decimal JSON keys (`"0"`–`"9"`). The front end now normalizes the index before reading the actual FFADO peak value; formerly only strip indices 10+ could match correctly. This affects every model using the common DICE EAP peak renderer.
+- Added CSS hiding for unsupported/unmapped `.peak-meter` controls, source-accurate tests for all 16 supported DICE meter profiles, and end-to-end regression coverage that renders actual backend-style JSON through the JavaScript meter display. No routing changes or invented meter readings. Physical devices still require testing. See [`TESTING_PEAK_METERS.md`](TESTING_PEAK_METERS.md).
+
+- Reserved a toolbar-to-bus-picker clearance in the sidebar across desktop, tablet and phone sizes. Adaptive bus-column selection now subtracts the real top/bottom padding from the available height instead of allowing the bus grid to crowd the routing/settings controls in a maximized 1440p window. Short landscape windows retain a smaller but positive gap, with vertical scrolling when necessary.
+- Added [`TESTING_BUS_TOOLBAR_CLEARANCE.md`](TESTING_BUS_TOOLBAR_CLEARANCE.md) and expanded the adaptive bus-grid regression test for constrained height and touch viewports. No changes to FFADO mixer controls or device settings.
+- Made the sidebar **bus selector responsive to bus count and available height**: small mixers remain at up to two columns, while large devices can expand leftward into 4, 6, or more bus columns within the current sidebar width/viewport cap. Outputs remain independent and limited to two columns.
+- Grouped each supported stereo bus pair with its link/unlink button, so buttons never drift onto a different row or lose their visual association when the panel widens. The user-resized sidebar and narrow/small-screen scrolling remain supported.
+- No changes to hardware routing, device profiles, stereo-link semantics, saved settings or version number. Added adaptive bus-grid regression tests and [`TESTING_ADAPTIVE_BUS_GRID.md`](TESTING_ADAPTIVE_BUS_GRID.md).
 - Updated the application's displayed version to **1.1.1** (still under active development; not a stable release announcement).
 - Moved root-level testing guides into [`docs/`](./README.md) and consolidated the previous `CHANGELOG_1_1_0_DEV.md` history into this version-independent changelog.
 - Kept the repository root `README.md` for GitHub discoverability and updated documentation references to their new paths.
