@@ -1,3 +1,47 @@
+## 1.1.1-dev — Meter color bands anchored to full scale (2026-10-21)
+
+- Fixed the **channel-strip peak color scale**: previously the green/yellow/red
+  gradient was stretched across the *current* meter fill, making even
+  mid-level peaks appear yellow or red. Now a fixed 100%-height gradient is
+  clipped from the bottom according to FFADO's real normalized peak value.
+- Standardized warning colors near the physical end of each meter:
+  green below roughly 90% of the displayed FFADO scale, yellow in the upper
+  band, and red very near full scale (97%+). Applied the same fixed-scale
+  treatment to horizontal **Crossbar Router** meters.
+- Preserved FFADO's underlying 12-bit peak conversion, destination/channel
+  mapping, stereo lane separation, peak-hold markers, near-full-scale warning
+  hold, and unsupported-device behavior. This is a rendering-only change, not
+  a modification to D-Bus metering, pan law, or routing.
+- Added Node regression coverage for full-scale clipping at multiple levels,
+  Python source checks, and an optional Chromium pixel regression covering
+  both vertical and horizontal meter colors. See
+  [`TESTING_METER_COLOR_SCALE.md`](TESTING_METER_COLOR_SCALE.md).
+  Physical FireWire hardware verification remains pending.
+
+## 1.1.1-dev — Fix MOTU Phones destination discovery (2026-10-21)
+
+- Fixed the missing **Phones destination** dropdown in In/Out → Bus → outputs:
+  MOTU model profiles declared `/Mixer/Control/Phones_src` as
+  `phones_source_path`, but the runtime D-Bus inventory did not probe that
+  attribute. Now the exact model-approved path is enumerated before resolving
+  the selector; it appears only when FFADO exports a real Discrete control.
+- Added discovery-level tests, including valid/invalid interfaces, unmapped
+  families, and independent bus destinations. Existing General Settings layout
+  and backend readback protection are unchanged. Hardware confirmation pending.
+
+## 1.1.1-dev — MOTU Phones destination and General Settings layout
+
+- In/Out → Bus → outputs now includes a **Phones destination** dropdown when an exact
+  MOTU `/Mixer/Control/Phones_src` Discrete control is advertised by FFADO.
+  Hardware reads and writes are verified; this is distinct from each mix bus's
+  `/Mixer/MixN/Mix_dest` and does not rewrite levels or matrix crosspoints.
+- Only source-mapped pre-Mk3 MOTU model profiles expose the control, and only
+  when the endpoint exists. Model-specific available destinations are reused.
+- General Settings now displays Skip loading screen and Hide minimized strips
+  in the left column, with Enable QJackCtl support in the upper-right column.
+  Options have centered checkboxes and centered, wrapping explanatory text;
+  on phones, they stack into one column.
+
 # Changelog
 
 ## 1.1.1 — development branch (2026-10-19)

@@ -24,7 +24,7 @@ The application uses Python, Flask, and FFADO's D-Bus control interface. A pyweb
 - Reject conflicting stereo pairs with an explicit message and preserve previous pairs and strip layouts on invalid operations. Pair changes from simultaneous browser clients are serialized.
 - Link consecutive output buses on supported mixer matrices and use per-channel stereo balance.
 - Show DICE/RME digital mixer **volume** in dB rather than raw percentages; soft mute and solo where supported.
-- Show real, matched DICE EAP router-destination peak meters beside channel faders when exposed by FFADO. Arbitrary stereo pairs display **separate Left/Right lanes** with independent hold and near-full-scale warnings. These are router readings, not verified post-fader dBFS.
+- Show real, matched DICE EAP router-destination peak meters beside channel faders when exposed by FFADO. Arbitrary stereo pairs display **separate Left/Right lanes** with independent hold and near-full-scale warnings. The green/yellow/red scale stays fixed to the full meter height, so low peaks cannot appear red. These are router readings, not verified post-fader dBFS.
 - Recover interrupted software mute/solo safely using per-device gain journals, explicit restore/discard controls, and verified hardware readback.
 - Switch among multiple connected, source-profiled FFADO interfaces by FireWire GUID, with optional local aliases.
 - Edit supported matrix coefficients with a **rotary control in every crosspoint cell**, plus the existing precise numeric dB editor and presets (where dB hardware mapping is available). Each drag writes once on release; wheel and keyboard changes are grouped before writing.
@@ -36,7 +36,10 @@ The application uses Python, Flask, and FFADO's D-Bus control interface. A pyweb
 - Enable QjackCtl support in **Settings → General** to reveal a dedicated **QjackCtl** tab with Graph and Patchbay controls.
 - Open the dedicated **In/Out** dialog for hardware routing. MOTU pre-Mk3 devices
   show mix-bus-to-output assignment, while supported DICE devices expose their
-  mixer-volume and crossbar controls separately.
+  mixer-volume and crossbar controls separately. The original MOTU UltraLite
+  also exposes a separate **Phones destination** selector above its bus assignments
+  when FFADO advertises the control; restart after installing updates that change
+  the D-Bus control inventory.
 
 ## Requirements
 
@@ -303,3 +306,11 @@ code contains the server's LAN URL, so the scanning phone/tablet must be able to
 reach the host on the network (including TCP port 5000). QR generation works
 without internet access or an additional Python dependency. The bundled
 JavaScript QR generator is MIT-licensed (see `ffado_webmixer/assets/static/QR-LICENSE.txt`).
+
+### MOTU Phones routing (v1.1.1-dev)
+
+For supported pre-Mk3 MOTU devices, In / Out → Bus → outputs now shows a
+**Phones destination** dropdown if the live FFADO D-Bus tree includes
+`/Mixer/Control/Phones_src`. This selector is independent of the four
+`Mix_dest` bus routing selectors. See
+[Phones and settings test guide](docs/TESTING_PHONES_AND_GENERAL_SETTINGS.md).

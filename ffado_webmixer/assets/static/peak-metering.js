@@ -127,7 +127,10 @@
             state.holdUntil = now + HOLD_MS;
           }
           if (item.near_full_scale) state.clipUntil = now + CLIP_HOLD_MS;
-          lane.querySelector('.peak-bar').style.height = (item.level * 100).toFixed(2) + '%';
+          // Reveal only the signal height from a full-height gradient, so the
+          // yellow/red bands stay at the physical top of the meter track.
+          lane.querySelector('.peak-bar').style.clipPath =
+            `inset(${((1 - item.level) * 100).toFixed(2)}% 0 0 0)`;
           lane.querySelector('.peak-hold').style.bottom = (state.held * 100).toFixed(2) + '%';
           lane.classList.toggle('clipping', now < state.clipUntil);
           const text = `${right !== null ? (side === 'left' ? 'Left · ' : 'Right · ') : ''}${sampleText(item)}`;

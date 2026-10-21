@@ -165,6 +165,16 @@ def inventory_profile(bus, device, profile):
         paths.add('/'+profile['rate_element'].lstrip('/'))
     matrix_path = profile.get('mixer_matrix',{}).get('path')
     if matrix_path: paths.add(matrix_path)
+    # Some model features declare additional, separately named endpoints.
+    # On pre-mk3 MOTU the Phones source selector is NOT a Mix_dest or one of
+    # the bus_destination feature's path/extra_paths.  Include that explicit
+    # source-derived path in the inventory or the UI can never discover it.
+    # The actual D-Bus interface is still checked below; a missing or
+    # non-Discrete endpoint will not be exposed as a writable selector.
+    if profile.get('family') == 'motu' and enabled(profile, 'bus_destination'):
+        phones_path = profile['capabilities']['features']['bus_destination'].get('phones_source_path')
+        if phones_path == '/Mixer/Control/Phones_src':
+            paths.add(phones_path)
     # Source-binding lists document FFADO controls, but do not authorize
     # extra D-Bus endpoints without an explicit model feature.
     # These are exact supplemental paths in the corresponding FFADO mixer code.

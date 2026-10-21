@@ -37,9 +37,9 @@ display.render({channels},1000);
 assert.equal(mono.meter.hidden,false);
 assert.equal(stereo.meter.hidden,false);
 assert.equal(noReading.meter.hidden,true);
-assert.equal(mono.lanes.left.bar.style.height,'80.00%');
-assert.equal(stereo.lanes.left.bar.style.height,'10.00%');
-assert.equal(stereo.lanes.right.bar.style.height,'95.00%');
+assert.equal(mono.lanes.left.bar.style.clipPath,'inset(20.00% 0 0 0)');
+assert.equal(stereo.lanes.left.bar.style.clipPath,'inset(90.00% 0 0 0)');
+assert.equal(stereo.lanes.right.bar.style.clipPath,'inset(5.00% 0 0 0)');
 assert(stereo.lanes.right.cls.has('clipping'));
 assert(!stereo.lanes.left.cls.has('clipping'));
 assert(stereo.meter.title.includes('Left · Mixer/In:02'));
@@ -63,6 +63,16 @@ assert.equal(stereo.lanes.right.hold.style.bottom,'0%');
 display.render({channels},5300);
 assert(!stereo.lanes.right.cls.has('clipping'));
 
+// Full-scale color coordinates: the visible fill changes but the gradient
+// remains fixed to the ENTIRE lane. A half-scale reading must not inherit
+// its own red/yellow top; the CSS positions those bands near track top.
+for (const [level, expectedClip] of [[0,'100.00'],[0.5,'50.00'],
+  [0.89,'11.00'],[0.93,'7.00'],[0.99,'1.00'],[1,'0.00']]) {
+  display.render({channels:{'0':peak('Mixer/In:01',level)}},5000+level);
+  assert.equal(mono.lanes.left.bar.style.clipPath,
+    `inset(${expectedClip}% 0 0 0)`, `wrong full-track clipping at ${level}`);
+}
+
 // Missing Right never silently copies Left or shows an artificial stereo peak.
 delete channels['4'];
 display.render({channels},5400);
@@ -79,8 +89,8 @@ assert(mono.meter.hidden && stereo.meter.hidden && noReading.meter.hidden);
 const reverse=fakeStrip('ch/07','ch/02');
 const other=new PeakDisplay(makeRow(reverse),'unit-a');
 other.render({channels:{'7':peak('Mixer/In:08',0.25),'2':peak('Mixer/In:03',0.75)}},123);
-assert.equal(reverse.lanes.left.bar.style.height,'25.00%');
-assert.equal(reverse.lanes.right.bar.style.height,'75.00%');
+assert.equal(reverse.lanes.left.bar.style.clipPath,'inset(75.00% 0 0 0)');
+assert.equal(reverse.lanes.right.bar.style.clipPath,'inset(25.00% 0 0 0)');
 
 // Real API contract: /api/state uses padded "ch/00" ... "ch/17" strip IDs,
 // whereas /api/peaks.channels JSON keys are decimal "0" ... "17".
@@ -95,7 +105,7 @@ const allChannels=Object.fromEntries(Array.from({length:18},(_,i)=>[
 allDisplay.render({channels:allChannels},1500);
 allStrips.forEach((strip,i)=>{
   assert.equal(strip.meter.hidden,false,`strip ${i} (index ${String(i).padStart(2,'0')}) should be metered`);
-  assert.equal(strip.lanes.left.bar.style.height,((i+1)*5).toFixed(2)+'%',`channel ${i} mapped incorrectly`);
+  assert.equal(strip.lanes.left.bar.style.clipPath,`inset(${(100-(i+1)*5).toFixed(2)}% 0 0 0)`,`channel ${i} mapped incorrectly`);
 });
 // A missing destination must still leave only that strip unmetered, never
 // borrow the peak of another channel or a similarly named router source.
@@ -115,7 +125,7 @@ if (process.env.FFADO_BACKEND_PEAK_JSON) {
   strips.forEach((strip,i)=>{
     const item=backend.channels[String(i)];
     assert.equal(strip.meter.hidden,!item,`backend/UI disagrees at channel ${i}`);
-    if (item) assert.equal(strip.lanes.left.bar.style.height,(item.level*100).toFixed(2)+'%');
+    if (item) assert.equal(strip.lanes.left.bar.style.clipPath,`inset(${((1-item.level)*100).toFixed(2)}% 0 0 0)`);
   });
 }
 

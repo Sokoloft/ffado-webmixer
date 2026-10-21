@@ -37,7 +37,7 @@ class Element {
   }
   querySelector(q) {return this.querySelectorAll(q)[0] || null;}
 }
-const ids='routerbox routingOverlay routingButton routingBusTab routingMatrixTab routingCrossbarTab routingBus routingMatrix routingCrossbar routingHint routingGrid routingEditor routingDb routingDbLabel routingKnob routingPreset routingPresetLabel routingRefresh routingClose routingDialog routingCellLabel routingLevel routingLevelLabel routingApply routingSilence routingUnity routingBusGrid routingDestinations'.split(' ');
+const ids='routerbox routingOverlay routingButton routingBusTab routingMatrixTab routingCrossbarTab routingBus routingMatrix routingCrossbar routingHint routingGrid routingEditor routingDb routingDbLabel routingKnob routingPreset routingPresetLabel routingRefresh routingClose routingDialog routingCellLabel routingLevel routingLevelLabel routingApply routingSilence routingUnity routingBusGrid routingPhonesAssignment routingPhonesSelect routingDestinations'.split(' ');
 const elements=Object.fromEntries(ids.map(id=>[id,new Element()]));
 elements.routingKnob.appendChild(Object.assign(new Element('span'),{className:'routing-knob-needle'}));
 elements.routingGrid.className='grid';

@@ -92,6 +92,30 @@ html { background: var(--page-background); }
   .hidemin { font-size: 13px; cursor: pointer; }
   .hidemin input { vertical-align: middle; margin-right: 6px; }
   .hidemin span { color: var(--text-secondary); }
+  /* Each option has a centered checkbox on the left, and centered wrapping
+     description text on the right. Two option columns on desktop; the left
+     column has two rows, while QJackCtl occupies the upper-right row. */
+  .general-options { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr));
+                     align-items: start; gap: 12px; margin: 0 0 16px; }
+  .general-option-column { display: grid; align-content: start; gap: 12px; min-width: 0; }
+  .general-option { display: grid; grid-template-columns: 36px minmax(0, 1fr);
+                    align-items: stretch; min-height: 92px; padding: 8px 7px;
+                    border: 1px solid var(--border-color); border-radius: 6px;
+                    background: var(--sidebar-background); cursor: pointer; }
+  .general-option-check { display: flex; align-items: center; justify-content: center; }
+  .general-option-check input { margin: 0; width: 17px; height: 17px; accent-color: var(--accent-color); }
+  .general-option-copy { display: flex; flex-direction: column; justify-content: center;
+                         align-items: center; gap: 5px; min-width: 0;
+                         text-align: center; overflow-wrap: anywhere; }
+  .general-option-copy strong { font-size: 12px; line-height: 1.35; font-weight: 600; }
+  .general-option-copy small { font-size: 11px; line-height: 1.45;
+                               color: var(--text-secondary); }
+  .general-option-copy #minCount { color: var(--text-secondary); }
+  .general-option:focus-within { outline: 2px solid var(--accent-color); outline-offset: 1px; }
+  @media (max-width: 480px) {
+    .general-options { grid-template-columns: minmax(0, 1fr); }
+    .general-option { min-height: 70px; grid-template-columns: 46px minmax(0, 1fr); }
+  }
 
   /* Keep the bus picker physically below the routing/settings toolbar, even
      when the adaptive grid grows vertically in a maximized window. Reserve
@@ -350,8 +374,13 @@ html.pywebview-client #fullscreenbox { display: none; }
 .peak-meter:focus-visible { outline:2px solid var(--accent-color); outline-offset:2px; }
 .peak-lane { position:relative; flex:1; min-width:0; height:100%; overflow:hidden;
   background:var(--control-background); border-radius:1px; }
-.peak-bar { position:absolute; bottom:0; left:0; right:0; height:0;
-  background:linear-gradient(to top,#43b581 55%,#e6b450 80%,#e05454 95%); }
+/* The color scale is fixed to the full meter track, NOT to the current
+   filled height. Clipping a full-height gradient keeps ordinary levels green;
+   yellow/red only appear when the signal actually reaches the top bands. */
+.peak-bar { position:absolute; inset:0; height:100%;
+  background:linear-gradient(to top,#43b581 0%,#43b581 89%,
+    #e6b450 90%,#e6b450 96%,#e05454 97%,#e05454 100%);
+  clip-path:inset(100% 0 0 0); pointer-events:none; }
 .peak-hold { position:absolute; left:0; right:0; height:2px; bottom:0;
   background:var(--text-primary); pointer-events:none; }
 .peak-clip { height:3px; position:absolute; top:0; left:0; right:0; background:transparent; }

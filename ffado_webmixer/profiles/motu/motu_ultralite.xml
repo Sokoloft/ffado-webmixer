@@ -18,7 +18,7 @@
     <feature name="peak_metering" state="unmapped" />
     <feature name="software_mute_solo" state="unmapped" />
     <feature name="stereo_bus_link" state="unmapped" />
-    <feature name="bus_destination" state="mapped" source="support/mixer-qt4/ffado/mixer/motu.py" path="/Mixer/Mix{n}/Mix_dest" count="4" />
+    <feature name="bus_destination" state="mapped" source="support/mixer-qt4/ffado/mixer/motu.py" path="/Mixer/Mix{n}/Mix_dest" count="4" phones_source_path="/Mixer/Control/Phones_src" />
     <feature name="monitor_line_volume" state="unmapped" />
     <feature name="monitor_line_mute" state="unmapped" />
     <feature name="monitor_global_mute" state="unmapped" />

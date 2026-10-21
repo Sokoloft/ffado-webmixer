@@ -35,3 +35,22 @@ def test_no_hidden_meter_overlaid_on_master():
     assert '<div class="track" id="masterTrack"' in (ROOT / 'ffado_webmixer/assets/static/index.html').read_text()
     assert "const meter = el.querySelector('.peak-meter')" in METERS
     assert 'if (!meter) return;' in METERS
+
+
+def test_full_height_gradient_is_clipped_not_scaled_with_signal_height():
+    """Colors must reflect absolute position on the meter's full 0..1 track."""
+    ROUTING_CSS = (ROOT / 'ffado_webmixer/assets/static/routing.css').read_text()
+    ROUTING_JS = (ROOT / 'ffado_webmixer/assets/static/routing.js').read_text()
+    assert '.peak-bar { position:absolute; inset:0; height:100%;' in CSS
+    assert 'clip-path:inset(100% 0 0 0)' in CSS
+    assert '#43b581 89%' in CSS and '#e05454 97%' in CSS
+    assert "lane.querySelector('.peak-bar').style.clipPath" in METERS
+    assert "lane.querySelector('.peak-bar').style.height" not in METERS
+    assert '.route-peak-fill { position:absolute; inset:0; height:100%; width:100%;' in ROUTING_CSS
+    assert 'clip-path:inset(0 100% 0 0)' in ROUTING_CSS
+    assert '#43b581 89%' in ROUTING_CSS and '#e05454 97%' in ROUTING_CSS
+    assert "meter.querySelector('.route-peak-fill').style.clipPath" in ROUTING_JS
+    assert "meter.querySelector('.route-peak-fill').style.width" not in ROUTING_JS
+    # Real raw hardware peak and warning/hold timing stay unchanged.
+    assert 'if (item.near_full_scale) state.clipUntil = now + CLIP_HOLD_MS;' in METERS
+    assert 'state.held * 100' in METERS

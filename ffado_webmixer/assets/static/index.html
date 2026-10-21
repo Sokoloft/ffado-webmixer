@@ -71,9 +71,24 @@
 
     <div class="panes">
     <div class="pane" id="pane-general" role="tabpanel" aria-labelledby="tab-general">
-      <label class="hidemin"><input type="checkbox" id="hideMin">Hide minimized strips <span id="minCount"></span></label>
-      <label class="hidemin"><input type="checkbox" id="skipLoadingScreen">Skip loading screen</label>
-      <label class="hidemin"><input type="checkbox" id="enableQjackctl">Enable QjackCtl support</label>
+      <div class="general-options" aria-label="General preferences">
+        <div class="general-option-column">
+          <label class="general-option" for="skipLoadingScreen">
+            <span class="general-option-check"><input type="checkbox" id="skipLoadingScreen"></span>
+            <span class="general-option-copy"><strong>Skip loading screen</strong><small>Open the mixer directly when starting the app.</small></span>
+          </label>
+          <label class="general-option" for="hideMin">
+            <span class="general-option-check"><input type="checkbox" id="hideMin"></span>
+            <span class="general-option-copy"><strong>Hide minimized strips <span id="minCount"></span></strong><small>Remove minimized channels from the mixer view.</small></span>
+          </label>
+        </div>
+        <div class="general-option-column">
+          <label class="general-option" for="enableQjackctl">
+            <span class="general-option-check"><input type="checkbox" id="enableQjackctl"></span>
+            <span class="general-option-copy"><strong>Enable QJackCtl support</strong><small>Show QJackCtl integration when it is running.</small></span>
+          </label>
+        </div>
+      </div>
       <div class="field device-alias-field"><label for="deviceAlias">Device alias</label><input id="deviceAlias" maxlength="48" placeholder="Optional local name" aria-label="Local device nickname"><button id="saveDeviceAlias" class="dlgbtn" type="button">Save</button></div>
     </div>
 
@@ -162,6 +177,10 @@
     </header>
     <div id="routingHint" role="status"></div>
     <div id="routingBus" class="routing-pane" hidden>
+      <div id="routingPhonesAssignment" class="phones-assignment" hidden>
+        <label for="routingPhonesSelect">Phones destination</label>
+        <select id="routingPhonesSelect" aria-label="Select MOTU Phones destination"></select>
+      </div>
       <div class="routing-scroll"><table id="routingBusGrid" aria-label="Assign each mix bus to a hardware output"></table></div>
     </div>
     <div id="routingMatrix" class="routing-pane">

@@ -6,7 +6,7 @@
   const tabs = { bus: $("routingBusTab"), matrix: $("routingMatrixTab"), crossbar: $("routingCrossbarTab") };
   const panes = { bus: $("routingBus"), matrix: $("routingMatrix"), crossbar: $("routingCrossbar") };
   let capabilities = { bus: false, matrix: false, crossbar: false }, active = "matrix", matrix = null, selection = null;
-  let loading = false;
+  let loading = false, phonesWriteBusy = false;
   let inlineGesture = null, matrixWriteBusy = false, matrixRefreshPending = false;
   let matrixWriteError = null, matrixWriteEpoch = 0;
   const routeMeterStates = new Map();
@@ -347,6 +347,27 @@
   // choose one hardware output per bus and never alter crosspoint gain. This
   // grid's columns are mix buses; rows are the real available destinations.
   function renderBusRouting(data) {
+    const phones = $("routingPhonesAssignment");
+    const select = $("routingPhonesSelect");
+    select.replaceChildren();
+    phones.hidden = !data.phones;
+    if (data.phones) {
+      data.phones.options.forEach(dest => {
+        const opt = document.createElement('option');
+        opt.textContent = dest.name;
+        opt.value = String(dest.value);
+        opt.disabled = dest.name.startsWith('Unavailable');
+        select.appendChild(opt);
+      });
+      select.value = String(data.phones.value);
+      // Unsupported hardware value is shown as read-only until the user
+      // deliberately chooses one of the known valid destinations.
+      const current = data.phones.options.find(dest => dest.value === data.phones.value);
+      if (current && current.name.startsWith('Unavailable')) {
+        select.title = 'Hardware has an unsupported Phones assignment; select a supported destination.';
+      } else select.title = 'Choose the hardware source for the Phones output.';
+      select.disabled = phonesWriteBusy;
+    }
     const table = $("routingBusGrid");
     table.replaceChildren();
     const head = document.createElement("thead"), hr = document.createElement("tr");
@@ -466,7 +487,10 @@
         state.level = value.level; state.until = now + 1600;
       }
       if (value.near_full_scale) state.clipUntil = now + 4000;
-      meter.querySelector('.route-peak-fill').style.width = (value.level * 100).toFixed(2) + '%';
+      // Clip a full-track gradient so yellow/red remain at the top of
+      // the absolute FFADO scale, even for low router readings.
+      meter.querySelector('.route-peak-fill').style.clipPath =
+        `inset(0 ${((1 - value.level) * 100).toFixed(2)}% 0 0)`;
       meter.querySelector('.route-peak-hold').style.left = (state.level * 100).toFixed(2) + '%';
       meter.classList.toggle('clipping', now < state.clipUntil);
       meter.querySelector('.route-peak-db').textContent = value.db === null ? '−∞' : value.db.toFixed(1) + ' dB';
@@ -519,6 +543,31 @@
   $("routingClose").addEventListener("click", close);
   overlay.addEventListener("mousedown", e => { if (e.target === overlay) close(); });
   document.addEventListener("keydown", e => { if (e.key === "Escape" && !overlay.hidden) close(); });
+  $("routingPhonesSelect").addEventListener("change", () => {
+    if (phonesWriteBusy) return;
+    const select = $("routingPhonesSelect");
+    const value = Number(select.value);
+    if (!Number.isInteger(value)) return;
+    phonesWriteBusy = true;
+    select.disabled = true;
+    message('Changing Phones destination…');
+    request('/api/phones-assignment', {value})
+      .then(() => request('/api/bus-routing'))
+      .then(data => {
+        phonesWriteBusy = false;
+        if (active === 'bus') renderBusRouting(data);
+      })
+      .catch(e => {
+        const error = 'Phones assignment failed: ' + e.message;
+        // Re-read the hardware; never leave a failed selection displayed.
+        return request('/api/bus-routing').then(data => {
+          phonesWriteBusy = false;
+          if (active === 'bus') renderBusRouting(data);
+          message(error);
+        }).catch(() => message(error));
+      })
+      .finally(() => { phonesWriteBusy = false; select.disabled = false; });
+  });
   tabs.bus.addEventListener("click", () => changeTab("bus"));
   tabs.matrix.addEventListener("click", () => changeTab("matrix"));
   tabs.crossbar.addEventListener("click", () => changeTab("crossbar"));

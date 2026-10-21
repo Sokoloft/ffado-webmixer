@@ -387,6 +387,20 @@ def register(app, backend, description, config, broadcast):
 
     # Pre-mark3 MOTU: each Mix_dest control routes one entire mix bus.
     # This endpoint does not touch mixer crosspoint gains.
+    @app.post('/api/phones-assignment')
+    def set_phones_assignment():
+        try:
+            msg = request.get_json(force=True)
+            if not isinstance(msg, dict) or type(msg.get('value')) is not int:
+                raise ValueError('Phones destination must be an integer')
+            value = backend.write_phones_assignment(msg['value'])
+        except (ValueError, KeyError, TypeError, AttributeError) as exc:
+            return jsonify(error=str(exc)), 400
+        except Exception as exc:
+            return jsonify(error=str(exc)), 500
+        broadcast({'type': 'destination', 'out': 'phones', 'value': value})
+        return jsonify(ok=True, value=value)
+
     @app.get("/api/bus-routing")
     def bus_routing_snapshot():
         try:

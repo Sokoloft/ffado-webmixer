@@ -4,7 +4,7 @@ Channels, buses and names come from FFADO matrix mixers. XML profiles provide
 source-derived device-specific metadata; missing controls stay unavailable.
 """
 from .profile_loader import (load_profile, resolve_mixer, resolve_controls,
-                             visible_columns, destination_options, bus_name, CHANNEL_WORDS)
+                             visible_columns, destination_options, resolve_phones_assignment, bus_name, CHANNEL_WORDS)
 from .controls import to_percent, from_percent, pan_to_ui, pan_from_ui
 from .profiles.capabilities import enabled, probe_allowed, activate_internal_model, declared_path
 from .peak_metering import meter_config, channel_destinations, normalize_peak
@@ -187,6 +187,7 @@ class Mixer:
             "bus_routing": bool(enabled(self.profile, "bus_destination") and
                                 self._dest_options() and
                                 any(out["dest"] is not None for out in self.outputs.values())),
+            "phones_assignment": bool(resolve_phones_assignment(self.device, self.profile)),
             "features": features,
             "hardware_capabilities": self.profile.get('capabilities', {}),
             "controls": {role: spec for role, (_, spec) in self.roles.items()},
@@ -879,7 +880,16 @@ class Mixer:
                 buses.append({"id": out["id"], "name": out["name"], "value": value})
         if not buses:
             raise ValueError("No bus destination controls reported by FFADO")
-        return {"buses": buses, "destinations": options, "kind": "motu_mix_dest"}
+        result = {"buses": buses, "destinations": options, "kind": "motu_mix_dest"}
+        # Phones assign is independent of the four bus Mix_dest selectors.
+        # Report it only for an explicitly mapped, physically discovered
+        # Discrete control; never fabricate a control for unsupported models.
+        control = resolve_phones_assignment(self.device, self.profile)
+        if control is not None:
+            with self.helper.transaction():
+                value = int(self.helper.get_value(control['path'], control['kind']))
+            result['phones'] = {'value': value, 'options': self._dest_options(value)}
+        return result
 
     def bus_routing_set(self, bus_id, value):
         # Reuse the single bus's validated FFADO Discrete write and ensure the
@@ -892,6 +902,26 @@ class Mixer:
             actual = int(self.helper.get_value(out["dest"]["path"], out["dest"]["kind"]))
             if actual != int(value):
                 raise IOError(f"MOTU reported routing value {actual}, expected {value}")
+
+    def write_phones_assignment(self, value):
+        """Set the MOTU headphone source, then verify what FFADO reports.
+
+        This control does not alter mix destinations or matrix volumes.
+        """
+        control = resolve_phones_assignment(self.device, self.profile)
+        if control is None:
+            raise ValueError('Phones destination is not supported by this device')
+        if type(value) is not int or value not in [opt['value'] for opt in self._dest_options()]:
+            raise ValueError('Phones destination is not available for this model')
+        with self.helper.transaction():
+            before = int(self.helper.get_value(control['path'], control['kind']))
+            if before == value:
+                return value
+            self.helper.set_value(control['path'], control['kind'], value)
+            actual = int(self.helper.get_value(control['path'], control['kind']))
+            if actual != value:
+                raise IOError(f'FFADO reported Phones destination {actual}, expected {value}')
+            return actual
 
     # ---------- where a bus is sent (Disabled, Phones, Analog 1-2 ...) ----------
     def _dest_options(self, current=None):

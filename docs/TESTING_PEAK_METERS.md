@@ -1,5 +1,16 @@
 # Peak-metering test and diagnostic report (v1.1.1 development build)
 
+## Full-track peak color fix (October 21, 2026)
+
+The strip and Crossbar Router gradients are now anchored to the **entire
+meter track**, not stretched across each current reading. A 50% peak shows a
+half-height green strip (no false yellow or red), while warning colors only
+appear near full-scale. See
+[`TESTING_METER_COLOR_SCALE.md`](TESTING_METER_COLOR_SCALE.md) for exact
+screen and Chromium regression checks. Actual FFADO normalization, meter
+identity, and clip-hold behavior are unchanged.
+
+
 ## Saffire PRO 26 missing-meter regression (October 20, 2026)
 
 The Saffire PRO 26 user's video shows live `Mixer/In:01` and `Mixer/In:02` peaks in

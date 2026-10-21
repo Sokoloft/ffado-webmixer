@@ -39,6 +39,16 @@
 @media(max-width:650px) { .routing-head { gap: 6px; } .routing-head strong { flex-basis: 100%; } #routingGrid td button { width: 72px; } }
 .read-only .track { pointer-events: none; opacity: .35; }
 
+/* MOTU headphones are sourced independently from the four bus destinations. */
+.phones-assignment { display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+  margin: 7px 12px 2px; padding: 10px 12px; border: 1px solid var(--border-color);
+  border-radius: 5px; background: var(--sidebar-background); }
+.phones-assignment label { font-size: 13px; color: var(--text-secondary); }
+.phones-assignment select { min-width: 130px; max-width: 100%; padding: 8px 10px;
+  border: 1px solid var(--border-color); border-radius: 4px;
+  background: var(--control-background); color: var(--text-primary); font: inherit; }
+.phones-assignment select:focus-visible { outline: 2px solid var(--accent-color); }
+.phones-assignment select:disabled { opacity: .6; cursor: wait; }
 /* MOTU mix destinations: selectors, not gain faders. A column has one active row. */
 #routingBusGrid { border-collapse: separate; border-spacing: 4px; margin: 10px; font-size: 13px; }
 #routingBusGrid th { position: sticky; top: 0; min-width: 105px; padding: 9px; background: var(--sidebar-background); font-weight: 500; z-index: 1; }
@@ -72,8 +82,12 @@
    an actual peak for that named destination (never guessed from strip index). */
 .route-peak { position:relative; display:block; width:100%; height:15px; padding:0; cursor:pointer; border:1px solid var(--border-color);
   border-radius:3px; background:var(--control-background); overflow:hidden; }
-.route-peak-fill { position:absolute; left:0; top:0; height:100%; width:0;
-  background:linear-gradient(to right,#43b581 65%,#e6b450 84%,#e05454 100%); }
+/* Keep the router's warning colors anchored to the right end of the
+   track too, rather than rescaling them across the current signal fill. */
+.route-peak-fill { position:absolute; inset:0; height:100%; width:100%;
+  background:linear-gradient(to right,#43b581 0%,#43b581 89%,
+    #e6b450 90%,#e6b450 96%,#e05454 97%,#e05454 100%);
+  clip-path:inset(0 100% 0 0); pointer-events:none; }
 .route-peak-db { position:absolute; right:5px; top:0; line-height:15px;
   font-size:10px; font-variant-numeric:tabular-nums; color:var(--text-primary); text-shadow:0 1px 2px #000; }
 

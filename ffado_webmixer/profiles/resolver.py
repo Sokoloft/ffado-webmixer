@@ -139,6 +139,26 @@ def match_outputs(device, mixes, profile=None):
     return outputs
 
 
+def resolve_phones_assignment(device, profile):
+    """Only the exact source-defined MOTU Phones_src D-Bus Discrete endpoint.
+
+    Bus Mix_dest and Phones_src are separate controls; never infer the latter
+    from a matching label, an arbitrary scalar, or another FFADO family.
+    """
+    if profile.get('family') != 'motu' or not enabled(profile, 'bus_destination'):
+        return None
+    feature = profile['capabilities']['features']['bus_destination']
+    suffix = feature.get('phones_source_path')
+    if suffix != '/Mixer/Control/Phones_src':
+        return None
+    prefix = device.get('device', '').rstrip('/')
+    path = prefix + suffix
+    for control in device.get('controls', []):
+        if control.get('path') == path and control.get('kind') == 'Discrete':
+            return control
+    return None
+
+
 def match_channel_controls(device, columns, profile=None):
     """Only known MOTU per-channel Discrete controls from motu.py."""
     if (profile or {}).get('family') != 'motu' or not (enabled(profile, 'channel_trim') or enabled(profile, 'channel_invert')):
