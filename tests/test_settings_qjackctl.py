@@ -22,7 +22,7 @@ class SettingsHTML(HTMLParser):
 
 
 def test_settings_controls_and_placement():
-    path = Path(__file__).resolve().parents[1] / "ffado_webmixer/assets/static/index.html"
+    path = Path(__file__).resolve().parents[1] / "src/ffado_webmixer/assets/static/index.html"
     html = path.read_text()
     parser = SettingsHTML()
     parser.feed(html)
@@ -53,7 +53,8 @@ def test_qjackctl_preference_persists(tmp_path):
 def test_qjackctl_is_disabled_on_server_until_enabled(monkeypatch):
     # Stub Flask's thin route decorators; no hardware, Flask installation, or HTTP listener needed.
     flask_stub = types.ModuleType("flask")
-    request = types.SimpleNamespace(get_json=lambda force=False: {"window": "graph"})
+    body = {'payload': {"window": "graph"}}
+    request = types.SimpleNamespace(get_json=lambda force=False: body['payload'])
     flask_stub.request = request
     flask_stub.jsonify = lambda **data: data
     monkeypatch.setitem(sys.modules, "flask", flask_stub)
@@ -83,6 +84,12 @@ def test_qjackctl_is_disabled_on_server_until_enabled(monkeypatch):
     assert routes[("GET", "/api/qjackctl/status")]() == {"enabled": True, "running": True}
     assert routes[("POST", "/api/qjackctl")]() == {"ok": True}
     assert seen == ["check", "graph"]
+    for invalid in (None, [], {'window': 1}):
+        body['payload'] = invalid
+        result, code = routes[("POST", "/api/qjackctl")]()
+        assert code == 400
+        assert 'string' in result['error']
+        assert seen == ['check', 'graph']
 
     assert routes[("POST", "/api/open-mixer")]() == {"ok": True}
     assert seen[-1] == "http://192.168.1.2:5000/"

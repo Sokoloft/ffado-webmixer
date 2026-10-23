@@ -1,0 +1,9 @@
+# FFADO WebMixer runtime Python dependencies.
+# Keep this list consistent with [project].dependencies in pyproject.toml.
+# pywebview[qt] installs the PyQt6, QtPy and Qt WebEngine Python packages.
+# Host requirements are separate: FFADO/ffado-dbus-server, working D-Bus,
+# FireWire access, and native development libraries if dbus-python is built.
+Flask>=3.0,<4
+Werkzeug>=3.0,<4
+dbus-python>=1.3
+pywebview[qt]>=5.0

@@ -5,8 +5,8 @@ import subprocess
 import pytest
 
 ROOT = Path(__file__).resolve().parents[1]
-CSS = (ROOT / 'ffado_webmixer/assets/static/index.css').read_text()
-JS = (ROOT / 'ffado_webmixer/assets/static/index.js').read_text()
+CSS = (ROOT / 'src/ffado_webmixer/assets/static/index.css').read_text()
+JS = (ROOT / 'src/ffado_webmixer/assets/static/index.js').read_text()
 
 
 def test_bus_grid_scopes_columns_to_bus_buttons_only():

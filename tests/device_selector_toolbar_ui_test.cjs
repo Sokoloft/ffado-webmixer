@@ -1,0 +1,25 @@
+/* Regression contracts for the compact multi-device selector and uniform hover geometry. */
+const assert = require('node:assert/strict');
+const fs = require('node:fs');
+const path = require('node:path');
+const root = path.join(__dirname, '../src/ffado_webmixer/assets/static');
+const html = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
+const css = fs.readFileSync(path.join(root, 'index.css'), 'utf8');
+const routingCss = fs.readFileSync(path.join(root, 'routing.css'), 'utf8');
+const js = fs.readFileSync(path.join(root, 'index.js'), 'utf8');
+assert(!html.includes('id="deviceTabs"'), 'large device tabs are gone');
+assert(html.includes('class="mixer-toolbar"'), 'toolbar buttons share one unified group');
+assert(html.includes('id="routerbox"') && html.includes('id="devicebox"') && html.includes('id="gearbox"') && html.includes('id="fullscreenbox"'));
+assert(html.indexOf('id="routingButton"') < html.indexOf('id="deviceButton"'), 'device chooser follows routing button');
+assert(html.includes('id="deviceMenu" role="menu"') && html.includes('aria-haspopup="menu"'));
+assert(js.includes("document.getElementById('devicebox').hidden = !multiple"), 'one-device systems hide the selector');
+assert(js.includes("post('/api/device', {guid: guid})"), 'switching continues to use the validated GUID endpoint');
+assert(js.includes("location.reload()"), 'switching reloads to avoid mixing device state');
+assert(js.includes('closeDeviceMenu(true)') && js.includes("e.key === 'Escape'"), 'escape closes and returns focus');
+assert(js.includes("e.key === 'ArrowDown'") && js.includes("e.key === 'ArrowUp'"), 'keyboard navigation works');
+assert(js.includes('closeDeviceMenu();\n    toast(\'Could not switch'), 'failed switching closes safely');
+assert(css.includes('.mixer-toolbar button { display: grid; place-items: center; box-sizing: border-box;'), 'buttons share one centered square geometry');
+assert(css.includes('width: var(--tool-size); height: var(--tool-size); margin: 0; padding: 0;'));
+assert(css.includes('.mixer-toolbar button:hover') && css.includes('background: var(--button-hover-background)'));
+assert(!routingCss.includes('#routingButton:hover'), 'no competing router hover CSS with different geometry');
+console.log('Compact device selector, GUID switching, keyboard menu and unified toolbar geometry passed');

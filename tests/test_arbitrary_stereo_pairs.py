@@ -28,7 +28,7 @@ def stub_stereo_handler(backend, config):
     flask = types.ModuleType('flask')
     flask.jsonify = lambda *a, **k: a[0] if a else k
     name = 'ffado_webmixer.services._pair_test_stereo'
-    path = Path(__file__).parents[1] / 'ffado_webmixer/services/stereo.py'
+    path = Path(__file__).parents[1] / 'src/ffado_webmixer/services/stereo.py'
     with patch.dict(sys.modules, {'flask': flask}):
         spec = importlib.util.spec_from_file_location(name, path)
         mod = importlib.util.module_from_spec(spec)
@@ -195,7 +195,7 @@ def test_api_pair_pan_uses_ordered_diagonal_writes():
                 self.routes[path] = fn
                 return fn
             return decorator
-    path=Path(__file__).parents[1]/'ffado_webmixer/api/mixer.py'
+    path=Path(__file__).parents[1]/'src/ffado_webmixer/api/mixer.py'
     with patch.dict(sys.modules, {'flask':flask}):
         spec=importlib.util.spec_from_file_location('ffado_webmixer.api._any_pair_api',path)
         module=importlib.util.module_from_spec(spec)

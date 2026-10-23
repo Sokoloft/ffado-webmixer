@@ -40,7 +40,7 @@ const fetchFake=(url, init={})=>{
   return Promise.resolve({ok:true,json:async()=>snapshot()});
 };
 const context=vm.createContext({document:{getElementById:id=>els[id],createElement:tag=>new Element(tag),addEventListener(){}},window:{activeFfadoDevice:'0001f2000007b2ca'},fetch:fetchFake,performance:{now:()=>0}});
-vm.runInContext(fs.readFileSync(path.join(__dirname,'../ffado_webmixer/assets/static/routing.js'),'utf8'),context);
+vm.runInContext(fs.readFileSync(path.join(__dirname,'../src/ffado_webmixer/assets/static/routing.js'),'utf8'),context);
 const flush=async()=>{for(let i=0;i<25;i++) await Promise.resolve();};
 (async()=>{
   context.window.configureRouting({bus_routing:true,matrix:{available:true},fader:{writable:true}});

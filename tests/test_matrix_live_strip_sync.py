@@ -45,7 +45,7 @@ def state_handler(mixer, config):
     # The module's import uses a relative path for the pair naming utility.
     # Load under its package without mutating the user's actual Flask install.
     name = 'ffado_webmixer.api._matrix_sync_test_api'
-    filename = Path(__file__).parents[1]/'ffado_webmixer/api/mixer.py'
+    filename = Path(__file__).parents[1]/'src/ffado_webmixer/api/mixer.py'
     with patch.dict(sys.modules, {'flask': flask}):
         from ffado_webmixer.services import stereo as stereo_module
         # services.stereo is allowed to be imported by any earlier test; it
@@ -156,11 +156,11 @@ def test_linked_input_unequal_gain_on_unpaired_bus_is_not_hidden():
 
 
 def test_browser_refresh_and_mismatch_cue_remain_connected():
-    root = Path(__file__).parents[1]/'ffado_webmixer/assets/static'
+    root = Path(__file__).parents[1]/'src/ffado_webmixer/assets/static'
     routing = (root/'routing.js').read_text()
     index = (root/'index.js').read_text()
     assert 'window.refreshMatrixStrips === "function"' in routing
     assert 'window.refreshMatrixStrips = loadMix' in index
-    assert 'if (ev.type === "matrix")' in index
+    assert 'if (ev.type === "matrix")' in (root/'live-sync.js').read_text()
     assert 'data.pair_mismatch' in index
-    assert 'valueLabel.textContent = "MAX "' in index
+    assert 'valueLabel.value = "MAX "' in index

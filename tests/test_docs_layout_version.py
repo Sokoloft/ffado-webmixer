@@ -1,6 +1,5 @@
 """Verify documentation organization and the development branch's version."""
 
-import ast
 import re
 import subprocess
 import sys
@@ -15,19 +14,22 @@ def test_root_keeps_only_readme_markdown():
     assert sorted(p.name for p in ROOT.glob('*.md')) == ['README.md']
     assert (DOCS / 'README.md').is_file()
     assert (DOCS / 'CHANGELOG.md').is_file()
-    assert len(list(DOCS.glob('TESTING_*.md'))) >= 17
+    assert (DOCS / 'TESTING.md').is_file()
+    import zipfile
+    with zipfile.ZipFile(ROOT / 'docs_legacy.zip') as archive:
+        assert len([name for name in archive.namelist()
+                    if name.startswith('docs/TESTING_') and name.endswith('.md')]) >= 17
 
 
-def test_version_is_111_without_release_suffix():
-    module = ast.parse((ROOT / 'main.py').read_text())
-    version = next(node.value for node in module.body
-                   if isinstance(node, ast.Assign)
-                   and any(isinstance(t, ast.Name) and t.id == 'APP_VERSION'
-                           for t in node.targets))
-    assert ast.literal_eval(version) == '1.1.1'
+def test_version_is_120_without_release_suffix():
+    from ffado_webmixer import __version__
+    from ffado_webmixer.main import APP_VERSION
+    assert APP_VERSION == __version__ == '1.2.0'
+    metadata = (ROOT / 'pyproject.toml').read_text()
+    assert 'version = {attr = "ffado_webmixer.__version__"}' in metadata
     result = subprocess.run([sys.executable, str(ROOT / 'main.py'), '--version'],
                             capture_output=True, text=True, check=True)
-    assert result.stdout.strip() == 'ffado-webmixer 1.1.1'
+    assert result.stdout.strip() == 'ffado-webmixer 1.2.0'
 
 
 def test_markdown_links_still_resolve_after_move():
@@ -52,7 +54,7 @@ def test_changelog_preserves_110_dev_history_and_111_entry():
 def test_docs_upgrade_only_removes_unchanged_guides(tmp_path, monkeypatch):
     import hashlib
     import importlib.util
-    helper = ROOT / 'packaging' / 'migrate_legacy_docs.py'
+    helper = ROOT / 'tools' / 'migrate_legacy_docs.py'
     spec = importlib.util.spec_from_file_location('migrate_legacy_docs', helper)
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)

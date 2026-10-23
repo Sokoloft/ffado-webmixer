@@ -4,7 +4,7 @@ const fs = require('fs');
 const vm = require('vm');
 const assert = require('node:assert/strict');
 const path = require('path');
-const src = fs.readFileSync(path.join(__dirname, '../ffado_webmixer/assets/static/index.js'), 'utf8');
+const src = fs.readFileSync(path.join(__dirname, '../src/ffado_webmixer/assets/static/index.js'), 'utf8');
 const layoutSource = src.slice(src.indexOf('// ---- adaptive buses and resizable right bar ----'),
                                src.indexOf('splitter.addEventListener("pointerdown"'));
 assert(layoutSource.includes('function layoutBusGrid()'));

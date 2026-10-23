@@ -1,6 +1,6 @@
 /* Offline DOM + polling regression. Node is not required by the app runtime. */
 const assert = require('node:assert/strict');
-const PeakDisplay = require('../ffado_webmixer/assets/static/peak-metering.js');
+const PeakDisplay = require('../src/ffado_webmixer/assets/static/peak-metering.js');
 function fakeLane(side) {
   const bar={style:{}}, hold={style:{}}, cls=new Set();
   return {side,hidden:false,title:'',bar,hold,cls,

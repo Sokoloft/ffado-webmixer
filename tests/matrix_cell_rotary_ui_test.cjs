@@ -74,7 +74,8 @@ const fetchFake=(url, options)=>{
 const ctx=vm.createContext({document:{getElementById:id=>elements[id],createElement:tag=>new Element(tag),addEventListener(){}},
   window:{activeFfadoDevice:'0011223344556677',refreshMatrixStrips:()=>refreshStrips++},
   fetch:fetchFake,setTimeout:setTimeoutFake,clearTimeout:clearTimeoutFake,performance:{now:()=>10}});
-const js=fs.readFileSync(path.join(__dirname,'../ffado_webmixer/assets/static/routing.js'),'utf8');
+const js=fs.readFileSync(path.join(__dirname,'../src/ffado_webmixer/assets/static/routing.js'),'utf8');
+ctx.shortFfadoLabel = text => text; // UI label helper; tests target matrix interactions.
 vm.runInContext(js,ctx);
 const flush=async()=>{for(let i=0;i<8;i++)await Promise.resolve();};
 const cells=()=>elements.routingGrid.querySelectorAll('.matrix-cell-control');

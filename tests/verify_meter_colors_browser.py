@@ -9,8 +9,8 @@ from PIL import Image
 from playwright.sync_api import sync_playwright
 
 ROOT=Path(__file__).resolve().parents[1]
-CSS=ROOT/'ffado_webmixer/assets/static/index.css'
-ROUTING_CSS=ROOT/'ffado_webmixer/assets/static/routing.css'
+CSS=ROOT/'src/ffado_webmixer/assets/static/index.css'
+ROUTING_CSS=ROOT/'src/ffado_webmixer/assets/static/routing.css'
 levels=(.5,.85,.93,.99)
 html='''<!doctype html><html><head><style>
 :root {--control-background:#141920;--border-color:#333;}

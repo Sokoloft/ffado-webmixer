@@ -27,7 +27,7 @@ from ffado_webmixer.profiles.capabilities import activate_internal_model
 from pathlib import Path
 
 GUID = '/org/ffado/Control/DeviceManager/0001f2000007b2ca'
-PROFILE = Path(__file__).resolve().parents[1] / 'ffado_webmixer/profiles/motu/common.xml'
+PROFILE = Path(__file__).resolve().parents[1] / 'src/ffado_webmixer/profiles/motu/common.xml'
 
 
 def setup_device():
@@ -159,9 +159,9 @@ class MotuApiTests(unittest.TestCase):
 
     def test_settings_inout_tab_was_removed_and_general_retains_qjackctl(self):
         page = (Path(__file__).resolve().parents[1] /
-                'ffado_webmixer/assets/static/index.html').read_text()
+                'src/ffado_webmixer/assets/static/index.html').read_text()
         script = (Path(__file__).resolve().parents[1] /
-                  'ffado_webmixer/assets/static/routing.js').read_text()
+                  'src/ffado_webmixer/assets/static/routing.js').read_text()
         self.assertNotIn('tab-inout', page)
         self.assertNotIn('pane-inout', page)
         self.assertIn('id="routingBusGrid"', page)

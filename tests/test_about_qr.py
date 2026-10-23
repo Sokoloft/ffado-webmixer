@@ -1,5 +1,4 @@
 """Offline checks for the 1.0.1 About / QR-code experience."""
-import ast
 import json
 import shutil
 import subprocess
@@ -7,7 +6,7 @@ from html.parser import HTMLParser
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-STATIC = ROOT / "ffado_webmixer" / "assets" / "static"
+STATIC = ROOT / "src/ffado_webmixer" / "assets" / "static"
 
 
 class Elements(HTMLParser):
@@ -23,11 +22,9 @@ class Elements(HTMLParser):
 
 
 def test_version_is_full_semver_string():
-    tree = ast.parse((ROOT / "main.py").read_text())
-    assignments = [node for node in tree.body if isinstance(node, ast.Assign)
-                   and any(isinstance(t, ast.Name) and t.id == 'APP_VERSION' for t in node.targets)]
-    assert len(assignments) == 1
-    assert ast.literal_eval(assignments[0].value) == "1.1.1"
+    from ffado_webmixer import __version__
+    from ffado_webmixer.main import APP_VERSION
+    assert APP_VERSION == __version__ == '1.2.0'
 
 
 def test_about_has_qr_button_and_replacement_dialog():

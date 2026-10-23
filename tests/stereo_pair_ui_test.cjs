@@ -3,11 +3,11 @@ const fs = require('fs');
 const vm = require('vm');
 const assert = require('assert');
 const path = require('path');
-const src = fs.readFileSync(path.join(__dirname, '../ffado_webmixer/assets/static/index.js'), 'utf8');
+const src = fs.readFileSync(path.join(__dirname, '../src/ffado_webmixer/assets/static/index.js'), 'utf8');
 const icon = src.slice(src.indexOf('var CHAIN_LINK_SVG'), src.indexOf('var PIN_SVG'));
 const logic = src.slice(src.indexOf('// Link buttons are available on every mono channel.'),
                         src.indexOf('function unlinkStrip('));
-const render = src.slice(src.indexOf('// Each mono strip gets its own link button'),
+const render = src.slice(src.indexOf('// Link state is highlighted on the strip;'),
                          src.indexOf('var loadToken ='));
 class ClassList {
   constructor() { this.set = new Set(); }
@@ -21,7 +21,7 @@ const strips = ids.map(id => ({ dataset: {id}, classList: new ClassList(), butto
 const row = {
   querySelectorAll(selector) {
     if (selector === ':scope > .strip') return strips;
-    if (selector === '.strip .link-toggle, .strip.stereo .unlink') return strips.flatMap(s => s.buttons);
+    if (selector === '.strip .strip-more') return strips.flatMap(s => s.buttons);
     if (selector === '.strip.stereo-pending') return strips.filter(s => s.classList.contains('stereo-pending'));
     if (selector === '.strip > .link-toggle') return strips.flatMap(s => s.buttons);
     throw new Error('Unexpected selector: ' + selector);
@@ -42,11 +42,10 @@ const context = vm.createContext({
 });
 for (const s of strips) s.appendChild = b => s.buttons.push(b);
 vm.runInContext(icon + '\n' + logic + '\n' + render, context);
-const click = id => strips.find(s => s.dataset.id === id).buttons[0].click();
+const click = id => context.chooseStereoChannel(id);
 (async function main() {
   context.renderLinkButtons(context.lastStripState);
-  assert(strips.every(s => s.buttons.length === 1), 'all faders receive buttons');
-  assert(strips.every(s => s.buttons[0].innerHTML.includes('<svg')), 'buttons show the chain-link SVG');
+  assert(strips.every(s => s.buttons.length === 0), 'no obsolete overlay buttons');
   click('ch/01');
   assert.strictEqual(context.pendingStereoLeft, 'ch/01');
   assert(strips[1].classList.contains('stereo-pending'));
@@ -63,6 +62,6 @@ const click = id => strips.find(s => s.dataset.id === id).buttons[0].click();
   click('ch/02');
   await new Promise(resolve => setImmediate(resolve));
   assert.strictEqual(JSON.stringify(submitted[1].body), JSON.stringify({action:'link', dragged:'ch/07', target:'ch/02'}));
-  assert(strips.every(s => s.buttons.length === 1));
-  console.log('Stereo pair UI: all eight buttons; first-click Left; cancellation; 2→5 and 8→3 passed');
+  assert(strips.every(s => s.buttons.length === 0));
+  console.log('Stereo pair UI: action state machine; first-click Left; cancellation; 2→5 and 8→3 passed');
 })().catch(e => {console.error(e);process.exit(1)});

@@ -38,7 +38,7 @@ def state_on(mixer, config, bus):
             return lambda fn: fn
     with patch.dict(sys.modules, {'flask':flask}):
         spec = importlib.util.spec_from_file_location('ffado_webmixer.api._bus_scoped_test_api',
-                                                     ROOT/'ffado_webmixer/api/mixer.py')
+                                                     ROOT/'src/ffado_webmixer/api/mixer.py')
         module = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(module)
         app = App()
@@ -140,7 +140,7 @@ def test_stereo_set_only_mirrors_on_selected_bus():
     config = Config()
     config.link('ch/01','ch/04',0)
     commands=[]
-    mixer.write = lambda mix, strip, control, value: commands.append((mix,strip,control,value))
+    mixer.write_group_mute = lambda buses, cols, value: commands.append((tuple(buses), tuple(cols), value))
     body = {'strip':'ch/01', 'control':'mute', 'value':True, 'mix':0}
     flask = types.ModuleType('flask')
     flask.jsonify = lambda *args, **kwargs: args[0] if args else kwargs
@@ -154,14 +154,14 @@ def test_stereo_set_only_mirrors_on_selected_bus():
             return decorator
     with patch.dict(sys.modules, {'flask':flask}):
         spec=importlib.util.spec_from_file_location('ffado_webmixer.api._bus_scoped_set_api',
-                                                    ROOT/'ffado_webmixer/api/mixer.py')
+                                                    ROOT/'src/ffado_webmixer/api/mixer.py')
         mod=importlib.util.module_from_spec(spec)
         spec.loader.exec_module(mod)
         app=App()
         mod.register(app,mixer,{},config,lambda event: None)
         assert app.set_value() == {'ok':True}
-        assert [cmd[:2] for cmd in commands] == [(0,'ch/01'),(0,'ch/04')]
+        assert commands == [((0,), (1, 4), True)]
         commands.clear()
         body['mix'] = 1
         assert app.set_value() == {'ok':True}
-        assert [cmd[:2] for cmd in commands] == [(1,'ch/01')]
+        assert commands == [((1,), (1,), True)]

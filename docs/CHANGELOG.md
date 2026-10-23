@@ -1,3 +1,188 @@
+## 1.2.0 — Access control and reliability (2026-10-22)
+
+- Default to a localhost listener. Explicit LAN access requires `--host 0.0.0.0` and a password in `FFADO_WEBMIXER_TOKEN`; remote clients authenticate as `ffado` using HTTP Basic authentication.
+- Reject cross-origin browser writes and non-JSON API submissions. Local desktop access remains automatic.
+- Validate saved configuration before applying it; retain malformed files in unique `.bad` backups and preserve legacy migrations.
+- Request a complete browser refresh of mixer state after event overflow or reconnection, including bus layouts and routing.
+- Extract routing and output controls from the mixer backend, and live synchronization from the main frontend script.
+- Use one package version for distribution metadata and the CLI: `1.2.0`.
+
+## 1.1.1-dev — Editable fader values and unity reset (2026-10-22)
+
+- Display tiny positive and negative dB levels rounded to zero as `0.0 dB`, never `+0.0 dB` or `-0.0 dB`.
+- Allow Enter-to-commit manual fader levels (e.g. `+3.1 dB`) and Escape-to-cancel for channel and master faders; validate limits before sending existing FFADO 0..100 transport values.
+- Double-click a calibrated DICE/RME fader handle or track to reset to 0.0 dB (unity), not silence. Preserve legacy percentage devices without guessing a dB calibration.
+- Added `tests/fader_value_edit_ui_test.cjs` and `docs/TESTING.md#mixer-routing-and-stereo-links`. No audio routing or backend gain arithmetic changes.
+
+## 1.1.1-dev — Concurrent theme-icon cache fix (2026-10-22)
+
+- Fixed a pywebview icon-cache race when switching themes or accents quickly. Concurrent worker threads previously reused a temporary SVG filename based on the process ID, resulting in intermittent `FileNotFoundError` during `os.replace()`.
+- Each icon write now uses its own securely allocated temporary file and an atomic replacement; stray temporary files are cleaned up if a write fails.
+- Added deterministic concurrent-write and failed-write cleanup regressions. No changes to hardware controls, theme palettes or browser favicon responses.
+
+## 1.1.1-dev — Stereo-bus fader from silence (2026-10-22)
+
+- Fixed linked-bus faders silently ignoring changes when both bus coefficients were −∞.
+- An explicit mono fader raise now connects that mono input to the selected stereo bus pair at the requested level. A linked input pair activates only its assigned Left/Right diagonal paths; linking alone never alters routing.
+- Restores each channel's previous pan ratio after a fader-down-to-−∞ and fader-up gesture in the same running session. Recognizes FFADO's 0–16 native silence sentinel, and invalidates memory on external matrix edits.
+- Groups linked input fader changes into a verified, serialized write with best-effort rollback on failure; preserves unrelated matrix routes.
+- Added Saffire PRO 40/40.1 and ProFire 2626/610 simulated tests. See [TESTING.md#mixer-routing-and-stereo-links](TESTING.md#mixer-routing-and-stereo-links).
+
+## 1.1.1-dev — Explicit stereo FireWire playback routing (2026-10-22)
+
+- Used the Focusrite Saffire PRO 40 manual's DAW playback → mixer → output routing architecture to distinguish FireWire playback sources from independent mixer bus outputs and physical monitor destinations.
+- Added an optional **Stereo FireWire playback** helper to the DICE Mixer Matrix. It discovers the current FFADO `1394/In` source assignments and correct mixer input columns; never assumes FireWire playback 1/2 appear on physical mixer faders 1/2.
+- After explicit confirmation, it connects Left input to Left bus and Right input to Right bus at 0 dB and silences only their two crossed connections. All unrelated crosspoints and the Crossbar Router remain unchanged.
+- Verified reads/writes, serialized hardware operations, and rollback for failures. Linking faders or buses alone still changes no audio routes. Added backend and browser interaction regressions. See [TESTING.md#mixer-routing-and-stereo-links](TESTING.md#mixer-routing-and-stereo-links).
+
+## 1.1.1-dev — Dynamic theme icons (2026-10-22)
+
+- Derive the browser favicon and Qt pywebview window icon from the color tokens
+  already used by the themed loading-screen logo, including custom themes and
+  six-digit accent overrides.
+- Set the native icon on startup and update it via a queued Qt GUI-thread slot
+  when themes or accents change in the pywebview client. Update browser
+  favicons immediately; no Qt dependencies for browser-only operation.
+- When the matching per-user KDE launcher is installed, synchronize its SVG
+  artwork with the current theme (Plasma may cache it until relaunch).
+- Added theme-asset, launcher, native bridge and browser interaction tests.
+
+## 1.1.1-dev — Compact Crossbar Router destination names (2026-10-22)
+
+- Replaced raw group headings such as `1394/Out`, `ADAT/Out`, `Line/Out`, `Loop` and `Mixer/In` with **Firewire**, **ADAT**, **Line Out**, **Loop** and **Mixer Inputs**.
+- Display destination rows with the same vocabulary: `1394/Out:01` → **Firewire 1**, `Line/Out:01` → **Line Out 1**, `Loop:01` → **Loop 1**. Mixer input rows continue to show both destination identity and live source (for example **In 9 ← Disconnected**).
+- Preserved the original FFADO destination IDs for D-Bus routing, meter mapping, readback, and selector option values. Added an end-to-end JavaScript regression test and a hardware checklist: [TESTING.md#mixer-routing-and-stereo-links](TESTING.md#mixer-routing-and-stereo-links).
+
+## 1.1.1-dev — Persisted intro preference and themed splash (2026-10-22)
+
+- Fixed **Skip loading screen** saving only to the selected device JSON, while the
+  desktop window checked the global `~/.config/ffado-webmixer/config.json`.
+  The preference now persists globally and is consistent when switching devices.
+- Import a previously saved per-device startup preference once, without
+  replacing an explicit global preference or re-enabling an option after the
+  user disables it. The existing device-specific mixer layouts and controls
+  remain separate.
+- Persist the active theme and accent override for use by the desktop intro.
+  Its first-frame background matches the selected theme, and its logo,
+  progress bar and activity indicator use theme CSS variables.
+- Report failed Skip setting saves and restore the previous checkbox state.
+  Added persistence, migration, themed-window, and visual-style checks.
+  See [TESTING.md#multiple-devices-and-desktop-integration](TESTING.md#multiple-devices-and-desktop-integration).
+
+## 1.1.1-dev — Consistent routing source labels in matrix and Crossbar Router (2026-10-22)
+
+- Matrix snapshot returns a separate `input_labels` array using the current DICE
+  Crossbar Router source for each mixer input, including **Disconnected** when
+  FFADO reports its `Mute:00` routing sentinel. Original matrix `inputs` and
+  numeric coefficient coordinates are unchanged.
+- Matrix reads refresh actual router source selections, so a matrix Refresh
+  picks up external `ffado-mixer` changes even without opening Crossbar Router.
+  A temporary router read failure does not block matrix volume reads.
+- Crossbar Router rows display both the stable destination and selected source
+  (e.g. `In 9 ← Disconnected`); dropdown labels use compact Analog/Firewire/etc.
+  names but retain raw FFADO option values.
+- A routing event now also refreshes an open matrix tab. Added Python and
+  JavaScript regression coverage. See [TESTING.md#mixer-routing-and-stereo-links](TESTING.md#mixer-routing-and-stereo-links).
+
+## 1.1.1-dev — Crossbar Router / fader source-label synchronization (2026-10-22)
+
+- Fixed DICE channel-strip hardware source labels remaining stuck at matrix
+  discovery values after selecting a new source for `Mixer/In` in In/Out →
+  Crossbar Router. The server now associates matrix input columns with the
+  exact router destinations and updates their display source from verified
+  router readback (or a fresh Crossbar Router snapshot).
+- Automatically refresh the active strips after a successful router selection
+  and send the existing routing event to other browser clients. Stereo pairs
+  show the updated ordered Left+Right labels, with existing custom strip names
+  preserved. Disconnected mixer inputs show `Disconnected`.
+- Does not rename physical matrix channels, touch mixer coefficients, or treat
+  a `Line/Out` route as a mixer input. Refreshes external ffado-mixer changes
+  when the Crossbar Router snapshot is requested, without per-fader D-Bus
+  polling. See [TESTING.md#mixer-routing-and-stereo-links](TESTING.md#mixer-routing-and-stereo-links).
+
+## 1.1.1-dev — Saffire PRO 40 inputs 3–8 label correction (2026-10-22)
+
+- Recognize both `Mic/Lin/Inst` (inputs 1–2) and `Mic/Lin/In` (inputs 3–8) as
+  analog input labels. Previously the formatter omitted the latter form, so
+  inputs 3–8 retained their long hardware names.
+- Apply the same compact naming to stereo pairs without repeating `Analog`
+  (for example `Mic/Lin/In:03+04` → `Analog 3+4`), while leaving underlying
+  FFADO IDs, customized names, and other device functionality untouched.
+- Added regression cases for all eight inputs, including the alternate
+  `Mic/Line/In` spelling. See [`TESTING.md#layout-editing-and-settings-persistence`](TESTING.md#layout-editing-and-settings-persistence).
+
+## 1.1.1-dev — Complete Saffire input labels / stereo 1394 display (2026-10-21)
+
+- Recognize `Mic/Lin/Inst` and `Mic/Line/Inst` as compact **Analog** input labels.
+  For example, `Mic/Lin/Inst:03+04` now appears as `Analog 3+4`.
+- Show native `1394/In` ports as **Firewire**, e.g. `1394/In:01` → `Firewire 1`.
+  A native stereo pair or two individually named 1394 ports displays
+  `Firewire 1+2`, with **no repeated “Firewire” prefix**. Reversed and
+  nonadjacent pair order remains intact.
+- Shortening occurs in the shared presentation-only label function across
+  channel strips, stereo pair names, bus names and In/Out matrix headings.
+  Custom names, FFADO routing identifiers, saved IDs and API payloads remain
+  unchanged. See [`TESTING.md#layout-editing-and-settings-persistence`](TESTING.md#layout-editing-and-settings-persistence).
+
+## 1.1.1-dev — Saffire PRO 40 stereo-pan and concise hardware labels (2026-10-21)
+
+- Fixed stereo input balance when the Right input had no active diagonal to
+  the linked Right bus. An **explicit** user pan adjustment can now complete
+  that one missing diagonal from the existing leg's level; it never activates
+  an arbitrary cross-route. Simply linking/unlinking still does not touch the
+  FFADO matrix. If both diagonals are disconnected, neither is enabled.
+- DICE/RME input pairs require the corresponding stereo output bus link for
+  balance; a missing link is explained instead of attempting unsupported
+  native pan writes. Selecting/starting from a linked Right output bus now
+  normalizes to its Left bus.
+- Pan drags preview locally and commit once on release; mouse wheel and
+  keyboard interactions are coalesced. Avoids flooding the slow FireWire
+  D-Bus mixer with intermediate writes.
+- Shortened recognized FFADO hardware labels in strips, bus selector, and
+  matrix headers (for example `Mixer/Out:01` → `Bus 1`, `Anlg/In:02` →
+  `Analog 2`). Original labels, D-Bus paths, channel IDs, and user-defined
+  names remain unchanged.
+- Added PRO 40 simulated hardware tests, UI interaction tests, and a live
+  test checklist: [`TESTING.md#mixer-routing-and-stereo-links`](TESTING.md#mixer-routing-and-stereo-links).
+  Hardware validation remains pending; start at low monitoring volume.
+
+## 1.1.1-dev — Shared live peak stream / smoother meters (2026-10-21)
+
+- Compared the uploaded `ffado-web-mixer-main` project's one-reader / WebSocket
+  100 ms architecture with our request-then-wait HTTP meter polling. Replaced
+  normal browser polling with a **shared, per-GUID, 100 ms FFADO sampler** and
+  dependency-free Flask Server-Sent Events at `/api/peak-stream`.
+- Coalesced frames for slow viewers (one-slot latest-frame queues), stopped
+  sampling when no page watches a device, and stopped browser streams in hidden
+  tabs. Existing `/api/peaks` remains as a diagnostic and transport fallback.
+- Cached repeated meter DOM lookups, used a short CSS full-track transition for
+  smoother movement, and preserved precise FFADO destination mapping, distinct
+  stereo lanes, color scale, peak/clip holds, and the Crossbar Router meters.
+- Added server fanout/device-safety tests and EventSource/fallback regression
+  tests. See [`TESTING.md#metering-performance-and-readback`](TESTING.md#metering-performance-and-readback).
+  Hardware performance verification is still pending.
+
+## 1.1.1-dev — Saffire PRO 40 / ProFire stereo mute correction (2026-10-21)
+
+- Fixed a linked **output bus** muting only its Left matrix row; a stereo input
+  pair on a linked bus now suppresses and restores all four affected DICE EAP
+  crosspoints rather than just the visible left bus.
+- Grouped software mute writes under one serialized operation with FFADO
+  readback and best-effort rollback; crash-safe per-device gain journals remain
+  in use and preexisting Solo/user mute states are preserved.
+- Corrected FFADO's `0..16` native silence-sentinel readback so some devices do
+  not misinterpret a muted cell as an external gain change and discard the
+  original level. Matrix silence alone is no longer mistaken for a user mute.
+- Stereo strips now report partial mute states and refresh from hardware after
+  a write. Output/master Mute surfaces rejected writes rather than silently
+  continuing. Incoming mute events refresh the actual state.
+- Added tests using exact Saffire PRO 40/40.1 and ProFire 2626/610 profile
+  simulations, including partial failure rollback, stereo pairs on stereo
+  buses, Solo coexistence and initially disconnected routes. See
+  [`TESTING.md#mixer-routing-and-stereo-links`](TESTING.md#mixer-routing-and-stereo-links).
+- This is limited to the FFADO matrix; direct Crossbar Router paths can bypass
+  the mixer. Physical interface validation is pending.
+
 ## 1.1.1-dev — Meter color bands anchored to full scale (2026-10-21)
 
 - Fixed the **channel-strip peak color scale**: previously the green/yellow/red
@@ -15,7 +200,7 @@
 - Added Node regression coverage for full-scale clipping at multiple levels,
   Python source checks, and an optional Chromium pixel regression covering
   both vertical and horizontal meter colors. See
-  [`TESTING_METER_COLOR_SCALE.md`](TESTING_METER_COLOR_SCALE.md).
+  [`TESTING.md#metering-performance-and-readback`](TESTING.md#metering-performance-and-readback).
   Physical FireWire hardware verification remains pending.
 
 ## 1.1.1-dev — Fix MOTU Phones destination discovery (2026-10-21)
@@ -47,13 +232,13 @@
 ## 1.1.1 — development branch (2026-10-19)
 
 - **Fixed missing Saffire PRO 26 and other DICE channel-strip meters**: `/api/state` uses zero-padded strip IDs (`ch/00`–`ch/09`), while `/api/peaks.channels` uses unpadded decimal JSON keys (`"0"`–`"9"`). The front end now normalizes the index before reading the actual FFADO peak value; formerly only strip indices 10+ could match correctly. This affects every model using the common DICE EAP peak renderer.
-- Added CSS hiding for unsupported/unmapped `.peak-meter` controls, source-accurate tests for all 16 supported DICE meter profiles, and end-to-end regression coverage that renders actual backend-style JSON through the JavaScript meter display. No routing changes or invented meter readings. Physical devices still require testing. See [`TESTING_PEAK_METERS.md`](TESTING_PEAK_METERS.md).
+- Added CSS hiding for unsupported/unmapped `.peak-meter` controls, source-accurate tests for all 16 supported DICE meter profiles, and end-to-end regression coverage that renders actual backend-style JSON through the JavaScript meter display. No routing changes or invented meter readings. Physical devices still require testing. See [`TESTING.md#metering-performance-and-readback`](TESTING.md#metering-performance-and-readback).
 
 - Reserved a toolbar-to-bus-picker clearance in the sidebar across desktop, tablet and phone sizes. Adaptive bus-column selection now subtracts the real top/bottom padding from the available height instead of allowing the bus grid to crowd the routing/settings controls in a maximized 1440p window. Short landscape windows retain a smaller but positive gap, with vertical scrolling when necessary.
-- Added [`TESTING_BUS_TOOLBAR_CLEARANCE.md`](TESTING_BUS_TOOLBAR_CLEARANCE.md) and expanded the adaptive bus-grid regression test for constrained height and touch viewports. No changes to FFADO mixer controls or device settings.
+- Added [`TESTING.md#layout-editing-and-settings-persistence`](TESTING.md#layout-editing-and-settings-persistence) and expanded the adaptive bus-grid regression test for constrained height and touch viewports. No changes to FFADO mixer controls or device settings.
 - Made the sidebar **bus selector responsive to bus count and available height**: small mixers remain at up to two columns, while large devices can expand leftward into 4, 6, or more bus columns within the current sidebar width/viewport cap. Outputs remain independent and limited to two columns.
 - Grouped each supported stereo bus pair with its link/unlink button, so buttons never drift onto a different row or lose their visual association when the panel widens. The user-resized sidebar and narrow/small-screen scrolling remain supported.
-- No changes to hardware routing, device profiles, stereo-link semantics, saved settings or version number. Added adaptive bus-grid regression tests and [`TESTING_ADAPTIVE_BUS_GRID.md`](TESTING_ADAPTIVE_BUS_GRID.md).
+- No changes to hardware routing, device profiles, stereo-link semantics, saved settings or version number. Added adaptive bus-grid regression tests and [`TESTING.md#layout-editing-and-settings-persistence`](TESTING.md#layout-editing-and-settings-persistence).
 - Updated the application's displayed version to **1.1.1** (still under active development; not a stable release announcement).
 - Moved root-level testing guides into [`docs/`](./README.md) and consolidated the previous `CHANGELOG_1_1_0_DEV.md` history into this version-independent changelog.
 - Kept the repository root `README.md` for GitHub discoverability and updated documentation references to their new paths.
@@ -69,7 +254,7 @@
 - Each lane has independent 1.6-second peak hold and 4-second near-full-scale warning, including optional click-to-clear; one loud channel never makes its partner appear loud. Missing metered channels stay hidden instead of receiving copied or synthetic values.
 - Refined accessible labels and tooltips identifying actual router destination names and readings, with no claim of calibrated dBFS or post-fader measurement. Enlarged the visual meter for legibility without changing fader range or matrix coefficients.
 - Preserved the existing exact FFADO DICE EAP matrix-row-to-router-destination mapping, 12-bit normalization, GUID scoping, and unsupported-device behavior. No D-Bus writes or unverified pre/post metering have been added.
-- Stopped stale asynchronous poll replies from showing peaks after a device change/restart. Expanded dependency-free Node.js UI regression tests and updated `TESTING_PEAK_METERS.md`. Actual ProFire verification remains necessary.
+- Stopped stale asynchronous poll replies from showing peaks after a device change/restart. Expanded dependency-free Node.js UI regression tests and updated `TESTING.md#metering-performance-and-readback`. Actual ProFire verification remains necessary.
 
 ## Matrix-cell rotary controls (2026-10-19)
 
@@ -97,7 +282,7 @@
   on a bus that is still loading or stale after switching.
 - Preserve unrestricted input pairing (2→5, 8→3), independent per-bus pairs,
   initial pan readback, chain-link SVG buttons, and routing-safe behavior.
-- Added `TESTING_STEREO_PAIR_VALIDATION.md`, Python concurrency/validation/
+- Added `TESTING.md#mixer-routing-and-stereo-links`, Python concurrency/validation/
   persistence regression tests, and browser-free UI error/race tests.
   Live FireWire hardware confirmation remains pending.
 
@@ -186,7 +371,7 @@
 - Matrix edits still trigger a direct strip refresh and SSE refresh on other
   app pages; the new state readback reflects external matrix values on reload.
 - Hardware routing and write-side pan laws are unchanged in this step.
-  See `TESTING_MATRIX_STRIP_SYNC.md` for screenshots-based validation.
+  See `TESTING.md#mixer-routing-and-stereo-links` for screenshots-based validation.
 
 ## Mixer controls
 
@@ -225,7 +410,7 @@
 - KDE taskbar identity and physical hardware interaction require live tests.
 - Automated tests do not establish successful writes to an actual interface.
 
-See `TESTING_V1_1.md` for a safe testing checklist and diagnostic instructions.
+See `TESTING.md#offline-smoke-tests` for a safe testing checklist and diagnostic instructions.
 
 
 ## Source-derived per-model capabilities (phase 1)
@@ -244,7 +429,7 @@ See `TESTING_V1_1.md` for a safe testing checklist and diagnostic instructions.
 - Debug fixtures now use synthetic identities based on their selected model
   rather than a shared unrelated placeholder GUID.
 - Added profile provenance checks and regression tests, and
-  TESTING_CAPABILITIES.md / profiles/CAPABILITIES.md.
+  TESTING.md#mixer-routing-and-stereo-links / PROFILE_CAPABILITIES.md.
 
 Profiles classified identity-only or source-only are **not** suddenly supported
 mixers; the feature map intentionally refuses unimplemented D-Bus writes.
@@ -272,7 +457,7 @@ mixers; the feature map intentionally refuses unimplemented D-Bus writes.
 - Added 1.6-second peak hold, 4-second near-full-scale warning hold, click to
   clear, stereo-pair peak aggregation, no overlapping polling requests, and
   safe behavior on unsupported devices or device changes.
-- New diagnostic guide: `TESTING_PEAK_METERS.md`.
+- New diagnostic guide: `TESTING.md#metering-performance-and-readback`.
 
 ## Native gain precision and matrix editor (this update)
 
@@ -283,7 +468,7 @@ mixers; the feature map intentionally refuses unimplemented D-Bus writes.
 - Completed matrix editing: 0.1 dB number entry/keyboard/knob, FFADO-style presets from +6 to −55 and −∞, unity and silence actions, and double-click-to-preview unity followed by Apply.
 - The UI displays **hardware readback**, not the assumed requested gain. Hardware's finite integer coefficients determine actual attainable precision.
 - Original MOTU UltraLite output routing remains unchanged; unsupported dB controls are not exposed.
-- Added `TESTING_GAIN_PRECISION.md` and converter/matrix regression tests.
+- Added `TESTING.md#mixer-routing-and-stereo-links` and converter/matrix regression tests.
 
 ## Software mute/solo reliability (phase 4)
 
@@ -304,7 +489,7 @@ mixers; the feature map intentionally refuses unimplemented D-Bus writes.
   saved output level before verifying the hardware restoration.
 - Debug profiles continue to use in-memory simulated D-Bus and do not create
   persistent recovery journals.
-- Added `TESTING_SOFTWARE_MUTE_SOLO.md` and hardware-free failure-injection
+- Added `TESTING.md#mixer-routing-and-stereo-links` and hardware-free failure-injection
   tests. Direct crossbar bypass signals are unaffected by software mute/solo.
 
 ## Three-device and KDE integration validation (phase 5)
@@ -331,7 +516,7 @@ mixers; the feature map intentionally refuses unimplemented D-Bus writes.
 - New three-unit tests cover route isolation, browser-session switching,
   rejected stale writes/reads, GUID collision rejection, config persistence
   across discovery-order changes, scoped events, and optional launcher setup.
-- Added `TESTING_MULTIPLE_DEVICES_KDE.md` for the tester with three ProFire
+- Added `TESTING.md#multiple-devices-and-desktop-integration` for the tester with three ProFire
   units and a repeatable KDE Plasma checklist.
 
 **Limits:** All validation in this phase is hardware-free. Live multi-interface

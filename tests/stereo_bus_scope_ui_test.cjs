@@ -3,14 +3,15 @@ const fs = require('fs');
 const vm = require('vm');
 const assert = require('assert');
 const path = require('path');
-const src = fs.readFileSync(path.join(__dirname, '../ffado_webmixer/assets/static/index.js'), 'utf8');
+const src = fs.readFileSync(path.join(__dirname, '../src/ffado_webmixer/assets/static/index.js'), 'utf8');
 
 const state = {currentMix:0, ACTIVE_DEVICE:null, CLIENT_ID:'this-browser', window:{}, row:{querySelector:() => null}};
 let redraws = 0;
 state.loadMix = () => {redraws++;};
 state.loadMaster = () => {};
 vm.createContext(state);
-const eventSource = src.slice(src.indexOf('function onSyncEvent(ev) {'), src.indexOf('var syncOpened ='));
+const syncSource = fs.readFileSync(path.join(__dirname, '../src/ffado_webmixer/assets/static/live-sync.js'), 'utf8');
+const eventSource = syncSource.slice(syncSource.indexOf('function onSyncEvent(ev) {'), syncSource.indexOf('function refreshSyncState()'));
 vm.runInContext(eventSource, state);
 state.onSyncEvent({type:'stereo',mix:1,origin:'other-browser'});
 assert.equal(redraws,0,'Bus 2 update must not redraw Bus 1');
@@ -27,7 +28,7 @@ vm.runInContext(iconCode, state);
 assert(state.CHAIN_LINK_SVG.includes('<svg'), 'Link button has an SVG');
 assert(state.CHAIN_LINK_SVG.includes('stroke="currentColor"'), 'Chain link is theme-colored');
 assert(!src.includes('&#x26D3;'), 'Old Unicode chains glyph is gone');
-assert(src.includes("+ CHAIN_LINK_SVG + '</button>'"), 'Linked strip uses the SVG too');
+assert(src.includes("actions.push(['Unlink stereo channels'"), 'Linked strips have an unlink menu action');
 
 const loadSource = src.slice(src.indexOf('var loadToken = 0;'), src.indexOf('window.refreshMatrixStrips = loadMix;'));
 const requested = [];
@@ -36,9 +37,12 @@ state.pendingStereoMix = 0;
 state.lastStripState = null;
 state.loadMuteRecovery = () => {};
 state.renderStrips = () => {};
-state.deviceFetch = url => {
-  requested.push(url);
-  return Promise.resolve({json: () => Promise.resolve(url.startsWith('/api/state') ? {} : [])});
+state.window.ffadoApi = {
+  latest(key, url, opts) {
+    requested.push(url);
+    assert.equal(opts.device, null);
+    return Promise.resolve(url.startsWith('/api/state') ? {} : []);
+  }
 };
 vm.runInContext(loadSource, state);
 (async function main() {

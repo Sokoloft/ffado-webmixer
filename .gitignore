@@ -1,7 +1,68 @@
-# PyCharm / JetBrains IDE
-.idea/
-
-# Python
+# Python caches and test output
 __pycache__/
 *.py[cod]
+.pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+.mypy_cache/
+.ruff_cache/
+.tox/
+.nox/
+.hypothesis/
+coverage.xml
+junit.xml
+
+# Browser dependencies and generated test reports
+node_modules/
+playwright-report/
+test-results/
+
+# Virtual environments / local tooling
 .venv/
+venv/
+.env
+.env.*
+!.env.example
+.cache/
+
+# Local mixer preferences and legacy runtime state
+/config.json
+/config.json.bad*
+/states/
+/devices/
+*.mute-recovery.json
+*.mute-recovery.json.bad*
+
+# Logs, temporary files and editor backups
+*.log
+*.tmp
+*.bak
+*~
+*.swp
+*.swo
+
+# Generated Python and PyPI packaging outputs
+build/
+dist/
+wheelhouse/
+pip-wheel-metadata/
+*.egg-info/
+*.dist-info/
+.eggs/
+*.egg
+*.whl
+*.tar.gz
+*.tar.bz2
+*.tar.xz
+
+# Release-upload credentials and transient uploads
+.pypirc
+.twine/
+.pypi-token
+*.upload.log
+
+# IDE / OS local files
+.idea/
+.vscode/
+.DS_Store

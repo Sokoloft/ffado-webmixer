@@ -5,7 +5,7 @@ import subprocess
 import pytest
 
 ROOT = Path(__file__).resolve().parents[1]
-STATIC = ROOT / 'ffado_webmixer' / 'assets' / 'static'
+STATIC = ROOT / 'src/ffado_webmixer' / 'assets' / 'static'
 
 
 def test_matrix_cell_controls_are_inline_and_existing_editor_is_retained():

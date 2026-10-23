@@ -82,7 +82,7 @@ def make_mixer():
     d = device()
     profile = {"family": "saffire_dice", "controls": {}, "mixer_matrix":
                {"path": "/EAP/MatrixMixer", "row_role": "inputs", "coefficient": "dice_db"}}
-    profile['capabilities'] = parse_capabilities(ET.parse(Path(__file__).resolve().parents[1] / 'ffado_webmixer/profiles/saffire_dice/saffire_pro_26_00130e_00000012.xml').getroot())
+    profile['capabilities'] = parse_capabilities(ET.parse(Path(__file__).resolve().parents[1] / 'src/ffado_webmixer/profiles/saffire_dice/saffire_pro_26_00130e_00000012.xml').getroot())
     model = resolve_mixer(d, profile)
     ctrl = resolve_controls(d, profile, model["matrices"], model["columns"], model["rows"])
     mixer = Mixer.__new__(Mixer)
@@ -173,7 +173,7 @@ class TestDICE(unittest.TestCase):
                           "col_names": [f"Analog {i}" for i in range(20)]}]
         r = resolve_mixer(d, {"family": "motu", "mixer_matrix":
                               {"path": "/Mixer/fader", "row_role": "outputs", "coefficient": "linear"},
-                              "capabilities": parse_capabilities(ET.parse(Path(__file__).resolve().parents[1] / "ffado_webmixer/profiles/motu/motu_ultralite.xml").getroot())})
+                              "capabilities": parse_capabilities(ET.parse(Path(__file__).resolve().parents[1] / "src/ffado_webmixer/profiles/motu/motu_ultralite.xml").getroot())})
         self.assertFalse(r["transposed"])
         self.assertEqual(len(r["rows"]), 4)
         self.assertEqual(len(r["columns"]), 20)

@@ -30,7 +30,7 @@ def handler(mixer, config):
     with patch.dict(sys.modules, {'flask': flask}):
         spec = importlib.util.spec_from_file_location(
             'ffado_webmixer.services._pair_validation',
-            ROOT / 'ffado_webmixer/services/stereo.py')
+            ROOT / 'src/ffado_webmixer/services/stereo.py')
         mod = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(mod)
     events = []
@@ -197,7 +197,7 @@ def test_stereo_http_route_rejects_malformed_bus_before_handler():
     with patch.dict(sys.modules, {'flask':flask,'ffado_webmixer.services.stereo':services}):
         spec = importlib.util.spec_from_file_location(
             'ffado_webmixer.api._pair_http_test',
-            ROOT / 'ffado_webmixer/api/stereo.py')
+            ROOT / 'src/ffado_webmixer/api/stereo.py')
         module = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(module)
         app = App()

@@ -17,7 +17,7 @@ from ffado_webmixer.profiles.loader import _common, load_profile
 from ffado_webmixer.profiles.resolver import resolve_mixer
 from ffado_webmixer.debug_backend import fixture_names
 
-ROOT = Path(__file__).resolve().parents[1] / 'ffado_webmixer/profiles'
+ROOT = Path(__file__).resolve().parents[1] / 'src/ffado_webmixer/profiles'
 
 
 def model_files():
@@ -172,8 +172,18 @@ class ModelCapabilityContract(unittest.TestCase):
         from unittest import mock
         fake=types.ModuleType('dbus')
         fake.SessionBus=lambda:object()
-        with mock.patch.dict(sys.modules, {'dbus': fake}):
+        try:
             from ffado_webmixer import interrogate
+        except ModuleNotFoundError as exc:
+            if exc.name != 'dbus':
+                raise
+            # Keep this regression runnable without the optional D-Bus runtime.
+            fake.Int32 = int
+            fake.exceptions = types.SimpleNamespace(DBusException=Exception)
+            with mock.patch.dict(sys.modules, {'dbus': fake}):
+                from ffado_webmixer import interrogate
+        # interrogate may already be imported with a real D-Bus module.
+        with mock.patch.object(interrogate, 'dbus', fake):
             info={'device':'/org/ffado/Control/DeviceManager/0001f2000007b2ca',
                   'guid':'0001f2000007b2ca','vendor_id':0x1f2,
                   'model_id':0x0,'unit_version':0x14,

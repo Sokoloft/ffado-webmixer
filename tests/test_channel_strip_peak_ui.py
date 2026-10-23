@@ -2,10 +2,10 @@
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-JS = (ROOT / 'ffado_webmixer/assets/static/index.js').read_text()
-CSS = (ROOT / 'ffado_webmixer/assets/static/index.css').read_text()
-METERS = (ROOT / 'ffado_webmixer/assets/static/peak-metering.js').read_text()
-BACKEND = (ROOT / 'ffado_webmixer/peak_metering.py').read_text()
+JS = (ROOT / 'src/ffado_webmixer/assets/static/index.js').read_text()
+CSS = (ROOT / 'src/ffado_webmixer/assets/static/index.css').read_text()
+METERS = (ROOT / 'src/ffado_webmixer/assets/static/peak-metering.js').read_text()
+BACKEND = (ROOT / 'src/ffado_webmixer/peak_metering.py').read_text()
 
 
 def test_stereo_lanes_created_in_user_selected_left_right_order():
@@ -32,19 +32,20 @@ def test_no_artificial_post_fader_or_unmapped_channels():
 
 
 def test_no_hidden_meter_overlaid_on_master():
-    assert '<div class="track" id="masterTrack"' in (ROOT / 'ffado_webmixer/assets/static/index.html').read_text()
+    assert '<div class="track" id="masterTrack"' in (ROOT / 'src/ffado_webmixer/assets/static/index.html').read_text()
     assert "const meter = el.querySelector('.peak-meter')" in METERS
     assert 'if (!meter) return;' in METERS
 
 
 def test_full_height_gradient_is_clipped_not_scaled_with_signal_height():
     """Colors must reflect absolute position on the meter's full 0..1 track."""
-    ROUTING_CSS = (ROOT / 'ffado_webmixer/assets/static/routing.css').read_text()
-    ROUTING_JS = (ROOT / 'ffado_webmixer/assets/static/routing.js').read_text()
+    ROUTING_CSS = (ROOT / 'src/ffado_webmixer/assets/static/routing.css').read_text()
+    ROUTING_JS = (ROOT / 'src/ffado_webmixer/assets/static/routing.js').read_text()
     assert '.peak-bar { position:absolute; inset:0; height:100%;' in CSS
     assert 'clip-path:inset(100% 0 0 0)' in CSS
     assert '#43b581 89%' in CSS and '#e05454 97%' in CSS
-    assert "lane.querySelector('.peak-bar').style.clipPath" in METERS
+    assert "cached.bar.style.clipPath" in METERS
+    assert "this.meterNodes = new WeakMap();" in METERS
     assert "lane.querySelector('.peak-bar').style.height" not in METERS
     assert '.route-peak-fill { position:absolute; inset:0; height:100%; width:100%;' in ROUTING_CSS
     assert 'clip-path:inset(0 100% 0 0)' in ROUTING_CSS

@@ -150,7 +150,7 @@ class PeakProfilesTest(unittest.TestCase):
         self.assertEqual(calls,['hasPeakMetering'])
 
     def test_every_optional_peak_model_declares_source_format_and_mapping(self):
-        root=Path(__file__).parents[1]/'ffado_webmixer'/'profiles'
+        root=Path(__file__).parents[1]/'src/ffado_webmixer'/'profiles'
         n=0
         for path in root.glob('*/*.xml'):
             if path.name in ('reference.xml','common.xml'):continue

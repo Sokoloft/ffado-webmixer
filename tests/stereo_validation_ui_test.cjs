@@ -3,10 +3,10 @@ const fs = require('fs');
 const vm = require('vm');
 const assert = require('node:assert/strict');
 const path = require('path');
-const src = fs.readFileSync(path.join(__dirname, '../ffado_webmixer/assets/static/index.js'), 'utf8');
+const src = fs.readFileSync(path.join(__dirname, '../src/ffado_webmixer/assets/static/index.js'), 'utf8');
 const block = src.slice(src.indexOf('var CHAIN_LINK_SVG'), src.indexOf('var PIN_SVG')) + '\n' +
   src.slice(src.indexOf('var pendingStereoLeft = null;'), src.indexOf('function startDrag(el, e)')) + '\n' +
-  src.slice(src.indexOf('// Each mono strip gets its own link button'), src.indexOf('var loadToken ='));
+  src.slice(src.indexOf('// Link state is highlighted on the strip;'), src.indexOf('var loadToken ='));
 const ids = ['ch/00','ch/01','ch/02','ch/03','ch/04','ch/05','ch/06','ch/07'];
 const cls = () => {
   const values = new Set();
@@ -17,7 +17,7 @@ const strips = ids.map(id => ({dataset:{id}, classList:cls(), buttons:[], append
 const row = {querySelectorAll(selector) {
   if (selector === ':scope > .strip') return strips;
   if (selector === '.strip.stereo-pending') return strips.filter(s => s.classList.contains('stereo-pending'));
-  if (selector === '.strip > .link-toggle' || selector === '.strip .link-toggle, .strip.stereo .unlink') return strips.flatMap(s=>s.buttons);
+  if (selector === '.strip .strip-more') return strips.flatMap(s=>s.buttons);
   throw Error('Unexpected selector: ' + selector);
 }};
 let reply; const submitted=[], toasts=[]; let refreshes=0;
@@ -30,7 +30,7 @@ const ctx=vm.createContext({
     setAttribute(key,value){this.attributes[key]=value;},remove(){for (const s of strips) s.buttons=s.buttons.filter(b=>b!==this);}};}}
 });
 vm.runInContext(block,ctx);
-const click = id => strips.find(s=>s.dataset.id===id).buttons[0].click();
+const click = id => ctx.chooseStereoChannel(id);
 const flush = async()=>{for (let i=0;i<5;i++) await new Promise(resolve=>setImmediate(resolve));};
 (async()=>{
   ctx.renderLinkButtons(ctx.lastStripState);
@@ -38,7 +38,7 @@ const flush = async()=>{for (let i=0;i<5;i++) await new Promise(resolve=>setImme
   click('ch/01'); click('ch/04');
   assert.equal(submitted.length,1);
   assert.equal(ctx.stereoLinkBusy,true);
-  assert(strips.every(s=>s.buttons[0].disabled));
+  assert(ctx.stereoLinkBusy, 'link action is locked while pending');
   click('ch/02'); click('ch/03');
   assert.equal(submitted.length,1,'race prevention must not send another link');
   reply({ok:false,json:async()=>({error:'ch/01 already linked elsewhere'})});
@@ -47,7 +47,7 @@ const flush = async()=>{for (let i=0;i<5;i++) await new Promise(resolve=>setImme
   assert.equal(ctx.pendingStereoLeft,null);
   assert(toasts.some(v=>v.includes('already linked elsewhere')));
   assert.equal(refreshes,1,'rejected link refreshes server state');
-  assert(strips.every(s=>!s.buttons[0].disabled));
+  assert(!ctx.stereoLinkBusy, 'link action unlocks after failure');
   // Mark channel 3 as paired by another client, reject it before sending.
   ctx.lastStripState['ch/03'].partner_of='ch/02';
   click('ch/03');

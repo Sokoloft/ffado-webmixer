@@ -4,9 +4,9 @@ const fs = require('fs');
 const path = require('path');
 const assert = require('assert');
 const vm = require('vm');
-const src = fs.readFileSync(path.join(__dirname, '../ffado_webmixer/assets/static/index.js'), 'utf8');
+const src = fs.readFileSync(path.join(__dirname, '../src/ffado_webmixer/assets/static/index.js'), 'utf8');
 const panUI = src.slice(src.indexOf('  function renderPan() {'),
-                        src.indexOf('  if (FEATURES.pan || STEREO_BUSES.includes(currentMix)) {'));
+                        src.indexOf('  if (FEATURES.pan || STEREO_BUSES.includes(currentMix) || stereo) {'));
 assert(panUI.startsWith('  function renderPan() {'));
 const env = vm.createContext({
   panAvailable: true, pan: 0.5, panEl: {value: null}, panVal: {textContent: null}, data: {},
@@ -27,7 +27,7 @@ assert.equal(env.panVal.textContent, '0*', 'Four-crosspoint balance must be iden
 env.panAvailable = false;
 env.renderPan();
 assert.equal(env.panVal.textContent, '—', 'Disconnected routes must NOT display fake center');
-assert(src.includes('panEl.disabled = !panAvailable ||'), 'Undefined pan must disable input');
+assert(src.includes('matrixPairNeedsBus || !panAvailable'), 'Undefined pan and unlinked output buses must disable input');
 assert(src.includes('if (panEl.disabled) return;'), 'Disabled pan must not send writes');
 assert(src.includes('return loadMix();'), 'UI should request new state after linking');
 console.log('Initial pan UI: readback labels, missing data, and cross-route warning passed');

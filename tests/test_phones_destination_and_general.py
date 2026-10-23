@@ -20,6 +20,8 @@ if 'dbus' not in sys.modules:
         dbus.Interface = lambda *args: None
         dbus.exceptions = types.SimpleNamespace(DBusException=Exception)
         sys.modules['dbus'] = dbus
+else:
+    dbus = sys.modules['dbus']
 
 from ffado_webmixer.profiles.resolver import resolve_phones_assignment
 from ffado_webmixer.profiles.capabilities import enabled, activate_internal_model
@@ -153,21 +155,21 @@ class MotuPhonesDestination(unittest.TestCase):
 
 class GeneralSettingsLayout(unittest.TestCase):
     def test_checkbox_layout_keeps_exact_user_order_and_ids(self):
-        html = (ROOT / 'ffado_webmixer/assets/static/index.html').read_text()
-        css = (ROOT / 'ffado_webmixer/assets/static/index.css').read_text()
+        html = (ROOT / 'src/ffado_webmixer/assets/static/index.html').read_text()
+        css = (ROOT / 'src/ffado_webmixer/assets/static/index.css').read_text()
         a = html.index('<div class="general-options"')
         b = html.index('<div class="field device-alias-field">', a)
         options = html[a:b]
         self.assertLess(options.index('id="skipLoadingScreen"'), options.index('id="hideMin"'))
         self.assertLess(options.index('id="hideMin"'), options.index('id="enableQjackctl"'))
         self.assertEqual(options.count('general-option-column'), 2)
-        self.assertEqual(options.count('general-option-check'), 3)
-        self.assertEqual(options.count('general-option-copy'), 3)
+        self.assertEqual(options.count('general-option-check'), 4)
+        self.assertEqual(options.count('general-option-copy'), 4)
         self.assertIn('grid-template-columns: repeat(2, minmax(0, 1fr))', css)
         self.assertIn('text-align: center', css)
         self.assertIn('@media (max-width: 480px)', css)
         self.assertIn('grid-template-columns: minmax(0, 1fr)', css)
-        for key in ('hideMin', 'skipLoadingScreen', 'enableQjackctl'):
+        for key in ('hideMin', 'hideMinBuses', 'skipLoadingScreen', 'enableQjackctl'):
             self.assertEqual(options.count('id="'+key+'"'), 1)
         self.assertEqual(options.count('id="minCount"'), 1)
 

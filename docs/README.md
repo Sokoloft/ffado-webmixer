@@ -1,34 +1,22 @@
-# Project documentation
+# Documentation
 
-Documentation lives in this folder so the repository root stays focused on the application source. The top-level [`README.md`](../README.md) remains in place for GitHub's project overview.
+The root [README](../README.md) provides the project overview, installation,
+and runtime instructions. This directory holds reference guides; historic
+step-by-step testing notes have been consolidated and archived.
 
-**Current project version:** 1.1.1 (development branch).
+- [Consolidated testing and hardware-verification guide](TESTING.md)
+- [Changelog](CHANGELOG.md)
+- [Device profiles](DEVICE_PROFILES.md) and [profile catalogue](PROFILES.md)
+- [Profile resolution and architecture](PROFILE_ARCHITECTURE.md)
+- [Profile capabilities](PROFILE_CAPABILITIES.md)
+- [Python package structure](PYTHON_PACKAGE.md)
+- [Custom user themes](USER_THEMES.md) and [built-in theme assets](THEME_ASSETS.md)
+- [PyPI publishing instructions](PUBLISHING_PYPI.md)
 
-- [Changelog](CHANGELOG.md) — development history and release notes.
+## Historical reference
 
-## Testing and verification guides
-
-- [Adaptive bus selector: two columns for small mixers, extra columns for ProFire-style devices](TESTING_ADAPTIVE_BUS_GRID.md)
-- [Priority 2: arbitrary input stereo pairs and safe routing (v1.1.1 development build)](TESTING_ARBITRARY_STEREO.md)
-- [Testing source-defined device capabilities (v1.1.1 development build)](TESTING_CAPABILITIES.md)
-- [v1.1.1 development build — Matrix gain precision testing](TESTING_GAIN_PRECISION.md)
-- [Initial stereo pan display — Priority 3](TESTING_INITIAL_PAN.md)
-- [v1.1.1 development build — inline matrix-cell rotary controls](TESTING_MATRIX_CELL_ROTARY.md)
-- [Matrix → strip synchronization (v1.1.1 development build)](TESTING_MATRIX_STRIP_SYNC.md)
-- [MOTU UltraLite (first generation) bus-routing update](TESTING_MOTU_ULTRALITE.md)
-- [Three interfaces + KDE Plasma: v1.1.1 development build validation](TESTING_MULTIPLE_DEVICES_KDE.md)
-- [Peak-metering test and diagnostic report (v1.1.1 development build)](TESTING_PEAK_METERS.md)
-- [About QR view / v1.0.1 quick test](TESTING_QR.md)
-- [Saffire PRO 26 — hardware testing and bug-report guide (ffado-webmixer 1.0.1)](TESTING_SAFFIRE_PRO26.md)
-- [Testing the QjackCtl and About settings update](TESTING_SETTINGS.md)
-- [v1.1.1 development build — Software mute/solo resilience and recovery](TESTING_SOFTWARE_MUTE_SOLO.md)
-- [Regression: input stereo pairs must be independent per bus](TESTING_STEREO_BUS_VISIBILITY.md)
-- [Stereo pairing validation (Priority 4)](TESTING_STEREO_PAIR_VALIDATION.md)
-- [ffado-webmixer 1.1.1 development build — hardware and debug testing](TESTING_V1_1.md)
-- [Priority 7 — mixer Volume vs. hardware Input Gain](TESTING_VOLUME_TERMINOLOGY.md)
-
-## Other documentation
-
-Device-family and profile implementation details stay near the code under [`ffado_webmixer/profiles/`](../ffado_webmixer/profiles/), and theme instructions stay with the theme assets.
-
-For new testing guides, add them here and link them from this index instead of putting more Markdown files in the project root.
+[`docs_legacy.zip`](../docs_legacy.zip) contains an **unchanged snapshot of
+all 56 Markdown documentation files** that were in `docs/` before this cleanup,
+including 46 retired `TESTING_*.md` change-specific guides. You can extract
+individual files from the ZIP if you need old test details. The archive is
+not part of the running application.

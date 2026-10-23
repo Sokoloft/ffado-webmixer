@@ -1,0 +1,542 @@
+html { background: var(--page-background); }
+
+  [hidden] { display: none !important; }
+  html, body { height: 100%; }
+  body { margin: 0; height: 100dvh; box-sizing: border-box; display: flex; overscroll-behavior: none;
+         background: var(--page-background); color: var(--text-primary); font-family: Helvetica, Arial, sans-serif;
+         padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left); }
+  input { -webkit-user-select: text; user-select: text; }
+
+  #main { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+  #row { display: flex; gap: 6px; align-items: stretch; flex: 1; min-height: 0; padding: 10px 12px 12px; overflow: auto; }
+
+  /* ---- right side: settings, output buttons, master fader ---- */
+  #side { --bus-toolbar-gap: 28px; box-sizing: border-box; flex: none; display: flex; flex-direction: column; position: relative;
+          background: var(--sidebar-background); border-left: 1px solid var(--border-color); }
+  #splitter { position: absolute; left: -5px; top: 0; bottom: 0; width: 11px; z-index: 6;
+              cursor: col-resize; touch-action: none; }
+  #splitter::after { content: ""; position: absolute; left: 4px; top: 50%; width: 3px; height: 44px; margin-top: -22px;
+                     border-radius: 2px; background: var(--border-color); transition: background .12s; }
+  #splitter:hover::after, body.resizing #splitter::after { background: var(--accent-color); }
+  body.resizing, body.resizing * { cursor: col-resize !important; user-select: none !important; }
+  /* One aligned toolbar for the optional router/device and permanent settings/fullscreen tools.
+     Uniform inner squares fix asymmetric highlight spacing across the old separate boxes. */
+  .sidehead { flex: none; display: flex; justify-content: flex-end; align-items: center; padding: 10px; }
+  .mixer-toolbar { --tool-size: 34px; box-sizing: border-box; display: flex; flex-wrap: wrap;
+                   justify-content: flex-end; align-items: center; gap: 2px; padding: 4px;
+                   max-width: 100%; border: 1px solid var(--border-color); border-radius: 6px;
+                   background: var(--sidebar-box-background); }
+  .mixer-toolbar > div { flex: 0 0 auto; padding: 0; border: 0; background: none; }
+  .mixer-toolbar button { display: grid; place-items: center; box-sizing: border-box;
+                          width: var(--tool-size); height: var(--tool-size); margin: 0; padding: 0;
+                          border: 0; border-radius: 4px; background: transparent;
+                          color: var(--text-secondary); cursor: pointer; }
+  .mixer-toolbar button svg { display: block; width: 22px; height: 22px; margin: 0; }
+  .mixer-toolbar button:hover, .mixer-toolbar button.open,
+  .mixer-toolbar button[aria-expanded="true"] { background: var(--button-hover-background); color: var(--text-primary); }
+  .mixer-toolbar button:focus-visible { outline: 2px solid var(--accent-color); outline-offset: -2px; }
+  #deviceMenu { position: fixed; z-index: 90; box-sizing: border-box; min-width: 210px;
+                max-width: min(320px, calc(100vw - 12px)); max-height: min(360px, calc(100dvh - 12px));
+                padding: 5px; overflow-y: auto; background: var(--sidebar-box-background);
+                border: 1px solid var(--border-color); border-radius: 7px;
+                box-shadow: 0 12px 30px rgba(0,0,0,.35); }
+  .device-choice { box-sizing: border-box; width: 100%; min-width: 0; display: flex; align-items: center;
+                   gap: 9px; padding: 9px 10px; text-align: left; border: 0; border-radius: 4px;
+                   background: transparent; color: var(--text-primary); cursor: pointer; }
+  .device-choice:hover, .device-choice:focus-visible { outline: none; background: var(--button-hover-background); }
+  .device-choice[aria-checked="true"] { color: var(--accent-color); }
+  .device-choice .device-check { flex: 0 0 14px; text-align: center; }
+  .device-choice .device-label { flex: 1; min-width: 0; }
+  .device-choice strong, .device-choice small { display: block; overflow-wrap: anywhere; }
+  .device-choice strong { font-size: 13px; font-weight: 600; }
+  .device-choice small { font-size: 11px; color: var(--text-secondary); margin-top: 2px; }
+  .device-choice:disabled { opacity: .55; cursor: wait; }
+  /* settings dialog: centered, with the page dimmed behind it */
+  #overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: 100; display: flex; align-items: center;
+             justify-content: center; padding: 16px; background: rgba(4, 5, 7, .72); }
+  #dialog { width: 440px; max-width: 100%; max-height: 100%; overflow: auto; outline: none; background: var(--channel-background);
+            border: 1px solid var(--border-color); border-radius: 8px; box-shadow: 0 24px 60px rgba(0, 0, 0, .6); }
+  .dlghead { display: flex; align-items: center; justify-content: space-between; padding: 12px 12px 10px 18px; background: var(--dialog-header-background); }
+  #dlgTitle { font-size: 16px; font-weight: 500; letter-spacing: .03em; }
+  #dlgClose { width: 32px; height: 32px; padding: 0; border: 0; border-radius: 4px; background: transparent;
+              color: var(--text-secondary); cursor: pointer; }
+  #dlgClose:hover { background: var(--button-hover-background); color: var(--text-primary); }
+  #dlgClose svg { display: block; margin: auto; }
+
+  /* tabs, like a browser: the active one joins the panel below it */
+  .tabs { display: flex; gap: 3px; padding: 0 12px; background: var(--dialog-header-background); border-bottom: 1px solid var(--border-color); }
+  .tab { position: relative; top: 1px; padding: 9px 18px; border: 1px solid transparent; border-bottom: 0;
+         border-radius: 7px 7px 0 0; background: transparent; color: var(--text-secondary); font-size: 13px; cursor: pointer; }
+  .tab:hover { color: var(--text-primary); background: var(--tab-hover-background); }
+  .tab.active { color: var(--text-primary); background: var(--channel-background); border-color: var(--border-color); }
+  .tab:focus-visible { outline: 2px solid var(--accent-color); outline-offset: -2px; }
+  .panes { display: grid; }
+  .pane { grid-area: 1 / 1; padding: 18px; }       /* every tab in the same cell: the dialog is as tall as the tallest */
+  .pane.off { visibility: hidden; pointer-events: none; }
+
+  .about { display: grid; grid-template-columns: 96px 1fr; gap: 10px 12px; margin: 0; font-size: 13px; }
+  .about dt { color: var(--text-secondary); }
+  .about dd { margin: 0; word-break: break-all; }
+  .about-address-row { display: flex; align-items: center; gap: 8px; min-width: 0; }
+  .about-address-text { flex: 1; min-width: 0; overflow-wrap: anywhere; }
+  .about-open-link { display: inline-flex; flex: none; width: 28px; height: 28px; align-items: center;
+                     justify-content: center; border-radius: 4px; border: 1px solid var(--border-color);
+                     color: var(--text-primary); background: var(--button-background); text-decoration: none; }
+  .about-open-link:hover { background: var(--button-hover-background); }
+  .about-open-link:focus-visible { outline: 2px solid var(--accent-color); }
+  /* Settings swaps to this QR-only dialog; the QR has its own white quiet zone. */
+  #qrDialog { position: relative; box-sizing: border-box; width: min(408px, 100%); max-height: 100%;
+              overflow: auto; padding: 48px 32px 32px; outline: none;
+              background: var(--channel-background); border: 1px solid var(--border-color);
+              border-radius: 8px; box-shadow: 0 24px 60px rgba(0, 0, 0, .6); }
+  #qrClose { position: absolute; top: 8px; right: 8px; width: 32px; height: 32px;
+             padding: 0; border: 0; border-radius: 4px; background: transparent;
+             color: var(--text-secondary); cursor: pointer; }
+  #qrClose:hover { background: var(--button-hover-background); color: var(--text-primary); }
+  #qrClose:focus-visible { outline: 2px solid var(--accent-color); }
+  #qrClose svg { display: block; margin: auto; }
+  #qrCode { display: flex; justify-content: center; }
+  #qrCode svg { display: block; width: 100%; max-width: 320px; height: auto; aspect-ratio: 1; }
+  #qrError { color: var(--text-primary); text-align: center; font-size: 13px; }
+  @media (max-width: 390px) { #qrDialog { padding: 46px 18px 22px; } }
+  .appname { font-size: 20px; font-weight: 500; letter-spacing: .03em; margin-bottom: 4px; }
+  .appver { color: var(--text-secondary); font-size: 13px; margin-bottom: 18px; }
+  .sectitle { margin-bottom: 12px; font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: var(--text-secondary); }
+  .field { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }
+  .field label { flex: none; width: 82px; font-size: 13px; color: var(--text-secondary); }
+  .field select { flex: 1; min-width: 0; padding: 8px 10px; font-size: 14px; color: var(--text-primary); background: var(--control-background);
+                  border: 1px solid var(--border-color); border-radius: 4px; }
+  .field select:focus { outline: none; border-color: var(--accent-color); }
+  .subsec { margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--group-border-color); }
+  .dlgbtns { display: flex; gap: 10px; margin-bottom: 10px; }
+  .dlgbtn { flex: 1; padding: 10px 8px; border: 1px solid var(--border-color); border-radius: 4px; background: var(--button-background);
+            color: var(--text-primary); font-size: 14px; cursor: pointer; }
+  .dlgbtn:hover { background: var(--button-hover-background); }
+  .dlgbtn:active { background: var(--button-active-background); }
+  .dlgbtn:disabled { opacity: .55; cursor: default; }
+  .dlgnote { min-height: 16px; font-size: 12px; color: var(--text-secondary); }
+  .dlgnote.err { color: var(--error-text-color); }
+  .hidemin { font-size: 13px; cursor: pointer; }
+  .hidemin input { vertical-align: middle; margin-right: 6px; }
+  .hidemin span { color: var(--text-secondary); }
+  /* Each option has a centered checkbox on the left, and centered wrapping
+     description text on the right. Two option columns on desktop; the left
+     column has two rows, while QJackCtl occupies the upper-right row. */
+  .general-options { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr));
+                     align-items: start; gap: 12px; margin: 0 0 16px; }
+  .general-option-column { display: grid; align-content: start; gap: 12px; min-width: 0; }
+  .general-option { display: grid; grid-template-columns: 36px minmax(0, 1fr);
+                    align-items: stretch; min-height: 92px; padding: 8px 7px;
+                    border: 1px solid var(--border-color); border-radius: 6px;
+                    background: var(--sidebar-background); cursor: pointer; }
+  .general-option-check { display: flex; align-items: center; justify-content: center; }
+  .general-option-check input { margin: 0; width: 17px; height: 17px; accent-color: var(--accent-color); }
+  .general-option-copy { display: flex; flex-direction: column; justify-content: center;
+                         align-items: center; gap: 5px; min-width: 0;
+                         text-align: center; overflow-wrap: anywhere; }
+  .general-option-copy strong { font-size: 12px; line-height: 1.35; font-weight: 600; }
+  .general-option-copy small { font-size: 11px; line-height: 1.45;
+                               color: var(--text-secondary); }
+  .general-option-copy #minCount { color: var(--text-secondary); }
+  .general-option:focus-within { outline: 2px solid var(--accent-color); outline-offset: 1px; }
+  @media (max-width: 480px) {
+    .general-options { grid-template-columns: minmax(0, 1fr); }
+    .general-option { min-height: 70px; grid-template-columns: 46px minmax(0, 1fr); }
+  }
+
+  /* Keep the bus picker physically below the routing/settings toolbar, even
+     when the adaptive grid grows vertically in a maximized window. Reserve
+     this space *inside* the height budget used by the grid layout script. */
+  .sidebody { flex: 1; min-height: 0; min-width: 0; box-sizing: border-box;
+              display: flex; justify-content: flex-end; gap: 10px;
+              padding: var(--bus-toolbar-gap) 10px 12px; }
+  /* one outer box, pinned to the bottom, holding two nested groups: Outputs and Buses */
+  #outbox { flex: none; align-self: flex-end; box-sizing: border-box; max-height: 100%; overflow-y: auto; display: flex; flex-direction: column; align-items: flex-end; gap: 10px;
+            padding: 10px; border: 1px solid var(--border-color); border-radius: 6px; background: var(--sidebar-box-background); }
+  #masterbox { border: 1px solid var(--border-color); border-radius: 6px; background: var(--sidebar-box-background); }
+  #masterbox { flex: none; display: flex; flex-direction: column; padding: 10px; }
+  #masterbox .strip.master { flex: 1; }
+  .outgroup { padding: 8px 18px 12px; border: 1px solid var(--group-border-color); border-radius: 5px; background: var(--sidebar-background); }
+  .grouptitle { margin-bottom: 8px; font-size: 11px; letter-spacing: .12em; text-align: center;
+                text-transform: uppercase; color: var(--text-secondary); }
+  .groupgrid { --btn-w: 68px; --cols: 2; display: grid; grid-template-columns: repeat(var(--cols), var(--btn-w));
+               grid-auto-rows: 48px; gap: 8px; }
+  /* The bus grid may use 4+ columns when many buses must fit vertically.
+     Outputs stay in their own (at most two-column) group at the right. */
+  #outbox .outgroup { flex: none; }
+  #outbox .busgrid { --cols: 2; }
+  #side.narrow .groupgrid { --cols: 1 !important; }                    /* bar dragged narrower than two columns need */
+  .outbtn { position: relative; display: flex; align-items: center; justify-content: center; padding: 0 5px; border: 1px solid var(--border-color); border-radius: 4px; background: var(--button-background);
+            color: var(--text-primary); font-size: 14px; cursor: pointer; }
+  .olabel { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden;
+            max-width: 100%; text-align: center; line-height: 1.15; word-break: break-word; font-size: 13px; }
+  .outbtn:hover { background: var(--button-hover-background); }
+  .outbtn.bus::before { content: ""; position: absolute; left: -1px; top: 5px; bottom: 5px; width: 3px; background: var(--solo-color); }
+  /* Main/Phones is the active output but the channel strips are showing this bus: a dot in the corner */
+  .outbtn.shows::after { content: ""; position: absolute; top: 6px; right: 6px; width: 7px; height: 7px; border-radius: 50%;
+                         background: var(--accent-color); box-shadow: 0 0 5px var(--accent-color); }
+  .outbtn.active { border-color: var(--accent-color); color: var(--text-primary); background: var(--selected-output-background); }
+
+  /* ---- channel strip ---- */
+  .strip { position: relative; flex: none; width: 108px; box-sizing: border-box; padding: 6px 10px 28px;
+           display: flex; flex-direction: column; align-items: stretch; gap: 9px;
+           background: var(--channel-background); border: 1px solid var(--strip-border-color); border-top: 3px solid transparent;
+           border-radius: 4px; user-select: none; }
+  .strip.pinned { border-top-color: var(--pin-color); }
+  .strip.dragging { opacity: .55; outline: 2px solid var(--fader-value-color); }
+
+  .grip { flex: none; height: 22px; line-height: 22px; text-align: center; cursor: grab;
+          color: var(--icon-muted-color); font-size: 14px; letter-spacing: 2px; touch-action: none; }
+  .grip:active { cursor: grabbing; }
+  .strip.pinned .grip { visibility: hidden; }       /* pinned strips can't be moved */
+
+  .pin, .eye { position: absolute; top: 3px; width: 22px; height: 22px; padding: 0; border: 0;
+               border-radius: 4px; background: transparent; cursor: pointer; }
+  .pin { right: 3px; color: var(--icon-muted-color); }
+  .eye { left: 3px; color: var(--text-secondary); }
+  .pin:hover, .eye:hover { background: var(--button-hover-background); }
+  .pin svg, .eye svg { display: block; margin: auto; }
+  .strip.pinned .pin { color: var(--pin-color); }
+  .eye:hover { color: var(--text-primary); }
+
+  .cap { font-size: 10px; letter-spacing: .1em; color: var(--text-secondary); text-align: center; margin-bottom: 3px; }
+  .na { visibility: hidden; }
+
+  .gaininv { flex: none; display: flex; align-items: flex-end; gap: 6px; }
+  .gainrow { flex: 1; min-width: 0; }
+  .gainboxes { display: flex; gap: 4px; }
+  .gainboxes .gain { width: auto; flex: 1; min-width: 0; }
+  .gain.na { visibility: hidden; }
+  .gain { width: 100%; height: 32px; box-sizing: border-box; padding: 0 4px; background: var(--control-background);
+          border: 1px solid var(--border-color); border-radius: 3px; color: var(--fader-value-color); font-size: 14px; text-align: center; }
+  .gain:focus { outline: none; border-color: var(--fader-value-color); }
+
+  .invert, .btn { flex: none; padding: 8px 0; border: 1px solid var(--border-color); border-radius: 3px;
+                  background: var(--button-background); color: var(--text-primary); font-size: 13px; cursor: pointer; }
+  .invert { width: 36px; height: 32px; padding: 0; font-size: 16px; color: var(--text-secondary); }
+  .invert.on { background: var(--fader-value-color); border-color: var(--fader-value-color); color: var(--detail-color-1); }
+  .strip.soloed .solo { background: var(--solo-color); border-color: var(--solo-color); color: var(--detail-color-1); }
+  .strip.muted .mute { background: var(--mute-color); border-color: var(--mute-color); color: var(--input-text-color); }
+  .strip.mute-partial:not(.muted) .mute { border-color: var(--mute-color); border-style: dashed; }
+
+  .panrow { flex: none; }
+  .caprow { display: flex; justify-content: space-between; align-items: center; height: 14px; padding: 0 12px 0 6px;
+            overflow: visible; font-size: 10px; letter-spacing: 0; color: var(--text-secondary); margin-bottom: 3px; }
+  .caprow span:first-child { letter-spacing: .1em; }
+  .panval { min-width: 28px; text-align: right; color: var(--accent-color); font-size: 11px; }
+  .pan { display: block; -webkit-appearance: none; appearance: none; width: 100%; height: 18px; margin: 0; touch-action: none;
+         background: linear-gradient(var(--text-secondary), var(--text-secondary)) center / 1px 12px no-repeat; }
+  .pan::-webkit-slider-runnable-track { height: 4px; background: var(--control-background); border: 1px solid var(--border-color); border-radius: 3px; }
+  .pan::-webkit-slider-thumb { -webkit-appearance: none; width: 14px; height: 14px; margin-top: -6px;
+                               border-radius: 50%; background: var(--accent-color); border: 0; }
+  .pan::-moz-range-track { height: 4px; background: var(--control-background); border: 1px solid var(--border-color); border-radius: 3px; }
+  .pan::-moz-range-thumb { width: 14px; height: 14px; border-radius: 50%; background: var(--accent-color); border: 0; }
+  .pan:disabled::-webkit-slider-thumb { background: var(--text-secondary); }
+
+  /* stereo pair: one strip for two channels */
+  .strip.stereo { background: var(--stereo-strip-background); }
+  /* Stereo names use the same resting and focus borders as mono names. */
+  .strip.stereo .name { border-color: var(--border-color); }
+  .strip.stereo .name:focus { border-color: var(--fader-value-color); }
+  /* Linked strips keep the standard pan/fader layout. Small unlink control
+     lives at the bottom-right, away from the pan and mute controls. */
+  .strip .unlink { position: absolute; bottom: 3px; right: 3px;
+    display: grid; place-items: center; width: 20px; height: 20px; padding: 0;
+    border: 0; border-radius: 4px; background: transparent;
+    color: var(--stereo-color); font-size: 15px; line-height: 1; cursor: pointer; }
+  .strip .unlink svg { display: block; width: 16px; height: 16px; }
+  .strip .unlink:hover { background: var(--button-hover-background); }
+  .strip .unlink:focus-visible { outline: 2px solid var(--accent-color); }
+  .strip.stereo-pending { outline: 2px solid var(--stereo-color); outline-offset: -3px; }
+  .strip.stereo-pending > .link-toggle { background: var(--stereo-target-background); color: var(--stereo-color); }
+  .strip.link-target { outline: 2px dashed var(--stereo-color); outline-offset: -4px; background: var(--stereo-target-background); }
+  .strip.link-target::after { content: "Link as stereo"; position: absolute; left: 6px; right: 6px; top: 50%; margin-top: -16px;
+                              padding: 8px 4px; border-radius: 4px; background: rgba(40, 34, 60, .94); color: var(--stereo-color);
+                              font-size: 12px; text-align: center; pointer-events: none; z-index: 5; }
+  #toast { position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%); z-index: 120; max-width: 80%;
+           padding: 10px 16px; border: 1px solid var(--border-color); border-radius: 6px; background: var(--button-background); color: var(--text-primary);
+           font-size: 13px; box-shadow: 0 8px 24px rgba(0, 0, 0, .5); }
+  .name, .mname { flex: none; width: 100%; box-sizing: border-box; padding: 7px 4px; background: var(--input-background);
+          border: 1px solid var(--border-color); border-radius: 3px; color: var(--input-text-color); font-size: 14px; text-align: center; }
+  .name:focus { outline: none; border-color: var(--fader-value-color); }
+
+  .fval { flex: none; width: 100%; box-sizing: border-box; height: 24px; padding: 0 2px;
+        line-height: 24px; text-align: center; font: inherit; font-size: 13px;
+        color: var(--fader-value-color); background: var(--control-background);
+        border: 1px solid var(--border-color); border-radius: 3px; white-space: nowrap;
+        cursor: text; }
+  .fval:focus { outline: none; border-color: var(--fader-value-color); }
+  .fval[readonly] { cursor: default; }
+
+  .faderwrap { flex: 1; min-height: 120px; display: flex; }
+  /* Reserve half the handle height at each end so it cannot overlap adjacent controls. */
+  .track { position: relative; width: 8px; align-self: stretch; margin: 13px auto; background: var(--control-background); border-radius: 4px; }
+  .track::before { content: ""; position: absolute; left: -17px; top: 0; bottom: 0; width: 9px;
+                   border-bottom: 1px solid var(--fader-tick-color);
+                   background: repeating-linear-gradient(to bottom, var(--fader-tick-color) 0, var(--fader-tick-color) 1px, transparent 1px, transparent 10%); }
+  .handle { position: absolute; left: -17px; width: 42px; height: 26px; margin-top: -13px; box-sizing: border-box;
+            background: linear-gradient(var(--fader-handle-top), var(--fader-handle-bottom)); border: 1px solid var(--fader-handle-border); border-radius: 3px;
+            cursor: grab; touch-action: none; }
+  .handle::after { content: ""; position: absolute; left: 4px; right: 4px; top: 50%; height: 2px; margin-top: -1px; background: var(--fader-handle-mark); }
+  .strip.muted .handle { background: linear-gradient(var(--muted-handle-top), var(--muted-handle-bottom)); }
+
+  .inname { flex: none; text-align: center; font-size: 11px; color: var(--text-secondary);
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+  /* master (output) strip */
+  .strip.master { width: 100px; border-top-color: var(--accent-color); }
+  .mname { color: var(--input-text-color); font-family: inherit; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; cursor: text; }
+  .mname:hover { border-color: var(--input-hover-border-color); }
+  .mname:focus { outline: none; border-color: var(--fader-value-color); }
+
+  /* ---- minimized strip ---- */
+  .vname { display: none; white-space: pre; line-height: 1.15; font-size: 14px; text-align: center; }
+  .strip.minimized { width: 30px; padding: 40px 0 8px; border-top-color: var(--mute-color); }
+  .strip.minimized .eye { color: var(--mute-color); }
+  .strip.minimized > :not(.strip-more):not(.vname) { display: none; }
+  .strip.minimized .vname { display: block; }
+  .strip.minimized:not(.pinned) .vname { cursor: grab; }
+  #row.hide-min .strip.minimized { display: none; }
+
+  /* ---- phones and tablets ---- */
+  @media (pointer: coarse) {
+    .strip { width: 124px; }
+    .strip.master { width: 112px; }
+    .handle { width: 56px; left: -24px; height: 36px; margin-top: -18px; }
+    .track::before { left: -26px; }
+    .grip { height: 32px; line-height: 32px; }
+    .pin, .eye { width: 34px; height: 34px; }
+    .pin svg, .eye svg { width: 20px; height: 20px; }
+    .name, .gain { font-size: 16px; }
+    .btn { padding: 11px 0; font-size: 14px; }
+    .gain, .invert { height: 40px; }
+    .strip .unlink { width: 26px; height: 26px; font-size: 18px; }
+    .invert { width: 44px; }
+    .pan::-webkit-slider-thumb { width: 22px; height: 22px; margin-top: -10px; }
+    .pan { height: 26px; }
+    .groupgrid { --btn-w: 72px; grid-auto-rows: 56px; }
+    #splitter { left: -10px; width: 22px; }
+    #splitter::after { left: 9px; height: 56px; margin-top: -28px; }
+    .outbtn { font-size: 15px; }
+    .mixer-toolbar { --tool-size: 40px; }
+    .hidemin { font-size: 15px; }
+    .field select { font-size: 16px; padding: 10px; }
+    .dlgbtn { padding: 14px 8px; font-size: 15px; }
+    #dlgClose { width: 40px; height: 40px; }
+    .tab { padding: 12px 18px; font-size: 14px; }
+    .hidemin input { width: 20px; height: 20px; }
+    .strip.minimized { width: 44px; padding-top: 48px; }
+  }
+  @media (max-height: 640px) {
+    .strip { gap: 5px; padding-bottom: 8px; }
+    .cap { display: none; }
+    .grip { height: 18px; line-height: 18px; }
+    .btn { padding: 6px 0; }
+    .name, .mname { padding: 5px 4px; }
+    .faderwrap { min-height: 80px; }
+    .strip.minimized { padding-top: 36px; }
+    .groupgrid { grid-auto-rows: 40px; }
+    #outbox { gap: 8px; padding: 8px; }
+    #masterbox { padding: 8px; }
+    .sidehead { padding: 6px 10px; }
+    .outgroup { padding: 6px 14px 8px; }
+    .grouptitle { margin-bottom: 6px; }
+  }
+  @media (max-width: 700px) {
+    #side { --bus-toolbar-gap: 20px; }
+    .groupgrid { --btn-w: 58px; }
+    .strip.master { width: 88px; }
+  }
+
+
+
+/* Accent customization — applies to all theme stylesheets. */
+.accent-field { margin-top: 14px; }
+#accentButton { width: 30px; height: 30px; border-radius: 50%; flex: none;
+  border: 2px solid var(--text-secondary); background: var(--accent-color); cursor: pointer; }
+#accentButton:focus-visible { outline: 2px solid var(--accent-color); outline-offset: 3px; }
+#accentCurrent { font-size: 12px; color: var(--text-secondary); font-family: monospace; }
+.accent-editor { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; margin: 4px 0 14px; }
+.accent-editor label { font-size: 12px; color: var(--text-secondary); width: 100%; }
+#accentHex { box-sizing: border-box; width: 112px; padding: 8px; background: var(--control-background);
+  border: 1px solid var(--border-color); border-radius: 4px; color: var(--text-primary); font-family: monospace; }
+.accent-editor .dlgbtn { flex: none; margin: 0; padding: 8px 12px; font-size: 12px; }
+#accentError { width: 100%; font-size: 12px; color: var(--error-text-color); }
+
+  .about-github { display: flex; align-items: center; justify-content: center; gap: 9px;
+                  margin-top: 24px; text-decoration: none; }
+  .about-github svg { flex: none; }
+
+/* Fullscreen is hidden in native pywebview. Tool geometry is shared above. */
+#fullscreenButton .fullscreen-exit { display: none; }
+#fullscreenButton.is-fullscreen .fullscreen-enter { display: none; }
+#fullscreenButton.is-fullscreen .fullscreen-exit { display: block; }
+html.pywebview-client #fullscreenbox { display: none; }
+
+.bus-pair-tile { display: grid; grid-column: span 2; grid-row: span 2;
+                 grid-template-columns: repeat(2, var(--btn-w)); grid-template-rows: repeat(2, minmax(0, 1fr)); gap: 8px; }
+#side.narrow .bus-pair-tile { grid-column: 1; grid-row: span 3;
+                              grid-template-columns: var(--btn-w); grid-template-rows: repeat(3, minmax(0, 1fr)); }
+.bus-pair-link { grid-column:1 / -1; background:var(--button-background); color:var(--text-secondary); border:1px solid var(--border-color); border-radius:4px; cursor:pointer; font-size:11px; padding:5px; }
+.bus-pair-link.is-linked { color:var(--accent-color); border-color:var(--accent-color); }
+.device-alias-field { margin-top:16px; padding-top:12px; border-top:1px solid var(--border-color); }
+#deviceAlias { width:125px; min-width:0; color:var(--text-primary); background:var(--control-background); border:1px solid var(--border-color); padding:7px; }
+.device-alias-field .dlgbtn { flex:none; padding:7px 9px; margin:0; }
+/* Genuine DICE router-destination peaks beside the fader; stereo has L/R
+   lanes in the user-selected order. Never display simulated post-fader levels. */
+.peak-meter { position:relative; display:flex; gap:2px; flex:none; width:12px;
+  height:calc(100% - 26px); align-self:center; padding:1px; cursor:pointer;
+  background:var(--control-background); border:1px solid var(--border-color);
+  border-radius:3px; overflow:hidden; box-sizing:border-box; }
+.peak-meter[hidden] { display:none; }
+.peak-meter.stereo-meter { width:22px; }
+.peak-meter:focus-visible { outline:2px solid var(--accent-color); outline-offset:2px; }
+.peak-lane { position:relative; flex:1; min-width:0; height:100%; overflow:hidden;
+  background:var(--control-background); border-radius:1px; }
+/* The color scale is fixed to the full meter track, NOT to the current
+   filled height. Clipping a full-height gradient keeps ordinary levels green;
+   yellow/red only appear when the signal actually reaches the top bands. */
+.peak-bar { position:absolute; inset:0; height:100%;
+  background:linear-gradient(to top,#43b581 0%,#43b581 89%,
+    #e6b450 90%,#e6b450 96%,#e05454 97%,#e05454 100%);
+  clip-path:inset(100% 0 0 0); transition:clip-path 80ms linear;
+  pointer-events:none; }
+.peak-hold { position:absolute; left:0; right:0; height:2px; bottom:0;
+  background:var(--text-primary); pointer-events:none; }
+.peak-clip { height:3px; position:absolute; top:0; left:0; right:0; background:transparent; }
+.peak-lane.clipping .peak-clip { background:#ff3434; }
+
+/* Interrupted mute/solo recovery — visible without opening Settings. */
+#muteRecovery { position: fixed; z-index: 110; top: 14px; left: 50%; transform: translateX(-50%);
+  box-sizing: border-box; max-width: min(520px, calc(100vw - 24px)); width: max-content;
+  border: 1px solid var(--border-color); border-radius: 7px;
+  padding: 12px; background: var(--channel-background); color: var(--text-primary);
+  box-shadow: 0 8px 35px rgba(0,0,0,.45); font-size: 13px; }
+.mute-recovery-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
+.mute-recovery-actions button { cursor: pointer; padding: 6px 10px; border: 1px solid var(--border-color);
+  border-radius: 4px; color: var(--text-primary); background: var(--button-background); }
+.mute-recovery-actions button:hover { background: var(--button-hover-background); }
+
+/* Linked inputs with different matrix gains: one strip shows the louder side. */
+.fval.level-mismatch { font-size: 11px; font-weight: 600; text-decoration: underline dotted; text-underline-offset: 3px; }
+
+/* Large FFADO matrices use a scrollable bus-tab strip instead of sidebar bus cards. */
+#busTabs { flex:none; display:flex; overflow-x:auto; overflow-y:hidden; gap:5px; align-items:stretch;
+  min-height:57px; padding:7px 12px 3px; border-bottom:1px solid var(--border-color); }
+body.bus-tabs-mode #outbox .bus-group { display:none; }
+.bus-tab-tile { position:relative; display:flex; flex:none; gap:0; border-radius:6px 6px 0 0; }
+.bus-tab { position:relative; flex:none; display:grid; align-items:center; grid-template-columns:16px 26px minmax(60px,95px) 19px 19px;
+  gap:2px; padding:7px 5px 5px; border:1px solid var(--border-color); background:var(--sidebar-background);
+  border-radius:5px 5px 0 0; color:var(--text-primary); }
+.bus-tab + .bus-tab { border-left:0; border-radius:0 5px 0 0; }
+.bus-tab.active { border-bottom:3px solid var(--accent-color); background:var(--selected-output-background); }
+.bus-tab.pinned { border-top:3px solid var(--pin-color); }
+.bus-tab.minimized { grid-template-columns:16px 24px 19px; }
+.bus-tab.minimized .bus-name, .bus-tab.minimized .bus-pin { display:none; }
+.bus-grip { font-size:12px; color:var(--text-secondary); cursor:grab; touch-action:none; }
+.bus-tab.pinned .bus-grip { opacity:.25; cursor:default; }
+.bus-activate, .bus-pin, .bus-min { background:transparent; border:0; color:inherit; padding:3px; cursor:pointer; border-radius:4px; }
+.bus-activate { color:var(--accent-color); font-weight:700; }
+.bus-name { width:100%; min-width:0; padding:4px 2px; border:1px solid transparent; background:transparent;
+  color:var(--text-primary); text-align:center; font-size:12px; box-sizing:border-box; }
+.bus-name:focus { outline:none; border-color:var(--accent-color); background:var(--control-background); }
+.bus-pin svg, .bus-min svg { width:14px; height:14px; display:block; }
+.bus-tab.pinned .bus-pin { color:var(--pin-color); }
+@media (max-width:650px) { #busTabs { padding:5px 7px 3px; } .bus-tab { grid-template-columns:13px 24px 70px 18px 18px; } }
+
+.bus-tab-tile.pinned .bus-grip { opacity:.25; cursor:default; }
+
+/* Small MixControl-style tabs: selection is the tab itself, and the three-dot
+ * button holds pin, minimize and rename actions. Darken pinned tabs using the
+ * active theme surface instead of using a bright pin-colored top border. */
+#busTabs { min-height:0; padding:4px 7px 1px; gap:3px; align-items:flex-end; scrollbar-width:thin; }
+.bus-tab-tile { border-radius:4px 4px 0 0; }
+.bus-tab { width:128px; height:29px; box-sizing:border-box; display:flex; align-items:center;
+  gap:2px; padding:2px 3px; border-radius:4px 4px 0 0; font-size:12px; cursor:pointer; }
+.bus-tab + .bus-tab { border-left:0; }
+.bus-tab.active { border-bottom:2px solid var(--accent-color); }
+.bus-tab.pinned { border-top:1px solid var(--border-color);
+  background:color-mix(in srgb, var(--sidebar-background) 82%, #000); }
+.bus-tab.pinned.active { background:color-mix(in srgb, var(--selected-output-background) 83%, #000); }
+.bus-tab.minimized { width:51px; }
+.bus-tab.minimized .bus-name { display:none; }
+.bus-grip { width:10px; flex:none; font-size:13px; line-height:1; text-align:center; }
+.bus-name { flex:1; min-width:0; width:0; font-size:12px; padding:2px 2px; line-height:17px;
+  text-align:left; text-overflow:ellipsis; cursor:pointer; }
+.bus-more { flex:none; display:grid; place-items:center; border:0; border-radius:3px;
+  width:19px; height:23px; padding:0; background:transparent; color:var(--text-secondary);
+  font-size:17px; line-height:1; cursor:pointer; }
+.bus-more:hover, .bus-more:focus-visible { background:var(--button-hover-background); color:var(--text-primary); }
+.bus-tab.minimized .bus-grip { flex:1; }
+.bus-context-menu { position:fixed; z-index:250; display:flex; flex-direction:column; gap:2px;
+  min-width:130px; padding:4px; background:var(--sidebar-background); color:var(--text-primary);
+  border:1px solid var(--border-color); border-radius:5px; box-shadow:0 6px 18px #0006; }
+.bus-context-menu button { background:transparent; color:inherit; text-align:left; border:0;
+  border-radius:3px; font:inherit; padding:7px 10px; cursor:pointer; }
+.bus-context-menu button:hover, .bus-context-menu button:focus-visible { background:var(--button-hover-background); }
+.gesture-edit[readonly] { cursor:default; caret-color:transparent; user-select:none; }
+.gesture-edit.gesture-editing { cursor:text; caret-color:auto; }
+@media (max-width:650px) {
+  #busTabs { padding:3px 4px 1px; gap:2px; }
+  .bus-tab { width:101px; height:31px; padding:2px; }
+  .bus-tab.minimized { width:46px; }
+  .bus-more { width:22px; height:25px; }
+}
+
+.bus-compact-label { display:none; font-size:11px; flex:1; text-align:center; }
+.bus-tab.minimized .bus-compact-label { display:block; }
+.bus-tab.minimized .bus-grip { width:6px; flex:none; }
+/* Focus by a simple click is selection, not permission to type. */
+.bus-name:focus[readonly], .name:focus[readonly], .mname:focus[readonly],
+.gain:focus[readonly], .fval:focus[readonly] { outline:none; border-color:var(--border-color); }
+.bus-name:focus[readonly] { border-color:transparent; background:transparent; }
+.bus-name:focus-visible[readonly] { outline:1px solid var(--accent-color); outline-offset:0; }
+
+/* Linked pairs take exactly one tab and expose their actions in the menu.
+ * The label stays centered between the drag grip and the three-dot button. */
+.bus-tab .bus-name { text-align:center; }
+.bus-tab.linked { width:128px; }
+.bus-tab.linked.minimized { width:63px; }
+.bus-tab.linked .bus-compact-label { white-space:nowrap; }
+@media (max-width:650px) {
+  .bus-tab.linked { width:101px; }
+  .bus-tab.linked.minimized { width:63px; }
+}
+
+/* Fader actions are in a single compact menu, including for minimized strips.
+ * The main fader is unchanged; only channel strips receive these actions. */
+.strip:not(.master) > .strip-more {
+  position:absolute; right:3px; top:3px; z-index:3;
+  border:0; border-radius:4px; padding:0; width:23px; height:23px;
+  background:transparent; color:var(--text-secondary);
+  font-size:19px; line-height:23px; cursor:pointer;
+}
+.strip > .strip-more:hover, .strip > .strip-more:focus-visible {
+  color:var(--text-primary); background:var(--button-hover-background);
+}
+.strip.minimized > :not(.vname):not(.strip-more) { display:none; }
+.strip.minimized > .strip-more { display:block; top:3px; right:2px; }
+.strip.minimized { padding-top:34px; }
+@media (pointer:coarse) {
+  .strip:not(.master) > .strip-more { width:30px; height:30px; line-height:30px; font-size:21px; }
+  .strip.minimized { padding-top:43px; }
+}
+
+/* One unpinned bus = one drag grip; linked stereo pairs move together.
+   Reserve the same left-hand width when pinned so tab labels stay centered
+   instead of jumping sideways when pinning/unpinning. */
+.bus-tab .bus-grip, .bus-tab.minimized .bus-grip {
+  width:19px; flex:none; user-select:none; -webkit-user-select:none;
+}
+.bus-tab.pinned .bus-grip, .bus-tab-tile.pinned .bus-grip {
+  visibility:hidden; pointer-events:none;
+}
+.bus-tab:not(.pinned) .bus-grip {
+  visibility:visible; cursor:grab; color:var(--text-primary); opacity:.88;
+  touch-action:none;
+}
+.bus-tab:not(.pinned) .bus-grip:hover { opacity:1; color:var(--accent-color); }
+.bus-tab-tile.dragging .bus-grip { cursor:grabbing; opacity:1; }
+@media (max-width:650px) {
+  .bus-tab .bus-grip, .bus-tab.minimized .bus-grip { width:22px; }
+}

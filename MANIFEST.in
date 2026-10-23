@@ -1,0 +1,12 @@
+include README.md LICENSE requirements.txt docs_legacy.zip
+include main.py
+recursive-include tools *.py
+recursive-include src/ffado_webmixer/assets *.svg *.html *.css *.js *.txt
+recursive-include src/ffado_webmixer/profiles *.xml ffado_configuration
+recursive-include docs *.md
+recursive-include img *.svg *.gif *.png *.jpg *.jpeg *.webp
+recursive-include tests *.py *.cjs
+recursive-include benchmarks *.py
+include pytest.ini
+prune __pycache__
+global-exclude *.py[cod] .DS_Store

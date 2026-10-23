@@ -1,0 +1,57 @@
+[build-system]
+requires = ["setuptools>=77", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ffado-webmixer"
+dynamic = ["version"]
+description = "Web and desktop mixer controls for FFADO FireWire audio devices"
+readme = "README.md"
+requires-python = ">=3.10"
+license = "GPL-2.0-or-later"
+authors = [{ name = "FFADO Webmixer contributors" }]
+keywords = ["ffado", "firewire", "audio", "mixer", "jack", "linux"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Environment :: X11 Applications :: Qt",
+    "Environment :: Web Environment",
+    "Intended Audience :: End Users/Desktop",
+    "Operating System :: POSIX :: Linux",
+    "Programming Language :: Python :: 3",
+    "Topic :: Multimedia :: Sound/Audio :: Mixers",
+]
+dependencies = [
+    "Flask>=3.0,<4",
+    "Werkzeug>=3.0,<4",
+    "dbus-python>=1.3",
+    "pywebview[qt]>=5.0",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8", "build>=1", "twine>=6"]
+
+[project.scripts]
+ffado-webmixer = "ffado_webmixer.main:main"
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+include-package-data = true
+
+[tool.setuptools.packages.find]
+where = ["src"]
+include = ["ffado_webmixer*"]
+
+[tool.setuptools.dynamic]
+version = {attr = "ffado_webmixer.__version__"}
+
+[tool.setuptools.package-data]
+ffado_webmixer = [
+    "assets/*.svg",
+    "assets/static/*.html",
+    "assets/static/*.css",
+    "assets/static/*.js",
+    "assets/static/*.txt",
+    "assets/themes/*.css",
+    "assets/themes/icons/*.svg",
+    "profiles/**/*",
+]
