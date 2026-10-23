@@ -39,7 +39,7 @@ def _common(path):
     for info in root.findall('info'):
         result[info.get('name')] = info.get('path')
     for c in root.findall('./controls/control'):
-        result['controls'][c.get('name')] = {k: (_number(v) if k in ('min', 'max') else v)
+        result['controls'][c.get('name')] = {k: (_number(v) if k in ('min', 'max', 'step') else v)
                                            for k, v in c.attrib.items() if k != 'name'}
     for d in root.findall('./destinations/destination'):
         result['destinations'].append({k: (_number(v) if k == 'value' else v) for k,v in d.attrib.items()})

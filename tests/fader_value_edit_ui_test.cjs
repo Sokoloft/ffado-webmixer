@@ -11,6 +11,7 @@ const changes = [];
 const ctx = vm.createContext({
   GAIN_SCALE: {mode: 'dice_db', min_db: -60, max_db: 6},
   toast: msg => messages.push(msg), window: {}, Math, Number, String, Object,
+  wheelDir: event => Math.sign(-event.deltaY),
 });
 vm.runInContext(functions, ctx);
 
@@ -29,10 +30,10 @@ function domNode() {
     setPointerCapture() {},
   };
 }
-function harness(editable = () => true) {
+function harness(editable = () => true, getScale) {
   const track = domNode(), handle = domNode(), label = domNode(), wrap = domNode();
   track.parentNode = wrap;
-  const fader = ctx.makeFader(track, handle, label, v => changes.push(v), editable);
+  const fader = ctx.makeFader(track, handle, label, v => changes.push(v), editable, getScale);
   return {track, handle, label, wrap, fader};
 }
 function approx(a, b, message) { assert.ok(Math.abs(a-b) < 0.0002, `${message}: ${a} vs ${b}`); }
@@ -118,6 +119,49 @@ legacy.label.value = '+3.1 dB';
 legacy.label.fire('keydown', {key: 'Enter'});
 assert.equal(legacy.label.value, '42', 'unknown dB scales reject dB typed input');
 
+// MOTU display endpoints keep the quietest finite position separate from OFF.
+// This is display interpolation; the API continues to carry native positions.
+const motuScale = {mode: 'motu_db', min_db: -84, max_db: 0, native_min: 0,
+  native_max: 128, min_finite_native: 1, step_native: 1, calibration: 'endpoint_interpolation'};
+ctx.FADER_SCALE = motuScale;
+const motu = harness();
+for (let raw = 0; raw <= 128; raw++) {
+  const transport = 100 * raw / 128;
+  motu.fader.set(transport);
+  const parsed = ctx.parseFaderEntry(motu.label.value);
+  assert.equal(parsed.ok, true);
+  approx(parsed.value, transport, `MOTU native position ${raw} survives display and edit`);
+}
+motu.fader.set(100);
+assert.equal(motu.label.value, '0.0 dB');
+motu.label.fire('focus');
+motu.label.value = '-84 dB';
+motu.label.fire('keydown', {key: 'Enter'});
+assert.equal(changes.at(-1), 100 / 128, '-84 is finite, not the silence sentinel');
+assert.equal(motu.label.value, '-84.0 dB');
+motu.wrap.fire('wheel', {deltaY: 100});
+assert.equal(changes.at(-1), 0, 'the next native step below -84 is silence');
+assert.equal(motu.label.value, '−∞ dB');
+motu.wrap.fire('wheel', {deltaY: -100, shiftKey: true});
+assert.equal(changes.at(-1), 100 / 128, 'the first step above silence is -84');
+motu.wrap.fire('dblclick');
+assert.equal(changes.at(-1), 100, 'MOTU unity is native maximum');
+const motuWrites = changes.length;
+for (const invalid of ['-85 dB', '+0.1 dB', '50%']) {
+  motu.label.fire('focus');
+  motu.label.value = invalid;
+  motu.label.fire('keydown', {key: 'Enter'});
+  assert.equal(changes.length, motuWrites, 'out-of-range MOTU edits do not write');
+}
+
+// A master fader resolves its own output scale, independently of the matrix.
+ctx.FADER_SCALE = ctx.GAIN_SCALE = {mode: 'dice_db', min_db: -60, max_db: 6};
+const motuMaster = harness(() => true, () => motuScale);
+motuMaster.fader.set(100 / 128);
+assert.equal(motuMaster.label.value, '-84.0 dB');
+motuMaster.wrap.fire('dblclick');
+assert.equal(changes.at(-1), 100, 'master unity follows its output descriptor');
+
 assert(src.includes('sendThrottled(id, "fader", v, stripMix, stripDevice)'), 'strip writes retain bus and GUID');
 assert(src.includes('function () { return masterReady; }'), 'master value edits require loaded output');
-console.log('Fader input UI: signed zero, native dB entry, validation, unity double-click, legacy and disabled cases passed');
+console.log('Fader input UI: native dB entry, MOTU endpoints/steps, output scales, validation and unity reset passed');

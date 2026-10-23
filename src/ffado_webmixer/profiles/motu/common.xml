@@ -5,10 +5,10 @@
   <info name="model_element" path="Mixer/Info/Model" />
   <info name="rate_element" path="Mixer/Info/SampleRate" />
   <controls>
-    <control name="fader" type="fader" min="0" max="128" />
+    <control name="fader" type="fader" min="0" max="128" step="1" />
     <control name="pan" type="knob" min="-64" max="64" />
     <control name="gain" type="knob" min="0" max="53" />
-    <control name="output_fader" type="fader" min="0" max="128" />
+    <control name="output_fader" type="fader" min="0" max="128" step="1" />
   </controls>
   <destinations>
     <destination value="0" name="Disabled" />

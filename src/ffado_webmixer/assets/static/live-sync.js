@@ -105,7 +105,7 @@ function refreshSyncState() {
     OUTPUTS = (info.outputs || []).map(function (out) {
       return {id: out.id, name: shortFfadoLabel(out.name), baseName: out.base_name || out.name,
               mix: out.mix == null ? null : out.mix, controllable: out.controllable,
-              destination: !!out.destination};
+              destination: !!out.destination, gainScale: out.gain_scale || null};
     });
     busLayout = Array.isArray(data[1]) ? data[1] : [];
     // A missed stereo-link event can turn the selected Right bus into the

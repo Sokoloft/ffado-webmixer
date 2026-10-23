@@ -6,8 +6,6 @@ configuration, including pending recovery and externally adjusted levels.
 from functools import wraps
 import math
 
-from .controls import to_percent, from_percent
-
 
 def serialized_output(method):
     """Keep output mute read/modify/write sequences atomic across API threads."""
@@ -44,10 +42,10 @@ class OutputControls:
         out = self._output(out_id)
         raw = self.helper.get_value(out["fader"]["path"], out["fader"]["kind"])
         spec = out.get("spec", self.out_spec)
-        lo, hi = spec.get("min", 0), spec.get("max", 1)
+        lo = spec.get("min", 0)
 
         def norm(value):
-            return to_percent(value, lo, hi) if spec["writable"] else 0
+            return self._to_ui(value, spec) if spec["writable"] else 0
 
         if out["mute"]:                                            # real mute parameter (buses)
             mute = bool(self._read_scalar(out["mute"]))
@@ -70,13 +68,13 @@ class OutputControls:
         if not spec["writable"]:
             raise ValueError("output level is read-only until a profile defines its range")
         fader = out["fader"]
-        lo, hi = spec["min"], spec["max"]
+        lo = spec["min"]
         emulated = out["mute"] is None
 
         if emulated and getattr(self, '_pending_output_recovery', set()) and out_id in self._pending_output_recovery:
             raise RuntimeError('This output has a pending mute recovery. Restore or keep current levels first.')
         if control == "fader":
-            raw = from_percent(value, lo, hi)
+            raw = self._from_ui(value, spec)
             if emulated and out_id in self.mute_memory:
                 old = self.mute_memory[out_id]
                 actual = self.helper.get_value(fader['path'], fader['kind'])

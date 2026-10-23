@@ -1,3 +1,10 @@
+## 1.2.0 — Fader spacing and MOTU volume display (2026-10-22)
+
+- Remove the 20px bottom reserve left by the former unlink button, keeping channel and master labels close to the bottom of their cards on desktop and mobile.
+- Shorten the input trim caption to **Gain** on mapped pre-mark3 MOTU devices.
+- Display MOTU channel, bus, Main and Phones volume from 0 dB to −84 dB with a separate −∞ position below the quietest finite setting. Preserve all 129 FFADO native positions instead of rounding them to integer percentages.
+- Keep native hardware writes and matrix capabilities unchanged. The manufacturer documents the −84..0 dB range, but not a raw-position conversion table; intermediate display values use endpoint interpolation and still require physical calibration.
+
 ## 1.2.0 — Access control and reliability (2026-10-22)
 
 - Default to a localhost listener. Explicit LAN access requires `--host 0.0.0.0` and a password in `FFADO_WEBMIXER_TOKEN`; remote clients authenticate as `ffado` using HTTP Basic authentication.

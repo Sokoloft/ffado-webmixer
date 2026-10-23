@@ -114,6 +114,15 @@ that physical-device verification has already succeeded.
 
 ## Still hardware-specific
 
+For mapped pre-mark3 MOTU devices, verify channel, bus, Main and Phones faders
+show 0 dB at the maximum, −84 dB at the quietest finite position, then −∞ one
+native step lower. Confirm typed −84 dB remains finite and double-click restores
+0 dB. Compare intermediate readouts with the device display: these values are
+interpolated between the documented endpoints, not a verified native dB table.
+The [original UltraLite manual](https://cdn-data.motu.com/manuals/firewire-usb-audio/UltraLite_Manual_Win.pdf#page=35)
+documents the channel range. Main/Phones/bus display scales follow the same
+mapped 0..128 control range and need separate physical confirmation.
+
 FFADO hardware D-Bus behavior, live routing rollback, JACK behavior, PyQt6
 window focus/title/icon integration, actual meter calibration, and mixer
 readback must be verified on each supported physical model. Mark unsupported

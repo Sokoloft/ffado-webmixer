@@ -8,7 +8,8 @@ from .profile_loader import (load_profile, resolve_mixer, resolve_controls,
 from .controls import to_percent, from_percent, pan_to_ui, pan_from_ui
 from .profiles.capabilities import enabled, probe_allowed, activate_internal_model, declared_path
 from .peak_metering import meter_config, channel_destinations, normalize_peak
-from .gain import UNITY, has_db_scale, scale as gain_scale, raw_to_db, db_to_raw, raw_to_ui, ui_to_raw
+from .gain import (UNITY, has_db_scale, scale as gain_scale, raw_to_db, db_to_raw,
+                   raw_to_ui, ui_to_raw, motu_display_scale)
 from copy import deepcopy
 from .soft_mute import MuteJournal
 from .mixer_outputs import OutputControls, serialized_output
@@ -149,6 +150,13 @@ class Mixer(RoutingControls, OutputControls):
         raw = float(raw)
         if has_db_scale(spec.get("type")):
             return raw_to_ui(raw, spec["type"])
+        if spec.get('step') and spec.get('max', 1) > spec.get('min', 0):
+            # Integer percentages cannot represent every MOTU 0..128 step.
+            # Retain enough precision to read and write any native level.
+            if not math.isfinite(raw):
+                return 0
+            return round(max(0., min(100., (raw - spec.get('min', 0)) * 100.
+                                        / (spec['max'] - spec.get('min', 0)))), 5)
         return to_percent(raw, spec.get("min", 0), spec.get("max", 1)) if math.isfinite(raw) else 0
 
     def _from_ui(self, ui, spec):
@@ -170,6 +178,14 @@ class Mixer(RoutingControls, OutputControls):
         return visible_columns(self.profile, self.model, self.columns, rate)
 
     # ---------- what the web server uses ----------
+    def _fader_display_scale(self, spec, feature):
+        if (self.profile.get('family') == 'motu'
+                and self.profile.get('internal_model_id') in (1, 2, 3, 4, 6)
+                and enabled(self.profile, feature)
+                and spec.get('min') == 0 and spec.get('max') == 128):
+            return motu_display_scale()
+        return gain_scale(spec.get('type'))
+
     def describe(self):
         model = self.profile.get("models", {}).get(str(self.model), {})
         fader = self.roles.get("fader", (None, {}))[1]
@@ -181,18 +197,22 @@ class Mixer(RoutingControls, OutputControls):
             if any(role in c for c in self.chan.values()):
                 spec = self.chan_specs[role]
                 features[role] = {"writable": spec["writable"], "min": spec.get("min", 0), "max": spec.get("max", 1)}
+                if role == 'gain' and self.profile.get('family') == 'motu':
+                    features[role]['label'] = 'Gain'
         return {
             "guid": getattr(self, 'guid', self.device.get('guid', '')),
             "profile": self.profile.get("device_profile"),
             "device": model.get("name") or self.profile.get("device_name") or f"FFADO device {self.device['guid']}",
             "mixes": [{"id": i, "name": bus_name(n)} for i, n in enumerate(self.mixes)],
             "outputs": [{"id": o["id"], "name": o["name"], "mix": o["mix"], "controllable": o["fader"] is not None,
-                         "destination": o["dest"] is not None and bool(self._dest_options())}
+                         "destination": o["dest"] is not None and bool(self._dest_options()),
+                         "gain_scale": self._fader_display_scale(o.get('spec', self.out_spec), 'output_level')}
                         for o in self.outputs.values()],
             "fader": {"writable": fader.get("writable", False)},
             "mute": {"writable": bool(self.roles.get("mute") or self._soft_mute())},
             "solo": {"writable": bool(self.roles.get("solo") or self._soft_mute())},
             "gain_scale": gain_scale(self.matrix["mode"]),
+            "fader_scale": self._fader_display_scale(fader, 'matrix_gain'),
             "peak_metering": bool(self.router_path and self.meter_spec and self.meter_channels),
             "peak_meter": {"encoding": self.meter_spec["format"], "calibrated_dbfs": False,
                             "unit": self.meter_spec["unit"]} if self.router_path and self.meter_spec and self.meter_channels else None,

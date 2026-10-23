@@ -178,7 +178,7 @@ html { background: var(--page-background); }
   .outbtn.active { border-color: var(--accent-color); color: var(--text-primary); background: var(--selected-output-background); }
 
   /* ---- channel strip ---- */
-  .strip { position: relative; flex: none; width: 108px; box-sizing: border-box; padding: 6px 10px 28px;
+  .strip { position: relative; flex: none; width: 108px; box-sizing: border-box; padding: 6px 10px 8px;
            display: flex; flex-direction: column; align-items: stretch; gap: 9px;
            background: var(--channel-background); border: 1px solid var(--strip-border-color); border-top: 3px solid transparent;
            border-radius: 4px; user-select: none; }
@@ -238,15 +238,6 @@ html { background: var(--page-background); }
   /* Stereo names use the same resting and focus borders as mono names. */
   .strip.stereo .name { border-color: var(--border-color); }
   .strip.stereo .name:focus { border-color: var(--fader-value-color); }
-  /* Linked strips keep the standard pan/fader layout. Small unlink control
-     lives at the bottom-right, away from the pan and mute controls. */
-  .strip .unlink { position: absolute; bottom: 3px; right: 3px;
-    display: grid; place-items: center; width: 20px; height: 20px; padding: 0;
-    border: 0; border-radius: 4px; background: transparent;
-    color: var(--stereo-color); font-size: 15px; line-height: 1; cursor: pointer; }
-  .strip .unlink svg { display: block; width: 16px; height: 16px; }
-  .strip .unlink:hover { background: var(--button-hover-background); }
-  .strip .unlink:focus-visible { outline: 2px solid var(--accent-color); }
   .strip.stereo-pending { outline: 2px solid var(--stereo-color); outline-offset: -3px; }
   .strip.stereo-pending > .link-toggle { background: var(--stereo-target-background); color: var(--stereo-color); }
   .strip.link-target { outline: 2px dashed var(--stereo-color); outline-offset: -4px; background: var(--stereo-target-background); }
@@ -310,7 +301,6 @@ html { background: var(--page-background); }
     .name, .gain { font-size: 16px; }
     .btn { padding: 11px 0; font-size: 14px; }
     .gain, .invert { height: 40px; }
-    .strip .unlink { width: 26px; height: 26px; font-size: 18px; }
     .invert { width: 44px; }
     .pan::-webkit-slider-thumb { width: 22px; height: 22px; margin-top: -10px; }
     .pan { height: 26px; }
@@ -328,7 +318,7 @@ html { background: var(--page-background); }
     .strip.minimized { width: 44px; padding-top: 48px; }
   }
   @media (max-height: 640px) {
-    .strip { gap: 5px; padding-bottom: 8px; }
+    .strip { gap: 5px; }
     .cap { display: none; }
     .grip { height: 18px; line-height: 18px; }
     .btn { padding: 6px 0; }

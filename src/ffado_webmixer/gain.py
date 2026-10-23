@@ -14,6 +14,20 @@ MAX_DB = 6.0
 NATIVE_LIMITS = {"dice_db": 65535, "rme_db": 32768}
 
 
+def motu_display_scale():
+    """Display endpoints for the pre-mk3 MOTU native 0..128 fader controls.
+
+    FFADO's src/motu/motu_controls.cpp exposes integer positions unchanged.
+    The original UltraLite manual specifies OFF and -84..0 dB (page 35),
+    but neither source specifies how intermediate positions map to dB.
+    This descriptor requests display interpolation between those endpoints;
+    it does not declare a calibrated native coefficient or enable dB writes.
+    """
+    return {"mode": "motu_db", "min_db": -84, "max_db": 0,
+            "native_min": 0, "native_max": 128, "min_finite_native": 1,
+            "step_native": 1, "calibration": "endpoint_interpolation"}
+
+
 def has_db_scale(mode):
     return mode in NATIVE_LIMITS
 
