@@ -9,6 +9,9 @@ from flask import jsonify, request
 from ..themes import theme_path, available_themes
 
 
+_APPLICATION_PREFERENCES = ('skip_loading_screen', 'theme', 'accent_overrides')
+
+
 @contextmanager
 def _locked_configs(*configs):
     """Lock the whole read/modify/write operation, not just Config.save().
@@ -179,12 +182,13 @@ def register(app, config, broadcast, startup_config=None, bus_count=None):
 
     @app.get('/api/settings')
     def get_settings():
-        # The loading-screen preference belongs to the application window,
-        # not a specific FireWire device. Keep all browsers in sync.
+        # Window appearance and the loading screen use the global preferences,
+        # including when a device file still contains older saved values.
         with _locked_configs(config, startup_config):
             settings = deepcopy(config.settings)
             if startup_config is not None:
-                settings['skip_loading_screen'] = startup_config.settings['skip_loading_screen']
+                for key in _APPLICATION_PREFERENCES:
+                    settings[key] = deepcopy(startup_config.settings[key])
         return jsonify(settings)
 
     @app.post('/api/settings')
@@ -194,7 +198,7 @@ def register(app, config, broadcast, startup_config=None, bus_count=None):
         except ValueError as exc:
             return jsonify(ok=False, error=str(exc)), 400
 
-        startup_keys = ('skip_loading_screen', 'theme', 'accent_overrides')
+        startup_keys = _APPLICATION_PREFERENCES
         update_global = startup_config is not None and any(k in changes for k in startup_keys)
         with _locked_configs(config, startup_config if update_global else None):
             old_device = deepcopy(config.settings)

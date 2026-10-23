@@ -3,6 +3,7 @@
 # pywebview[qt] installs the PyQt6, QtPy and Qt WebEngine Python packages.
 # Host requirements are separate: FFADO/ffado-dbus-server, working D-Bus,
 # FireWire access, and native development libraries if dbus-python is built.
+argon2-cffi>=23.1,<26
 Flask>=3.0,<4
 Werkzeug>=3.0,<4
 dbus-python>=1.3

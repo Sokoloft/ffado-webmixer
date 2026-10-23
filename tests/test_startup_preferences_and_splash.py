@@ -65,6 +65,11 @@ def test_setting_is_saved_globally_and_visible_on_another_device(tmp_path, monke
         another_app = FakeApp()
         api.register(another_app, second, lambda event: None, startup_config=root)
         assert another_app.routes[('GET', '/api/settings')]()['skip_loading_screen'] is True
+        settings = another_app.routes[('GET', '/api/settings')]()
+        assert settings['theme'] == 'light'
+        assert settings['accent_overrides'] == {'light': '#123456'}
+        settings['accent_overrides']['light'] = '#ffffff'
+        assert root.settings['accent_overrides'] == {'light': '#123456'}
         payload.clear()
         payload['skip_loading_screen'] = False
         assert another_app.routes[('POST', '/api/settings')]() == {'ok': True}
@@ -97,6 +102,7 @@ def test_legacy_per_device_intro_preference_is_imported_once(tmp_path, monkeypat
     flask_stub = types.ModuleType('flask')
     flask_stub.session = {}
     flask_stub.has_request_context = lambda: False
+    flask_stub.request = types.SimpleNamespace(environ={})
     monkeypatch.setitem(sys.modules, 'flask', flask_stub)
     sys.modules.pop('ffado_webmixer.device_manager', None)
     dm = importlib.import_module('ffado_webmixer.device_manager')

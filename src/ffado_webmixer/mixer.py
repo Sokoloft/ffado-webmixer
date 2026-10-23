@@ -785,11 +785,12 @@ class Mixer(RoutingControls, OutputControls):
             self._remember_router_source(destination, source)
 
     @serialized_output
-    def read_mix(self, mix, *, stereo_bus=False):
+    def read_mix(self, mix, *, stereo_bus=False, channels=None):
         """Read a bus and (optionally) its linked right bus in one transaction.
 
         A linked bus derives its fader and balance from the *same* pair of
         native matrix coefficients. No coefficients are changed by a read.
+        Optional channel IDs limit hardware reads to those visible strips.
         """
         if stereo_bus and (mix % 2 or mix + 1 >= len(self.mixes) or
                            self.matrix["mode"] not in ("dice_db", "rme_db")):
@@ -797,6 +798,7 @@ class Mixer(RoutingControls, OutputControls):
         if not 0 <= mix < len(self.mixes):
             raise ValueError("mix out of range")
         out = {}
+        selected = set(channels) if channels is not None else None
         # Only the display label changes when a DICE input is re-routed.
         # Keep immutable matrix column indices, the names configuration, and
         # unrelated output routing exactly as they were.
@@ -804,6 +806,8 @@ class Mixer(RoutingControls, OutputControls):
                       for destination, index in getattr(self, '_router_input_columns', {}).items()
                       if destination in getattr(self, '_router_input_sources', {})}
         for col in self._visible_cols():
+            if selected is not None and f'ch/{col:02d}' not in selected:
+                continue
             display_name = live_names.get(col, self.columns[col])
             entry = {"name": display_name, "input": display_name}
             if "fader" in self.roles:

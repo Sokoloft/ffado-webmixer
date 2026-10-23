@@ -86,6 +86,7 @@
       <button class="tab active" role="tab" id="tab-general" data-tab="general" aria-selected="true" aria-controls="pane-general">General</button>
       <button class="tab" role="tab" id="tab-qjackctl" data-tab="qjackctl" aria-selected="false" aria-controls="pane-qjackctl" tabindex="-1" hidden>QjackCtl</button>
       <button class="tab" role="tab" id="tab-theme" data-tab="theme" aria-selected="false" aria-controls="pane-theme" tabindex="-1">Theme</button>
+      <button class="tab" role="tab" id="tab-remote-access" data-tab="remote-access" aria-selected="false" aria-controls="pane-remote-access" tabindex="-1">Remote Access</button>
       <button class="tab" role="tab" id="tab-about" data-tab="about" aria-selected="false" aria-controls="pane-about" tabindex="-1">About</button>
     </div>
 
@@ -153,6 +154,22 @@
         <div id="accentError" role="status" aria-live="polite"></div>
       </div>
       <div class="dlgnote">Changes apply immediately and are saved for future sessions.</div>
+    </div>
+
+    <div class="pane off" id="pane-remote-access" role="tabpanel" aria-labelledby="tab-remote-access">
+      <form id="remoteAccessForm">
+        <fieldset id="remoteAccessFields" disabled>
+          <legend class="sectitle">Remote Access</legend>
+          <label class="remote-access-toggle"><input type="checkbox" id="remoteAccessEnabled"> Enable access from other devices</label>
+          <div class="field"><label for="remoteAccessUsername">Username</label><input id="remoteAccessUsername" name="username" maxlength="64" autocomplete="username" spellcheck="false" autocapitalize="none" data-gesture-edit="direct"></div>
+          <div class="field"><label for="remoteAccessPassword">Password</label><input id="remoteAccessPassword" name="password" type="password" minlength="16" maxlength="1024" autocomplete="new-password" aria-describedby="remoteAccessPasswordHint"></div>
+          <div class="field"><label for="remoteAccessConfirm">Confirm</label><input id="remoteAccessConfirm" name="confirm-password" type="password" minlength="16" maxlength="1024" autocomplete="new-password"></div>
+          <p class="dlgnote" id="remoteAccessPasswordHint">Use at least 16 characters. Leave both password fields blank to keep the saved password.</p>
+          <button class="dlgbtn" id="remoteAccessSave" type="submit">Save remote access</button>
+        </fieldset>
+      </form>
+      <p id="remoteAccessMessage" class="dlgnote" role="status" aria-live="polite"></p>
+      <p class="dlgnote">The local app stays accessible without a password. Enabling LAN access requires an app restart. Use HTTPS or an SSH tunnel to protect credentials over the network.</p>
     </div>
 
     <div class="pane off" id="pane-about" role="tabpanel" aria-labelledby="tab-about">
@@ -257,6 +274,7 @@
 </div>
 <script src="/static/labels.js"></script>
 <script src="/static/frontend-api.js"></script>
+<script src="/static/remote-access.js"></script>
 <script src="/static/editable-input.js"></script>
 <script src="/static/routing.js"></script>
 <script src="/static/qrcode.js"></script>

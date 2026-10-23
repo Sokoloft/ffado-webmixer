@@ -5,6 +5,7 @@ import queue
 import threading
 import time
 import unittest
+from unittest.mock import patch
 from ffado_webmixer.services.peak_stream import PeakStreamHub, SAMPLE_INTERVAL
 
 
@@ -119,6 +120,71 @@ class PeakStreamTest(unittest.TestCase):
             self.assertTrue(event.startswith(b'data: '))
             self.assertEqual(json.loads(event.removeprefix(b'data: ').strip())['guid'],backend.guid)
             response.close()
+
+
+@unittest.skipUnless(importlib.util.find_spec('flask'), 'Flask is not installed in the offline test environment')
+class PeakStreamResponseTest(unittest.TestCase):
+    def setUp(self):
+        from ffado_webmixer.api.mixer import register
+        from flask import Flask
+        self.hub = PeakStreamHub(interval=.01)
+        self.backend = DummyPeakDevice('1111111111111111')
+        self.app = Flask('peak_response_test')
+        with patch('ffado_webmixer.api.mixer.PeakStreamHub', return_value=self.hub):
+            register(self.app, self.backend, {}, None, lambda event: None)
+        self.addCleanup(self.stop_samplers)
+
+    def stop_samplers(self):
+        for sampler in self.hub._samplers.values():
+            with sampler.lock:
+                clients, thread = tuple(sampler.clients), sampler.thread
+            for client in clients:
+                self.hub.unsubscribe(sampler, client)
+            if thread is not None:
+                thread.join(timeout=1)
+
+    def open_response(self):
+        # Flask's test client starts iteration before returning the response.
+        # Dispatch directly to exercise a close before the first yield.
+        with self.app.test_request_context('/api/peak-stream'):
+            response = self.app.full_dispatch_request()
+        self.addCleanup(response.close)
+        sampler = self.hub._samplers[self.backend.guid]
+        return response, sampler, sampler.thread
+
+    def assert_sampler_stopped(self, sampler, thread):
+        self.assertFalse(sampler.clients)
+        thread.join(timeout=1)
+        self.assertFalse(thread.is_alive())
+
+    def test_close_before_first_iteration_stops_polling(self):
+        response, sampler, thread = self.open_response()
+        self.assertEqual(len(sampler.clients), 1)
+        response.close()
+        response.close()  # Repeated response closure must be harmless.
+        self.assert_sampler_stopped(sampler, thread)
+
+    def test_close_after_streaming_stops_polling(self):
+        response, sampler, thread = self.open_response()
+        self.assertEqual(next(response.response), ': connected\n\n')
+        self.assertTrue(next(response.response).startswith('data: '))
+        response.close()  # Generator-finally and response-close both unsubscribe.
+        response.close()
+        self.assert_sampler_stopped(sampler, thread)
+
+    def test_early_close_keeps_other_viewer_subscribed(self):
+        first, sampler, thread = self.open_response()
+        second, other_sampler, other_thread = self.open_response()
+        self.assertIs(sampler, other_sampler)
+        self.assertIs(thread, other_thread)
+        self.assertEqual(len(sampler.clients), 2)
+        first.close()
+        self.assertEqual(len(sampler.clients), 1)
+        self.assertEqual(next(second.response), ': connected\n\n')
+        self.assertTrue(next(second.response).startswith('data: '))
+        self.assertTrue(thread.is_alive())
+        second.close()
+        self.assert_sampler_stopped(sampler, thread)
 
 
 if __name__ == '__main__':

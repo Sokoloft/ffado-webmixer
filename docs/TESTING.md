@@ -27,9 +27,19 @@ python main.py --demo --headless
 
 Open `http://127.0.0.1:5000/` in a browser. `--debug` simulates FFADO
 controls and does not access live device D-Bus or save user mixer settings.
-The listener is local-only unless `--host 0.0.0.0` is passed with
-`FFADO_WEBMIXER_TOKEN` set to a password of at least 16 characters. Remote
-browsers must authenticate as `ffado`; local desktop access remains automatic.
+Demo/debug listeners remain local-only by default. To test LAN access, first run
+`python main.py --enable-remote-access`, enter a username and hidden password
+of at least 16 characters, then explicitly pass `--host 0.0.0.0` to the demo/debug
+launch. Normal launches use the saved **Settings → Remote Access** enable flag.
+Remote browsers authenticate with the saved username and password; local desktop
+access remains automatic. Demo/debug sessions cannot edit saved credentials.
+Verify that GUI and CLI setup both use `~/.config/ffado-webmixer/auth.json`, that
+it contains an Argon2id hash rather than the password, and that the file and
+directory permissions are `0600` and `0700`. Check password confirmation,
+restart instructions, credential rotation and disabling remote access. GUI
+changes affect new requests immediately and close existing remote event and meter
+streams when credentials change or access is disabled. Local streams remain
+connected. CLI changes require an app restart.
 Confirm that remote requests without credentials return HTTP 401 and foreign
 Origin POSTs return HTTP 403 without changing mixer state.
 Available development checks (optional):
@@ -102,6 +112,9 @@ that physical-device verification has already succeeded.
 1. Apply a low-level test signal. Check that meters track their designated
    hardware channels, stay responsive with two browser clients, and follow
    device/bus changes without bleeding state between units.
+   After a temporary meter-stream failure, confirm HTTP fallback returns to
+   `/api/peak-stream` automatically. Retry delays grow from one second to a
+   30-second cap; hiding the page or changing devices cancels pending retries.
 2. For a linked DICE/RME bus, modify a coefficient through another FFADO
    controller and refresh webmixer. It must use *fresh* hardware values, not a
    cache left over from the previous request. Verify mute and stereo balance

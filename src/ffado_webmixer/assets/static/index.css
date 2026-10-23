@@ -54,7 +54,7 @@ html { background: var(--page-background); }
   /* settings dialog: centered, with the page dimmed behind it */
   #overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: 100; display: flex; align-items: center;
              justify-content: center; padding: 16px; background: rgba(4, 5, 7, .72); }
-  #dialog { width: 440px; max-width: 100%; max-height: 100%; overflow: auto; outline: none; background: var(--channel-background);
+  #dialog { width: 640px; max-width: 100%; max-height: 100%; overflow: auto; outline: none; background: var(--channel-background);
             border: 1px solid var(--border-color); border-radius: 8px; box-shadow: 0 24px 60px rgba(0, 0, 0, .6); }
   .dlghead { display: flex; align-items: center; justify-content: space-between; padding: 12px 12px 10px 18px; background: var(--dialog-header-background); }
   #dlgTitle { font-size: 16px; font-weight: 500; letter-spacing: .03em; }
@@ -64,8 +64,9 @@ html { background: var(--page-background); }
   #dlgClose svg { display: block; margin: auto; }
 
   /* tabs, like a browser: the active one joins the panel below it */
-  .tabs { display: flex; gap: 3px; padding: 0 12px; background: var(--dialog-header-background); border-bottom: 1px solid var(--border-color); }
-  .tab { position: relative; top: 1px; padding: 9px 18px; border: 1px solid transparent; border-bottom: 0;
+  .tabs { display: flex; gap: 3px; padding: 0 12px; overflow-x: auto; scrollbar-width: thin;
+          background: var(--dialog-header-background); border-bottom: 1px solid var(--border-color); }
+  .tab { position: relative; flex: none; white-space: nowrap; top: 1px; padding: 9px 18px; border: 1px solid transparent; border-bottom: 0;
          border-radius: 7px 7px 0 0; background: transparent; color: var(--text-secondary); font-size: 13px; cursor: pointer; }
   .tab:hover { color: var(--text-primary); background: var(--tab-hover-background); }
   .tab.active { color: var(--text-primary); background: var(--channel-background); border-color: var(--border-color); }
@@ -116,6 +117,15 @@ html { background: var(--page-background); }
   .dlgbtn:disabled { opacity: .55; cursor: default; }
   .dlgnote { min-height: 16px; font-size: 12px; color: var(--text-secondary); }
   .dlgnote.err { color: var(--error-text-color); }
+  #remoteAccessFields { border: 0; margin: 0; padding: 0; min-width: 0; }
+  #remoteAccessFields .sectitle { padding: 0; }
+  .remote-access-toggle { display: flex; align-items: center; gap: 8px; margin-bottom: 18px; font-size: 13px; }
+  #remoteAccessFields input:not([type="checkbox"]) { flex: 1; min-width: 0; box-sizing: border-box;
+    padding: 8px 10px; color: var(--text-primary); background: var(--control-background);
+    border: 1px solid var(--border-color); border-radius: 4px; font: inherit; }
+  #remoteAccessFields input:focus-visible { outline: 2px solid var(--accent-color); }
+  #remoteAccessFields:disabled { opacity: .65; }
+  #remoteAccessSave { margin-top: 8px; }
   .hidemin { font-size: 13px; cursor: pointer; }
   .hidemin input { vertical-align: middle; margin-right: 6px; }
   .hidemin span { color: var(--text-secondary); }

@@ -28,6 +28,7 @@ def create_app(backend, description, config, about=None, device_manager=None, ac
     policy = access_policy or AccessPolicy()
     register_access(app, policy)
     hub = Hub()
+    application_config = device_manager.global_config if device_manager else config
 
     def mixer_url():
         from ipaddress import ip_address
@@ -93,12 +94,16 @@ def create_app(backend, description, config, about=None, device_manager=None, ac
 
     @app.before_request
     def reject_stale_device_write():
+        # Every route (including discovery and streams) must use the same
+        # backend/configuration as its validation and eventual broadcast.
+        if device_manager:
+            device_manager.pin_request()
         # An old browser tab or an in-flight fader throttle must not suddenly
         # write to a *different* FireWire unit after device switching.
         if not device_manager or not request.path.startswith('/api/'):
             return None
         # The initial discovery endpoints are intentionally device-independent.
-        if request.path in ('/api/devices', '/api/device'):
+        if request.path in ('/api/devices', '/api/device', '/api/remote-access'):
             return None
         expected = request.headers.get('X-FFADO-Device')
         if expected and expected != device_manager.current_guid:
@@ -120,16 +125,17 @@ def create_app(backend, description, config, about=None, device_manager=None, ac
         # A browser may be previewing a different theme from the Qt client.
         # Each request resolves its own colors and does not modify config.
         explicit_theme = 'theme' in request.args
-        name = request.args.get('theme', config.settings.get('theme', 'dark'))
-        accent = request.args.get('accent')
-        if not valid_accent(accent):
-            # Explicit per-browser theme requests without an accent mean
-            # "use the theme default", even if another client had an override.
-            # Bare /favicon.svg uses the saved global theme and accent.
-            accent = None
-            if not explicit_theme:
-                overrides = config.settings.get('accent_overrides', {})
-                accent = overrides.get(name) if isinstance(overrides, dict) else None
+        with application_config._save_lock:
+            name = request.args.get('theme', application_config.settings.get('theme', 'dark'))
+            accent = request.args.get('accent')
+            if not valid_accent(accent):
+                # Explicit per-browser theme requests without an accent mean
+                # "use the theme default", even if another client had an override.
+                # Bare /favicon.svg uses the saved global theme and accent.
+                accent = None
+                if not explicit_theme:
+                    overrides = application_config.settings.get('accent_overrides', {})
+                    accent = overrides.get(name) if isinstance(overrides, dict) else None
         return app.response_class(themed_icon_svg(name, accent), mimetype='image/svg+xml',
                                   headers={'Cache-Control': 'no-store'})
 
@@ -154,7 +160,7 @@ def create_app(backend, description, config, about=None, device_manager=None, ac
 
     mixer_routes.register(app, backend, description, config, broadcast)
     settings_routes.register(app, config, broadcast, bus_count=lambda: len(backend.mixes),
-                             startup_config=device_manager.global_config if device_manager else None)
+                             startup_config=application_config if device_manager else None)
     event_routes.register(app, hub, device_manager)
     integration_routes.register(app, config, lambda: mixer_url() + '/',
                                 debug=bool(device_manager and device_manager.debug))

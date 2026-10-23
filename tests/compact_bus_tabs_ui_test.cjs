@@ -23,12 +23,21 @@ function node(type='text') {
 }
 async function run() {
   const staticInput = node();
+  const usernameInput = node();
+  const usernameTag = html.match(/<input\b[^>]*\bid="remoteAccessUsername"[^>]*>/)[0];
+  usernameInput.dataset.gestureEdit = usernameTag.match(/data-gesture-edit="([^"]+)"/)?.[1];
   const window = {};
   const context = vm.createContext({
-    window,document:{querySelectorAll:()=>[staticInput]},MouseEvent:class {constructor(t){this.type=t}},
+    window,document:{querySelectorAll:()=>[staticInput, usernameInput]},MouseEvent:class {constructor(t){this.type=t}},
     setTimeout,clearTimeout,
   });
   vm.runInContext(src, context);
+  usernameInput.fire('click');
+  usernameInput.focus();
+  assert.equal(usernameInput.readOnly,false,'username supports normal click-to-edit');
+  usernameInput.blur();
+  assert.equal(usernameInput.readOnly,false,'username stays editable after losing focus');
+  assert.equal(usernameInput.classList.contains('gesture-edit'),false,'username has no mixer editing lock');
   assert.equal(staticInput.readOnly,true,'static fields start locked');
   staticInput.focus();assert.equal(staticInput.readOnly,true,'simple focus is not an edit gesture');
   let prevented=false;

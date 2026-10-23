@@ -133,8 +133,8 @@ def test_linked_gain_can_skip_an_input_without_that_control():
     config.link('ch/01', 'ch/04', 0)
     old_read = mixer.read_mix
 
-    def no_right_gain(mix):
-        result = old_read(mix)
+    def no_right_gain(mix, **kwargs):
+        result = old_read(mix, **kwargs)
         del result['ch/04']['gain']
         return result
 
@@ -258,3 +258,192 @@ def test_first_stereo_leg_failure_after_write_restores_and_does_not_touch_partne
     assert mixer.read_mix(2)['ch/04']['fader'] == old_right
     assert (2, 'ch/04', 'fader', 91) not in calls
     assert (2, 'ch/01', 'fader', old_left) in calls
+
+
+@pytest.mark.parametrize('failed_channel', ['ch/04', 'ch/01'])
+@pytest.mark.parametrize('changed_before_error', [False, True])
+def test_paired_pan_restores_distinct_values_when_either_write_fails(failed_channel, changed_before_error):
+    from copy import deepcopy
+    mixer, config = DemoMixer(), Config(None)
+    # The first clicked input is Left, even when its channel number is higher.
+    left, right, mix = 'ch/04', 'ch/01', 2
+    config.link(left, right, mix)
+    mixer.write(mix, left, 'pan', 0.25)
+    mixer.write(mix, right, 'pan', -0.4)
+    before = deepcopy(mixer.mixes)
+    write = mixer.write
+    failed = False
+
+    def unreliable(bus, channel, control, value):
+        nonlocal failed
+        if channel == failed_channel and control == 'pan' and not failed:
+            failed = True
+            if changed_before_error:
+                write(bus, channel, control, value)
+            raise IOError('paired pan write timed out')
+        return write(bus, channel, control, value)
+
+    mixer.write = unreliable
+    payload = {'strip': left, 'mix': mix, 'control': 'pan', 'value': 0.3}
+    for app, events in api(mixer, config, payload):
+        response, status = app.set_value()
+        assert status == 500 and 'timed out' in response['error']
+        assert mixer.mixes == before
+        assert not events
+        assert app.set_value() == {'ok': True}  # retry after the transient error
+        assert mixer.mixes[mix][left]['pan'] == pytest.approx(-0.4)
+        assert mixer.mixes[mix][right]['pan'] == 1
+        assert mixer.mixes[0] == before[0]
+        assert mixer.mixes[mix]['ch/02'] == before[mix]['ch/02']
+        assert len(events) == 1 and events[0]['strip'] == left
+
+
+@pytest.mark.parametrize('position,expected', [(-0.5, (-1, 0)), (0, (-1, 1))])
+def test_paired_pan_keeps_stereo_image_on_success(position, expected):
+    mixer, config = DemoMixer(), Config(None)
+    config.link('ch/04', 'ch/01', 2)
+    for app, events in api(mixer, config, {
+            'strip': 'ch/04', 'mix': 2, 'control': 'pan', 'value': position}):
+        assert app.set_value() == {'ok': True}
+        assert (mixer.mixes[2]['ch/04']['pan'], mixer.mixes[2]['ch/01']['pan']) == expected
+        assert len(events) == 1
+
+
+def test_paired_pan_reports_incomplete_rollback_and_continues_restoring_other_channel():
+    mixer, config = DemoMixer(), Config(None)
+    config.link('ch/04', 'ch/01', 2)
+    write = mixer.write
+    write(2, 'ch/04', 'pan', 0.25)
+    write(2, 'ch/01', 'pan', -0.4)
+    failed = False
+
+    def unreliable(mix, channel, control, value):
+        nonlocal failed
+        if channel == 'ch/01' and not failed:
+            failed = True
+            write(mix, channel, control, value)
+            raise IOError('right write timed out')
+        if channel == 'ch/01' and value == -0.4:
+            raise IOError('right restore failed')
+        return write(mix, channel, control, value)
+
+    mixer.write = unreliable
+    for app, events in api(mixer, config, {
+            'strip': 'ch/04', 'mix': 2, 'control': 'pan', 'value': 0.3}):
+        response, status = app.set_value()
+        assert status == 500 and 'rollback may be incomplete' in response['error']
+        assert 'ch/01' in response['error'] and 'right restore failed' in response['error']
+        assert mixer.mixes[2]['ch/04']['pan'] == 0.25
+        assert not events
+
+
+@pytest.mark.parametrize('snapshot_failure', ['missing_channel', 'missing_pan', 'null_pan', 'read_error'])
+def test_paired_pan_never_writes_without_both_original_values(snapshot_failure):
+    mixer, config = DemoMixer(), Config(None)
+    config.link('ch/04', 'ch/01', 2)
+    read = mixer.read_mix
+    writes = []
+
+    def snapshot(mix, **kwargs):
+        if snapshot_failure == 'read_error':
+            raise IOError('could not read original pan')
+        result = read(mix, **kwargs)
+        if snapshot_failure == 'missing_channel':
+            del result['ch/01']
+        elif snapshot_failure == 'missing_pan':
+            del result['ch/01']['pan']
+        else:
+            result['ch/01']['pan'] = None
+        return result
+
+    mixer.read_mix = snapshot
+    mixer.write = lambda *args: writes.append(args)
+    for app, events in api(mixer, config, {
+            'strip': 'ch/04', 'mix': 2, 'control': 'pan', 'value': 0.3}):
+        response, status = app.set_value()
+        assert status == (500 if snapshot_failure == 'read_error' else 400)
+        assert response['error']
+        assert not writes and not events
+
+
+def test_paired_pan_locks_snapshot_writes_and_rollback_in_one_transaction():
+    from threading import RLock
+    from types import SimpleNamespace
+    mixer, config = DemoMixer(), Config(None)
+    config.link('ch/04', 'ch/01', 2)
+    lock, observed = RLock(), []
+    depth = 0
+
+    @contextlib.contextmanager
+    def transaction():
+        nonlocal depth
+        with lock:
+            depth += 1
+            try:
+                yield
+            finally:
+                depth -= 1
+
+    mixer.helper = SimpleNamespace(transaction=transaction)
+    read, write = mixer.read_mix, mixer.write
+    failed = False
+
+    def snapshot(mix, **kwargs):
+        observed.append(('snapshot', depth))
+        return read(mix, **kwargs)
+
+    def unreliable(mix, channel, control, value):
+        nonlocal failed
+        observed.append(('write', depth))
+        write(mix, channel, control, value)
+        if channel == 'ch/01' and not failed:
+            failed = True
+            raise IOError('second pan write failed')
+
+    mixer.read_mix, mixer.write = snapshot, unreliable
+    for app, events in api(mixer, config, {
+            'strip': 'ch/04', 'mix': 2, 'control': 'pan', 'value': 0.3}):
+        _, status = app.set_value()
+        assert status == 500
+        assert observed == [('snapshot', 1)] + [('write', 1)] * 4
+        assert depth == 0 and not events
+
+
+def test_native_motu_pair_pan_restores_exact_coefficients_after_timeout(monkeypatch):
+    from ffado_webmixer import debug_backend
+    create_fixture = debug_backend.create_fixture
+
+    def with_native_pan(alias):
+        device, profile = create_fixture(alias)
+        # The normal debug fixture exposes only the gain matrix. Add the
+        # optional, source-declared MOTU pan matrix to its simulated inventory.
+        device['matrices'].append(dict(device['matrices'][0],
+                                       path=device['device'] + '/Mixer/pan'))
+        return device, profile
+
+    monkeypatch.setattr(debug_backend, 'create_fixture', with_native_pan)
+    mixer_config = Config(None)
+    mixer_config.link('ch/04', 'ch/01', 2)
+    with contextlib.redirect_stdout(io.StringIO()):
+        mixer = debug_backend.make_debug_mixer('motuultralite', mixer_config)
+        path = mixer.roles['pan'][0]
+        mixer._set_cell(path, 2, 4, 17)
+        mixer._set_cell(path, 2, 1, -39)
+        before = dict(mixer.helper.cells)
+        original_set = mixer.helper.set_cell
+        failed = False
+
+        def timeout_after_right_write(p, row, col, raw):
+            nonlocal failed
+            original_set(p, row, col, raw)
+            if p == path and (row, col) == mixer._coordinates(2, 1) and not failed:
+                failed = True
+                raise IOError('native pan timeout')
+
+        mixer.helper.set_cell = timeout_after_right_write
+        for app, events in api(mixer, mixer_config, {
+                'strip': 'ch/04', 'mix': 2, 'control': 'pan', 'value': 0.3}):
+            response, status = app.set_value()
+            assert status == 500 and 'native pan timeout' in response['error']
+            assert mixer.helper.cells == before
+            assert not events

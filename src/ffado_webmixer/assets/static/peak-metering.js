@@ -9,6 +9,8 @@
   const CLIP_HOLD_MS = 4000;
   const POLL_MS = 100; // HTTP fallback only; normal transport is server push
   const FALLBACK_MS = 1000;
+  const RECONNECT_MS = 1000;
+  const MAX_RECONNECT_MS = 30000;
 
   function validSample(item) {
     return item && typeof item.destination === 'string' &&
@@ -41,16 +43,21 @@
       this.timer = null;
       this.stream = null;
       this.streamWatchdog = null;
+      this.reconnectTimer = null;
+      this.reconnectDelay = RECONNECT_MS;
       this.stopped = true;
       this.generation = 0;
       this.onVisibility = () => {
         if (document.hidden) {
+          ++this.generation;
           this.closeStream();
           clearTimeout(this.timer);
+          this.timer = null;
+          this.clearReconnect();
           this.states.clear();
           this.hideAll();
         } else if (!this.stopped) {
-          clearTimeout(this.timer);
+          this.reconnectDelay = RECONNECT_MS;
           this.beginTransport();
         }
       };
@@ -61,6 +68,7 @@
     start() {
       if (!this.stopped) return;
       this.stopped = false;
+      this.reconnectDelay = RECONNECT_MS;
       ++this.generation;
       document.addEventListener('visibilitychange', this.onVisibility);
       this.beginTransport();
@@ -70,6 +78,7 @@
       ++this.generation;  // discard requests started before stop/restart
       clearTimeout(this.timer);
       this.timer = null;
+      this.clearReconnect();
       this.closeStream();
       document.removeEventListener('visibilitychange', this.onVisibility);
       this.states.clear();
@@ -77,7 +86,22 @@
     }
     schedule(delay) {
       clearTimeout(this.timer);
-      if (!this.stopped) this.timer = setTimeout(() => this.poll(), delay);
+      if (!this.stopped && !document.hidden) this.timer = setTimeout(() => this.poll(), delay);
+    }
+    clearReconnect() {
+      clearTimeout(this.reconnectTimer);
+      this.reconnectTimer = null;
+    }
+    scheduleReconnect() {
+      if (this.stopped || document.hidden || this.reconnectTimer !== null ||
+          typeof root.EventSource !== 'function') return;
+      const generation = this.generation;
+      const delay = this.reconnectDelay;
+      this.reconnectDelay = Math.min(delay * 2, MAX_RECONNECT_MS);
+      this.reconnectTimer = setTimeout(() => {
+        this.reconnectTimer = null;
+        if (!this.stopped && !document.hidden && generation === this.generation) this.beginTransport();
+      }, delay);
     }
     closeStream() {
       clearTimeout(this.streamWatchdog);
@@ -87,13 +111,24 @@
     }
     beginTransport() {
       if (document.hidden || this.stopped) return;
+      clearTimeout(this.timer);
+      this.timer = null;
+      this.clearReconnect();
       this.closeStream();
+      // A transport change also invalidates any in-flight fallback request.
+      const generation = ++this.generation;
       if (typeof root.EventSource !== 'function') {
         this.poll();
         return;
       }
-      const generation = this.generation;
-      const stream = new root.EventSource('/api/peak-stream');
+      let stream;
+      try {
+        stream = new root.EventSource('/api/peak-stream');
+      } catch (error) {
+        this.schedule(0);
+        this.scheduleReconnect();
+        return;
+      }
       this.stream = stream;
       const fallback = () => {
         if (this.stopped || generation !== this.generation || this.stream !== stream) return;
@@ -101,6 +136,7 @@
         // An older deployment or a lost SSE connection still works through
         // the existing JSON endpoint. Never run two hardware polling loops.
         this.schedule(0);
+        this.scheduleReconnect();
       };
       const watchdog = () => {
         clearTimeout(this.streamWatchdog);
@@ -114,6 +150,7 @@
           if (data.guid && this.guid && data.guid !== this.guid) {
             this.states.clear(); this.hideAll(); this.stop(); return;
           }
+          this.reconnectDelay = RECONNECT_MS;
           if (!data.available || !data.channels) {
             this.states.clear(); this.hideAll();
             // No real meter on this device: release the sampler. A transient
@@ -132,16 +169,21 @@
     }
     async poll() {
       if (this.stopped || this.stream) return;
-      if (document.hidden) { this.schedule(FALLBACK_MS); return; }
+      if (document.hidden) return;
       const generation = this.generation;
       try {
         const response = await this.fetcher('/api/peaks');
+        if (this.stopped || generation !== this.generation || this.stream || document.hidden) return;
+        if (response.status === 401 || response.status === 403) {
+          this.stop();
+          return;
+        }
         if (!response.ok) throw Error('peak request failed');
         const data = await response.json();
-        if (this.stopped || generation !== this.generation || this.stream) return;
+        if (this.stopped || generation !== this.generation || this.stream || document.hidden) return;
         if (data.guid && this.guid && data.guid !== this.guid) {
           // Never expose peaks from a different FireWire device.
-          this.states.clear(); this.hideAll(); this.schedule(FALLBACK_MS); return;
+          this.stop(); return;
         }
         if (!data.available || !data.channels) {
           this.stop(); // Unsupported FFADO interface: no fabricated meters.
@@ -151,7 +193,7 @@
         document.dispatchEvent(new CustomEvent('ffado-peaks', {detail:data}));
         this.schedule(POLL_MS);
       } catch (error) {
-        if (this.stopped || generation !== this.generation || this.stream) return;
+        if (this.stopped || generation !== this.generation || this.stream || document.hidden) return;
         this.states.clear(); this.hideAll(); this.schedule(FALLBACK_MS);
       }
     }

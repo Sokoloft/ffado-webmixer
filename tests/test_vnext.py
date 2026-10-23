@@ -107,6 +107,7 @@ class SourceDefinedProfiles(unittest.TestCase):
         flask = types.ModuleType('flask')
         flask.session = {}
         flask.has_request_context = lambda: True
+        flask.request = types.SimpleNamespace(environ={})
         with tempfile.TemporaryDirectory() as tmp, mock.patch.dict(sys.modules, {'flask': flask}):
             sys.modules.pop('ffado_webmixer.device_manager', None)
             from ffado_webmixer.device_manager import DeviceManager

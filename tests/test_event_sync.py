@@ -77,13 +77,13 @@ class StreamingResponse:
 
 class EventRouteTest(unittest.TestCase):
     def setUp(self):
-        self.request = types.SimpleNamespace(args={})
+        self.request = types.SimpleNamespace(args={}, environ={})
         flask = types.ModuleType('flask')
         flask.request = self.request
         flask.jsonify = lambda **kwargs: kwargs
         flask.Response = StreamingResponse
         path = Path(__file__).parents[1] / 'src/ffado_webmixer/api/events.py'
-        spec = importlib.util.spec_from_file_location('_event_sync_test_api', path)
+        spec = importlib.util.spec_from_file_location('ffado_webmixer.api._event_sync_test_api', path)
         module = importlib.util.module_from_spec(spec)
         with patch.dict(sys.modules, {'flask': flask}):
             spec.loader.exec_module(module)

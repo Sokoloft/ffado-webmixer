@@ -27,9 +27,10 @@ class DemoMixer:
                              "gain": {"writable": True, "min": 0, "max": 53},
                              "invert": {"writable": True}}}
 
-    def read_mix(self, mix):
+    def read_mix(self, mix, *, channels=None):
+        selected = set(channels) if channels is not None else None
         return {sid: {"name": NAMES[i], "input": f"Input {i + 1}", **self.mixes[mix][sid], **self.chan[sid]}
-                for i, sid in enumerate(self.chan)}
+                for i, sid in enumerate(self.chan) if selected is None or sid in selected}
 
     def write(self, mix, strip, control, value):
         if strip not in self.chan:

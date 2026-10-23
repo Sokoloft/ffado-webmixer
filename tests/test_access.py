@@ -5,13 +5,14 @@ import pytest
 from flask import Flask, Response
 
 from ffado_webmixer.access import AccessPolicy, register
+from ffado_webmixer.remote_access import RemoteAccessConfig
 
 
-TOKEN = 'test-password-with-32-characters!!'
+PASSWORD = 'test-password-with-32-characters!!'
 REMOTE = {'REMOTE_ADDR': '192.168.1.20'}
 
 
-def authorization(password=TOKEN, username='ffado'):
+def authorization(password=PASSWORD, username='studio'):
     value = b64encode(f'{username}:{password}'.encode()).decode()
     return {'Authorization': f'Basic {value}'}
 
@@ -19,7 +20,9 @@ def authorization(password=TOKEN, username='ffado'):
 @pytest.fixture
 def mixer():
     app = Flask(__name__)
-    register(app, AccessPolicy('0.0.0.0', TOKEN))
+    credentials = RemoteAccessConfig()
+    credentials.update(enabled=True, username='studio', password=PASSWORD)
+    register(app, AccessPolicy('0.0.0.0', credentials))
     writes = []
 
     @app.get('/')
@@ -49,7 +52,7 @@ def test_remote_requests_require_password_including_streams_and_assets(mixer, pa
 
 @pytest.mark.parametrize('headers', [
     {}, authorization('wrong'), authorization(username='other'),
-    {'Authorization': 'Bearer ' + TOKEN}, {'Authorization': 'Basic malformed'},
+    {'Authorization': 'Bearer ' + PASSWORD}, {'Authorization': 'Basic malformed'},
     {'X-Forwarded-For': '127.0.0.1', 'X-Forwarded-Host': 'localhost'},
 ])
 def test_unauthenticated_remote_writes_never_reach_hardware(mixer, headers):
@@ -126,21 +129,24 @@ def test_default_listener_is_local_only_and_does_not_authenticate_remote_users()
     assert response.status_code == 401
 
 
-@pytest.mark.parametrize('token', [None, '', '  ', 'too-short'])
-def test_lan_binding_requires_a_password_before_server_or_hardware_start(token):
-    with pytest.raises(ValueError, match='FFADO_WEBMIXER_TOKEN'):
-        AccessPolicy('0.0.0.0', token)
+@pytest.mark.parametrize('credentials', [None, RemoteAccessConfig()])
+def test_lan_binding_requires_saved_enabled_credentials_before_server_or_hardware_start(credentials):
+    with pytest.raises(ValueError, match='--enable-remote-access'):
+        AccessPolicy('0.0.0.0', credentials)
 
 
 def test_password_is_not_in_policy_representation():
-    assert TOKEN not in repr(AccessPolicy('0.0.0.0', TOKEN))
+    credentials = RemoteAccessConfig()
+    credentials.update(enabled=True, username='studio', password=PASSWORD)
+    assert PASSWORD not in repr(AccessPolicy('0.0.0.0', credentials))
 
 
-def test_cli_rejects_lan_without_password_before_importing_server(monkeypatch):
+def test_cli_rejects_lan_without_saved_password_even_with_old_environment_variable(tmp_path, monkeypatch):
     import sys
     from ffado_webmixer import main
-    monkeypatch.delenv('FFADO_WEBMIXER_TOKEN', raising=False)
+    monkeypatch.setenv('FFADO_WEBMIXER_TOKEN', PASSWORD)
+    monkeypatch.setattr(main, 'CONFIG_DIR', tmp_path)
     monkeypatch.setattr(sys, 'argv', ['ffado-webmixer', '--demo', '--headless', '--host', '0.0.0.0'])
     monkeypatch.setattr(main, 'create_backends', lambda *_: pytest.fail('Must not initialize hardware'))
-    with pytest.raises(SystemExit, match='FFADO_WEBMIXER_TOKEN'):
+    with pytest.raises(SystemExit, match='--enable-remote-access'):
         main.main()

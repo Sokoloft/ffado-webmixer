@@ -1,6 +1,7 @@
 import json
 import queue
 from flask import Response, jsonify, request
+from ..services.streams import StreamClosed, StreamSubscription
 
 def register(app, hub, device_manager=None):
     @app.get("/api/events")
@@ -16,14 +17,20 @@ def register(app, hub, device_manager=None):
         if expected and expected != selected:
             return jsonify(error='Selected mixer changed in another tab; reload this page'), 409
         client = hub.subscribe(selected)
+        subscription = StreamSubscription(client, lambda: hub.unsubscribe(client),
+                                          request.environ.get('ffado_webmixer.remote_authorization'))
 
         def stream():
             try:
+                if subscription.closed.is_set():
+                    return
                 yield "retry: 1000\n\n"
 
                 while True:
                     try:
-                        event = client.get(timeout=15)
+                        event = subscription.get(timeout=15)
+                    except StreamClosed:
+                        return
                     except queue.Empty:
                         # Also lets the server notice pages that have closed.
                         yield ": keepalive\n\n"
@@ -31,7 +38,7 @@ def register(app, hub, device_manager=None):
 
                     yield f"data: {json.dumps(event)}\n\n"
             finally:
-                hub.unsubscribe(client)
+                subscription.close()
 
         response = Response(
             stream(),
@@ -39,5 +46,5 @@ def register(app, hub, device_manager=None):
             headers={"X-Accel-Buffering": "no", "Cache-Control": "no-store"},
         )
         # Closing a response before iteration also needs to remove its client.
-        response.call_on_close(lambda: hub.unsubscribe(client))
+        response.call_on_close(subscription.close)
         return response

@@ -64,6 +64,7 @@ def manager_factory(monkeypatch, tmp_path):
     flask_stub = types.ModuleType('flask')
     flask_stub.session = {}
     flask_stub.has_request_context = lambda: True
+    flask_stub.request = types.SimpleNamespace(environ={})
     monkeypatch.setitem(sys.modules, 'flask', flask_stub)
     with isolated_modules(('ffado_webmixer.device_manager',)):
         dm = importlib.import_module('ffado_webmixer.device_manager')
@@ -189,7 +190,7 @@ def test_three_device_routes_and_stale_client_isolation(monkeypatch, tmp_path):
     session = {}
     flask_stub.session = session
     flask_stub.has_request_context = lambda: True
-    request = types.SimpleNamespace(method='GET', path='', headers={}, args={},
+    request = types.SimpleNamespace(method='GET', path='', headers={}, args={}, environ={},
                                     remote_addr='127.0.0.1', host_url='http://localhost/',
                                     is_json=True,
                                     get_json=lambda force=False, silent=False: {})
@@ -234,6 +235,7 @@ def test_three_device_routes_and_stale_client_isolation(monkeypatch, tmp_path):
                          device_manager=manager, about={'version':'1.1.1'})
 
         def call(method, path, *, header=None, body=None):
+            request.environ = {}  # Each emulated HTTP request has its own selection.
             request.method, request.path = method, path
             request.headers = {'X-FFADO-Device':header} if header else {}
             request.get_json = lambda force=False, silent=False: body or {}

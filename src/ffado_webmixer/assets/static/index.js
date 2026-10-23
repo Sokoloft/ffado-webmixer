@@ -837,7 +837,7 @@ var gear = document.getElementById("gear"), overlay = document.getElementById("o
 var dialog = document.getElementById("dialog");
 var hideBox = document.getElementById("hideMin");
 var qjackctlEnabled = false;
-var TABS = ["general", "theme", "about"], currentTab = "general";
+var TABS = ["general", "theme", "remote-access", "about"], currentTab = "general";
 var jackEnableBox = document.getElementById("enableQjackctl");
 function setQjackctlEnabled(enabled) {
   qjackctlEnabled = !!enabled;
@@ -852,7 +852,7 @@ function setQjackctlEnabled(enabled) {
     tab.setAttribute("aria-selected", "false");
     tab.tabIndex = -1;
   }
-  TABS = qjackctlEnabled ? ["general", "qjackctl", "theme", "about"] : ["general", "theme", "about"];
+  TABS = qjackctlEnabled ? ["general", "qjackctl", "theme", "remote-access", "about"] : ["general", "theme", "remote-access", "about"];
   if (!qjackctlEnabled && currentTab === "qjackctl") showTab("general");
 }
 function showTab(name) {
@@ -867,6 +867,7 @@ function showTab(name) {
   });
   if (name === "about") loadAbout();
   if (name === "qjackctl") checkJackStatus();
+  if (name === "remote-access") window.ffadoRemoteAccess.load();
 }
 Array.prototype.forEach.call(document.querySelectorAll(".tab"), function (tab) {
   tab.addEventListener("click", function () { showTab(tab.dataset.tab); });
@@ -1012,6 +1013,7 @@ function openSettings() {
 }
 function closeSettings() {
   if (!qrDialog.hidden) { closeMixerQR(); return; }
+  window.ffadoRemoteAccess.clear();
   overlay.hidden = true;
   gear.classList.remove("open");
   gear.focus();

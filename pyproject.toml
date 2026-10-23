@@ -21,6 +21,7 @@ classifiers = [
     "Topic :: Multimedia :: Sound/Audio :: Mixers",
 ]
 dependencies = [
+    "argon2-cffi>=23.1,<26",
     "Flask>=3.0,<4",
     "Werkzeug>=3.0,<4",
     "dbus-python>=1.3",

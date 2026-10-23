@@ -7,8 +7,18 @@
 
 ## 1.2.0 — Access control and reliability (2026-10-22)
 
-- Default to a localhost listener. Explicit LAN access requires `--host 0.0.0.0` and a password in `FFADO_WEBMIXER_TOKEN`; remote clients authenticate as `ffado` using HTTP Basic authentication.
+- Default to a localhost listener until Remote Access is enabled. Configure a username and password in the new settings tab or with `--enable-remote-access` (hidden password prompts); both save a private Argon2id credential file in `~/.config/ffado-webmixer/auth.json`. Saved settings control LAN listening, with an explicit `--host` override. `--disable-remote-access` disables it for the next launch. This replaces `FFADO_WEBMIXER_TOKEN`; remote clients use their configured credentials with HTTP Basic authentication.
 - Reject cross-origin browser writes and non-JSON API submissions. Local desktop access remains automatic.
+- Pin the selected GUID, backend and settings for each HTTP request so another browser changing the preferred mixer cannot redirect in-flight reads, writes or event broadcasts.
+- Apply paired native pan changes in one hardware transaction, restoring both original values after partial failures and reporting any incomplete rollback.
+- Limit paired-edit rollback snapshots to the affected input channels, avoiding whole-bus D-Bus reads while retaining the same value conversions and transaction lock.
+- Serialize channel/output renames with preference saves, restore prior names after failed persistence, and return JSON validation errors for malformed mixer changes.
+- Validate mute-recovery journal structure and numeric values before applying them. Preserve malformed files and show the existing recovery warning with safe discard, rather than preventing startup.
+- Route SIGTERM through normal server shutdown and software-mute restoration. Run cleanup once, tolerate repeated termination signals during restoration, and retain recovery records for levels that could not be restored.
+- Remove peak-stream subscribers even when their response closes before iteration starts, so metering stops after the last viewer disconnects.
+- Retry shared peak streaming after temporary transport failures with exponential delays capped at 30 seconds and HTTP polling between attempts. Cancel retries for hidden/stopped views, reject stale polling results after reconnection, and stop metering when access is denied.
+- Revoke existing remote event and meter streams when credentials change or remote access is disabled. Wake idle streams, release their subscriptions, and reject streams authenticated before the change even if they subscribe afterward.
+- Read application theme and accent preferences from the global configuration for every device and the default favicon, matching the desktop splash while preserving explicit icon previews.
 - Validate saved configuration before applying it; retain malformed files in unique `.bad` backups and preserve legacy migrations.
 - Request a complete browser refresh of mixer state after event overflow or reconnection, including bus layouts and routing.
 - Extract routing and output controls from the mixer backend, and live synchronization from the main frontend script.

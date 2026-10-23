@@ -2,9 +2,10 @@
 
 Each browser's signed session independently selects a mixer. A saved global GUID
 supplies the default selection on application startup or for a new session.
-There is no process-global active mixer that could redirect in-flight writes.
+HTTP requests pin their GUID, backend and configuration before validation so
+another browser changing the saved default cannot redirect an in-flight write.
 """
-from flask import session, has_request_context
+from flask import session, has_request_context, request
 from .config import Config, DEFAULT_SETTINGS
 from pathlib import Path
 from copy import deepcopy
@@ -82,8 +83,29 @@ class DeviceManager:
 
     @property
     def current_guid(self):
+        selected = self._request_selection()
+        if selected is not None:
+            return selected[0]
         guid = session.get('ffado_device') if has_request_context() else None
         return guid if isinstance(guid, str) and guid in self.devices else self.preferred_guid
+
+    def _request_selection(self):
+        if has_request_context():
+            selections = request.environ.get('ffado_webmixer.device_selections', {})
+            return selections.get(self)
+        return None
+
+    def pin_request(self):
+        """Keep one device identity and its objects for this HTTP request.
+
+        Store on the request rather than the application context: embedded
+        callers can reuse an application context across several requests.
+        Repeated calls must not replace an already validated selection.
+        """
+        selections = request.environ.setdefault('ffado_webmixer.device_selections', {})
+        if self not in selections:
+            guid = self.current_guid
+            selections[self] = (guid, self.devices[guid], self.configs[guid])
 
     def remember_device(self, guid):
         """Persist a successful device choice as the startup default.
@@ -115,10 +137,16 @@ class DeviceManager:
 
     @property
     def backend(self):
+        selected = self._request_selection()
+        if selected is not None:
+            return selected[1]
         return self.devices[self.current_guid]
 
     @property
     def config(self):
+        selected = self._request_selection()
+        if selected is not None:
+            return selected[2]
         return self.configs[self.current_guid]
 
     def list_devices(self):

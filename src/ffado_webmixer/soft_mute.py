@@ -21,17 +21,37 @@ class MuteJournal:
     def load(self):
         if self.path is None or not self.path.exists():
             return {}
-        data = json.loads(self.path.read_text(encoding='utf-8'))
-        if (data.get('schema') != 1 or data.get('guid') != self.guid or
+        invalid = f'Invalid software mute recovery data in {self.path}'
+        try:
+            data = json.loads(self.path.read_text(encoding='utf-8'))
+        except (ValueError, RecursionError) as exc:
+            raise ValueError(invalid) from exc
+        if not isinstance(data, dict):
+            raise ValueError(invalid)
+        if (type(data.get('schema')) is not int or data['schema'] != 1 or
+                data.get('guid') != self.guid or
                 data.get('matrix_path') != self.matrix_path):
             raise ValueError(f'Recovery journal identity does not match this device: {self.path}')
+        levels = data.get('levels')
+        if not isinstance(levels, list):
+            raise ValueError(invalid)
         values = {}
-        for item in data['levels']:
-            key = (int(item['mix']), int(item['column']))
-            raw = float(item['raw'])
-            if (key in values or key[0] < 0 or key[1] < 0 or
-                    not math.isfinite(raw) or raw < 0):
-                raise ValueError(f'Invalid software mute recovery data in {self.path}')
+        for item in levels:
+            if not isinstance(item, dict):
+                raise ValueError(invalid)
+            mix, column, raw = item.get('mix'), item.get('column'), item.get('raw')
+            # Do not coerce coordinates: truncating a float or accepting a
+            # boolean could restore a gain to a different channel or bus.
+            if (type(mix) is not int or type(column) is not int or
+                    mix < 0 or column < 0 or type(raw) not in (int, float)):
+                raise ValueError(invalid)
+            try:
+                raw = float(raw)
+            except OverflowError as exc:
+                raise ValueError(invalid) from exc
+            key = (mix, column)
+            if key in values or not math.isfinite(raw) or raw < 0:
+                raise ValueError(invalid)
             values[key] = raw
         return values
 

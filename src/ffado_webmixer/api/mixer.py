@@ -1,32 +1,41 @@
 from flask import jsonify, request
 from contextlib import nullcontext
+import math
 import queue
+from werkzeug.exceptions import BadRequest
 from ..services.peak_stream import PeakStreamHub
+from ..services.streams import StreamClosed, StreamSubscription
 from ..services.stereo import MIRRORED, pair_name
 from ..mixer import input_pair_balance_from_raw
 
 def write_linked_controls(backend, mix, pair, control, value):
-    """Write a visible linked strip with best-effort rollback on any failure.
+    """Apply the same value to a linked strip with best-effort rollback."""
+    _write_linked_values(backend, mix, control, {channel: value for channel in pair})
 
-    Snapshot the UI control values *before* touching either channel. A missing
-    hardware control (e.g. gain on just one input) remains optional, as before,
-    but no write is attempted without a value available for restoration.
-    On FFADO hardware, hold its transaction lock across snapshot and writes so
-    concurrent browser requests cannot interleave the two legs.
+
+def _write_linked_values(backend, mix, control, values, *, require_all=False):
+    """Apply ordered per-channel values within one hardware transaction.
+
+    Snapshot only the affected channels *before* touching either one. A missing
+    hardware control (e.g. gain on just one input) is optional unless both are
+    required, as with stereo pan. Keep the transaction locked through rollback
+    so another browser's edit cannot interleave the two legs or their restore.
     """
     helper = getattr(backend, 'helper', None)
     transaction = helper.transaction() if helper is not None else nullcontext()
     with transaction:
-        state = backend.read_mix(mix)
-        if any(channel not in state for channel in pair):
+        state = backend.read_mix(mix, channels=tuple(values))
+        if any(channel not in state for channel in values):
             raise ValueError('One or both linked channels are unavailable')
-        originals = {channel: state[channel][control] for channel in pair
+        originals = {channel: state[channel][control] for channel in values
                      if control in state[channel] and state[channel][control] is not None}
+        if require_all and len(originals) != len(values):
+            raise ValueError(f'Both linked channels must support {control}')
         if not originals:
             raise ValueError(f'Neither linked channel supports {control}')
         attempted = []
         try:
-            for channel in pair:
+            for channel, value in values.items():
                 if channel in originals:
                     # Include a call which raises: a D-Bus write may have
                     # reached the device before reporting an error.
@@ -43,6 +52,36 @@ def write_linked_controls(backend, mix, pair, control, value):
                 raise RuntimeError('Linked-channel write failed; rollback may be incomplete: '
                                    + '; '.join(failed)) from exc
             raise
+
+
+def _validate_set_request(msg):
+    if not isinstance(msg, dict):
+        raise ValueError('Mixer changes must be a JSON object')
+    if any(key not in msg for key in ('strip', 'control', 'value')):
+        raise ValueError('Mixer changes require strip, control and value fields')
+    strip, control, value = msg['strip'], msg['control'], msg['value']
+    if not isinstance(strip, str) or not strip.strip():
+        raise ValueError('Strip must be a non-empty string')
+    if not isinstance(control, str) or control not in MIRRORED + ('pan', 'name'):
+        raise ValueError('Unknown mixer control')
+    raw_mix = msg.get('mix', 0)
+    if type(raw_mix) is not int and not (
+            isinstance(raw_mix, str) and raw_mix.isascii() and raw_mix.isdecimal()):
+        raise ValueError('Mix must be a non-negative integer')
+    mix = int(raw_mix)
+    if mix < 0:
+        raise ValueError('Mix must be a non-negative integer')
+    if control == 'name':
+        if not isinstance(value, str) or not 0 < len(value.strip()) <= 16:
+            raise ValueError('Name must contain 1 to 16 characters')
+        value = value.strip()
+    elif control in ('mute', 'solo', 'invert'):
+        if type(value) is not bool:
+            raise ValueError(f'{control} value must be a boolean')
+    elif (isinstance(value, bool) or not isinstance(value, (int, float, str))
+          or not math.isfinite(float(value))):
+        raise ValueError(f'{control} value must be a finite number')
+    return strip, control, value, mix
 
 
 def register(app, backend, description, config, broadcast):
@@ -167,23 +206,32 @@ def register(app, backend, description, config, broadcast):
         from flask import Response
         selected_backend = backend.manager.backend if hasattr(backend, 'manager') else backend
         sampler, client = peak_streams.subscribe(selected_backend)
+        subscription = StreamSubscription(client, lambda: peak_streams.unsubscribe(sampler, client),
+                                          request.environ.get('ffado_webmixer.remote_authorization'))
 
         def stream():
             try:
+                if subscription.closed.is_set():
+                    return
                 yield ': connected\n\n'
                 while True:
                     try:
-                        data = client.get(timeout=2)
+                        data = subscription.get(timeout=2)
+                    except StreamClosed:
+                        return
                     except queue.Empty:
                         yield ': keepalive\n\n'
                         continue
                     yield 'data: ' + data + '\n\n'
             finally:
-                peak_streams.unsubscribe(sampler, client)
+                subscription.close()
 
-        return Response(stream(), mimetype='text/event-stream', headers={
+        response = Response(stream(), mimetype='text/event-stream', headers={
             'Cache-Control': 'no-cache', 'X-Accel-Buffering': 'no',
         })
+        # An unstarted generator does not run its finally block when closed.
+        response.call_on_close(subscription.close)
+        return response
 
     @app.post('/api/bus-stereo')
     def bus_stereo():
@@ -319,30 +367,32 @@ def register(app, backend, description, config, broadcast):
 
     @app.post("/api/set")
     def set_value():
-        msg = request.get_json(force=True)
-
-        strip = msg["strip"]
-        control = msg["control"]
-        value = msg["value"]
+        try:
+            strip, control, value, mix = _validate_set_request(request.get_json(force=True))
+        except BadRequest:
+            return jsonify(error='Mixer changes must contain valid JSON'), 400
+        except (ValueError, TypeError, OverflowError) as exc:
+            return jsonify(error=str(exc)), 400
 
         if control == "name":
-            name = str(value).strip()[:16]
-
-            if name:
-                config.names[strip] = name
-                config.save()
-
-                broadcast(
-                    {
-                        "type": "name",
-                        "strip": strip,
-                        "value": name,
-                    }
-                )
-
+            with config._save_lock:
+                previous = config.names.get(strip)
+                config.names[strip] = value
+                try:
+                    config.save()
+                except Exception as exc:
+                    if previous is None:
+                        config.names.pop(strip, None)
+                    else:
+                        config.names[strip] = previous
+                    try:
+                        config.save()
+                    except Exception:
+                        return jsonify(error='Could not save name; rollback may be incomplete'), 500
+                    return jsonify(error='Could not save name: ' + str(exc)), 500
+            broadcast({'type': 'name', 'strip': strip, 'value': value})
             return jsonify(ok=True)
 
-        mix = int(msg.get('mix', 0))
         pair = config.pair_of(strip, mix) if control in MIRRORED else None
         # A linked DICE/RME output is two distinct matrix rows; an input
         # pair is two distinct matrix columns. Muting must cover their full
@@ -373,7 +423,6 @@ def register(app, backend, description, config, broadcast):
                 position = float(value)
                 if not -1 <= position <= 1:
                     raise ValueError('Stereo pan must be between -1 and 1')
-                mix = int(msg.get('mix', 0))
                 left_pan = -1 + 2 * max(0, position)
                 right_pan = 1 + 2 * min(0, position)
                 matrix_pan = (hasattr(backend, 'matrix') and
@@ -389,9 +438,9 @@ def register(app, backend, description, config, broadcast):
                         activate_missing=True)
                 else:
                     # On non-matrix mixers, only call actual source-defined pan
-                    # controls. Linking itself never touches hardware controls.
-                    for channel, pan_value in ((left, left_pan), (right, right_pan)):
-                        backend.write(mix, channel, 'pan', pan_value)
+                    # controls, restoring both originals on a partial failure.
+                    _write_linked_values(backend, mix, 'pan',
+                                         {left: left_pan, right: right_pan}, require_all=True)
             except (ValueError, TypeError, KeyError, IndexError) as exc:
                 return jsonify(error=str(exc)), 400
             except Exception as exc:
@@ -399,7 +448,7 @@ def register(app, backend, description, config, broadcast):
             broadcast({'type': 'strip', 'mix': mix, 'strip': left, 'control': 'pan', 'value': position})
             return jsonify(ok=True)
         if control == 'fader' and hasattr(backend, 'matrix') and backend.matrix['mode'] in ('dice_db','rme_db'):
-            bus=int(msg.get('mix',0))
+            bus = mix
             if bus in config.settings.get('stereo_buses', []):
                 try:
                     # A paired input strip is one operation: when both inputs
@@ -418,7 +467,6 @@ def register(app, backend, description, config, broadcast):
                            'control':'fader','value':value})
                 return jsonify(ok=True)
         if control == 'pan' and hasattr(backend, 'matrix') and backend.matrix['mode'] in ('dice_db','rme_db'):
-            mix=int(msg.get('mix',0))
             left = mix - 1 if mix % 2 else mix
             if left in config.settings.get('stereo_buses', []):
                 try:
@@ -435,7 +483,7 @@ def register(app, backend, description, config, broadcast):
                 write_linked_controls(backend, mix, pair, control, value)
             else:
                 backend.write(mix, strip, control, value)
-        except (ValueError, KeyError) as exc:
+        except (ValueError, KeyError, TypeError, IndexError, OverflowError) as exc:
             return jsonify(error=str(exc)), 400
         except Exception as exc:
             return jsonify(error=str(exc)), 500
@@ -443,7 +491,7 @@ def register(app, backend, description, config, broadcast):
         broadcast(
             {
                 "type": "strip",
-                "mix": int(msg.get("mix", 0)),
+                "mix": mix,
                 "strip": pair[0] if pair else strip,
                 "control": control,
                 "value": value,

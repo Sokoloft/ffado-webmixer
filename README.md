@@ -53,11 +53,17 @@ By default the server listens only on the host computer. In headless mode, open 
 To enable access from another device on your trusted network, set a password of at least 16 characters and explicitly enable the LAN listener:
 
 ```bash
-export FFADO_WEBMIXER_TOKEN='replace-this-with-a-long-random-password'
-python main.py --headless --host 0.0.0.0
+python main.py --enable-remote-access
+python main.py --headless
 ```
 
-Open `http://HOST-IP:5000/` and sign in with username **ffado** and that password. The local desktop and localhost browser remain accessible without a password. HTTP Basic authentication does not encrypt traffic; use a trusted LAN or an SSH tunnel. Do not forward this port to the public internet.
+The setup command prompts for a username, a hidden password (at least 16 characters), and password confirmation, then exits without starting the mixer. The password is never passed as a command argument. You can also configure these credentials in **Settings → Remote Access** from the local app or localhost browser. Both methods store the username and a salted Argon2id password hash in `~/.config/ffado-webmixer/auth.json`, with directory permissions `0700` and file permissions `0600`.
+
+After enabling remote access, start or restart the app and open `http://HOST-IP:5000/`. Sign in with your chosen username and password. The saved setting enables the LAN listener; `--host 127.0.0.1` overrides it for a local-only launch. Demo/debug sessions stay local by default and cannot change saved remote-access settings; an explicit `--host 0.0.0.0` uses previously saved credentials for remote testing.
+
+The local desktop and localhost browser remain accessible without a password. GUI credential changes apply to new requests immediately; leave the password fields blank to keep the current password. Disabling remote access in the GUI immediately blocks new remote requests; restart to close the listener. For command-line disabling, run `python main.py --disable-remote-access` and restart any running instance. CLI changes are picked up on the next application start. The former `FFADO_WEBMIXER_TOKEN` variable is no longer used.
+
+HTTP Basic authentication does not encrypt traffic. Use HTTPS or an SSH tunnel to protect credentials over the network. Do not forward this port to the public internet.
 
 On first desktop launch, the application can offer to install a launcher and themed icon. You can also manage it manually:
 

@@ -8,6 +8,7 @@
   const MOVE_LIMIT = 11;
   function protect(input) {
     if (!input || input.dataset.gestureProtected === 'true') return input;
+    if (input.dataset.gestureEdit === 'direct') return input;
     if (!/^(?:text|number|search|email|url|tel)$/.test(input.type)) return input;
     input.dataset.gestureProtected = 'true';
     input.dataset.gestureEdit = 'locked';
