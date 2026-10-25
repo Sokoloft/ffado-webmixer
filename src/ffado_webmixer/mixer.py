@@ -873,14 +873,30 @@ class Mixer(RoutingControls, OutputControls):
         An error restores every changed cell and its recovery journal before
         reporting failure. No new cross-routes are enabled by a mute.
         """
+        self._write_group_mute_solo(mixes, columns, 'mute', value)
+
+    def write_group_solo(self, mixes, columns, value):
+        """Solo all selected inputs on every leg of a linked output bus.
+
+        Set the entire input pair's logical state before changing gains, so
+        one selected input is never silenced while enabling its partner.
+        Every other input on the affected buses participates in rollback.
+        """
+        self._write_group_mute_solo(mixes, columns, 'solo', value)
+
+    def _write_group_mute_solo(self, mixes, columns, control, value):
         if not self._soft_mute() or 'fader' not in self.roles:
-            raise ValueError('Software matrix mute is unavailable on this device')
-        targets = list(dict.fromkeys((int(bus), int(col)) for bus in mixes for col in columns))
-        if not targets or any(not 0 <= bus < len(self.mixes) or
-                              not 0 <= col < len(self.columns) for bus, col in targets):
-            raise ValueError('Invalid stereo mute target')
+            raise ValueError(f'Software matrix {control} is unavailable on this device')
+        buses = tuple(dict.fromkeys(mixes))
+        selected = tuple(dict.fromkeys(columns))
+        if (not buses or not selected or
+                any(type(bus) is not int or not 0 <= bus < len(self.mixes) for bus in buses) or
+                any(type(col) is not int or not 0 <= col < len(self.columns) for col in selected)):
+            raise ValueError(f'Invalid stereo {control} target')
         if type(value) is not bool:
-            raise ValueError('Mute value must be true or false')
+            raise ValueError(f'{control.capitalize()} value must be true or false')
+        affected = range(len(self.columns)) if control == 'solo' else selected
+        targets = [(bus, col) for bus in buses for col in affected]
         with self.helper.transaction():
             self._require_recovery_resolved()
             if not hasattr(self, '_user_mutes'):
@@ -895,45 +911,68 @@ class Mixer(RoutingControls, OutputControls):
             before_raw = {key: self._get_cell(path, *key) for key in targets}
             before_saved = dict(self._matrix_mutes)
             before_mutes = set(self._user_mutes)
+            before_solos = deepcopy(self._solos)
             try:
-                for key in targets:
-                    if value:
-                        self._user_mutes.add(key)
-                    else:
-                        self._user_mutes.discard(key)
+                if control == 'solo':
+                    for bus in buses:
+                        solos = self._solos.setdefault(bus, set())
+                        if value:
+                            solos.update(selected)
+                        else:
+                            solos.difference_update(selected)
+                        if not solos:
+                            self._solos.pop(bus, None)
+                else:
+                    for key in targets:
+                        if value:
+                            self._user_mutes.add(key)
+                        else:
+                            self._user_mutes.discard(key)
                 for key in targets:
                     self._reconcile_cell(*key)
                 # Re-read every target: the D-Bus call succeeding does not
                 # guarantee that the device accepted the whole transaction.
                 for key in targets:
                     actual = self._get_cell(path, *key)
-                    if value and not self._is_zero(actual):
+                    if self._silenced(*key) and not self._is_zero(actual):
                         raise IOError(f'FFADO did not mute bus {key[0]+1}, input {key[1]+1}')
                     # If another solo or explicit user mute still suppresses
                     # this route, it must remain in the recovery journal.
-                    if not value and key in self._matrix_mutes and not self._silenced(*key):
+                    if key in self._matrix_mutes and not self._silenced(*key):
                         raise IOError(f'FFADO did not restore bus {key[0]+1}, input {key[1]+1}')
                 self._mute_fault = None
             except Exception as exc:
                 self._user_mutes = before_mutes
+                self._solos = before_solos
                 failures = []
+                # Unsilencing may already have removed saved levels. Journal
+                # them again BEFORE rollback writes any of those cells to zero.
+                self._matrix_mutes = {**before_saved, **self._matrix_mutes}
+                journal_ready = True
+                try:
+                    self._save_soft_mutes()
+                except Exception as journal_exc:
+                    journal_ready = False
+                    failures.append(f'recovery journal: {journal_exc}')
                 for key, prior in before_raw.items():
                     try:
                         actual = self._get_cell(path, *key)
                         if not (self._is_zero(prior) and self._is_zero(actual)) and abs(float(actual) - float(prior)) > 0.000001:
+                            if self._is_zero(prior) and not journal_ready:
+                                raise RuntimeError('Cannot silence a rollback cell without a recovery journal')
                             self._set_cell(path, *key, prior)
                             self._verify_cell(*key, prior)
                     except Exception as rollback_exc:
                         failures.append(f'bus {key[0]+1}, input {key[1]+1}: {rollback_exc}')
                 if not failures:
                     self._matrix_mutes = before_saved
-                    try:
-                        self._save_soft_mutes()
-                    except Exception as journal_exc:
-                        failures.append(f'recovery journal: {journal_exc}')
+                try:
+                    self._save_soft_mutes()
+                except Exception as journal_exc:
+                    failures.append(f'recovery journal: {journal_exc}')
                 # If rollback is incomplete, preserve the current journal;
                 # never overwrite a possibly needed crash-recovery entry.
-                self._mute_fault = f'Stereo mute failed: {exc}'
+                self._mute_fault = f'Stereo {control} failed: {exc}'
                 if failures:
                     self._mute_fault += '; incomplete rollback: ' + '; '.join(failures)
                 raise RuntimeError(self._mute_fault) from exc
@@ -960,42 +999,7 @@ class Mixer(RoutingControls, OutputControls):
             return
 
         if self._soft_mute() and control in ("mute", "solo") and "fader" in self.roles:
-            if not hasattr(self, '_user_mutes'): self._user_mutes = set()
-            if not hasattr(self, '_solos'): self._solos = {}
-            with self.helper.transaction():
-                self._require_recovery_resolved()
-                # Detect externally changed cells before changing logical state.
-                for key in list(self._matrix_mutes):
-                    self._external_override(*key, self._get_cell(self.roles['fader'][0], *key))
-                prior_mutes = set(self._user_mutes)
-                prior_solos = deepcopy(self._solos)
-                try:
-                    if control == 'mute':
-                        if value: self._user_mutes.add((mix, col))
-                        else: self._user_mutes.discard((mix, col))
-                        self._reconcile_cell(mix, col)
-                    else:
-                        solos = self._solos.setdefault(mix, set())
-                        if value: solos.add(col)
-                        else: solos.discard(col)
-                        if not solos: self._solos.pop(mix, None)
-                        for index in range(len(self.columns)):
-                            self._reconcile_cell(mix, index)
-                    self._mute_fault = None
-                except Exception as exc:
-                    self._user_mutes = prior_mutes
-                    self._solos = prior_solos
-                    # Best-effort rollback to the previous logical state.
-                    # Any hardware writes that cannot be undone keep a journal.
-                    rollback_errors = []
-                    for key in list(self._matrix_mutes):
-                        if key[0] == mix:
-                            try: self._reconcile_cell(*key)
-                            except Exception as failure: rollback_errors.append(str(failure))
-                    self._mute_fault = f'Mute/solo failed: {exc}'
-                    if rollback_errors:
-                        self._mute_fault += '; rollback incomplete: ' + '; '.join(rollback_errors)
-                    raise RuntimeError(self._mute_fault) from exc
+            self._write_group_mute_solo((mix,), (col,), control, value)
             return
         if control not in ("fader", "pan", "mute", "solo") or control not in self.roles:
             raise ValueError(f"{control} is not controllable on this device")

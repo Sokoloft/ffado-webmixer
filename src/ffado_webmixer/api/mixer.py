@@ -395,25 +395,28 @@ def register(app, backend, description, config, broadcast):
 
         pair = config.pair_of(strip, mix) if control in MIRRORED else None
         # A linked DICE/RME output is two distinct matrix rows; an input
-        # pair is two distinct matrix columns. Muting must cover their full
-        # Cartesian product, not just the visible left-hand strip/bus.
-        if control == 'mute' and getattr(backend, '_soft_mute', lambda: False)():
+        # pair is two distinct matrix columns. Software mute/solo must cover
+        # both bus legs and update paired inputs together before changing gains.
+        if control in ('mute', 'solo') and getattr(backend, '_soft_mute', lambda: False)():
             try:
                 if type(value) is not bool:
-                    raise ValueError('Mute value must be a boolean')
+                    raise ValueError(f'{control.capitalize()} value must be a boolean')
                 stereo_bus = (hasattr(backend, 'matrix') and
                               backend.matrix['mode'] in ('dice_db', 'rme_db') and
                               mix in config.settings.get('stereo_buses', []))
                 buses = (mix, mix + 1) if stereo_bus else (mix,)
                 channels = [int(channel.split('/')[-1]) for channel in (pair or [strip])]
-                backend.write_group_mute(buses, channels, value)
+                if control == 'solo':
+                    backend.write_group_solo(buses, channels, value)
+                else:
+                    backend.write_group_mute(buses, channels, value)
             except (ValueError, TypeError, IndexError, KeyError) as exc:
                 return jsonify(error=str(exc)), 400
             except Exception as exc:
                 return jsonify(error=str(exc)), 500
             broadcast({'type': 'strip', 'mix': mix,
                        'strip': pair[0] if pair else strip,
-                       'control': 'mute', 'value': value})
+                       'control': control, 'value': value})
             return jsonify(ok=True)
         if control == 'pan' and config.pair_of(strip, mix):
             # Stereo pan shifts the L/R image without collapsing both channels
