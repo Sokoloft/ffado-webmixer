@@ -7,6 +7,7 @@
   const username = document.getElementById('remoteAccessUsername');
   const password = document.getElementById('remoteAccessPassword');
   const confirm = document.getElementById('remoteAccessConfirm');
+  const port = document.getElementById('remoteAccessPort');
   const message = document.getElementById('remoteAccessMessage');
   let status = null;
   let busy = false;
@@ -25,15 +26,20 @@
     status = data;
     enabled.checked = data.enabled;
     username.value = data.username;
+    port.value = data.port === 5000 ? '' : String(data.port);
     fields.disabled = !data.can_manage;
     clear();
     requirements();
     if (!data.can_manage) {
       tell('Manage remote access from the local app or localhost browser, outside demo/debug mode.');
     } else if (data.restart_required) {
-      tell((saved ? 'Saved. ' : '') + (data.enabled
-        ? 'Restart the app to enable LAN access. Remove any localhost --host override.'
-        : 'Remote requests are blocked. Restart the app to close the LAN listener.'));
+      const changes = [];
+      if (data.port !== data.listening_port) changes.push(`use port ${data.port}`);
+      if (data.enabled && !data.listening) changes.push('enable LAN access');
+      if (!data.enabled && data.listening) changes.push('close the LAN listener');
+      tell((saved ? 'Saved. ' : '') + (!data.enabled ? 'Remote requests are blocked. ' : '') +
+        'Restart the app to ' + changes.join(' and ') + '.' +
+        (data.enabled && !data.listening ? ' Remove any localhost --host override.' : ''));
     } else {
       tell((saved ? 'Saved. ' : '') + (data.enabled
         ? 'Remote access is enabled. Credential changes apply to new requests immediately.'
@@ -63,7 +69,8 @@
       return;
     }
     if (!form.reportValidity()) return;
-    const body = {enabled: enabled.checked, username: username.value, password: password.value};
+    const body = {enabled: enabled.checked, username: username.value, password: password.value,
+                  port: port.value.trim()};
     busy = true;
     fields.disabled = true;
     clear();

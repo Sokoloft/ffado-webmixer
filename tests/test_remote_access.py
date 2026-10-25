@@ -79,6 +79,7 @@ def test_local_gui_setup_persists_and_does_not_return_secrets(tmp_path):
         'enabled': True, 'username': 'my-mixer', 'password': PASSWORD})
     assert response.status_code == 200
     assert response.json == {'enabled': True, 'username': 'my-mixer', 'configured': True,
+                             'port': 5000, 'listening_port': 5000,
                              'can_manage': True, 'listening': False, 'restart_required': True}
     assert PASSWORD not in response.text and '$argon2' not in response.text
     reloaded = RemoteAccessConfig(config.path)
@@ -190,7 +191,7 @@ def test_cli_prompts_username_then_hidden_password_and_gui_can_read_it(tmp_path,
     prompts = []
     def username(prompt):
         prompts.append(prompt)
-        return 'studio'
+        return 'studio' if 'username' in prompt else ''
     def password(prompt):
         prompts.append(prompt)
         return PASSWORD
@@ -200,6 +201,7 @@ def test_cli_prompts_username_then_hidden_password_and_gui_can_read_it(tmp_path,
     assert prompts[0].endswith('username: ')
     assert prompts[1].startswith('Remote access password')
     assert prompts[2] == 'Confirm password: '
+    assert 'port' in prompts[3] and '5000' in prompts[3]
     config = RemoteAccessConfig(main.CONFIG_DIR / 'auth.json')
     config.load()
     app = Flask(__name__)
@@ -215,7 +217,7 @@ def test_cli_prompts_username_then_hidden_password_and_gui_can_read_it(tmp_path,
 
 def test_cli_retries_invalid_username_short_password_and_mismatch(tmp_path, monkeypatch):
     main = setup_cli(monkeypatch, tmp_path)
-    usernames = iter(['bad:name', 'studio'])
+    usernames = iter(['bad:name', 'studio', ''])
     passwords = iter(['short', PASSWORD, 'mismatch', PASSWORD, PASSWORD])
     monkeypatch.setattr('builtins.input', lambda _: next(usernames))
     monkeypatch.setattr(getpass, 'getpass', lambda _: next(passwords))
@@ -245,11 +247,12 @@ def test_cancelled_or_unsafe_prompt_does_not_change_credentials(tmp_path, monkey
 def test_disable_cli_preserves_credentials(tmp_path, monkeypatch):
     main = setup_cli(monkeypatch, tmp_path, '--disable-remote-access')
     config = RemoteAccessConfig(main.CONFIG_DIR / 'auth.json')
-    config.update(enabled=True, username='studio', password=PASSWORD)
+    config.update(enabled=True, username='studio', password=PASSWORD, port=8123)
     main.main()
     config.load()
     assert not config.enabled and config.configured
     assert not config.authenticate('studio', PASSWORD)
+    assert config.port == 8123
 
 
 @pytest.mark.parametrize('extra,expected', [([], '0.0.0.0'), (['--host', '127.0.0.1'], '127.0.0.1'),
@@ -283,3 +286,130 @@ def test_remote_access_tab_is_accessible_and_uses_password_fields():
     for name in ('remoteAccessPassword', 'remoteAccessConfirm'):
         assert parser.ids[name][1]['type'] == 'password'
         assert parser.ids[name][1]['autocomplete'] == 'new-password'
+    port = parser.ids['remoteAccessPort'][1]
+    assert port['type'] == 'number' and port['placeholder'] == '5000'
+    assert port['min'] == '1' and port['max'] == '65535'
+    assert port['data-gesture-edit'] == 'direct'
+
+
+@pytest.mark.parametrize('port,expected', [('', 5000), ('   ', 5000), (1, 1),
+                                          ('8123', 8123), (' 8123 ', 8123), (65535, 65535)])
+def test_gui_port_is_validated_persisted_and_applied_after_restart(app, credentials, port, expected):
+    password_hash = credentials._password_hash
+    response = app.test_client().post('/api/remote-access', json={
+        'enabled': True, 'username': 'studio', 'port': port})
+    assert response.status_code == 200
+    assert response.json['port'] == expected
+    assert response.json['listening_port'] == 5000
+    assert response.json['restart_required'] is (expected != 5000)
+    assert app.ffado_port == 5000  # Saving cannot silently move a live listener.
+    assert credentials._password_hash == password_hash
+    reloaded = RemoteAccessConfig(credentials.path)
+    reloaded.load()
+    assert reloaded.port == expected
+    restarted = Flask('restarted')
+    register(restarted, AccessPolicy('0.0.0.0', reloaded))
+    assert restarted.ffado_port == expected
+    assert not restarted.test_client().get('/api/remote-access').json['restart_required']
+
+
+@pytest.mark.parametrize('port', [None, True, False, 0, -1, 65536, 12.5, '12.5',
+                                 '1e3', 'abc', [], {}, '１２３４'])
+def test_invalid_gui_port_keeps_previous_file_and_credentials(app, credentials, port):
+    original = credentials.path.read_bytes()
+    response = app.test_client().post('/api/remote-access', json={
+        'enabled': True, 'username': 'studio', 'port': port})
+    assert response.status_code == 400
+    assert credentials.port == 5000
+    assert credentials.path.read_bytes() == original
+    assert credentials.authenticate('studio', PASSWORD)
+
+
+def test_blank_port_restores_default_and_omitted_port_preserves_custom_value(app, credentials):
+    client = app.test_client()
+    payload = {'enabled': True, 'username': 'studio'}
+    assert client.post('/api/remote-access', json=dict(payload, port=8123)).json['port'] == 8123
+    assert client.post('/api/remote-access', json=payload).json['port'] == 8123
+    assert client.post('/api/remote-access', json=dict(payload, port='')).json['port'] == 5000
+
+
+def test_existing_credentials_without_port_use_default(credentials):
+    record = json.loads(credentials.path.read_text())
+    del record['port']
+    credentials.path.write_text(json.dumps(record))
+    restored = RemoteAccessConfig(credentials.path)
+    restored.load()
+    assert restored.port == 5000
+    assert restored.authenticate('studio', PASSWORD)
+
+
+@pytest.mark.parametrize('port', [None, 0, -1, 65536, 'invalid', True])
+def test_corrupt_saved_port_is_rejected(credentials, port):
+    record = json.loads(credentials.path.read_text())
+    record['port'] = port
+    credentials.path.write_text(json.dumps(record))
+    with pytest.raises(ValueError, match='Invalid remote-access configuration'):
+        RemoteAccessConfig(credentials.path).load()
+
+
+@pytest.mark.parametrize('answer,expected', [('', 5000), ('8123', 8123)])
+def test_cli_optional_port_uses_the_same_configuration_as_gui(tmp_path, monkeypatch, answer, expected):
+    main = setup_cli(monkeypatch, tmp_path)
+    answers = iter(['studio', answer])
+    monkeypatch.setattr('builtins.input', lambda _: next(answers))
+    monkeypatch.setattr(getpass, 'getpass', lambda _: PASSWORD)
+    main.main()
+    config = RemoteAccessConfig(main.CONFIG_DIR / 'auth.json')
+    config.load()
+    assert config.port == expected
+    assert json.loads(config.path.read_text())['port'] == expected
+    assert config.authenticate('studio', PASSWORD)
+
+
+def test_cli_retries_invalid_port_without_reprompting_for_password(tmp_path, monkeypatch):
+    main = setup_cli(monkeypatch, tmp_path)
+    answers = iter(['studio', '0', '65536', 'invalid', '8123'])
+    passwords = iter([PASSWORD, PASSWORD])
+    monkeypatch.setattr('builtins.input', lambda _: next(answers))
+    monkeypatch.setattr(getpass, 'getpass', lambda _: next(passwords))
+    main.main()
+    config = RemoteAccessConfig(main.CONFIG_DIR / 'auth.json')
+    config.load()
+    assert config.port == 8123
+
+
+def test_cancelled_port_prompt_does_not_save_credentials(tmp_path, monkeypatch):
+    main = setup_cli(monkeypatch, tmp_path)
+    config = RemoteAccessConfig(main.CONFIG_DIR / 'auth.json')
+    config.update(enabled=True, username='original', password=PASSWORD, port=8123)
+    original = config.path.read_bytes()
+    def answer(prompt):
+        if 'port' in prompt:
+            raise EOFError
+        return 'new-name'
+    monkeypatch.setattr('builtins.input', answer)
+    monkeypatch.setattr(getpass, 'getpass', lambda _: PASSWORD)
+    with pytest.raises(SystemExit, match='settings were not changed'):
+        main.main()
+    assert config.path.read_bytes() == original
+
+
+def test_about_and_browser_links_use_running_port_until_restart(credentials, monkeypatch):
+    from ffado_webmixer import server
+    from ffado_webmixer.config import Config
+    from ffado_webmixer.demo import DemoMixer
+    import webbrowser
+    credentials.update(enabled=True, username='studio', port=8123)
+    backend = DemoMixer()
+    app = server.create_app(backend, backend.describe(), Config(None),
+                            access_policy=AccessPolicy('0.0.0.0', credentials))
+    monkeypatch.setattr(server, 'lan_ip', lambda: '192.0.2.10')
+    opened = []
+    monkeypatch.setattr(webbrowser, 'open', lambda url: opened.append(url) or True)
+    client = app.test_client()
+    assert client.get('/api/about').json['address'] == 'http://192.0.2.10:8123'
+    assert client.post('/api/open-mixer', json={}).status_code == 200
+    assert opened == ['http://192.0.2.10:8123/']
+    assert client.post('/api/remote-access', json={
+        'enabled': True, 'username': 'studio', 'port': 9000}).json['restart_required']
+    assert client.get('/api/about').json['address'] == 'http://192.0.2.10:8123'

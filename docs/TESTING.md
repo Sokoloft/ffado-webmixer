@@ -33,6 +33,11 @@ of at least 16 characters, then explicitly pass `--host 0.0.0.0` to the demo/deb
 launch. Normal launches use the saved **Settings → Remote Access** enable flag.
 Remote browsers authenticate with the saved username and password; local desktop
 access remains automatic. Demo/debug sessions cannot edit saved credentials.
+The setup command also prompts for an optional port; Enter uses 5000. The GUI's
+empty Port field also uses 5000. Verify custom ports survive restart, the desktop
+window and About/QR links use the running port, and invalid ports are rejected
+without replacing saved settings. Existing credential files without a port
+continue to use 5000. Port changes require a restart.
 Verify that GUI and CLI setup both use `~/.config/ffado-webmixer/auth.json`, that
 it contains an Argon2id hash rather than the password, and that the file and
 directory permissions are `0600` and `0700`. Check password confirmation,

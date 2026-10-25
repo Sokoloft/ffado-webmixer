@@ -59,7 +59,7 @@ def parse_args():
     desktop.add_argument('--remove-desktop', action='store_true', help='Remove the FFADO Webmixer per-user launcher')
     desktop.add_argument('--check-desktop', action='store_true', help='Check the per-user desktop launcher')
     desktop.add_argument('--enable-remote-access', action='store_true',
-                         help='Prompt for a username and hidden password, save remote access, and exit')
+                         help='Prompt for a username, hidden password and optional port, save remote access, and exit')
     desktop.add_argument('--disable-remote-access', action='store_true',
                          help='Disable saved remote access and exit (restart any running instance)')
 
@@ -284,7 +284,7 @@ def _run_application(args, config, manager, access_policy, create_app, prepare_s
     try:
         from ffado_webmixer.client import run_window, wait_until_ready
         try:
-            wait_until_ready(server_thread=server_thread)
+            wait_until_ready(server_thread=server_thread, port=app.ffado_port)
         except RuntimeError as exc:
             sys.exit(str(exc))
         run_window(
@@ -292,6 +292,7 @@ def _run_application(args, config, manager, access_policy, create_app, prepare_s
             config.settings.get("theme", "dark"),
             skip_loading_screen=config.settings.get("skip_loading_screen", False),
             config=config,
+            port=app.ffado_port,
         )
     finally:
         http_server.shutdown()

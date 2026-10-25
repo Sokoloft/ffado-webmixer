@@ -15,14 +15,15 @@ function element(id) {
 }
 const requests = [];
 let saved = {enabled: false, username: '', configured: false, can_manage: true,
-             listening: false, restart_required: false};
+             port: 5000, listening_port: 5000, listening: false, restart_required: false};
 let saveError = null;
 const window = {ffadoApi: {async request(url, options = {}) {
   requests.push({url, options});
   if (options.body) {
     if (saveError) throw Error(saveError);
     saved = {...saved, enabled: options.body.enabled, username: options.body.username,
-             configured: true, restart_required: options.body.enabled};
+             port: options.body.port === '' ? 5000 : Number(options.body.port),
+             configured: true, restart_required: options.body.enabled || options.body.port !== ''};
   }
   return saved;
 }}};
@@ -31,6 +32,7 @@ const enabled = element('remoteAccessEnabled');
 const username = element('remoteAccessUsername');
 const password = element('remoteAccessPassword');
 const confirm = element('remoteAccessConfirm');
+const port = element('remoteAccessPort');
 const fields = element('remoteAccessFields');
 const message = element('remoteAccessMessage');
 const submit = () => element('remoteAccessForm').handlers.submit({preventDefault() {}});
@@ -38,6 +40,7 @@ const submit = () => element('remoteAccessForm').handlers.submit({preventDefault
   await window.ffadoRemoteAccess.load();
   assert.equal(fields.disabled, false);
   assert.equal(password.required, false);
+  assert.equal(port.value, '', 'default port is represented by the empty field');
   enabled.checked = true;
   enabled.handlers.change();
   assert.equal(password.required, true, 'initial setup requires a password');
@@ -53,13 +56,21 @@ const submit = () => element('remoteAccessForm').handlers.submit({preventDefault
   await submit();
   assert.equal(requests.at(-1).url, '/api/remote-access');
   assert.deepEqual({...requests.at(-1).options.body}, {
-    enabled: true, username: 'studio', password: 'a long password for the mixer'
+    enabled: true, username: 'studio', password: 'a long password for the mixer', port: ''
   });
   assert.equal(requests.at(-1).options.device, undefined, 'credentials are application-wide');
   assert.match(message.textContent, /Saved.*Restart/);
   assert.equal(password.value, '');
   assert.equal(confirm.value, '');
   assert.equal(password.required, false, 'blank password preserves existing credentials');
+  port.value = '8123';
+  await submit();
+  assert.equal(requests.at(-1).options.body.port, '8123');
+  assert.equal(port.value, '8123');
+  assert.match(message.textContent, /Restart.*port 8123/);
+  port.value = '';
+  await submit();
+  assert.equal(saved.port, 5000, 'clearing port restores the default');
 
   enabled.checked = false;
   await submit();

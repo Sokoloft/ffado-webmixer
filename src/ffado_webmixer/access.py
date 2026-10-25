@@ -3,6 +3,7 @@ from dataclasses import dataclass, field
 from ipaddress import ip_address
 from typing import TYPE_CHECKING
 from urllib.parse import urlsplit
+from .remote_access import DEFAULT_PORT
 
 if TYPE_CHECKING:
     from .remote_access import RemoteAccessConfig
@@ -51,6 +52,7 @@ def register(app, policy):
     from flask import jsonify, request
 
     app.ffado_host = policy.host
+    app.ffado_port = policy.remote_access.port if policy.remote_access else DEFAULT_PORT
 
     @app.before_request
     def check_access():
@@ -94,10 +96,13 @@ def register(app, policy):
     def remote_access_status():
         local = policy.permits_local(request.remote_addr, urlsplit(request.host_url).hostname)
         config = policy.remote_access
-        status = config.status() if config else {'enabled': False, 'username': '', 'configured': False}
+        status = config.status() if config else {'enabled': False, 'username': '', 'configured': False,
+                                                'port': DEFAULT_PORT}
         return jsonify(**status, can_manage=bool(local and config and config.writable),
                        listening=not _loopback(policy.host),
-                       restart_required=status['enabled'] != (not _loopback(policy.host)))
+                       listening_port=app.ffado_port,
+                       restart_required=(status['enabled'] != (not _loopback(policy.host))
+                                         or status['port'] != app.ffado_port))
 
     @app.post('/api/remote-access')
     def update_remote_access():
@@ -111,7 +116,8 @@ def register(app, policy):
             return jsonify(error='Remote-access settings must be a JSON object'), 400
         try:
             config.update(enabled=payload.get('enabled'), username=payload.get('username'),
-                          password=payload.get('password', ''))
+                          password=payload.get('password', ''),
+                          **({'port': payload['port']} if 'port' in payload else {}))
         except ValueError as exc:
             return jsonify(error=str(exc)), 400
         except OSError:

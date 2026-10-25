@@ -170,6 +170,13 @@ def test_desktop_splash_uses_saved_theme_accent_and_background(tmp_path, monkeyp
         client.run_window('Mixer', theme='light', config=root, skip_loading_screen=True)
         assert created[-1]['url'] is None
         assert created[-1]['html'] == ''
+        opened, ready = [], []
+        window.load_url = opened.append
+        monkeypatch.setattr(client, 'wait_until_ready', lambda *, port: ready.append(port))
+        webview_stub.start = lambda callback, **kwargs: callback()
+        client.run_window('Mixer', config=root, skip_loading_screen=True, port=8123)
+        assert ready == [8123]
+        assert opened == ['http://127.0.0.1:8123/']
     finally:
         sys.modules.pop('ffado_webmixer.client', None)
 

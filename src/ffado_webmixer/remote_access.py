@@ -15,6 +15,21 @@ from argon2.exceptions import InvalidHashError, VerificationError
 
 
 _HASHER = PasswordHasher(time_cost=2, memory_cost=19456, parallelism=1, type=Type.ID)
+DEFAULT_PORT = 5000
+_UNSET = object()
+
+
+def validate_port(port):
+    if isinstance(port, str):
+        port = port.strip()
+        if not port:
+            return DEFAULT_PORT
+        if not port.isascii() or not port.isdecimal():
+            raise ValueError('Port must be a whole number from 1 to 65535')
+        port = int(port)
+    if type(port) is not int or not 1 <= port <= 65535:
+        raise ValueError('Port must be a whole number from 1 to 65535')
+    return port
 
 
 def validate_username(username):
@@ -45,6 +60,7 @@ class RemoteAccessConfig:
         self.writable = writable
         self.enabled = False
         self.username = ''
+        self.port = DEFAULT_PORT
         self._password_hash = ''
         self._lock = threading.RLock()
         self._cache_key = secrets.token_bytes(32)
@@ -69,6 +85,7 @@ class RemoteAccessConfig:
         try:
             if not isinstance(record, dict) or type(record.get('enabled')) is not bool:
                 raise ValueError('Invalid enabled flag')
+            port = validate_port(record.get('port', DEFAULT_PORT))
             username, password_hash = record.get('username', ''), record.get('password_hash', '')
             if username or password_hash or record['enabled']:
                 username = validate_username(username)
@@ -80,13 +97,15 @@ class RemoteAccessConfig:
             raise ValueError('Invalid remote-access configuration; run --enable-remote-access to replace it') from exc
         with self._lock:
             self._publish(record['enabled'], username, password_hash)
+            self.port = port
 
-    def update(self, *, enabled, username, password=''):
+    def update(self, *, enabled, username, password='', port=_UNSET):
         if not self.writable:
             raise PermissionError('Remote-access settings cannot be changed in demo or debug mode')
         if type(enabled) is not bool or not isinstance(password, str) or not isinstance(username, str):
             raise ValueError('Enabled must be a boolean; username and password must be strings')
         with self._lock:
+            port = self.port if port is _UNSET else validate_port(port)
             username = validate_username(username) if username or enabled or password else ''
             password_hash = self._password_hash
             if password:
@@ -96,9 +115,10 @@ class RemoteAccessConfig:
                 password_hash = ''
             if (enabled or username or password_hash) and not (username and password_hash):
                 raise ValueError('Set a username and password before saving remote-access credentials')
-            record = {'enabled': enabled, 'username': username, 'password_hash': password_hash}
+            record = {'enabled': enabled, 'username': username, 'password_hash': password_hash, 'port': port}
             self._save(record)
             self._publish(enabled, username, password_hash)
+            self.port = port
 
     def _publish(self, enabled, username, password_hash):
         """Publish saved credentials and revoke streams under the same lock."""
@@ -162,7 +182,8 @@ class RemoteAccessConfig:
 
     def status(self):
         with self._lock:
-            return {'enabled': self.enabled, 'username': self.username, 'configured': self.configured}
+            return {'enabled': self.enabled, 'username': self.username, 'configured': self.configured,
+                    'port': self.port}
 
 
 def prompt_remote_access(config):
@@ -186,8 +207,14 @@ def prompt_remote_access(config):
                 if password != getpass.getpass('Confirm password: '):
                     print('Passwords do not match; try again.')
                     continue
-                config.update(enabled=True, username=username, password=password)
                 break
+        while True:
+            try:
+                port = validate_port(input(f'Remote access port [Enter for {DEFAULT_PORT}]: '))
+                break
+            except ValueError as exc:
+                print(exc)
+        config.update(enabled=True, username=username, password=password, port=port)
     except (EOFError, KeyboardInterrupt):
         raise ValueError('Remote access setup cancelled; settings were not changed') from None
     except getpass.GetPassWarning:

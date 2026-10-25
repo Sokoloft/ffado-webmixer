@@ -64,15 +64,15 @@ html { background: var(--page-background); }
   #dlgClose svg { display: block; margin: auto; }
 
   /* tabs, like a browser: the active one joins the panel below it */
-  .tabs { display: flex; gap: 3px; padding: 0 12px; overflow-x: auto; scrollbar-width: thin;
+  .tabs { display: flex; flex-wrap: wrap; gap: 3px; padding: 0 12px;
           background: var(--dialog-header-background); border-bottom: 1px solid var(--border-color); }
   .tab { position: relative; flex: none; white-space: nowrap; top: 1px; padding: 9px 18px; border: 1px solid transparent; border-bottom: 0;
          border-radius: 7px 7px 0 0; background: transparent; color: var(--text-secondary); font-size: 13px; cursor: pointer; }
   .tab:hover { color: var(--text-primary); background: var(--tab-hover-background); }
   .tab.active { color: var(--text-primary); background: var(--channel-background); border-color: var(--border-color); }
   .tab:focus-visible { outline: 2px solid var(--accent-color); outline-offset: -2px; }
-  .panes { display: grid; }
-  .pane { grid-area: 1 / 1; padding: 18px; }       /* every tab in the same cell: the dialog is as tall as the tallest */
+  .panes { display: grid; grid-template-columns: minmax(0, 1fr); }
+  .pane { grid-area: 1 / 1; min-width: 0; padding: 18px; }       /* every tab in the same cell: the dialog is as tall as the tallest */
   .pane.off { visibility: hidden; pointer-events: none; }
 
   .about { display: grid; grid-template-columns: 96px 1fr; gap: 10px 12px; margin: 0; font-size: 13px; }

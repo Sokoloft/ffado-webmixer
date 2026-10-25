@@ -5,10 +5,11 @@ from .themes import theme_path
 from .theme_icons import themed_icon_svg, valid_accent
 from .services.events import Hub
 from .access import AccessPolicy, register as register_access
+from .remote_access import DEFAULT_PORT
 from .api import mixer as mixer_routes, settings as settings_routes, events as event_routes, integrations as integration_routes, stereo as stereo_routes
 
 HOST = "127.0.0.1"
-PORT = 5000
+PORT = DEFAULT_PORT
 
 def lan_ip():
     """Best guess at this machine's address on the local network."""
@@ -35,7 +36,7 @@ def create_app(backend, description, config, about=None, device_manager=None, ac
         address = lan_ip() if ip_address(policy.host).is_unspecified else policy.host
         if ':' in address:
             address = f'[{address}]'
-        return f'http://{address}:{PORT}'
+        return f'http://{address}:{app.ffado_port}'
     if device_manager:
         import secrets
         app.secret_key = secrets.token_hex(32)
@@ -176,11 +177,12 @@ def prepare_server(app):
     """
     from werkzeug.serving import make_server
     host = getattr(app, 'ffado_host', HOST)
+    port = getattr(app, 'ffado_port', PORT)
     try:
-        return make_server(host, PORT, app, threaded=True)
+        return make_server(host, port, app, threaded=True)
     except (OSError, SystemExit) as exc:
         raise RuntimeError(
-            f'Cannot start ffado-webmixer on {host}:{PORT} '
+            f'Cannot start ffado-webmixer on {host}:{port} '
             '(port already in use or unavailable). Close the other server or free the port.'
         ) from exc
 

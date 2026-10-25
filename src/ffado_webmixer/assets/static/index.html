@@ -164,12 +164,14 @@
           <div class="field"><label for="remoteAccessUsername">Username</label><input id="remoteAccessUsername" name="username" maxlength="64" autocomplete="username" spellcheck="false" autocapitalize="none" data-gesture-edit="direct"></div>
           <div class="field"><label for="remoteAccessPassword">Password</label><input id="remoteAccessPassword" name="password" type="password" minlength="16" maxlength="1024" autocomplete="new-password" aria-describedby="remoteAccessPasswordHint"></div>
           <div class="field"><label for="remoteAccessConfirm">Confirm</label><input id="remoteAccessConfirm" name="confirm-password" type="password" minlength="16" maxlength="1024" autocomplete="new-password"></div>
+          <div class="field"><label for="remoteAccessPort">Port</label><input id="remoteAccessPort" name="port" type="number" min="1" max="65535" step="1" placeholder="5000" inputmode="numeric" data-gesture-edit="direct" aria-describedby="remoteAccessPortHint"></div>
+          <p class="dlgnote" id="remoteAccessPortHint">Leave blank to use port 5000. Port changes require an app restart.</p>
           <p class="dlgnote" id="remoteAccessPasswordHint">Use at least 16 characters. Leave both password fields blank to keep the saved password.</p>
           <button class="dlgbtn" id="remoteAccessSave" type="submit">Save remote access</button>
         </fieldset>
       </form>
       <p id="remoteAccessMessage" class="dlgnote" role="status" aria-live="polite"></p>
-      <p class="dlgnote">The local app stays accessible without a password. Enabling LAN access requires an app restart. Use HTTPS or an SSH tunnel to protect credentials over the network.</p>
+      <p class="dlgnote">The local app stays accessible without a password. Changes to the port or LAN listener require an app restart. Use HTTPS or an SSH tunnel to protect credentials over the network.</p>
     </div>
 
     <div class="pane off" id="pane-about" role="tabpanel" aria-labelledby="tab-about">

@@ -24,11 +24,14 @@ function node(type='text') {
 async function run() {
   const staticInput = node();
   const usernameInput = node();
+  const portInput = node('number');
   const usernameTag = html.match(/<input\b[^>]*\bid="remoteAccessUsername"[^>]*>/)[0];
   usernameInput.dataset.gestureEdit = usernameTag.match(/data-gesture-edit="([^"]+)"/)?.[1];
+  const portTag = html.match(/<input\b[^>]*\bid="remoteAccessPort"[^>]*>/)[0];
+  portInput.dataset.gestureEdit = portTag.match(/data-gesture-edit="([^"]+)"/)?.[1];
   const window = {};
   const context = vm.createContext({
-    window,document:{querySelectorAll:()=>[staticInput, usernameInput]},MouseEvent:class {constructor(t){this.type=t}},
+    window,document:{querySelectorAll:()=>[staticInput, usernameInput, portInput]},MouseEvent:class {constructor(t){this.type=t}},
     setTimeout,clearTimeout,
   });
   vm.runInContext(src, context);
@@ -38,6 +41,11 @@ async function run() {
   usernameInput.blur();
   assert.equal(usernameInput.readOnly,false,'username stays editable after losing focus');
   assert.equal(usernameInput.classList.contains('gesture-edit'),false,'username has no mixer editing lock');
+  portInput.focus();
+  assert.equal(portInput.readOnly,false,'port supports normal click-to-edit');
+  const settingsTabs = css.match(/(?:^|\n)\s*\.tabs\s*\{([^}]+)\}/)[1];
+  assert.match(settingsTabs,/flex-wrap:\s*wrap/,'settings tabs wrap on narrow windows');
+  assert(!/overflow(?:-[xy])?:|scrollbar-width:/.test(settingsTabs),'settings tabs have no scroll container');
   assert.equal(staticInput.readOnly,true,'static fields start locked');
   staticInput.focus();assert.equal(staticInput.readOnly,true,'simple focus is not an edit gesture');
   let prevented=false;

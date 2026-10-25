@@ -217,15 +217,17 @@ def test_server_binding_fails_before_desktop_window(monkeypatch, reason):
         _extract_prepare_server()(object())
 
 
-def test_server_preserves_threaded_flask_handling(monkeypatch):
+@pytest.mark.parametrize('port', [5000, 8123])
+def test_server_preserves_threaded_flask_handling(monkeypatch, port):
     calls = []
     serving = types.ModuleType('werkzeug.serving')
     serving.make_server = lambda *args, **kwargs: calls.append((args, kwargs)) or object()
     monkeypatch.setitem(sys.modules, 'werkzeug', types.ModuleType('werkzeug'))
     monkeypatch.setitem(sys.modules, 'werkzeug.serving', serving)
-    server = _extract_prepare_server()(object())
+    server = _extract_prepare_server()(types.SimpleNamespace(ffado_port=port))
     assert server is not None
     assert calls[0][1]['threaded'] is True
+    assert calls[0][0][1] == port
 
 
 def test_client_readiness_timeout_and_dead_thread(monkeypatch):
@@ -256,7 +258,7 @@ def _mock_main(monkeypatch, prepare):
     monkeypatch.setattr(main, 'parse_args', lambda: args)
     monkeypatch.setattr(main, 'create_backends', lambda args, cfg: [object()])
     server = types.ModuleType('ffado_webmixer.server')
-    server.create_app = lambda **kwargs: object()
+    server.create_app = lambda **kwargs: types.SimpleNamespace(ffado_port=5000)
     server.prepare_server = prepare
     monkeypatch.setitem(sys.modules, 'ffado_webmixer.server', server)
     device_manager = types.ModuleType('ffado_webmixer.device_manager')
@@ -290,7 +292,8 @@ def test_main_releases_server_when_initial_readiness_fails(monkeypatch):
     server = FakeServer()
     main = _mock_main(monkeypatch, lambda app: server)
     client = types.ModuleType('ffado_webmixer.client')
-    def fail_ready(server_thread):
+    def fail_ready(server_thread, *, port):
+        assert port == 5000
         raise RuntimeError('listener quit unexpectedly')
     client.wait_until_ready = fail_ready
     client.run_window = lambda *args, **kwargs: calls.append('opened window')
@@ -299,6 +302,21 @@ def test_main_releases_server_when_initial_readiness_fails(monkeypatch):
         main.main()
     assert 'shutdown' in calls and 'close' in calls
     assert 'opened window' not in calls
+
+
+def test_main_passes_running_port_to_desktop_and_readiness(monkeypatch):
+    calls = []
+    listener = types.SimpleNamespace(serve_forever=lambda: None,
+                                    shutdown=lambda: calls.append('shutdown'),
+                                    server_close=lambda: calls.append('close'))
+    main = _mock_main(monkeypatch, lambda app: listener)
+    sys.modules['ffado_webmixer.server'].create_app = lambda **kwargs: types.SimpleNamespace(ffado_port=8123)
+    client = types.ModuleType('ffado_webmixer.client')
+    client.wait_until_ready = lambda **kwargs: calls.append(('ready', kwargs['port']))
+    client.run_window = lambda *args, **kwargs: calls.append(('window', kwargs['port']))
+    monkeypatch.setitem(sys.modules, 'ffado_webmixer.client', client)
+    main.main()
+    assert calls == [('ready', 8123), ('window', 8123), 'shutdown', 'close']
 
 
 def test_simultaneous_settings_updates_remain_consistent(api, monkeypatch):

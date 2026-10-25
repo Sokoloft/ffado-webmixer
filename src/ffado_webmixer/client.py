@@ -31,14 +31,14 @@ def theme_background(theme):
         if match:
             return match.group(1)
     return '#17191d'
-def wait_until_ready(timeout=10.0, server_thread=None):
+def wait_until_ready(timeout=10.0, server_thread=None, *, port=PORT):
     """Verify the local server responds, or raise instead of waiting forever."""
     deadline = time.monotonic() + timeout
     while True:
         if server_thread is not None and not server_thread.is_alive():
             raise RuntimeError('ffado-webmixer web server exited before becoming ready')
         try:
-            with urlopen(f'http://127.0.0.1:{PORT}/api/settings', timeout=0.2) as response:
+            with urlopen(f'http://127.0.0.1:{port}/api/settings', timeout=0.2) as response:
                 if response.status == 200:
                     return
         except (OSError, TimeoutError):
@@ -49,12 +49,12 @@ def wait_until_ready(timeout=10.0, server_thread=None):
         time.sleep(min(0.05, remaining))
 
 
-def run_window(title, theme='dark', skip_loading_screen=False, config=None):
+def run_window(title, theme='dark', skip_loading_screen=False, config=None, *, port=PORT):
     # Qt on Plasma Wayland uses desktopFileName for task-manager grouping.
     # Use an identity distinct from FFADO's Qt mixer; the supplied desktop
     # launcher must be installed with the matching basename.
     os.environ['QT_WAYLAND_APP_ID'] = 'ffado-webmixer'
-    mixer_url = f'http://127.0.0.1:{PORT}/'
+    mixer_url = f'http://127.0.0.1:{port}/'
     params = {'theme': theme}
     accents = config.settings.get('accent_overrides', {}) if config else {}
     accent = accents.get(theme) if isinstance(accents, dict) else None
@@ -121,7 +121,7 @@ def run_window(title, theme='dark', skip_loading_screen=False, config=None):
     def open_mixer():
         started = time.monotonic()
         try:
-            wait_until_ready()
+            wait_until_ready(port=port)
         except RuntimeError as exc:
             # If the listener dies after the initial readiness check, the Qt
             # window must report the failure instead of showing a stuck splash.

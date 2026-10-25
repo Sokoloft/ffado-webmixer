@@ -7,6 +7,8 @@
 
 ## 1.2.0 — Access control and reliability (2026-10-22)
 
+- Remove the settings tab scroll container and wrap tabs on narrow windows. Keep hidden settings panels from forcing horizontal overflow.
+- Add an optional saved listener port to GUI and CLI Remote Access setup. Blank input uses 5000; validate ports from 1 to 65535 and use the running port for the desktop, readiness checks, and About/QR links. Port changes require restart; existing credential files retain the default.
 - Default to a localhost listener until Remote Access is enabled. Configure a username and password in the new settings tab or with `--enable-remote-access` (hidden password prompts); both save a private Argon2id credential file in `~/.config/ffado-webmixer/auth.json`. Saved settings control LAN listening, with an explicit `--host` override. `--disable-remote-access` disables it for the next launch. This replaces `FFADO_WEBMIXER_TOKEN`; remote clients use their configured credentials with HTTP Basic authentication.
 - Reject cross-origin browser writes and non-JSON API submissions. Local desktop access remains automatic.
 - Pin the selected GUID, backend and settings for each HTTP request so another browser changing the preferred mixer cannot redirect in-flight reads, writes or event broadcasts.
