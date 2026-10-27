@@ -38,6 +38,8 @@ function fixture() {
     clearTimeout() {}
   };
   vm.createContext(context);
+  const index = fs.readFileSync(path.join(root, 'index.js'), 'utf8');
+  vm.runInContext(index.slice(index.indexOf('function outputPartner('), index.indexOf('var outputLinkBusy')), context);
   vm.runInContext(source, context);
   return {context, calls, streams, timers, info};
 }

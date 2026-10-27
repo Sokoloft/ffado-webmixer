@@ -77,6 +77,8 @@ python main.py --remove-desktop
 
 Select a connected interface from the device dropdown when more than one is available. Use the three-dot menus on buses and faders to link, pin, or minimize them. Right-click a name or numeric field to edit it, or long-press on a touchscreen.
 
+On the Saffire Pro 40 and other DICE/RME matrix mixers, pan controls appear only on linked stereo buses. Every mixer input can then be panned independently; input channels do not need to be linked. Raise a silent channel's fader first, and its pan control becomes available automatically. Use the bus three-dot menu to link adjacent output buses; linking alone leaves the existing audio routes and levels unchanged.
+
 ## Documentation and screenshots
 
 Additional reference information is in [`docs/`](docs/README.md). The [`img/`](img/) folder holds the project logo and will contain demo GIFs showing the interface.

@@ -6,7 +6,7 @@ const assert = require('assert');
 const vm = require('vm');
 const src = fs.readFileSync(path.join(__dirname, '../src/ffado_webmixer/assets/static/index.js'), 'utf8');
 const panUI = src.slice(src.indexOf('  function renderPan() {'),
-                        src.indexOf('  if (FEATURES.pan || STEREO_BUSES.includes(currentMix) || stereo) {'));
+                        src.indexOf('  function updatePanAvailability() {'));
 assert(panUI.startsWith('  function renderPan() {'));
 const env = vm.createContext({
   panAvailable: true, pan: 0.5, panEl: {value: null}, panVal: {textContent: null}, data: {},

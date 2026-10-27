@@ -373,10 +373,21 @@ html { background: var(--page-background); }
 #fullscreenButton.is-fullscreen .fullscreen-exit { display: block; }
 html.pywebview-client #fullscreenbox { display: none; }
 
-.bus-pair-tile { display: grid; grid-column: span 2; grid-row: span 2;
-                 grid-template-columns: repeat(2, var(--btn-w)); grid-template-rows: repeat(2, minmax(0, 1fr)); gap: 8px; }
-#side.narrow .bus-pair-tile { grid-column: 1; grid-row: span 3;
-                              grid-template-columns: var(--btn-w); grid-template-rows: repeat(3, minmax(0, 1fr)); }
+.bus-pair-tile, .output-pair-tile { position:relative; display:grid; grid-column:span 2;
+  grid-template-columns:repeat(2, var(--btn-w)); grid-template-rows:minmax(0, 1fr); gap:8px; }
+.bus-pair-tile.is-linked > .outbtn, .output-pair-tile.is-linked > .outbtn { grid-column:1 / -1; }
+#side.narrow .bus-pair-tile, #side.narrow .output-pair-tile { grid-column:1; grid-row:span 2;
+  grid-template-columns:var(--btn-w); grid-template-rows:repeat(2, minmax(0, 1fr)); }
+#side.narrow .bus-pair-tile.is-linked > .outbtn, #side.narrow .output-pair-tile.is-linked > .outbtn { grid-row:1 / -1; }
+.bus-pair-tile > .bus-pair-link, .output-pair-link { position:absolute; z-index:1;
+  left:50%; top:50%; transform:translate(-50%, -50%); width:20px; height:20px;
+  display:flex; align-items:center; justify-content:center; padding:2px;
+  border:1px solid var(--border-color); border-radius:10px; cursor:pointer;
+  color:var(--text-secondary); background:var(--sidebar-background); }
+.bus-pair-tile.is-linked > .bus-pair-link, .output-pair-tile.is-linked > .output-pair-link { top:0; }
+#side.narrow .bus-pair-tile.is-linked > .bus-pair-link, #side.narrow .output-pair-tile.is-linked > .output-pair-link { top:50%; left:100%; }
+.output-pair-link.is-linked { color:var(--accent-color); border-color:var(--accent-color); }
+.bus-pair-link:focus-visible, .output-pair-link:focus-visible { outline:2px solid var(--accent-color); outline-offset:2px; }
 .bus-pair-link { grid-column:1 / -1; background:var(--button-background); color:var(--text-secondary); border:1px solid var(--border-color); border-radius:4px; cursor:pointer; font-size:11px; padding:5px; }
 .bus-pair-link.is-linked { color:var(--accent-color); border-color:var(--accent-color); }
 .device-alias-field { margin-top:16px; padding-top:12px; border-top:1px solid var(--border-color); }

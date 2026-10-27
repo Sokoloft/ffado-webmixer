@@ -63,3 +63,20 @@ def normalize_peak(raw, config):
     return {'raw': raw, 'level': amplitude,
             'db': round(20 * math.log10(amplitude), 2) if amplitude > 0 else None,
             'near_full_scale': raw >= config['clip_code']}
+
+
+def output_peak_samples(mixer, destinations):
+    """Map source-declared outputs to real FFADO router destination peaks.
+
+    ``destinations`` is the normalized getPeakValues() frame already used by
+    input and routing meters. No additional hardware reads or calculations
+    from mixer gains are needed. Missing output peaks remain unavailable.
+    """
+    if mixer.matrix['mode'] != 'dice_db':
+        return {}
+    result = {}
+    for out_id, output in mixer.outputs.items():
+        destination = output.get('meter_destination')
+        if destination in destinations:
+            result[out_id] = {'destination': destination, **destinations[destination]}
+    return result

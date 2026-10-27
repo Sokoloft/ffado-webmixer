@@ -64,6 +64,13 @@ def _settings(value):
             raise ValueError('stereo_buses must contain non-negative even integer bus ids')
         if len(set(buses)) != len(buses):
             raise ValueError('stereo_buses must contain unique bus ids')
+    if 'stereo_outputs' in settings:
+        outputs = _list(settings['stereo_outputs'], 'stereo_outputs')
+        if any(not isinstance(output, str) or not re.fullmatch(r'line/[1-9][0-9]*', output)
+               or int(output.split('/')[1]) % 2 != 1 for output in outputs):
+            raise ValueError('stereo_outputs must contain odd-numbered line output ids')
+        if len(set(outputs)) != len(outputs):
+            raise ValueError('stereo_outputs must contain unique output ids')
     for key in ('output', 'device_alias'):
         if key in settings and not isinstance(settings[key], str):
             raise ValueError(f'{key} must be a string')

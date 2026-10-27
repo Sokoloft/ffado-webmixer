@@ -7,7 +7,7 @@ from .profile_loader import (load_profile, resolve_mixer, resolve_controls,
                              visible_columns, destination_options, resolve_phones_assignment, bus_name, CHANNEL_WORDS)
 from .controls import to_percent, from_percent, pan_to_ui, pan_from_ui
 from .profiles.capabilities import enabled, probe_allowed, activate_internal_model, declared_path
-from .peak_metering import meter_config, channel_destinations, normalize_peak
+from .peak_metering import meter_config, channel_destinations, normalize_peak, output_peak_samples
 from .gain import (UNITY, has_db_scale, scale as gain_scale, raw_to_db, db_to_raw,
                    raw_to_ui, ui_to_raw, motu_display_scale)
 from copy import deepcopy
@@ -477,17 +477,48 @@ class Mixer(RoutingControls, OutputControls):
 
     def write_bus_balance(self, bus, col, value):
         """Source-derived stereo bus balance: FFADO matrixmixer.py formulas."""
-        if 'fader' not in self.roles or not 0 <= bus < len(self.mixes) - 1 or bus % 2:
+        if ('fader' not in self.roles or type(bus) is not int or
+                not 0 <= bus < len(self.mixes) - 1 or bus % 2 or
+                self.matrix['mode'] not in ('dice_db', 'rme_db')):
             raise ValueError('Stereo balance requires an odd/even output pair')
-        value = max(-1., min(1., float(value)))
+        if type(col) is not int or not 0 <= col < len(self.columns):
+            raise ValueError('channel out of range')
+        if not self.roles['fader'][1]['writable']:
+            raise ValueError('Stereo balance requires a writable gain matrix')
+        value = float(value)
+        if not math.isfinite(value) or not -1 <= value <= 1:
+            raise ValueError('Stereo balance must be between -1 and 1')
         with self.helper.transaction():
             self._require_recovery_resolved()
-            left, right = self._cell_base(bus, col), self._cell_base(bus + 1, col)
-            total = float(left) + float(right)
+            current = (float(self._matrix_raw(bus, col)),
+                       float(self._matrix_raw(bus + 1, col)))
+            native_max = gain_scale(self.matrix['mode'])['native_max']
+            if any(not math.isfinite(raw) or not 0 <= raw <= native_max for raw in current):
+                raise ValueError('Invalid native mixer gain from FFADO')
+            total = sum(v for v in current if v > 16)
+            if not total:
+                raise ValueError('Raise this channel fader before adjusting stereo pan')
             lnew = round(total * (1 - value) / 2)
             rnew = round(total - lnew)
-            for m, raw in ((bus, lnew), (bus+1, rnew)):
-                self._write_gain_cell(m, col, raw)
+            if max(lnew, rnew) > native_max:
+                raise ValueError('Stereo pan would exceed the native mixer gain range; lower the channel fader first')
+            attempted = []
+            try:
+                for mix, old, raw in ((bus, current[0], lnew), (bus + 1, current[1], rnew)):
+                    if old != raw:
+                        attempted.append((mix, old))
+                        self._write_gain_cell(mix, col, raw)
+            except Exception as exc:
+                failures = []
+                for mix, old in reversed(attempted):
+                    try:
+                        self._write_gain_cell(mix, col, old)
+                    except Exception as rollback_exc:
+                        failures.append(str(rollback_exc))
+                if failures:
+                    raise RuntimeError('Stereo pan failed; hardware rollback may be incomplete: '
+                                       + '; '.join(failures)) from exc
+                raise
 
     def forget_input_pair_balance(self, left, right, bus=None):
         """Discard this bus's temporary balance reference on link/unlink.
@@ -700,12 +731,14 @@ class Mixer(RoutingControls, OutputControls):
         """Backwards-compatible single mono strip entry point."""
         return self.write_stereo_levels(bus, [(col, 'mono')], ui)
 
+    @serialized_output
     def peak_snapshot(self):
         """Read only the source-declared DICE EAP router peaks.
 
         Destination names and column indexes come directly from FFADO's
-        matrix row labels. Meters are pre-mixer router destination readings,
-        not per-bus or post-fader measurements.
+        matrix row labels. Output destinations come from source-mapped output
+        controls. Both use FFADO hardware peaks, without a gain-based estimate.
+        Their scale is normalized to FFADO's meter, not calibrated dBFS.
         """
         empty = {'available': False, 'channels': {}, 'destinations': {},
                  'meter': self.meter_spec, 'guid': self.guid}
@@ -726,9 +759,10 @@ class Mixer(RoutingControls, OutputControls):
         channels = {index: {'destination': dest, **clean_destinations[dest]}
                     for index, dest in self.meter_channels.items()
                     if dest in clean_destinations}
+        outputs = output_peak_samples(self, clean_destinations)
         return {'available': True, 'guid': self.guid, 'meter': self.meter_spec,
                 'channels': channels, 'destination_levels': clean_destinations,
-                'destinations': raw_destinations}
+                'destinations': raw_destinations, 'outputs': outputs}
 
 
     def _remember_router_source(self, destination, source):

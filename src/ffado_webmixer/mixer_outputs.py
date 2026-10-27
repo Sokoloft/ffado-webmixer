@@ -19,6 +19,76 @@ def serialized_output(method):
 class OutputControls:
     """Main, Phones and bus output levels with verified mute transitions."""
 
+    def output_pairs(self):
+        """Only source-mapped DICE line controls can form physical pairs."""
+        if self.matrix.get('mode') != 'dice_db':
+            return []
+        pairs = []
+        for out_id, output in self.outputs.items():
+            if not out_id.startswith('line/'):
+                continue
+            number = int(out_id.split('/')[1])
+            right = self.outputs.get(f'line/{number + 1}')
+            if number % 2 and output.get('fader') and right and right.get('fader'):
+                pairs.append([out_id, right['id']])
+        return pairs
+
+    def linked_outputs(self, out_id):
+        for left, right in self.output_pairs():
+            if left in self.config.settings.get('stereo_outputs', []) and out_id in (left, right):
+                return (left, right)
+        return (out_id,)
+
+    @serialized_output
+    def read_linked_output(self, out_id):
+        pair = self.linked_outputs(out_id)
+        states = [self.read_output(channel) for channel in pair]
+        result = dict(states[0])
+        if len(pair) == 2:
+            result.update(level=max(state['level'] for state in states),
+                          mute=all(state['mute'] for state in states),
+                          partner=pair[1])
+        return result
+
+    @serialized_output
+    def write_linked_output(self, out_id, control, value):
+        pair = self.linked_outputs(out_id)
+        if control == 'mute':
+            if type(value) is not bool:
+                raise ValueError('Output mute must be a boolean')
+        elif control == 'fader':
+            if (isinstance(value, bool) or not isinstance(value, (int, float)) or
+                    not math.isfinite(value) or not 0 <= value <= 100):
+                raise ValueError('Output level must be between 0 and 100')
+        else:
+            raise ValueError('Unknown output control')
+        # Validate both legs before changing either one.
+        for channel in pair:
+            output = self._output(channel)
+            if not output.get('spec', self.out_spec)['writable']:
+                raise ValueError('Output level is read-only')
+            if channel in getattr(self, '_pending_output_recovery', set()):
+                raise RuntimeError('This output has a pending mute recovery')
+        if len(pair) == 1:
+            return self.write_output(out_id, control, value)
+        before = {channel: self.read_output(channel) for channel in pair}
+        attempted = []
+        try:
+            for channel in pair:
+                attempted.append(channel)
+                self.write_output(channel, control, value)
+        except Exception as exc:
+            errors = []
+            for channel in reversed(attempted):
+                try:
+                    self.write_output(channel, control, before[channel]['level' if control == 'fader' else 'mute'])
+                except Exception as rollback_exc:
+                    errors.append(f'{channel}: {rollback_exc}')
+            if errors:
+                raise RuntimeError('Linked output change failed; rollback may be incomplete: '
+                                   + '; '.join(errors)) from exc
+            raise
+
     # ---------- output (master) faders: Main, Phones, buses ----------
     def _output(self, out_id):
         out = self.outputs.get(out_id)

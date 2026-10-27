@@ -91,13 +91,17 @@ def register(app, backend, description, config, broadcast):
         # Output names (Main, Phones, buses) can be renamed in the UI; saved names win.
         result = dict(backend.describe())
         result['stereo_buses'] = config.settings.get('stereo_buses', [])
+        result['output_pairs'] = backend.output_pairs() if hasattr(backend, 'output_pairs') else []
+        result['stereo_outputs'] = [pair[0] for pair in result['output_pairs']
+                                    if pair[0] in config.settings.get('stereo_outputs', [])]
         result['stereo_bus_names'] = {str(left): config.names['bus-pair:' + str(left)]
                                       for left in result['stereo_buses']
                                       if 'bus-pair:' + str(left) in config.names}
         result['mixes'] = [dict(mix, name=config.names.get('bus:' + str(mix['id']), mix['name']))
                            for mix in result.get('mixes', [])]
         result["outputs"] = [
-            dict(output, base_name=output["name"], name=config.names.get("out:" + output["id"], output["name"]))
+            dict(output, base_name=output["name"], name=config.names.get("out:" + output["id"], output["name"]),
+                 custom_name="out:" + output["id"] in config.names)
             for output in result.get("outputs", [])
         ]
 
@@ -471,15 +475,16 @@ def register(app, backend, description, config, broadcast):
                 return jsonify(ok=True)
         if control == 'pan' and hasattr(backend, 'matrix') and backend.matrix['mode'] in ('dice_db','rme_db'):
             left = mix - 1 if mix % 2 else mix
-            if left in config.settings.get('stereo_buses', []):
-                try:
-                    backend.write_bus_balance(left, int(strip.split('/')[-1]), float(value))
-                except (ValueError,TypeError,IndexError) as exc:
-                    return jsonify(error=str(exc)),400
-                except Exception as exc:
-                    return jsonify(error=str(exc)),500
-                broadcast({'type':'strip','mix':left,'strip':strip,'control':'pan','value':value})
-                return jsonify(ok=True)
+            if left not in config.settings.get('stereo_buses', []):
+                return jsonify(error='Link the stereo output buses first to pan DICE/RME inputs'), 400
+            try:
+                backend.write_bus_balance(left, int(strip.split('/')[-1]), float(value))
+            except (ValueError,TypeError,IndexError) as exc:
+                return jsonify(error=str(exc)),400
+            except Exception as exc:
+                return jsonify(error=str(exc)),500
+            broadcast({'type':'strip','mix':left,'strip':strip,'control':'pan','value':value})
+            return jsonify(ok=True)
 
         try:
             if pair:
@@ -503,13 +508,45 @@ def register(app, backend, description, config, broadcast):
 
         return jsonify(ok=True)
 
+    @app.post('/api/output-stereo')
+    def output_stereo():
+        data = request.get_json(silent=True)
+        pairs = backend.output_pairs() if hasattr(backend, 'output_pairs') else []
+        if (not isinstance(data, dict) or type(data.get('linked')) is not bool or
+                data.get('left') not in [pair[0] for pair in pairs]):
+            return jsonify(error='Select an available consecutive line output pair'), 400
+        left, linked = data['left'], data['linked']
+        with config._save_lock:
+            original = list(config.settings.get('stereo_outputs', []))
+            selected = [out for out in original if out != left]
+            if linked:
+                selected.append(left)
+            config.settings['stereo_outputs'] = selected
+            try:
+                config.save()
+            except Exception as exc:
+                config.settings['stereo_outputs'] = original
+                try:
+                    config.save()
+                except Exception:
+                    return jsonify(error='Could not save output link; rollback may be incomplete'), 500
+                return jsonify(error='Could not save output link: ' + str(exc)), 500
+        broadcast({'type': 'output-stereo', 'left': left, 'linked': linked})
+        return jsonify(ok=True)
+
     @app.get("/api/output")
     def get_output():
         out = request.args.get("out", "")
 
         try:
-            output = backend.read_output(out)
-            output["name"] = config.names.get("out:" + out, output["name"])
+            output = (backend.read_linked_output(out) if hasattr(backend, 'read_linked_output')
+                      else backend.read_output(out))
+            pair = backend.linked_outputs(out) if hasattr(backend, 'linked_outputs') else (out,)
+            name = output['name']
+            if len(pair) == 2 and 'out:' + pair[0] not in config.names:
+                right = pair[1]
+                name = pair_name(name, config.names.get('out:' + right, backend.outputs[right]['name']))
+            output["name"] = config.names.get("out:" + pair[0], name)
 
             return jsonify(output)
         except (ValueError, KeyError) as exc:
@@ -522,7 +559,8 @@ def register(app, backend, description, config, broadcast):
         msg = request.get_json(force=True)
 
         try:
-            backend.write_output(
+            writer = backend.write_linked_output if hasattr(backend, 'write_linked_output') else backend.write_output
+            writer(
                 msg["out"],
                 msg["control"],
                 msg["value"],

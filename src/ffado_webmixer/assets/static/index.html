@@ -58,7 +58,12 @@
     <div id="masterbox" hidden><div id="master" class="strip master">
       <input class="mname" id="masterName" maxlength="16" spellcheck="false" autocomplete="off" title="Right-click or long-press to rename">
       <input class="fval" id="masterVal" type="text" inputmode="decimal" autocomplete="off" spellcheck="false" aria-label="Output volume" title="Right-click or long-press to edit volume; Enter applies, Escape cancels">
-      <div class="faderwrap"><div class="track" id="masterTrack" title="Output volume"><div class="handle" id="masterHandle"></div></div></div>
+      <div class="faderwrap"><div class="track" id="masterTrack" title="Output volume"><div class="handle" id="masterHandle"></div></div>
+        <button type="button" class="peak-meter" hidden aria-label="Clear output peak hold">
+          <span class="peak-lane" data-side="left"><span class="peak-bar"></span><span class="peak-hold"></span><span class="peak-clip"></span></span>
+          <span class="peak-lane" data-side="right" hidden><span class="peak-bar"></span><span class="peak-hold"></span><span class="peak-clip"></span></span>
+        </button>
+      </div>
       <button class="btn mute" id="masterMute">Mute</button>
       <div class="inname">Output</div>
     </div></div>

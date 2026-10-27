@@ -12,7 +12,8 @@ def test_stereo_lanes_created_in_user_selected_left_right_order():
     assert 'data-side="left"' in JS
     assert 'data-side="right"' in JS
     assert 'el.dataset.partner = pid' in JS
-    assert 'const right = el.dataset.partner ? channelKey(el.dataset.partner) : null;' in METERS
+    assert '(el.dataset.partner ? channelKey(el.dataset.partner) : null)' in METERS
+    assert 'const right = output ? (el.dataset.outputPartner || null)' in METERS
     assert "{side: 'left', channel: left}" in METERS
     assert "lanes.push({side: 'right', channel: right})" in METERS
     assert '.peak-meter.stereo-meter' in CSS

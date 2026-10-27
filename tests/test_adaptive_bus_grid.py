@@ -15,8 +15,8 @@ def test_bus_grid_scopes_columns_to_bus_buttons_only():
     assert 'busCount <= 8' in JS  # UltraLite and other small mixers cap at two
     assert 'grid.style.setProperty("--cols", String(selected))' in JS
     assert '#side.narrow .groupgrid { --cols: 1 !important; }' in CSS
-    assert '.bus-pair-tile { display: grid; grid-column: span 2; grid-row: span 2;' in CSS
-    assert '#side.narrow .bus-pair-tile { grid-column: 1; grid-row: span 3;' in CSS
+    assert '.bus-pair-tile, .output-pair-tile { position:relative; display:grid; grid-column:span 2;' in CSS
+    assert '#side.narrow .bus-pair-tile, #side.narrow .output-pair-tile { grid-column:1; grid-row:span 2;' in CSS
     assert '.bus-pair-link { grid-column:1 / -1;' in CSS
     assert 'tile.appendChild(makeOutputButton(left));' in JS
     assert 'tile.appendChild(makeOutputButton(right));' in JS

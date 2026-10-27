@@ -8,6 +8,8 @@ var GAIN_SCALE = null;
 var FADER_SCALE = null;
 var STEREO_BUSES = [];
 var STEREO_BUS_NAMES = {};
+var OUTPUT_PAIRS = [];
+var STEREO_OUTPUTS = [];
 var ACTIVE_DEVICE = null;
 var currentMix = 0;       // which bus the channel strips show
 var currentOut = "";      // which output the master fader controls (Main, Phones or a bus)
@@ -92,10 +94,37 @@ function sendThrottled(strip, control, value, mix = currentMix, device = ACTIVE_
     Promise.resolve(send(strip, control, next, mix, device)).finally(function () {
       state.busy = false;
       if (state.next !== undefined) pump();
-      else delete queuedControlWrites[key];
+      else {
+        delete queuedControlWrites[key];
+        if (control === 'fader' || control === 'pan') scheduleStripPanRefresh(mix, device);
+      }
     });
   }
   pump();
+}
+
+// Our own strip events are ignored by live-sync. Re-read derived pan after
+// the final local write too, without rebuilding a fader under the pointer.
+var stripPanRefreshTimer = null;
+function scheduleStripPanRefresh(mix, device) {
+  if (mix !== currentMix || device !== ACTIVE_DEVICE || !STEREO_BUSES.includes(mix)) return;
+  clearTimeout(stripPanRefreshTimer);
+  // Let a fader gesture settle before reading every matrix column over D-Bus.
+  stripPanRefreshTimer = setTimeout(function () { refreshStripPans(mix, device); }, 120);
+}
+function refreshStripPans(mix, device) {
+  if (mix !== currentMix || device !== ACTIVE_DEVICE || !STEREO_BUSES.includes(mix)) return;
+  return window.ffadoApi.latest('strip-pan-state', '/api/state?mix=' + mix, {device}).then(function (state) {
+    if (!state || mix !== currentMix || device !== ACTIVE_DEVICE) return;
+    row.querySelectorAll(':scope > .strip').forEach(function (el) {
+      var id = el.dataset.id, entry = state[id];
+      if (!entry || entry.partner !== el.dataset.partner) return;
+      // A newer gesture may already be queued while this snapshot arrives.
+      var prefix = [device || '', mix, id].join('|') + '|';
+      if (queuedControlWrites[prefix + 'fader'] || queuedControlWrites[prefix + 'pan']) return;
+      el._apply('pan-state', entry);
+    });
+  }).catch(function (error) { toast('Could not refresh pan: ' + error.message); });
 }
 
 // Interrupted software mute/solo is journaled per FireWire GUID. No automatic
@@ -533,11 +562,9 @@ function buildStrip(id, data, pinned, minimized, partner) {
   var missing = function (v) { return v === undefined || v === null; };
 
   // which controls this device offers (and which this particular channel has)
-  var matrixPairNeedsBus = stereo && GAIN_SCALE &&
-    ["dice_db", "rme_db"].includes(GAIN_SCALE.mode) && !STEREO_BUSES.includes(currentMix);
-  // A linked DICE input has no native per-channel pan. Display the
-  // requirement instead of dispatching partial/nonexistent hardware writes.
-  q(".panrow").hidden = !FEATURES.pan && !STEREO_BUSES.includes(currentMix) && !stereo;
+  var matrixPan = GAIN_SCALE && ["dice_db", "rme_db"].includes(GAIN_SCALE.mode);
+  var matrixPairNeedsBus = matrixPan && !STEREO_BUSES.includes(currentMix);
+  q(".panrow").hidden = matrixPairNeedsBus || (!FEATURES.pan && !STEREO_BUSES.includes(currentMix));
   if (stereo) invertEl.title = "Polarity of both channels";
   soloEl.hidden = !FEATURES.solo && !(FEATURES.software_solo);
   q(".mute").hidden = !MUTE_ALLOWED;
@@ -596,20 +623,16 @@ function buildStrip(id, data, pinned, minimized, partner) {
     panVal.textContent = (p === 0 ? "0" : (p < 0 ? "L" + (-p) : "R" + p)) +
       (data.pan_partial ? "*" : "");
   }
-  if (FEATURES.pan || STEREO_BUSES.includes(currentMix) || stereo) {
+  function updatePanAvailability() {
     panEl.disabled = matrixPairNeedsBus || !panAvailable ||
-      (!STEREO_BUSES.includes(currentMix) && !matrixPairNeedsBus && !FEATURES.pan?.writable);
-    if (matrixPairNeedsBus) {
-      panEl.title = "Link the output buses as a stereo pair to enable input balance";
-      panVal.title = panEl.title;
-      panVal.textContent = "—";
-    } else if (data.pan_note) {
-      panEl.title = data.pan_note;
-      panVal.title = data.pan_note;
-    } else if (!panAvailable) {
-      panEl.title = "No active matrix route for this channel. Connect it in In/Out before adjusting balance.";
-      panVal.title = panEl.title;
-    }
+      (!STEREO_BUSES.includes(stripMix) && !FEATURES.pan?.writable);
+    panEl.title = matrixPairNeedsBus ? 'Pan requires stereo output buses' :
+      (data.pan_note || (!panAvailable ?
+        'Raise this channel fader to send it to the stereo buses, then adjust pan.' : 'Double-click to center'));
+    panVal.title = panEl.title;
+  }
+  updatePanAvailability();
+  if (FEATURES.pan || STEREO_BUSES.includes(currentMix) || stereo) {
     // Pan is a two-matrix-cell FFADO transaction, often over a relatively
     // slow FireWire D-Bus link. Preview drag locally; commit the final value
     // on release. Wheel/keyboard steps are grouped to avoid stale writes.
@@ -618,7 +641,7 @@ function buildStrip(id, data, pinned, minimized, partner) {
       clearTimeout(panCommitTimer);
       if (!panChanged || panEl.disabled) return;
       panChanged = false;
-      send(id, "pan", pan);
+      sendThrottled(id, "pan", pan, stripMix, stripDevice);
     }
     function queuePanCommit() {
       clearTimeout(panCommitTimer);
@@ -710,12 +733,18 @@ function buildStrip(id, data, pinned, minimized, partner) {
     else if (control === "solo") el.classList.toggle("soloed", !!value);
     else if (control === "invert") invertEl.classList.toggle("on", !!value);
     else if (control === "gain") { if (gain1) gain1.set(value); }
-    else if (control === "pan") {
-      if (!panDragging) {
-        panAvailable = value !== null && value !== undefined && Number.isFinite(Number(value));
+    else if (control === "pan" || control === "pan-state") {
+      if (!panDragging && !panChanged) {
+        if (control === 'pan-state') {
+          data.pan_note = value.pan_note;
+          data.pan_partial = value.pan_partial;
+          data.pan_available = value.pan_available;
+          value = value.pan;
+        }
+        panAvailable = value !== null && value !== undefined && Number.isFinite(Number(value)) &&
+          data.pan_available !== false;
         pan = panAvailable ? Number(value) : 0;
-        panEl.disabled = matrixPairNeedsBus || !panAvailable ||
-          (!STEREO_BUSES.includes(currentMix) && !matrixPairNeedsBus && !FEATURES.pan?.writable);
+        updatePanAvailability();
         renderPan();
       }
     }
@@ -1047,15 +1076,19 @@ hideBox.addEventListener("change", function () {
 });
 
 // ---- master (output) fader: Main, Phones or a bus ----
+function writeOutput(out, control, value, device = ACTIVE_DEVICE) {
+  return window.ffadoApi.serial('output|' + (device || '') + '|' + out, function () {
+    return postJson('/api/output', {out:out, control:control, value:value}, device);
+  });
+}
 var masterEl = document.getElementById("master");
 var masterToken = 0, masterReady = false;
 var masterFader = makeFader(document.getElementById("masterTrack"), document.getElementById("masterHandle"),
   document.getElementById("masterVal"), function (v) {
     if (!masterReady) return;  // Never send a stale output's displayed level.
-    var out = currentOut;
-    throttled("out|" + out, v, function (x) {
-      post("/api/output", { out: out, control: "fader", value: x })
-        .then(function (r) { return r.json().then(function (d) { if (!r.ok || d.error) throw Error(d.error || "Unable to set output"); }); })
+    var out = currentOut, device = ACTIVE_DEVICE;
+    throttled("out|" + (device || '') + '|' + out, v, function (x) {
+      writeOutput(out, "fader", x, device)
         .catch(function (e) { toast("Output change failed: " + e.message); });
     });
   }, function () { return masterReady; }, function () {
@@ -1066,11 +1099,10 @@ document.getElementById("masterMute").addEventListener("click", function () {
   if (button.disabled) return;
   button.disabled = true;
   var want = !masterEl.classList.contains("muted");
-  post("/api/output", { out: currentOut, control: "mute", value: want })
-    .then(r => r.json().then(d => { if (!r.ok || d.error) throw Error(d.error || 'Output mute write failed'); }))
+  writeOutput(currentOut, "mute", want, ACTIVE_DEVICE)
     .then(loadMaster)  // Main/Phones soft mute moves the fader; hardware readback is authoritative.
-    .catch(e => { toast('Output mute: ' + e.message); loadMaster(); loadMuteRecovery(); })
-    .finally(() => { button.disabled = false; });
+    .catch(e => { toast('Output mute write failed: ' + e.message); loadMaster(); loadMuteRecovery(); })
+    .finally(() => { button.disabled = !masterReady; });
 });
 // ---- rename the active output (Main, Phones, a bus): context-menu / long press the label ----
 var masterName = document.getElementById("masterName");
@@ -1080,27 +1112,41 @@ function showMasterName(name) {
   lastMasterName = name;
   if (document.activeElement !== masterName) masterName.value = name;      // don't overwrite while typing
 }
-function applyOutputName(id, name) {             // update the button, the label and our list
-  OUTPUTS.forEach(function (o) { if (o.id === id) o.name = name; });
-  Array.prototype.forEach.call(document.querySelectorAll(".outbtn"), function (b) {
-    if (b.dataset.id === id) { b.firstChild.textContent = name; b.title = name; }
+function applyOutputName(id, name, customName = true, confirmed = true) {
+  OUTPUTS.forEach(function (o) {
+    if (o.id !== id) return;
+    o.name = name;
+    o.customName = customName;
+    if (confirmed && o._nameState) {
+      o._nameState.name = name;
+      o._nameState.customName = customName;
+    }
   });
-  if (id === currentOut) showMasterName(name);
+  buildOutputs(); markOutputs();
+  var active = OUTPUTS.find(function (o) { return o.id === currentOut; });
+  if (active && (id === currentOut || outputPartner(currentOut)?.id === id))
+    showMasterName(outputButtonName(active));
   if (busTabsEnabled()) renderBusTabs();
 }
 masterName.addEventListener("change", function () {
   var name = masterName.value.trim() || lastMasterName;
   masterName.value = name;
   if (name === lastMasterName) return;
-  var out = currentOut, previous = lastMasterName;
-  applyOutputName(out, name);
-  window.ffadoApi.serial('name|' + (ACTIVE_DEVICE || '') + '|out:' + out, function () {
-    return postJson('/api/set', {strip: 'out:' + out, control: 'name', value: name});
+  var out = canonicalOutput(currentOut), device = ACTIVE_DEVICE;
+  var output = OUTPUTS.find(function (o) { return o.id === out; });
+  if (!output) return;
+  var saved = output._nameState || (output._nameState = {name:output.name, customName:!!output.customName});
+  applyOutputName(out, name, true, false);
+  window.ffadoApi.serial('name|' + (device || '') + '|out:' + out, function () {
+    return postJson('/api/set', {strip: 'out:' + out, control: 'name', value: name}, device);
   })
+    .then(function () { saved.name = name; saved.customName = true; })
     .catch(function (error) {
       toast('Could not rename output: ' + error.message);
-      if (currentOut === out && masterName.value === name) applyOutputName(out, previous);
-      loadMaster();
+      if (device !== ACTIVE_DEVICE) return;
+      var latest = OUTPUTS.find(function (o) { return o.id === out; });
+      if (latest && latest.name === name) applyOutputName(out, saved.name, saved.customName, false);
+      if (currentOut === out) loadMaster();
     });
 });
 masterName.addEventListener("keydown", function (e) {
@@ -1110,14 +1156,20 @@ masterName.addEventListener("keydown", function (e) {
 masterName.addEventListener("focus", function () { if (masterName.dataset?.gestureEdit !== "locked") masterName.select(); });
 
 function loadMaster(options) {
+  currentOut = canonicalOutput(currentOut);
   var out = OUTPUTS.filter(function (o) { return o.id === currentOut; })[0];
   window.ffadoApi.cancel('master-output');
   masterReady = false;
   document.getElementById('masterMute').disabled = true;
   masterEl.hidden = !out || !out.controllable;
+  masterEl.dataset.id = 'out:' + currentOut;
+  masterEl.dataset.output = currentOut;
+  masterEl.dataset.outputPartner = outputPartner(currentOut)?.id || '';
+  masterEl.querySelector('.peak-meter').hidden = true;
   document.getElementById("masterbox").hidden = masterEl.hidden;
   if (masterEl.hidden) return;
-  masterHardwareName.textContent = out.baseName;
+  var partner = outputPartner(currentOut);
+  masterHardwareName.textContent = partner ? out.baseName + ' + ' + partner.baseName : out.baseName;
   var token = ++masterToken;
   return window.ffadoApi.latest('master-output', '/api/output?out=' + encodeURIComponent(currentOut),
     {device: ACTIVE_DEVICE}).then(function (o) {
@@ -1471,14 +1523,53 @@ hideBusesBox.addEventListener('change', function () {
 });
 
 // ---- output buttons (right side): Main, Phones, then the buses ----
+function outputPartner(id) {
+  var pair = OUTPUT_PAIRS.find(function (pair) { return STEREO_OUTPUTS.includes(pair[0]) && pair.includes(id); });
+  return pair ? OUTPUTS.find(function (out) { return out.id === (pair[0] === id ? pair[1] : pair[0]); }) : null;
+}
+function canonicalOutput(id) {
+  var pair = OUTPUT_PAIRS.find(function (pair) { return STEREO_OUTPUTS.includes(pair[0]) && pair.includes(id); });
+  return pair ? pair[0] : id;
+}
+function outputButtonName(o) {
+  var partner = outputPartner(o.id);
+  if (partner) {
+    // Match input faders: a custom Left name replaces the combined name.
+    if (o.customName) return o.name;
+    var left = /^(.*?)(\d+)$/.exec(o.name), right = /^(.*?)(\d+)$/.exec(partner.name);
+    return left && right && left[1] === right[1] ? left[1] + left[2] + '+' + right[2] :
+      o.name + ' + ' + partner.name;
+  }
+  if (o.mix !== null && STEREO_BUSES.includes(o.mix)) {
+    partner = OUTPUTS.find(function (out) { return out.mix === o.mix + 1; });
+  }
+  return partner ? o.name + ' + ' + partner.name : o.name;
+}
+var outputLinkBusy = false;
+function toggleOutputLink(left) {
+  if (outputLinkBusy) return;
+  outputLinkBusy = true;
+  var device = ACTIVE_DEVICE;
+  return postJson('/api/output-stereo', {left:left, linked:!STEREO_OUTPUTS.includes(left)}, device)
+    .then(function () { return readJson('/api/describe', device); })
+    .then(function (info) {
+      if (device !== ACTIVE_DEVICE) return;
+      STEREO_OUTPUTS = info.stereo_outputs || [];
+      OUTPUT_PAIRS = info.output_pairs || [];
+      currentOut = canonicalOutput(currentOut);
+      buildOutputs(); markOutputs(); loadMaster(); saveViewSelection();
+    }).catch(function (error) { toast('Could not change output link: ' + error.message); })
+    .finally(function () { outputLinkBusy = false; });
+}
 function markOutputs() {
   var busActive = OUTPUTS.some(function (o) { return o.id === currentOut && o.mix !== null; });
   Array.prototype.forEach.call(document.querySelectorAll(".outbtn"), function (b) {
     var o = OUTPUTS.filter(function (x) { return x.id === b.dataset.id; })[0];
-    b.classList.toggle("active", b.dataset.id === currentOut);
+    b.classList.toggle("active", b.dataset.id === canonicalOutput(currentOut));
     var shows = !busActive && o.mix !== null && (o.mix === currentMix || (STEREO_BUSES.includes(currentMix) && o.mix === currentMix+1));
     b.classList.toggle("shows", shows);
-    b.title = shows ? o.name + " (the channel strips are showing this bus)" : o.name;
+    var name = outputButtonName(o);
+    b.title = shows ? name + " (the channel strips are showing this bus)" : name;
   });
   if (busTabsEnabled()) renderBusTabs();
 }
@@ -1531,8 +1622,8 @@ function buildOutputs() {
       btn.className = "outbtn" + (o.mix !== null ? " bus" : "");
       btn.dataset.id = o.id;
       btn.innerHTML = '<span class="olabel"></span>';
-      btn.firstChild.textContent = o.name;
-      btn.title = o.name;
+      btn.firstChild.textContent = outputButtonName(o);
+      btn.title = outputButtonName(o);
       btn.addEventListener("click", function () { selectOutput(o); });
       return btn;
     }
@@ -1540,35 +1631,49 @@ function buildOutputs() {
       var linked = STEREO_BUSES.includes(left);
       var link = document.createElement('button');
       link.type = 'button'; link.className = 'bus-pair-link' + (linked ? ' is-linked' : '');
-      link.textContent = linked ? '🔗 Bus ' + (left+1) + '+' + (left+2) : '↔ Link ' + (left+1) + '+' + (left+2);
+      link.innerHTML = CHAIN_LINK_SVG;
+      link.setAttribute('aria-pressed', String(linked));
+      link.setAttribute('aria-label', (linked ? 'Unlink' : 'Link') + ' buses ' + (left+1) + ' and ' + (left+2));
       link.title = 'Toggle stereo bus link for pair ' + (left+1) + '/' + (left+2);
-      link.onclick = () => post('/api/bus-stereo',{left:left,linked:!linked})
-         .then(r => r.json().then(d => { if (!r.ok || d.error) throw Error(d.error || 'Bus link failed'); }))
-         .then(() => deviceFetch('/api/describe').then(r => r.json()))
-         .then(info => {
-           STEREO_BUSES = info.stereo_buses || [];
-           // A newly linked bus pair is represented by its LEFT bus. Do not
-           // leave the mixer on the old Right-only state with disabled pan.
-           if (STEREO_BUSES.includes(left) && currentMix === left + 1) currentMix = left;
-           buildOutputs(); markOutputs(); loadMix();
-         })
-         .catch(e => toast(e.message));
+      link.onclick = () => toggleBusLink(left);
       return link;
     }
-    // Keep each stereo-bus link directly below its two bus buttons, even in
-    // a six-column layout. Otherwise the link can wrap away from its pair.
+    // Keep each pair and its seam icon together in every grid width.
     var byMix = {};
     members.forEach(function (o) { if (o.mix !== null) byMix[o.mix] = o; });
     var rendered = {};
     members.forEach(function (o) {
       if (rendered[o.id]) return;
+      var pair = OUTPUT_PAIRS.find(function (pair) { return pair.includes(o.id); });
+      if (g[0] === 'Outputs' && pair) {
+        var first = members.find(function (out) { return out.id === pair[0]; });
+        var second = members.find(function (out) { return out.id === pair[1]; });
+        if (first && second) {
+          var linked = STEREO_OUTPUTS.includes(pair[0]);
+          var card = document.createElement('div');
+          card.className = 'output-pair-tile' + (linked ? ' is-linked' : '');
+          card.appendChild(makeOutputButton(first));
+          if (!linked) card.appendChild(makeOutputButton(second));
+          var link = document.createElement('button');
+          link.type = 'button'; link.className = 'output-pair-link' + (linked ? ' is-linked' : '');
+          link.innerHTML = CHAIN_LINK_SVG;
+          link.title = (linked ? 'Unlink ' : 'Link ') + first.name + ' / ' + second.name;
+          link.setAttribute('aria-label', link.title);
+          link.setAttribute('aria-pressed', String(linked));
+          link.onclick = function () { toggleOutputLink(pair[0]); };
+          card.appendChild(link); grid.appendChild(card);
+          rendered[first.id] = rendered[second.id] = true;
+          return;
+        }
+      }
       var leftMix = o.mix !== null ? o.mix - o.mix % 2 : -1;
       var left = byMix[leftMix], right = byMix[leftMix + 1];
       if (g[0] === 'Buses' && GAIN_SCALE && left && right) {
         var tile = document.createElement('div');
-        tile.className = 'bus-pair-tile';
+        var linkedBus = STEREO_BUSES.includes(leftMix);
+        tile.className = 'bus-pair-tile' + (linkedBus ? ' is-linked' : '');
         tile.appendChild(makeOutputButton(left));
-        tile.appendChild(makeOutputButton(right));
+        if (!linkedBus) tile.appendChild(makeOutputButton(right));
         tile.appendChild(makeBusLink(leftMix));
         grid.appendChild(tile);
         rendered[left.id] = rendered[right.id] = true;
@@ -1592,7 +1697,7 @@ var side = document.getElementById("side");
 var splitter = document.getElementById("splitter");
 var busGridFrame = 0;
 
-// Bus pair cards take two columns and two rows, so the native CSS Grid
+// Bus pair cards take two columns (two rows in the narrow layout). Native CSS Grid
 // measurement determines the right number of columns for any mixture of
 // paired and unpaired bus entries. No assumptions about router data are made.
 function sideLimits() {
@@ -1607,7 +1712,7 @@ function sideLimits() {
   var two = side.getBoundingClientRect().width;
   var btn = document.querySelector(".outbtn"), grid = document.querySelector(".groupgrid");
   var hasButtons = !!btn && !document.getElementById("outbox").hidden;
-  var step = hasButtons ? btn.offsetWidth + (parseFloat(getComputedStyle(grid).columnGap) || 8) : 76;
+  var step = hasButtons ? (parseFloat(getComputedStyle(grid).getPropertyValue('--btn-w')) || 68) + (parseFloat(getComputedStyle(grid).columnGap) || 8) : 76;
   var one = hasButtons ? two - step : two;
   if (wasWidth) side.style.width = wasWidth;
   side.classList.toggle("narrow", wasNarrow);
@@ -1622,7 +1727,7 @@ function layoutBusGrid() {
   var grid = document.querySelector("#outbox .busgrid");
   var box = document.getElementById("outbox");
   if (!grid || box.hidden) return;
-  var busCount = grid.querySelectorAll(".outbtn.bus").length;
+  var busCount = OUTPUTS.filter(function (out) { return out.mix !== null; }).length;
   var lim = sideLimits();
   if (side.classList.contains("narrow")) {
     grid.style.setProperty("--cols", "1");
@@ -1912,6 +2017,8 @@ Promise.all([
   window.activeFfadoDevice = ACTIVE_DEVICE;
   STEREO_BUSES = info.stereo_buses || [];
   STEREO_BUS_NAMES = info.stereo_bus_names || {};
+  OUTPUT_PAIRS = info.output_pairs || [];
+  STEREO_OUTPUTS = info.stereo_outputs || [];
   if (info.solo && info.solo.writable && !FEATURES.solo) FEATURES.software_solo = true;
   FADER_ALLOWED = !info.fader || !!info.fader.writable;
   MUTE_ALLOWED = !info.mute || !!info.mute.writable;
@@ -1919,7 +2026,7 @@ Promise.all([
   if (window.configureRouting) window.configureRouting(info);
   OUTPUTS = (info.outputs || []).map(function (o) {
     return { id: o.id, name: shortFfadoLabel(o.name), baseName: o.base_name || o.name, mix: (o.mix === null || o.mix === undefined) ? null : o.mix, controllable: o.controllable,
-             destination: !!o.destination, gainScale: o.gain_scale || null };
+             destination: !!o.destination, gainScale: o.gain_scale || null, customName: !!o.custom_name };
   });
   document.title = info.device || "Mixer";
   window.syncNativeWindowTitle(info.device);
@@ -1972,7 +2079,7 @@ Promise.all([
 var activePeakDisplay = null;
 function startPeakPolling() {
   if (activePeakDisplay) activePeakDisplay.stop();
-  activePeakDisplay = new FFADOPeakDisplay(row, ACTIVE_DEVICE);
+  activePeakDisplay = new FFADOPeakDisplay(document, ACTIVE_DEVICE);
   activePeakDisplay.start();
 }
 

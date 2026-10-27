@@ -65,8 +65,8 @@ function onSyncEvent(ev) {
     el = stripEl(ev.strip);
     if (el) el._apply("name", ev.value, ev.strip);
   } else if (ev.type === "output") {
-    if (ev.out !== currentOut) return;
-    if (ev.control === "fader") masterFader.set(ev.value); else loadMaster();   // Main/Phones mute can move the level
+    if (canonicalOutput(ev.out) !== canonicalOutput(currentOut)) return;
+    loadMaster();
   } else if (ev.type === 'bus-name') {
     var named = MIXES.find(x => x.id === ev.mix);
     if (named) named.name = ev.name;
@@ -80,7 +80,7 @@ function onSyncEvent(ev) {
     }).catch(function (error) { toast('Could not sync bus tabs: ' + error.message); });
   } else if (ev.type === "layout") {
     if (ev.mix === currentMix) applyLayout();     // another bus's arrangement doesn't concern this page
-  } else if (ev.type === "bus-stereo") {
+  } else if (ev.type === "bus-stereo" || ev.type === 'output-stereo') {
     requestSyncRefresh();
   } else if (ev.type === "stereo") {
     if (ev.mix !== undefined && ev.mix !== currentMix) return;
@@ -99,13 +99,16 @@ function refreshSyncState() {
     if (device && info.guid !== device) throw Error('Selected mixer changed; reload this page');
     STEREO_BUSES = info.stereo_buses || [];
     STEREO_BUS_NAMES = info.stereo_bus_names || {};
+    OUTPUT_PAIRS = info.output_pairs || [];
+    STEREO_OUTPUTS = info.stereo_outputs || [];
+    currentOut = canonicalOutput(currentOut);
     MIXES = (info.mixes || []).map(function (mix) {
       return Object.assign({}, mix, {name: shortFfadoLabel(mix.name)});
     });
     OUTPUTS = (info.outputs || []).map(function (out) {
       return {id: out.id, name: shortFfadoLabel(out.name), baseName: out.base_name || out.name,
               mix: out.mix == null ? null : out.mix, controllable: out.controllable,
-              destination: !!out.destination, gainScale: out.gain_scale || null};
+              destination: !!out.destination, gainScale: out.gain_scale || null, customName: !!out.custom_name};
     });
     busLayout = Array.isArray(data[1]) ? data[1] : [];
     // A missed stereo-link event can turn the selected Right bus into the

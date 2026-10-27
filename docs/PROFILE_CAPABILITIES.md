@@ -116,8 +116,12 @@ format="dice_eap_peak12" channel_map="matrix_input_router_destination"
 
 The router must exist at `/EAP/Router` and return true to `hasPeakMetering()`.
 FFADO's matrix row label **must itself name** the router destination
-(e.g. `Mixer/In:01`) for a channel strip to show a meter. The rest of the
-router destinations are still displayed in In/Out → Crossbar router.
+(e.g. `Mixer/In:01`) for a channel strip to show a meter. Source-mapped DICE
+line outputs use their corresponding `Line/Out:NN` hardware peaks from the
+same `getPeakValues()` frame, with separate Left/Right lanes when linked.
+Output metering adds no routing or matrix-gain reads and does not estimate
+levels from input peaks. Missing hardware output peaks leave that meter
+unavailable. Other destinations remain visible in In/Out → Crossbar router.
 
 This feature does not reinterpret FireWire device model IDs, guess meter
 counts, or synthesize meter readings for unmatched control paths. The peak

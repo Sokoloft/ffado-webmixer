@@ -7,7 +7,7 @@ const src = fs.readFileSync(path.join(__dirname, '../src/ffado_webmixer/assets/s
 const code = src.slice(src.indexOf('var CLIENT_ID'), src.indexOf('// Interrupted software mute/solo'));
 const requests = [];
 const ctx = vm.createContext({
-  ACTIVE_DEVICE: 'aaaaaaaaaaaaaaaa', currentMix: 0, Math, Date,
+  ACTIVE_DEVICE: 'aaaaaaaaaaaaaaaa', currentMix: 0, STEREO_BUSES: [], Math, Date,
   setTimeout, clearTimeout, Promise,
   fetch(url, options) {
     let done;

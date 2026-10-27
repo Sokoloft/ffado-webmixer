@@ -1,5 +1,6 @@
-/* FFADO DICE EAP router-destination peaks displayed beside input strips.
- * These are router destination readings, NOT post-fader or calibrated dBFS.
+/* FFADO DICE EAP peaks beside input strips and the selected output fader.
+ * Inputs and outputs use real FFADO router destination peak readings.
+ * FFADO's normalized meter scale is not calibrated dBFS.
  * One lane per real input. An arbitrary stereo pair keeps its Left/Right order.
  * All controls here are read-only; tapping a meter clears browser-only holds.
  */
@@ -210,14 +211,21 @@
     }
     render(data, now) {
       const active = new Set();
-      const channels = data.channels || {};
       this.row.querySelectorAll('.strip').forEach(el => {
         const meter = el.querySelector('.peak-meter');
         if (!meter) return;
-        const left = channelKey(el.dataset.id);
-        const right = el.dataset.partner ? channelKey(el.dataset.partner) : null;
+        const output = el.dataset.output;
+        const channels = output ? (data.outputs || {}) : (data.channels || {});
+        const left = output || channelKey(el.dataset.id);
+        const right = output ? (el.dataset.outputPartner || null) :
+          (el.dataset.partner ? channelKey(el.dataset.partner) : null);
         const lanes = [{side: 'left', channel: left}];
         if (right !== null) lanes.push({side: 'right', channel: right});
+        else {
+          const cached = this.cachedLane(meter, 'right');
+          if (cached) cached.lane.hidden = true;
+        }
+        meter.classList.toggle('stereo-meter', right !== null);
         const details = [];
         let any = false;
         lanes.forEach(({side, channel}) => {
@@ -252,9 +260,11 @@
         });
         meter.hidden = !any;
         if (!any) return;
-        meter.classList.toggle('stereo-meter', right !== null);
-        meter.title = `${details.join(' / ')}. FFADO router destination (not post-fader or calibrated dBFS). Click to clear holds.`;
-        meter.setAttribute('aria-label', `Clear peak holds: ${details.join('; ')}. FFADO router destination readings, not measured post-fader.`);
+        const description = output
+          ? 'FFADO hardware output peak (router destination, not calibrated dBFS)'
+          : 'FFADO router destination (not post-fader or calibrated dBFS)';
+        meter.title = `${details.join(' / ')}. ${description}. Click to clear holds.`;
+        meter.setAttribute('aria-label', `Clear peak holds: ${details.join('; ')}. ${description}${output ? '.' : '; not measured post-fader.'}`);
         // Attach once per DOM meter; the closures created for every 100 ms
         // sample previously cost work even when the user never clicked.
         if (!this.boundMeters.has(meter)) {
