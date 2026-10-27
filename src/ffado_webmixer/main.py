@@ -22,7 +22,7 @@ CONFIG_FILE = CONFIG_DIR / "config.json"
 def parse_args():
     parser = argparse.ArgumentParser(
         prog=APP_NAME,
-        description="ffado-mixer replacement with web functionality",
+        description="ffado-mixer alternative",
     )
 
     parser.add_argument(
