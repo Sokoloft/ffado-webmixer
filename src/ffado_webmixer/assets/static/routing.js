@@ -6,6 +6,8 @@
   const tabs = { bus: $("routingBusTab"), matrix: $("routingMatrixTab"), crossbar: $("routingCrossbarTab") };
   const panes = { bus: $("routingBus"), matrix: $("routingMatrix"), crossbar: $("routingCrossbar") };
   let capabilities = { bus: false, matrix: false, crossbar: false }, active = "matrix", matrix = null, selection = null;
+  const selectedCells = new Map();
+  let cancelMatrixTouch = () => {};
   let loading = false, phonesWriteBusy = false;
   let refreshEpoch = 0, refreshController = null;
   let inlineGesture = null, matrixWriteBusy = false, matrixRefreshPending = false;
@@ -57,6 +59,7 @@
   }
   function changeTab(name) {
     if (!capabilities[name]) return;
+    if (name !== 'matrix') cancelMatrixTouch();
     if (name !== 'matrix' && inlineGesture) {
       if (inlineGesture.pointer != null) cancelMatrixGesture();
       else commitMatrixGesture();
@@ -92,8 +95,8 @@
     loading = false;
   }
   // Each crosspoint is a real rotary control. Its pointer/wheel/keyboard
-  // preview stays local until release (or an idle pause), then ONE FFADO write
-  // is made and the value is replaced by verified hardware readback.
+  // preview stays local until release (or an idle pause), then each selected
+  // crosspoint is written and replaced by verified hardware readback.
   function cellLevel(value, db) {
     return isDb() ? dbToUi(db) : clamp(Number(value), 0, 100);
   }
@@ -137,28 +140,48 @@
     return id + ' ← ' + shortFfadoLabel(
       !source || source.startsWith('Mute:') ? 'Disconnected' : source);
   }
-  function selectMatrixCell(i, o, cell) {
-    const old = $('routingGrid').querySelector('.route-selected');
-    if (old && old !== cell) old.classList.remove('route-selected');
-    cell.classList.add('route-selected');
-    selection = { input: i, output: o, button: cell };
-    $('routingEditor').hidden = false;
-    $('routingCellLabel').textContent = shortFfadoLabel(matrixInputLabel(i)) + ' → ' + shortFfadoLabel(matrix.outputs[o]);
-    renderEditor(matrix.values[i][o], isDb() ? matrix.db_values[i][o] : undefined);
-  }
-  function previewMatrixCell(gesture, level) {
-    if (isDb()) {
-      const db = level <= scale().min_db ? null : Math.round(clamp(level, scale().min_db, scale().max_db) * 10) / 10;
-      gesture.db = db;
-      // A preview is not the hardware value: only the visible knob and the
-      // selected detailed editor change until the write succeeds.
-      paintMatrixCell(gesture.cell, db === null ? 0 : dbToUi(db), db);
-      renderEditor(dbToUi(db), db);
-    } else {
-      gesture.percent = Math.round(clamp(level, 0, 100) * 100) / 100;
-      paintMatrixCell(gesture.cell, gesture.percent);
-      renderEditor(gesture.percent);
+  function selectMatrixCell(i, o, cell, toggle = false) {
+    const key = i + ':' + o;
+    if (!toggle && !selectedCells.has(key)) {
+      selectedCells.forEach(entry => entry.button.classList.remove('route-selected'));
+      selectedCells.clear();
     }
+    if (toggle && selectedCells.has(key)) {
+      cell.classList.remove('route-selected');
+      selectedCells.delete(key);
+      selection = Array.from(selectedCells.values()).pop() || null;
+    } else {
+      selection = { input: i, output: o, button: cell };
+      selectedCells.set(key, selection);
+      cell.classList.add('route-selected');
+    }
+    $('routingEditor').hidden = !selection;
+    $('routingGrid').querySelectorAll('.matrix-cell-control').forEach(button => {
+      button.setAttribute('aria-description', button.classList.contains('route-selected') ? 'Selected for group adjustment' : '');
+    });
+    if (!selection) return;
+    const {input, output} = selection;
+    $('routingCellLabel').textContent = selectedCells.size > 1
+      ? selectedCells.size + ' entries selected — Apply sets all to this level'
+      : shortFfadoLabel(matrixInputLabel(input)) + ' → ' + shortFfadoLabel(matrix.outputs[output]);
+    renderEditor(matrix.values[input][output], isDb() ? matrix.db_values[input][output] : undefined);
+  }
+  function previewMatrixCell(gesture, level, absolute = false) {
+    const delta = level - gesture.initialLevel;
+    gesture.targets.forEach(target => {
+      const next = absolute ? level : target.initialLevel + delta;
+      if (isDb()) {
+        target.db = next <= scale().min_db ? null : Math.round(clamp(next, scale().min_db, scale().max_db) * 10) / 10;
+        paintMatrixCell(target.cell, target.db === null ? 0 : dbToUi(target.db), target.db);
+      } else {
+        target.percent = Math.round(clamp(next, 0, 100) * 100) / 100;
+        paintMatrixCell(target.cell, target.percent);
+      }
+      if (target.cell === gesture.cell) {
+        gesture.db = target.db; gesture.percent = target.percent;
+        renderEditor(isDb() ? dbToUi(target.db) : target.percent, target.db);
+      }
+    });
     gesture.changed = true;
   }
   function clearGestureTimer() {
@@ -169,8 +192,10 @@
   }
   function undoMatrixPreview(gesture) {
     if (!matrix || !gesture) return;
-    paintMatrixCell(gesture.cell, matrix.values[gesture.input][gesture.output],
-      isDb() ? matrix.db_values[gesture.input][gesture.output] : undefined);
+    (gesture.targets || [gesture]).forEach(target => {
+      paintMatrixCell(target.cell, matrix.values[target.input][target.output],
+        isDb() ? matrix.db_values[target.input][target.output] : undefined);
+    });
     if (selection && selection.button === gesture.cell) {
       renderEditor(matrix.values[gesture.input][gesture.output],
         isDb() ? matrix.db_values[gesture.input][gesture.output] : undefined);
@@ -185,7 +210,7 @@
       if (!overlay.hidden && active === 'matrix') refresh();
     }
   }
-  function writeMatrixValue(input, output, cell, payload) {
+  function writeMatrixValue(input, output, cell, payload, targets = [{input, output, cell, payload}]) {
     if (matrixWriteBusy) return Promise.resolve(false);
     matrixWriteBusy = true;
     matrixWriteEpoch++;
@@ -194,26 +219,24 @@
     // Disable ALL crosspoint knobs until the hardware confirms this write;
     // otherwise another user's gesture could be overwritten by a stale read.
     $('routingGrid').querySelectorAll('.matrix-cell-control').forEach(b => { b.disabled = true; });
-    return request('/api/matrix', payload).then(result => {
+    return (async () => {
+      // Serialize writes under one busy lock; keep each verified readback even
+      // if a later entry fails. FFADO does not offer an atomic group write.
+      for (const {input, output, cell, payload} of targets) {
+        const result = await request('/api/matrix', payload);
+        matrix.values[input][output] = result.value;
+        if (isDb()) matrix.db_values[input][output] = result.db;
+        paintMatrixCell(cell, result.value, isDb() ? result.db : undefined);
+        if (selection && selection.button === cell) renderEditor(result.value, isDb() ? result.db : undefined);
+        message((result.deferred ? 'Saved for unmute: ' : 'Hardware readback: ') +
+          matrix.inputs[input] + ' → ' + matrix.outputs[output] + ' = ' + uiDb(result.value, result.db));
+      }
       matrixWriteError = null;
-      matrix.values[input][output] = result.value;
-      if (isDb()) matrix.db_values[input][output] = result.db;
-      paintMatrixCell(cell, result.value, isDb() ? result.db : undefined);
-      if (selection && selection.button === cell) {
-        renderEditor(result.value, isDb() ? result.db : undefined);
-      }
       if (typeof window.refreshMatrixStrips === "function") window.refreshMatrixStrips();
-      message((result.deferred ? 'Saved for unmute: ' : 'Hardware readback: ') +
-        matrix.inputs[input] + ' → ' + matrix.outputs[output] +
-        ' = ' + uiDb(result.value, result.db));
       return true;
-    }).catch(error => {
-      paintMatrixCell(cell, matrix.values[input][output],
-        isDb() ? matrix.db_values[input][output] : undefined);
-      if (selection && selection.button === cell) {
-        renderEditor(matrix.values[input][output],
-          isDb() ? matrix.db_values[input][output] : undefined);
-      }
+    })().catch(error => {
+      targets.forEach(target => undoMatrixPreview(target));
+      if (typeof window.refreshMatrixStrips === "function") window.refreshMatrixStrips();
       matrixWriteError = 'Could not set matrix level: ' + error.message;
       message(matrixWriteError);
       // Hardware may have changed even if readback failed. Reload it.
@@ -233,7 +256,10 @@
     const payload = isDb()
       ? { input: gesture.input, output: gesture.output, db: gesture.db }
       : { input: gesture.input, output: gesture.output, value: gesture.percent };
-    writeMatrixValue(gesture.input, gesture.output, gesture.cell, payload);
+    const targets = gesture.targets.map(target => ({...target, payload: isDb()
+      ? {input: target.input, output: target.output, db: target.db}
+      : {input: target.input, output: target.output, value: target.percent}}));
+    writeMatrixValue(gesture.input, gesture.output, gesture.cell, payload, targets);
   }
   function cancelMatrixGesture() {
     const gesture = inlineGesture;
@@ -249,6 +275,13 @@
     if (!inlineGesture) {
       inlineGesture = { input:i, output:o, cell, timer:null, changed:false,
         db: isDb() ? matrix.db_values[i][o] : null, percent:matrix.values[i][o] };
+      inlineGesture.initialLevel = isDb() ? (inlineGesture.db === null ? scale().min_db : inlineGesture.db) : inlineGesture.percent;
+      inlineGesture.targets = Array.from(selectedCells.values(), entry => ({
+        input: entry.input, output: entry.output, cell: entry.button,
+        db: isDb() ? matrix.db_values[entry.input][entry.output] : null,
+        percent: matrix.values[entry.input][entry.output],
+        initialLevel: isDb() ? (matrix.db_values[entry.input][entry.output] ?? scale().min_db) : matrix.values[entry.input][entry.output]
+      }));
     }
     return inlineGesture;
   }
@@ -257,18 +290,41 @@
     if (inlineGesture) inlineGesture.timer = setTimeout(commitMatrixGesture, 320);
   }
   function installMatrixKnob(cell, i, o) {
-    cell.addEventListener('click', () => {
-      if (!matrixWriteBusy && !inlineGesture) selectMatrixCell(i, o, cell);
+    let touch = null, suppressClick = false;
+    function clearTouch() {
+      if (touch) clearTimeout(touch.timer);
+      touch = null;
+    }
+    cell.addEventListener('click', e => {
+      if (suppressClick) { suppressClick = false; return; }
+      if (!matrixWriteBusy && !inlineGesture) selectMatrixCell(i, o, cell, e.ctrlKey || e.metaKey);
     });
+    cell.addEventListener('contextmenu', e => e.preventDefault());
     cell.addEventListener('dblclick', () => {
       if (matrixWriteBusy) return;
       if (inlineGesture) cancelMatrixGesture();
       selectMatrixCell(i, o, cell);
       if (isDb()) editDb(0); else renderEditor(100);
-      message('Unity selected for this crosspoint. Press Apply to write to hardware.');
+      message('Unity selected. Press Apply to set all selected entries to this level.');
     });
     cell.addEventListener('pointerdown', e => {
       if (e.button !== undefined && e.button !== 0) return;
+      if (matrixWriteBusy || (inlineGesture && inlineGesture.pointer != null)) return;
+      suppressClick = false;
+      if (e.ctrlKey || e.metaKey) return; // click toggles without starting a level gesture
+      if (e.pointerType === 'touch') {
+        if (inlineGesture) commitMatrixGesture();
+        if (matrixWriteBusy) return;
+        cancelMatrixTouch();
+        cancelMatrixTouch = clearTouch;
+        touch = {x: e.clientX, y: e.clientY, pointer: e.pointerId, timer: setTimeout(() => {
+          cancelMatrixGesture();
+          selectMatrixCell(i, o, cell, true);
+          suppressClick = true;
+          clearTouch();
+        }, 500)};
+      }
+      if (touch) { e.preventDefault(); cell.setPointerCapture(e.pointerId); return; }
       const gesture = beginMatrixGesture(i, o, cell);
       if (!gesture) return;
       clearGestureTimer();
@@ -280,6 +336,14 @@
       cell.setPointerCapture(e.pointerId);
     });
     cell.addEventListener('pointermove', e => {
+      if (touch && touch.pointer === e.pointerId) {
+        if (Math.hypot((e.clientX ?? touch.x) - touch.x, e.clientY - touch.y) < 8) return;
+        const startY = touch.y;
+        clearTouch();
+        const started = beginMatrixGesture(i, o, cell);
+        if (!started) return;
+        started.startY = startY; started.startLevel = started.initialLevel; started.pointer = e.pointerId;
+      }
       const gesture = inlineGesture;
       if (!gesture || gesture.cell !== cell || gesture.pointer !== e.pointerId) return;
       const delta = gesture.startY - e.clientY;
@@ -287,11 +351,17 @@
       previewMatrixCell(gesture, gesture.startLevel + delta * (isDb() ? 0.1 : 0.5));
     });
     cell.addEventListener('pointerup', e => {
+      if (touch && touch.pointer === e.pointerId) {
+        clearTouch();
+        selectMatrixCell(i, o, cell);
+        suppressClick = true;
+      }
       if (!inlineGesture || inlineGesture.cell !== cell || inlineGesture.pointer !== e.pointerId) return;
       inlineGesture.pointer = null;
       commitMatrixGesture();
     });
     cell.addEventListener('pointercancel', e => {
+      clearTouch(); suppressClick = true;
       if (inlineGesture && inlineGesture.cell === cell && inlineGesture.pointer === e.pointerId) cancelMatrixGesture();
     });
     cell.addEventListener('wheel', e => {
@@ -321,14 +391,17 @@
         : preset === 'max' ? (isDb() ? scale().max_db : 100)
         : preset === 'unity' ? (isDb() ? 0 : 100)
         : current + direction * step;
-      previewMatrixCell(gesture, next);
+      previewMatrixCell(gesture, next, preset !== null);
       scheduleMatrixGesture();
     });
   }
   function renderMatrix(data) {
     const previous = selection ? {input: selection.input, output: selection.output,
       focused: document.activeElement === selection.button} : null;
+    cancelMatrixTouch();
+    const previousCells = Array.from(selectedCells.values());
     cancelMatrixGesture();
+    selectedCells.clear();
     matrix = data;
     const dbMode = isDb();
     $("routingDb").hidden = !dbMode;
@@ -364,7 +437,7 @@
         cell.setAttribute('role', 'slider');
         cell.setAttribute('aria-label', shortFfadoLabel(displayName) + ' to ' + shortFfadoLabel(outname) + ' mixer volume');
         cell.title = shortFfadoLabel(displayName) + ' → ' + shortFfadoLabel(outname) +
-          ': drag up/down, scroll, or use arrow keys; click for exact dB';
+          ': drag up/down, scroll, or use arrow keys; Ctrl-click or long press to toggle group selection';
         const dial = document.createElement('span'), needle = document.createElement('span');
         dial.className = 'matrix-cell-dial';
         needle.className = 'matrix-cell-needle';
@@ -382,12 +455,16 @@
       body.appendChild(tr);
     });
     table.appendChild(body);
+    previousCells.forEach(entry => {
+      const cell = cellButtons[entry.input] && cellButtons[entry.input][entry.output];
+      if (cell) selectMatrixCell(entry.input, entry.output, cell, true);
+    });
     if (previous && cellButtons[previous.input] && cellButtons[previous.input][previous.output]) {
       const cell = cellButtons[previous.input][previous.output];
       selectMatrixCell(previous.input, previous.output, cell);
       if (previous.focused) cell.focus();
     }
-    message(matrixWriteError || "Drag a matrix knob to adjust, scroll or use arrow keys; changes write on release/pause. Click for precise editing and presets.");
+    message(matrixWriteError || "Drag a matrix knob to adjust, scroll or use arrow keys; changes write on release/pause. Ctrl-click (⌘-click on Mac) or long press to select multiple entries. Click for precise editing and presets.");
   }
   // The MOTU Mk1/Mk2 has four per-bus Discrete Mix_dest selectors. Those
   // choose one hardware output per bus and never alter crosspoint gain. This
@@ -620,6 +697,7 @@
       });
   }
   function close() {
+    cancelMatrixTouch();
     if (inlineGesture) {
       if (inlineGesture.pointer != null) cancelMatrixGesture();
       else commitMatrixGesture();
@@ -645,7 +723,7 @@
     message('Applying stereo FireWire routing…');
     request('/api/stereo-firewire', {left_source: source, bus: bus})
       .then(result => {
-        if (typeof window.refreshMatrixStrips === 'function') window.refreshMatrixStrips();
+        if (typeof window.refreshMatrixStrips === "function") window.refreshMatrixStrips();
         // Refresh the hardware readback before announcing the completed
         // patch, so the normal matrix-refresh hint doesn't hide the result.
         matrixWriteEpoch++;
@@ -761,7 +839,12 @@
     const { input, output, button: cell } = selection;
     const payload = isDb() ? { input, output, db: editorDb } :
       { input, output, value: editorPercent };
-    writeMatrixValue(input, output, cell, payload);
+    const targets = Array.from(selectedCells.values(), entry => ({
+      input: entry.input, output: entry.output, cell: entry.button,
+      payload: isDb() ? {input: entry.input, output: entry.output, db: editorDb}
+        : {input: entry.input, output: entry.output, value: editorPercent}
+    }));
+    writeMatrixValue(input, output, cell, payload, targets);
   });
   window.configureRouting = function (info) {
     capabilities = { bus: !!info.bus_routing,

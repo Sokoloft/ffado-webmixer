@@ -398,8 +398,9 @@ html.pywebview-client #fullscreenbox { display: none; }
   display:flex; align-items:center; justify-content:center; padding:2px;
   border:1px solid var(--border-color); border-radius:10px; cursor:pointer;
   color:var(--text-secondary); background:var(--sidebar-background); }
-.bus-pair-tile.is-linked > .bus-pair-link, .output-pair-tile.is-linked > .output-pair-link { top:0; }
-#side.narrow .bus-pair-tile.is-linked > .bus-pair-link, #side.narrow .output-pair-tile.is-linked > .output-pair-link { top:50%; left:100%; }
+/* Keep the unlink action inside the merged button in both sidebar layouts. */
+.bus-pair-tile.is-linked > .bus-pair-link, .output-pair-tile.is-linked > .output-pair-link {
+  top:auto; left:auto; right:3px; bottom:3px; transform:none; }
 .output-pair-link.is-linked { color:var(--accent-color); border-color:var(--accent-color); }
 .bus-pair-link:focus-visible, .output-pair-link:focus-visible { outline:2px solid var(--accent-color); outline-offset:2px; }
 .bus-pair-link { grid-column:1 / -1; background:var(--button-background); color:var(--text-secondary); border:1px solid var(--border-color); border-radius:4px; cursor:pointer; font-size:11px; padding:5px; }

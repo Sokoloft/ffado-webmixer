@@ -77,7 +77,7 @@ const ctx=vm.createContext({document:{getElementById:id=>elements[id],createElem
 const js=fs.readFileSync(path.join(__dirname,'../src/ffado_webmixer/assets/static/routing.js'),'utf8');
 ctx.shortFfadoLabel = text => text; // UI label helper; tests target matrix interactions.
 vm.runInContext(js,ctx);
-const flush=async()=>{for(let i=0;i<8;i++)await Promise.resolve();};
+const flush=async()=>{for(let i=0;i<24;i++)await Promise.resolve();};
 const cells=()=>elements.routingGrid.querySelectorAll('.matrix-cell-control');
 const value=c=>c.querySelector('.matrix-cell-value').textContent;
 const event=(x={})=>({preventDefault(){this.prevented=true;}, ...x});
@@ -166,5 +166,78 @@ const event=(x={})=>({preventDefault(){this.prevented=true;}, ...x});
   cells()[0].emit('dblclick');
   assert.equal(posts.length,postCount);
   assert.equal(elements.routingLevel.value,100);
+  // Ctrl-click toggles membership without staging a level change.
+  matrix={mode:'dice_db',gain_scale:{min_db:-60,max_db:6},inputs:['In 1','In 2'],outputs:['Out 1','Out 2'],values:[[80,70],[60,50]],db_values:[[-10,-20],[-30,-40]]};
+  elements.routingRefresh.click();await flush();
+  let group=cells();const beforeGroup=posts.length;
+  group[0].click();
+  group[1].emit('pointerdown',event({button:0,ctrlKey:true,clientY:100,pointerId:20}));
+  group[1].emit('click',event({ctrlKey:true}));
+  assert.equal(posts.length,beforeGroup);
+  assert.equal(group.filter(c=>c.classList.contains('route-selected')).length,2);
+  assert.match(elements.routingCellLabel.textContent,/2 entries/);
+  group[0].emit('wheel',event({deltaY:-1,shiftKey:true}));
+  assert.equal(value(group[0]),'-9.0 dB');assert.equal(value(group[1]),'-19.0 dB');
+  flushTimers();await flush();
+  assert.equal(posts.length,beforeGroup+2);
+  assert.equal(matrix.db_values[1][0],-30,'unselected crosspoints are untouched');
+  // A canceled group drag restores every preview and writes nothing.
+  group[0].emit('pointerdown',event({button:0,clientY:100,pointerId:21}));
+  group[0].emit('pointermove',event({clientY:80,pointerId:21}));
+  assert.equal(value(group[1]),'-17.0 dB');
+  group[0].emit('pointercancel',event({pointerId:21}));
+  assert.equal(value(group[0]),'-9.0 dB');assert.equal(value(group[1]),'-19.0 dB');
+  assert.equal(posts.length,beforeGroup+2);
+  // Exact Apply writes all selected entries, with one busy lock for the batch.
+  elements.routingDb.value='-12';held=[];
+  elements.routingApply.click();await flush();
+  assert.equal(held.length,1);assert.equal(group[0].disabled,true);
+  held.shift()();await flush();
+  assert.equal(held.length,1);assert.equal(group[0].disabled,true);
+  held.shift()();held=null;await flush();
+  assert.equal(group[0].disabled,false);
+  assert.equal(matrix.db_values[0][0],-12);assert.equal(matrix.db_values[0][1],-12);
+  // Refresh preserves group membership, and Ctrl-click can remove an entry.
+  elements.routingRefresh.click();await flush();group=cells();
+  assert.equal(group.filter(c=>c.classList.contains('route-selected')).length,2);
+  group[1].emit('click',event({ctrlKey:true}));
+  assert.equal(group.filter(c=>c.classList.contains('route-selected')).length,1);
+  // A touch long press adds a crosspoint; its trailing click cannot undo it.
+  const touchDown=(cell,id)=>cell.emit('pointerdown',event({button:0,pointerType:'touch',clientX:50,clientY:100,pointerId:id}));
+  const touchUp=(cell,id)=>cell.emit('pointerup',event({pointerId:id}));
+  touchDown(group[2],30);
+  group[2].emit('pointermove',event({clientX:52,clientY:101,pointerId:30}));
+  flushTimers();touchUp(group[2],30);group[2].click();
+  assert.equal(group[2].classList.contains('route-selected'),true);
+  assert.equal(group[0].classList.contains('route-selected'),true);
+  touchDown(group[2],31);flushTimers();touchUp(group[2],31);group[2].click();
+  assert.equal(group[2].classList.contains('route-selected'),false,'long press toggles off too');
+  // Short taps select immediately; movement cancels long press and drags.
+  touchDown(group[3],32);touchUp(group[3],32);group[3].click();
+  assert.equal(group.filter(c=>c.classList.contains('route-selected')).length,1);
+  assert.equal(group[3].classList.contains('route-selected'),true);
+  touchDown(group[3],33);
+  group[3].emit('pointermove',event({clientX:50,clientY:80,pointerId:33}));
+  flushTimers();assert.equal(value(group[3]),'-38.0 dB');
+  group[3].emit('pointercancel',event({pointerId:33}));
+  assert.equal(value(group[3]),'-40.0 dB');
+  touchDown(group[0],34);elements.routingClose.click();flushTimers();
+  assert.equal(group[0].classList.contains('route-selected'),false,'closing cancels long press');
+  elements.routingButton.click();await flush();group=cells();
+  // Percent matrices also support group adjustments and exact Apply.
+  matrix={mode:'percent',inputs:['In 1'],outputs:['Out 1','Out 2'],values:[[25,50]]};
+  elements.routingRefresh.click();await flush();group=cells();
+  group[0].click();group[1].emit('click',event({ctrlKey:true}));
+  group[0].emit('keydown',event({key:'ArrowUp'}));flushTimers();await flush();
+  assert.deepEqual(matrix.values,[[26,51]]);
+  elements.routingLevel.value=60;elements.routingLevel.emit('input');elements.routingApply.click();await flush();
+  assert.deepEqual(matrix.values,[[60,60]]);
+  // A later failure keeps earlier verified writes and reloads the rest.
+  held=[];elements.routingLevel.value=70;elements.routingLevel.emit('input');elements.routingApply.click();await flush();
+  held.shift()();await flush();fail=true;held.shift()();held=null;await flush();
+  await new Promise(resolve=>setImmediate(resolve));
+  assert.deepEqual(matrix.values,[[70,60]]);
+  assert.equal(value(cells()[0]),'70%');assert.equal(value(cells()[1]),'60%');
+  assert.match(elements.routingHint.textContent,/Could not set matrix level/);
   console.log('Matrix-cell rotary UI: drag, wheel debounce, keyboard, readback, rollback, selection, isolated writes passed');
 })().catch(e=>{console.error(e);process.exitCode=1;});
