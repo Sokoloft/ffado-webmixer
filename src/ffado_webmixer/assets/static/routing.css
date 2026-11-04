@@ -83,7 +83,7 @@
 .route-peak-fill { position:absolute; inset:0; height:100%; width:100%;
   background:linear-gradient(to right,#43b581 0%,#43b581 89%,
     #e6b450 90%,#e6b450 96%,#e05454 97%,#e05454 100%);
-  clip-path:inset(0 100% 0 0); transition:clip-path 80ms linear; pointer-events:none; }
+  clip-path:inset(0 100% 0 0); transition:clip-path 40ms linear; pointer-events:none; }
 .route-peak-db { position:absolute; right:5px; top:0; line-height:15px;
   font-size:10px; font-variant-numeric:tabular-nums; color:var(--text-primary); text-shadow:0 1px 2px #000; }
 

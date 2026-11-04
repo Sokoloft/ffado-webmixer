@@ -427,7 +427,7 @@ html.pywebview-client #fullscreenbox { display: none; }
 .peak-bar { position:absolute; inset:0; height:100%;
   background:linear-gradient(to top,#43b581 0%,#43b581 89%,
     #e6b450 90%,#e6b450 96%,#e05454 97%,#e05454 100%);
-  clip-path:inset(100% 0 0 0); transition:clip-path 80ms linear;
+  clip-path:inset(100% 0 0 0); transition:clip-path 40ms linear;
   pointer-events:none; }
 .peak-hold { position:absolute; left:0; right:0; height:2px; bottom:0;
   background:var(--text-primary); pointer-events:none; }

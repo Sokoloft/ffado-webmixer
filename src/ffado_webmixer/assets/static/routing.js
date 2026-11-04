@@ -641,8 +641,9 @@
       if (value.near_full_scale) state.clipUntil = now + 4000;
       // Clip a full-track gradient so yellow/red remain at the top of
       // the absolute FFADO scale, even for low router readings.
+      const displayed = window.FFADOPeakDisplay.meterLevel(state, value.level, now);
       meter.querySelector('.route-peak-fill').style.clipPath =
-        `inset(0 ${((1 - value.level) * 100).toFixed(2)}% 0 0)`;
+        `inset(0 ${((1 - displayed) * 100).toFixed(2)}% 0 0)`;
       meter.querySelector('.route-peak-hold').style.left = (state.level * 100).toFixed(2) + '%';
       meter.classList.toggle('clipping', now < state.clipUntil);
       meter.querySelector('.route-peak-db').textContent = value.db === null ? '−∞' : value.db.toFixed(1) + ' dB';

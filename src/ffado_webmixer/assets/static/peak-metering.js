@@ -8,7 +8,8 @@
   "use strict";
   const HOLD_MS = 1600;
   const CLIP_HOLD_MS = 4000;
-  const POLL_MS = 100; // HTTP fallback only; normal transport is server push
+  const RELEASE_MS = 400; // full-scale-to-silence fall time; CSS softens each step
+  const POLL_MS = 50; // HTTP fallback only; normal transport is server push
   const FALLBACK_MS = 1000;
   const RECONNECT_MS = 1000;
   const MAX_RECONNECT_MS = 30000;
@@ -32,6 +33,14 @@
   }
 
   class PeakDisplay {
+    // Time-based visual envelope, independent of sample cadence. Only the bar
+    // uses this: numeric readings, peak holds and clip warnings stay raw.
+    static meterLevel(state, level, now) {
+      const elapsed = Math.max(0, now - (state.levelAt ?? now));
+      state.displayLevel = Math.max(level, (state.displayLevel ?? level) - elapsed / RELEASE_MS);
+      state.levelAt = now;
+      return state.displayLevel;
+    }
     constructor(row, guid, fetcher) {
       this.row = row;
       this.guid = guid;
@@ -250,8 +259,9 @@
           if (item.near_full_scale) state.clipUntil = now + CLIP_HOLD_MS;
           // Reveal only the signal height from a full-height gradient, so the
           // yellow/red bands stay at the physical top of the meter track.
+          const displayed = PeakDisplay.meterLevel(state, item.level, now);
           cached.bar.style.clipPath =
-            `inset(${((1 - item.level) * 100).toFixed(2)}% 0 0 0)`;
+            `inset(${((1 - displayed) * 100).toFixed(2)}% 0 0 0)`;
           cached.hold.style.bottom = (state.held * 100).toFixed(2) + '%';
           lane.classList.toggle('clipping', now < state.clipUntil);
           const text = `${right !== null ? (side === 'left' ? 'Left · ' : 'Right · ') : ''}${sampleText(item)}`;
@@ -265,7 +275,7 @@
           : 'FFADO router destination (not post-fader or calibrated dBFS)';
         meter.title = `${details.join(' / ')}. ${description}. Click to clear holds.`;
         meter.setAttribute('aria-label', `Clear peak holds: ${details.join('; ')}. ${description}${output ? '.' : '; not measured post-fader.'}`);
-        // Attach once per DOM meter; the closures created for every 100 ms
+        // Attach once per DOM meter; the closures created for every
         // sample previously cost work even when the user never clicked.
         if (!this.boundMeters.has(meter)) {
           this.boundMeters.add(meter);

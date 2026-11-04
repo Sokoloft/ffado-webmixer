@@ -1,3 +1,16 @@
+## Unreleased — DICE meter responsiveness
+
+- Sample DICE hardware peaks every 50 ms (20 Hz) through the shared per-device
+  stream; match the HTTP fallback delay to 50 ms.
+- Shorten the 80 ms rise/fall CSS animation to 40 ms and add an
+  elapsed-time-based linear release (400 ms from full scale to silence) for
+  channel, output and Crossbar bars. Keep numeric readings and peak/clip holds
+  independent of the visual release.
+- Compare 100, 50 and 25 ms sampling in the offline responsiveness benchmark,
+  including snapshot p95 duration and over-budget read counts. Physical-device
+  cadence and contention still require hardware verification; see
+  [TESTING.md#dice-meter-responsiveness](TESTING.md#dice-meter-responsiveness).
+
 ## 1.2.0 — Fader spacing and MOTU volume display (2026-10-22)
 
 - Remove the 20px bottom reserve left by the former unlink button, keeping channel and master labels close to the bottom of their cards on desktop and mobile.

@@ -71,7 +71,7 @@ def exercise_mixer(model, *, stereo, iterations, delay):
     }
 
 
-def exercise_meter(*, iterations, delay):
+def exercise_meter(*, iterations, delay, interval):
     # Run the actual profile-driven meter conversion and SSE fanout against
     # the debug DICE FFADO router, not a fake random peak generator.
     with contextlib.redirect_stdout(io.StringIO()):
@@ -87,14 +87,17 @@ def exercise_meter(*, iterations, delay):
 
     mixer.helper.router_call = counted_router
     original_snapshot = mixer.peak_snapshot
+    read_times = []
     def timestamped_snapshot():
+        started = time.monotonic()
         with contextlib.redirect_stdout(io.StringIO()):
             frame = original_snapshot()
         frame['generated_at'] = time.monotonic()
+        read_times.append((frame['generated_at'] - started) * 1000)
         return frame
     mixer.peak_snapshot = timestamped_snapshot
 
-    hub = PeakStreamHub(interval=0.1)
+    hub = PeakStreamHub(interval=interval)
     sampler, first = hub.subscribe(mixer)
     _, second = hub.subscribe(mixer)
     times, latencies = [], []
@@ -115,6 +118,9 @@ def exercise_meter(*, iterations, delay):
         if sampler.thread is not None:
             sampler.thread.join(timeout=1)
     return {
+        'requested_interval_ms': interval * 1000,
+        'snapshot_ms_p95': percentile(read_times, .95),
+        'snapshot_over_budget_count': sum(t > interval * 1000 for t in read_times),
         'samples': iterations, 'ffado_get_peak_values_calls': rpc_counts['getPeakValues'],
         'ffado_has_peak_metering_calls': rpc_counts['hasPeakMetering'],
         'two_viewers_received_same_frames': identical,
@@ -138,7 +144,8 @@ def main():
         'rpc_ms': args.rpc_ms, 'iterations': args.iterations,
         'mixers': [exercise_mixer('profire2626', stereo=True, iterations=args.iterations, delay=delay),
                    exercise_mixer('motuultralite', stereo=False, iterations=args.iterations, delay=delay)],
-        'peak_sse_sampler': exercise_meter(iterations=args.iterations, delay=delay),
+        'peak_sse_sampler': [exercise_meter(iterations=args.iterations, delay=delay, interval=interval)
+                             for interval in (.1, .05, .025)],
     }
     print(json.dumps(result, indent=2))
 

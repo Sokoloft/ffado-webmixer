@@ -10,7 +10,7 @@ import queue
 import threading
 import time
 
-SAMPLE_INTERVAL = 0.1  # FFADO reference project's 100 ms sampling cadence
+SAMPLE_INTERVAL = 0.05  # 20 Hz; retain one shared reader per physical device
 
 
 class _Sampler:
@@ -71,7 +71,7 @@ class _Sampler:
                         pass
             delay = self.interval - (time.monotonic() - started)
             # Don't hammer a disconnected FFADO service on every tenth of a
-            # second. Once the service recovers normal 100 ms cadence resumes.
+            # second. Once the service recovers normal sampling resumes.
             if failed:
                 delay = max(delay, 0.5)
             if delay > 0:

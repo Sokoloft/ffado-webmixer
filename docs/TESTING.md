@@ -59,6 +59,33 @@ The benchmark uses **simulated** FFADO delays; it does not measure actual
 FireWire latency or browser rendering. Nothing in this documentation implies
 that physical-device verification has already succeeded.
 
+### DICE meter responsiveness
+
+Meters now sample every 50 ms (20 Hz), with a short 40 ms visual transition
+and a linear visual release of one full-scale unit per 400 ms. Smaller drops take
+proportionally less time. Release uses elapsed time, so its speed is independent
+of frame cadence. Bar targets update with each received sample; the 40 ms CSS
+transition softens those steps and completes before the next normal sample.
+This halves the original 80 ms animation time. Numeric readings remain instantaneous, and
+the separate 1.6 s peak and 4 s near-full-scale holds are unchanged.
+
+The responsiveness benchmark compares 100, 50 and 25 ms sampling, reporting
+snapshot p95 duration, over-budget reads, observed cadence and delivery time.
+An offline run with 20 samples and 1 ms simulated D-Bus calls measured mean
+intervals of 100.01, 50.02 and 25.01 ms respectively, with no over-budget reads.
+Both viewers received identical frames through queues limited to one frame.
+These measurements exclude real device refresh rates, hardware lock contention,
+HTTP delivery and browser rendering. The default stays at 50 ms pending hardware
+measurement rather than doubling the read rate again to 25 ms.
+
+For a physical-device trial, restart the application and reload the browser.
+Use short signal bursts to compare attack and release on channel, output and
+Crossbar meters. Check incoming `/api/peak-stream` events in browser developer
+tools for roughly 50 ms spacing, both idle and while moving faders or refreshing
+the matrix. Also compare local and remote browsers. If updates stall during
+control operations, measure hardware transaction wait time and `peak_snapshot()`
+duration before increasing the read rate further.
+
 ## Mixer, routing, and stereo links
 
 1. With monitoring level low, check all displayed input/output names against

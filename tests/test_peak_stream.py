@@ -30,8 +30,8 @@ class DummyPeakDevice:
 
 
 class PeakStreamTest(unittest.TestCase):
-    def test_default_cadence_matches_reference_project(self):
-        self.assertAlmostEqual(SAMPLE_INTERVAL, .1)
+    def test_default_cadence_is_twenty_hz(self):
+        self.assertAlmostEqual(SAMPLE_INTERVAL, .05)
 
     def test_two_viewers_share_one_hw_read_per_sample_and_idle_stops(self):
         dev = DummyPeakDevice('1111111111111111')

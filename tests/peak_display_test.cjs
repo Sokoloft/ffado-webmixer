@@ -68,9 +68,39 @@ assert(!stereo.lanes.right.cls.has('clipping'));
 // its own red/yellow top; the CSS positions those bands near track top.
 for (const [level, expectedClip] of [[0,'100.00'],[0.5,'50.00'],
   [0.89,'11.00'],[0.93,'7.00'],[0.99,'1.00'],[1,'0.00']]) {
+  display.states.clear(); // independent scale checks, without a prior release
   display.render({channels:{'0':peak('Mixer/In:01',level)}},5000+level);
   assert.equal(mono.lanes.left.bar.style.clipPath,
     `inset(${expectedClip}% 0 0 0)`, `wrong full-track clipping at ${level}`);
+}
+
+// A full-scale transient targets its peak immediately (CSS softens the step),
+// then falls by elapsed time.
+// Different input cadences must produce the same release at the same time.
+for (const cadence of [25, 50, 100]) {
+  const strip = fakeStrip('ch/00');
+  const d = new PeakDisplay(makeRow(strip), 'unit-a');
+  const render = (level, at) => d.render({channels:{'0':peak('Mixer/In:01', level)}}, at);
+  render(0, 0);
+  render(1, 1);
+  assert.equal(strip.lanes.left.bar.style.clipPath, 'inset(0.00% 0 0 0)');
+  for (let at = cadence; at <= 400; at += cadence) {
+    render(0, 1 + at);
+    if (at === 100) assert.equal(strip.lanes.left.bar.style.clipPath, 'inset(25.00% 0 0 0)');
+  }
+  assert.equal(strip.lanes.left.bar.style.clipPath, 'inset(100.00% 0 0 0)');
+  assert.equal(strip.lanes.left.hold.style.bottom, '100.00%');
+  render(.2, 401);
+  render(0, 431);
+  assert.equal(strip.lanes.left.bar.style.clipPath, 'inset(87.50% 0 0 0)');
+  render(.8, 432);
+  assert.equal(strip.lanes.left.bar.style.clipPath, 'inset(20.00% 0 0 0)', 'new peak attacks without smoothing');
+  render(0, 2000);
+  assert.equal(strip.lanes.left.bar.style.clipPath, 'inset(100.00% 0 0 0)', 'long gaps cannot prolong release');
+  render(.8, 2001);
+  d.render({channels:{}}, 2002);
+  render(.1, 2003);
+  assert.equal(strip.lanes.left.bar.style.clipPath, 'inset(90.00% 0 0 0)', 'missing data clears the previous envelope');
 }
 
 // Missing Right never silently copies Left or shows an artificial stereo peak.
