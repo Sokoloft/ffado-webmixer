@@ -8,9 +8,17 @@ const src = fs.readFileSync(path.join(__dirname, '../src/ffado_webmixer/assets/s
 const functions = src.slice(src.indexOf('function faderHasDbScale()'), src.indexOf('// ---- a gain box:'));
 const messages = [];
 const changes = [];
+const observers = [];
+class ResizeObserver {
+  constructor(callback) { this.callback = callback; observers.push(this); }
+  observe(target) { this.target = target; }
+  disconnect() { this.target = null; }
+  resize(height) { this.target.clientHeight = height; this.callback(); }
+}
 const ctx = vm.createContext({
   GAIN_SCALE: {mode: 'dice_db', min_db: -60, max_db: 6},
-  toast: msg => messages.push(msg), window: {}, Math, Number, String, Object,
+  toast: msg => messages.push(msg), window: {ResizeObserver}, Math, Number, String, Object,
+  document: {createElement: () => domNode()},
   wheelDir: event => Math.sign(-event.deltaY),
 });
 vm.runInContext(functions, ctx);
@@ -18,9 +26,12 @@ vm.runInContext(functions, ctx);
 function domNode() {
   const events = {};
   return {
-    style: {}, value: '', readOnly: false, events,
+    style: {}, clientHeight: 300, value: '', textContent: '', title: '', className: '', readOnly: false, events, children: [],
     addEventListener: (type, callback) => { (events[type] ||= []).push(callback); },
     removeEventListener: (type, callback) => { events[type] = (events[type] || []).filter(fn => fn !== callback); },
+    appendChild(child) { this.children.push(child); return child; },
+    replaceChildren(...children) { this.children = children; },
+    setAttribute() {},
     fire(type, fields = {}) {
       const ev = Object.assign({key: '', preventDefault() {}}, fields);
       for (const fn of events[type] || []) fn(ev);
@@ -47,6 +58,44 @@ assert.equal(ctx.formatFaderDb(-0.15), '-0.1 dB');
 assert.equal(ctx.formatFaderDb(null), '−∞ dB');
 
 const ui = harness();
+assert.equal(ui.track.children[0].children.length, 23, '6 dB marks and unlabeled 3 dB half marks are rendered');
+assert.equal(ui.track.children[0].children[0].textContent, '+6', 'top mark is labeled in integer dB');
+assert.equal(ui.track.children[0].children[1].textContent, '', 'half marks are unlabeled');
+assert.equal(ui.track.children[0].children[1].style.top, `${100 - 100*63/66}%`, 'half mark is placed at +3 dB');
+assert.equal(ui.track.children[0].children[2].textContent, '0', 'unity label has no decimals');
+assert.equal(ui.track.children[0].children[2].className, 'fader-mark major unity', '0 dB mark is bold');
+assert.equal(ui.track.children[0].children[2].style.top, `${100 - 100*60/66}%`, 'unity mark is placed at 0 dB');
+assert.equal(ui.track.children[0].children.at(-1).textContent, '-60', 'bottom mark is labeled in integer dB');
+const hasDecimal = text => /\.\d/.test(text);
+assert.equal(hasDecimal('+6.0'), true, 'the decimal detector rejects positive decimal labels');
+assert.equal(hasDecimal('-12.5'), true, 'the decimal detector rejects negative decimal labels');
+assert.equal(hasDecimal('-12'), false, 'integer labels remain valid');
+assert.equal(ui.track.children[0].children.some(mark => hasDecimal(mark.textContent)), false, 'dB tick labels have no decimals');
+
+// Actual label positions must remain readable after shrinking and growing,
+// including hidden/minimized tracks that become visible again.
+function checkResponsiveLabels(ui, observer, tickCount) {
+  for (const height of [94, 54, 0, 54, 300]) {
+    observer.resize(height);
+    const marks = ui.track.children[0].children;
+    assert.equal(marks.length, tickCount, 'resizing preserves every tick');
+    const labels = marks.filter(mark => mark.textContent);
+    assert.equal(labels.some(mark => mark.textContent === '0' && mark.className.includes('unity')), true,
+      'unity is always labeled');
+    for (let i = 1; i < labels.length; i++) {
+      const spacing = Math.abs(parseFloat(labels[i].style.top) - parseFloat(labels[i - 1].style.top)) * height / 100;
+      assert.ok(spacing >= 12, `labels need 12px separation, got ${spacing}px at height ${height}`);
+    }
+    assert.equal(labels.some(mark => hasDecimal(mark.textContent)), false);
+    if (height === 300) assert.equal(labels.length, marks.filter(mark => mark.className.includes('major')).length,
+      'growing restores all major labels');
+  }
+}
+checkResponsiveLabels(ui, observers.at(-1), 23);
+const rme = harness(() => true, () => ({mode: 'rme_db', min_db: -60, max_db: 6}));
+checkResponsiveLabels(rme, observers.at(-1), 23);
+rme.fader.destroy();
+assert.equal(observers.at(-1).target, null, 'disposing a strip releases its observed track');
 ui.fader.set(100*60/66);
 assert.equal(ui.label.value, '0.0 dB');
 ui.label.fire('focus');
@@ -106,6 +155,8 @@ assert.equal(locked.label.value, '0.0 dB');
 // Legacy percentage devices do not have a calibrated dB unity; do not pretend otherwise.
 ctx.GAIN_SCALE = null;
 const legacy = harness();
+assert.equal(legacy.track.children[0].children.length, 21, 'legacy scale has no calibrated unity marker');
+assert.equal(legacy.track.children[0].children[0].textContent, '0', 'legacy marks are labeled with percentages');
 legacy.fader.set(35);
 assert.equal(legacy.label.value, '35');
 legacy.wrap.fire('dblclick');
@@ -125,6 +176,12 @@ const motuScale = {mode: 'motu_db', min_db: -84, max_db: 0, native_min: 0,
   native_max: 128, min_finite_native: 1, step_native: 1, calibration: 'endpoint_interpolation'};
 ctx.FADER_SCALE = motuScale;
 const motu = harness();
+assert.equal(motu.track.children[0].children.length, 29, 'MOTU marks are spaced by 6 dB with 3 dB half marks');
+assert.equal(motu.track.children[0].children[0].className, 'fader-mark major unity');
+assert.equal(motu.track.children[0].children[0].textContent, '0');
+assert.equal(motu.track.children[0].children[1].textContent, '', 'MOTU half marks remain unlabeled');
+assert.equal(motu.track.children[0].children.at(-1).textContent, '-84');
+checkResponsiveLabels(motu, observers.at(-1), 29);
 for (let raw = 0; raw <= 128; raw++) {
   const transport = 100 * raw / 128;
   motu.fader.set(transport);

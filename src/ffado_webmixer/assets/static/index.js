@@ -402,12 +402,94 @@ function parseFaderEntry(text, scale = faderScale()) {
 }
 function makeFader(track, handle, label, onChange, canEdit = function () { return true; }, getScale = faderScale) {
   var value = 0, dragging = false, editing = false;
+  var marks = document.createElement("div"), marksScaleKey = null;
+  var majorMarks = [], markStep = 6;
+  marks.className = "fader-marks";
+  marks.setAttribute("aria-hidden", "true");
+  track.appendChild(marks);
+  function layoutMarkLabels() {
+    var height = track.clientHeight, step = markStep;
+    // Keep regular intervals anchored at zero, using actual tick positions
+    // because native MOTU positions are quantized. Leave all ticks visible.
+    while (true) {
+      var visible = majorMarks.filter(function (item) { return item.value % step === 0; });
+      var crowded = visible.some(function (item, index) {
+        return index > 0 && Math.abs(item.position - visible[index - 1].position) * height / 100 < 12;
+      });
+      if (!crowded) break;
+      step *= 2;
+    }
+    majorMarks.forEach(function (item) {
+      item.element.textContent = item.value % step === 0 ? item.text : "";
+    });
+  }
+  function renderMarks(scale) {
+    var scaleKey = scale ? [scale.mode, scale.min_db, scale.max_db, scale.native_max,
+      scale.min_finite_native, scale.step_native].join("|") : "percent";
+    if (scaleKey === marksScaleKey) return;
+    marksScaleKey = scaleKey;
+    marks.replaceChildren();
+    majorMarks = [];
+    markStep = hasFaderDbScale(scale) ? 6 : 10;
+    if (hasFaderDbScale(scale)) {
+      for (var db = Math.floor(scale.max_db / 3) * 3; db >= scale.min_db; db -= 3) {
+        var dbUi = faderDbToUi(db, scale);
+        var dbPosition = 100 - dbUi;
+        var isDbMajor = db % 6 === 0;
+        var dbMark = document.createElement("span");
+        dbMark.className = "fader-mark " + (isDbMajor ? "major" : "minor");
+        dbMark.style.top = dbPosition + "%";
+        if (isDbMajor) {
+          dbMark.textContent = (db > 0 ? "+" : "") + String(db);
+          dbMark.title = (db > 0 ? "+" : "") + String(db) + " dB";
+          majorMarks.push({position: dbPosition, element: dbMark, value: db, text: dbMark.textContent});
+        }
+        marks.appendChild(dbMark);
+      }
+    } else {
+      for (var position = 100; position >= 0; position -= 5) {
+        var isMajor = position % 10 === 0;
+        var mark = document.createElement("span");
+        mark.className = "fader-mark " + (isMajor ? "major" : "minor");
+        mark.style.top = position + "%";
+        if (isMajor) {
+          mark.textContent = String(100 - position);
+          marks.appendChild(mark);
+          majorMarks.push({position: position, element: mark, value: 100 - position, text: mark.textContent});
+        } else {
+          marks.appendChild(mark);
+        }
+      }
+    }
+    if (hasFaderDbScale(scale) && scale.min_db <= 0 && scale.max_db >= 0) {
+      var unityPosition = 100 - faderDbToUi(0, scale);
+      var alignedMark = majorMarks.find(function (item) {
+        return Math.abs(item.position - unityPosition) < 0.01;
+      });
+      if (alignedMark) {
+        alignedMark.element.className += " unity";
+        alignedMark.element.textContent = "0";
+        alignedMark.element.title = "0.0 dB";
+      } else {
+        var unity = document.createElement("span");
+        unity.className = "fader-unity";
+        unity.style.top = unityPosition + "%";
+        unity.title = "0.0 dB";
+        marks.appendChild(unity);
+      }
+    }
+    layoutMarkLabels();
+  }
   function render() {
     var scale = getScale();
+    renderMarks(scale);
     handle.style.top = (100 - value) + "%";
     if (!editing) label.value = hasFaderDbScale(scale) ? formatFaderDb(faderUiToDb(value, scale)) :
       (value === 0 ? "−∞" : String(value));
   }
+  renderMarks(getScale());
+  var marksObserver = window.ResizeObserver ? new window.ResizeObserver(layoutMarkLabels) : null;
+  if (marksObserver) marksObserver.observe(track);
   function setValue(v) {
     if (!canEdit()) return;
     var scale = getScale();
@@ -481,7 +563,7 @@ function makeFader(track, handle, label, onChange, canEdit = function () { retur
       (scale ? (e.shiftKey ? 0.15 : 0.75) : (e.shiftKey ? 1 : 2));
     if (dir) setValue(value + dir * step);
   }, { passive: false });
-  return { set: function (v) {
+  return { destroy: function () { if (marksObserver) marksObserver.disconnect(); }, set: function (v) {
     if (dragging) return;
     value = Math.min(100, Math.max(0, hasFaderDbScale(getScale()) ? Number(v) : Math.round(v)));
     render();
@@ -684,6 +766,7 @@ function buildStrip(id, data, pinned, minimized, partner) {
   // Fader and mute: linked inputs and stereo buses are applied across all matrix legs by the API.
   var fader = makeFader(q(".track"), q(".handle"), q(".fval"), function (v) { if (FADER_ALLOWED) sendThrottled(id, "fader", v, stripMix, stripDevice); },
     function () { return FADER_ALLOWED && stripMix === currentMix && stripDevice === ACTIVE_DEVICE; });
+  el.destroyFader = fader.destroy;
   function toggleHardware(control, on) {
     // Never optimistically show both stereo legs muted before FFADO has
     // acknowledged every write. Read the entire state back on success.
@@ -1842,6 +1925,7 @@ var lastStripMix = null;
 function renderStrips(state, layout) {
   lastStripState = state;
   lastStripMix = currentMix;
+  row.querySelectorAll('.strip').forEach(function (el) { if (el.destroyFader) el.destroyFader(); });
   row.innerHTML = "";
   var placed = {};
   function make(id, pinned, minimized) {

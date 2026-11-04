@@ -272,10 +272,19 @@ html { background: var(--page-background); }
   .faderwrap { flex: 1; min-height: 120px; display: flex; }
   /* Reserve half the handle height at each end so it cannot overlap adjacent controls. */
   .track { position: relative; width: 8px; align-self: stretch; margin: 13px auto; background: var(--control-background); border-radius: 4px; }
-  .track::before { content: ""; position: absolute; left: -17px; top: 0; bottom: 0; width: 9px;
-                   border-bottom: 1px solid var(--fader-tick-color);
-                   background: repeating-linear-gradient(to bottom, var(--fader-tick-color) 0, var(--fader-tick-color) 1px, transparent 1px, transparent 10%); }
-  .handle { position: absolute; left: -17px; width: 42px; height: 26px; margin-top: -13px; box-sizing: border-box;
+  .fader-marks { position: absolute; inset: 0; z-index: 1; pointer-events: none; }
+  .fader-mark { position: absolute; right: calc(100% + 2px); width: 34px; transform: translateY(-50%);
+                color: var(--text-secondary); text-align: right; white-space: nowrap; font-size: 9px; line-height: 10px; }
+  .fader-mark::after { content: ""; position: absolute; left: calc(100% + 2px); top: 50%; width: 8px;
+                       border-top: 1px solid var(--fader-tick-color); }
+  .fader-mark.minor::after { left: calc(100% + 6px); width: 4px; opacity: .8; }
+  .fader-mark.unity { color: var(--fader-value-color); font-weight: 700; }
+  .fader-mark.unity::after { border-top: 2px solid var(--fader-value-color); }
+  .fader-unity { position: absolute; left: -2px; width: 12px; transform: translateY(-1px);
+                 border-top: 2px solid var(--fader-value-color); color: var(--fader-value-color); }
+  .fader-unity::after { content: "0"; position: absolute; left: calc(100% + 3px); top: -6px;
+                        font-size: 9px; font-weight: 700; line-height: 10px; }
+  .handle { position: absolute; z-index: 2; left: -17px; width: 42px; height: 26px; margin-top: -13px; box-sizing: border-box;
             background: linear-gradient(var(--fader-handle-top), var(--fader-handle-bottom)); border: 1px solid var(--fader-handle-border); border-radius: 3px;
             cursor: grab; touch-action: none; }
   .handle::after { content: ""; position: absolute; left: 4px; right: 4px; top: 50%; height: 2px; margin-top: -1px; background: var(--fader-handle-mark); }
