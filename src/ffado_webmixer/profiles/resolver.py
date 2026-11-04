@@ -117,7 +117,7 @@ def match_outputs(device, mixes, profile=None):
                     'id':f'line/{i}', 'name':f'Line Out {i}', 'mix':None,
                     'meter_destination':f'Line/Out:{i:02d}',
                     'fader':fader, 'mute':get(declared_path(profile, 'monitor_line_mute').replace('{n}',str(i)), 'Boolean') if enabled(profile, 'monitor_line_mute') else None,
-                    'dest':None, 'spec':{'min':-40,'max':0,'writable':True}}
+                    'dest':None, 'spec':{'min':-40,'max':0,'step':1,'writable':True}}
     if family == 'motu' and enabled(profile, 'output_level'):
         extra = profile['capabilities']['features']['output_level'].get('extra_paths', '').split(',')
         for out_id,name,path in (('main','Main','Mainout_fader'),('phones','Phones','Phones_fader')):

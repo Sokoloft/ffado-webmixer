@@ -33,8 +33,9 @@
   };
 
   root.buildDiceMonitoring = function (box) {
+    var master = root.OUTPUTS.find(function (out) { return out.id === 'dice/master'; });
     var dim = root.OUTPUTS.find(function (out) { return out.id === 'dice/dim'; });
-    if (!dim && !supported.hw_monitor) return;
+    if (!master && !dim && !supported.hw_monitor) return;
     var group = document.createElement('div');
     group.className = 'outgroup dice-group';
     var title = document.createElement('div');
@@ -43,6 +44,14 @@
     var grid = document.createElement('div');
     grid.className = 'groupgrid dice-grid';
     group.appendChild(grid);
+    if (master) {
+      var masterButton = document.createElement('button');
+      masterButton.type = 'button'; masterButton.className = 'outbtn'; masterButton.dataset.id = master.id;
+      masterButton.textContent = 'Master';
+      masterButton.title = 'Set the level of all line outputs.';
+      masterButton.addEventListener('click', function () { root.selectOutput(master); });
+      grid.appendChild(masterButton);
+    }
     if (dim) {
       var button = document.createElement('button');
       button.type = 'button'; button.className = 'outbtn'; button.dataset.id = dim.id;

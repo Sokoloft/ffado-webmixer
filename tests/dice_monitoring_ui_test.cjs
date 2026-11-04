@@ -22,7 +22,9 @@ const writes = [], messages = [];
 const context = vm.createContext({
   document: {createElement: () => new Element(),
     getElementById: id => descendants(box).find(el => el.id === id)},
-  ACTIVE_DEVICE: 'device-a', OUTPUTS: [{id: 'dice/dim', mix: null, controllable: true}],
+  ACTIVE_DEVICE: 'device-a', OUTPUTS: [
+    {id: 'dice/master', mix: null, controllable: true},
+    {id: 'dice/dim', mix: null, controllable: true}],
   selectOutput: selected => { output = selected; },
   loadMaster: () => { loads++; }, toast: message => messages.push(message),
   ffadoApi: {
@@ -40,12 +42,34 @@ context.window = context;
 const base = path.join(__dirname, '../src/ffado_webmixer/assets/static');
 vm.runInContext(fs.readFileSync(path.join(base, 'dice-monitoring.js'), 'utf8'), context);
 const flush = async () => { for (let i = 0; i < 25; i++) await Promise.resolve(); };
+// Exercise the real master label rendering with each model's line inventory.
+const indexSource = fs.readFileSync(path.join(base, 'index.js'), 'utf8');
+const label = {}, masterStrip = {dataset: {}, querySelector: () => ({hidden: true})};
+const labelContext = vm.createContext({
+  currentOut: 'dice/master', canonicalOutput: id => id, outputPartner: () => null,
+  masterEl: masterStrip, masterHardwareName: label, masterToken: 0,
+  ACTIVE_DEVICE: 'device-a', document: {getElementById: () => ({})},
+  ffadoApi: {cancel() {}, latest: async () => null},
+});
+labelContext.window = labelContext;
+vm.runInContext(indexSource.slice(indexSource.indexOf('function loadMaster(options)'),
+  indexSource.indexOf('// ---- Bus tabs')), labelContext);
+for (const count of [4, 6, 10]) {
+  labelContext.OUTPUTS = [{id: 'dice/master', baseName: 'Master', controllable: true},
+    ...Array.from({length: count}, (_, n) => ({id: `line/${n + 1}`}))];
+  labelContext.loadMaster();
+  assert.equal(label.textContent, `Line Out\n1-${count}`, 'Master label uses the actual line inventory');
+}
 (async () => {
   context.configureDiceMonitoring({dice_monitoring: {dim: true, mute: true, hw_monitor: true}});
   context.buildDiceMonitoring(box);
   const group = box.children[0], grid = group.children[1];
   assert.equal(group.children[0].textContent, 'Dice');
-  const [dim, hardware] = grid.children;
+  const [master, dim, hardware] = grid.children;
+  assert.equal(master.textContent, 'Master');
+  master.click();
+  assert.equal(output.id, 'dice/master');
+  assert.equal(writes.length, 0, 'selecting Master must not change line levels');
   assert.equal(dim.textContent, 'Dim');
   assert(hardware.innerHTML.includes('H/W<br>Monitor'), 'Monitor appears on a second line');
   assert(hardware.disabled, 'toggle waits for initial hardware readback');

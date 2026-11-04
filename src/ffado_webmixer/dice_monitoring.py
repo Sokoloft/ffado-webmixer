@@ -11,6 +11,37 @@ from .mixer_outputs import serialized_output
 
 
 class DiceMonitoring:
+    def dice_master_outputs(self):
+        if self.profile.get('family') != 'saffire_dice':
+            return ()
+        return tuple(key for key, out in self.outputs.items()
+                     if key.startswith('line/') and out.get('fader'))
+
+    @serialized_output
+    def read_dice_master(self):
+        mute = self.dice_monitor_controls().get('mute')
+        lines = self.dice_master_outputs()
+        if not lines or not mute:
+            raise ValueError('Global DICE Master is unavailable')
+        states = [self.read_output(line) for line in lines]
+        hardware = any(state.get('hardware_controlled') for state in states)
+        return {'name': 'Master', 'level': None if hardware else max(s['level'] for s in states),
+                'hardware_controlled': hardware,
+                'mute': bool(self._read_scalar(mute['state'])), 'emulated_mute': False}
+
+    @serialized_output
+    def write_dice_master(self, control, value):
+        mute = self.dice_monitor_controls().get('mute')
+        if not self.dice_master_outputs() or not mute:
+            raise ValueError('Global DICE Master is unavailable')
+        if control == 'mute' and type(value) is bool:
+            self._monitor_changes([(mute['state'], value)] +
+                                  [(item, True) for item in mute['members']])
+        elif control == 'fader':
+            return self.write_linked_output('dice/master', control, value)
+        else:
+            raise ValueError('Invalid DICE Master control or value')
+
     def dice_monitor_controls(self):
         if self.profile.get('family') != 'saffire_dice':
             return {}
@@ -108,12 +139,12 @@ class DiceMonitoring:
         if not dim or not mute:
             raise ValueError('Global DICE Dim and hardware mute are unavailable')
         active = bool(self._read_scalar(dim['state']))
-        raw = self._read_scalar(dim['level']) if active else 0
+        raw = self._read_scalar(dim['level'])
         if not math.isfinite(float(raw)) or not -87 <= raw <= 0:
             raise IOError('Invalid DICE Dim level')
         # Reserve position zero for Off. Positions 1..88 run from -87 to 0 dB.
-        return {'name': 'Dim', 'level': (float(raw) + 88) * 100 / 88 if active else 0,
-                'mute': bool(self._read_scalar(mute['state'])),
+        return {'name': 'Dim', 'level': (float(raw) + 88) * 100 / 88,
+                'mute': not active,
                 'dim_active': active, 'emulated_mute': False}
 
     @serialized_output
@@ -123,7 +154,7 @@ class DiceMonitoring:
         if not dim or not mute:
             raise ValueError('Global DICE Dim and hardware mute are unavailable')
         if control == 'mute' and type(value) is bool:
-            changes = [(mute['state'], value)] + [(item, True) for item in mute['members']]
+            changes = [(dim['state'], not value)] + [(item, True) for item in dim['members']]
         elif (control == 'fader' and not isinstance(value, bool) and isinstance(value, (int, float))
               and math.isfinite(value) and 0 <= value <= 100):
             active = value > 0

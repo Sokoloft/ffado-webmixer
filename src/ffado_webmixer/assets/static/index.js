@@ -1206,7 +1206,7 @@ var masterFader = makeFader(document.getElementById("masterTrack"), document.get
       writeOutput(out, "fader", x, device)
         .catch(function (e) {
           toast("Output change failed: " + e.message);
-          if (out === 'dice/dim' && out === currentOut && device === ACTIVE_DEVICE) loadMaster();
+          if (out.startsWith('dice/') && out === currentOut && device === ACTIVE_DEVICE) loadMaster();
         });
     });
   }, function () { return masterReady && !masterHardwareControlled; }, function () {
@@ -1304,6 +1304,11 @@ function loadMaster(options) {
   if (masterEl.hidden) return;
   var partner = outputPartner(currentOut);
   masterHardwareName.textContent = partner ? out.baseName + ' + ' + partner.baseName : out.baseName;
+  if (currentOut === 'dice/master') {
+    var lines = OUTPUTS.filter(function (output) { return output.id.startsWith('line/'); })
+      .map(function (output) { return Number(output.id.split('/')[1]); });
+    masterHardwareName.textContent = 'Line Out\n' + Math.min(...lines) + '-' + Math.max(...lines);
+  }
   var token = ++masterToken;
   return window.ffadoApi.latest('master-output', '/api/output?out=' + encodeURIComponent(currentOut),
     {device: ACTIVE_DEVICE}).then(function (o) {
@@ -1743,7 +1748,7 @@ function buildOutputs() {
   if (window.buildDiceMonitoring) window.buildDiceMonitoring(box);
   [["Outputs", function (o) { return o.mix === null; }],
    ["Buses",   function (o) { return o.mix !== null; }]].forEach(function (g) {
-    var members = OUTPUTS.filter(function (o) { return o.id !== 'dice/dim' && g[1](o); });
+    var members = OUTPUTS.filter(function (o) { return !o.id.startsWith('dice/') && g[1](o); });
     if (!members.length) return;
     var group = document.createElement("div");
     group.className = "outgroup" + (g[0] === "Buses" ? " bus-group" : "");

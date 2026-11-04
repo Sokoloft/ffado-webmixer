@@ -126,10 +126,16 @@ class Mixer(DiceMonitoring, RoutingControls, OutputControls):
         self.out_spec = resolved["output_spec"]
         self.outputs = resolved["outputs"]
         monitor = self.dice_monitor_controls()
+        lines = self.dice_master_outputs()
+        if lines and 'mute' in monitor:
+            self.outputs['dice/master'] = {
+                'id': 'dice/master', 'name': 'Master', 'mix': None, 'dest': None,
+                'fader': self.outputs[lines[0]]['fader'], 'mute': monitor['mute']['state'],
+                'spec': self.outputs[lines[0]].get('spec', self.out_spec)}
         if 'dim' in monitor and 'mute' in monitor:
             self.outputs['dice/dim'] = {
                 'id': 'dice/dim', 'name': 'Dim', 'mix': None, 'dest': None,
-                'fader': monitor['dim']['level'], 'mute': monitor['mute']['state'],
+                'fader': monitor['dim']['level'], 'mute': monitor['dim']['state'],
                 'spec': {'min': 0, 'max': 87, 'type': 'dice_dim', 'writable': True}}
         self.chan = resolved["channels"]
         self.chan_specs = resolved["channel_specs"]
