@@ -9,7 +9,7 @@
   function protect(input) {
     if (!input || input.dataset.gestureProtected === 'true') return input;
     if (input.dataset.gestureEdit === 'direct') return input;
-    if (!/^(?:text|number|search|email|url|tel)$/.test(input.type)) return input;
+    if (input.tagName !== 'TEXTAREA' && !/^(?:text|number|search|email|url|tel)$/.test(input.type)) return input;
     input.dataset.gestureProtected = 'true';
     input.dataset.gestureEdit = 'locked';
     input.readOnly = true;
@@ -69,5 +69,5 @@
     // A menu action deliberately opts into editing, like a context menu.
     input.dispatchEvent(new MouseEvent('contextmenu', {bubbles:true, cancelable:true}));
   };
-  document.querySelectorAll('input[type="text"], input[type="number"], input:not([type])').forEach(protect);
+  document.querySelectorAll('input[type="text"], input[type="number"], input:not([type]), textarea.name, textarea.mname').forEach(protect);
 })();

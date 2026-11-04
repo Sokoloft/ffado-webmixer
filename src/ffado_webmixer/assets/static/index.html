@@ -56,7 +56,7 @@
   <div class="sidebody">
     <div id="outbox" hidden></div>
     <div id="masterbox" hidden><div id="master" class="strip master">
-      <input class="mname" id="masterName" maxlength="16" spellcheck="false" autocomplete="off" title="Right-click or long-press to rename">
+      <textarea class="mname" id="masterName" rows="1" maxlength="16" spellcheck="false" autocomplete="off" title="Right-click or long-press to rename"></textarea>
       <input class="fval" id="masterVal" type="text" inputmode="decimal" autocomplete="off" spellcheck="false" aria-label="Output volume" title="Right-click or long-press to edit volume; Enter applies, Escape cancels">
       <div class="faderwrap"><div class="track" id="masterTrack" title="Output volume"><div class="handle" id="masterHandle"></div></div>
         <button type="button" class="peak-meter" hidden aria-label="Clear output peak hold">
@@ -283,6 +283,7 @@
 <script src="/static/frontend-api.js"></script>
 <script src="/static/remote-access.js"></script>
 <script src="/static/editable-input.js"></script>
+<script src="/static/fader-labels.js"></script>
 <script src="/static/routing.js"></script>
 <script src="/static/qrcode.js"></script>
 <script src="/static/peak-metering.js"></script>

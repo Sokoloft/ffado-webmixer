@@ -188,11 +188,95 @@ def browser_check(root):
     view.show()
     passed = False
 
-    def checked(failures):
+    def labels_checked(failures):
         nonlocal passed
         passed = failures == []
-        print('Fader layout:', failures, flush=True)
+        print('Fader label layout:', failures, flush=True)
         app.quit()
+
+    def checked(failures):
+        if failures:
+            labels_checked(failures)
+            return
+        # Exercise wrapping and shared track geometry after observer/frame work.
+        setup = r"""
+        window.labelFailures = [];
+        const row = document.createElement('div'); row.id = 'row';
+        row.style.cssText = 'position:fixed;inset:0 auto auto 0;width:700px;height:650px;box-sizing:border-box';
+        document.body.appendChild(row);
+        for (const kind of ['', 'stereo', '']) {
+          const strip = document.createElement('div'); strip.className = 'strip ' + kind;
+          strip.innerHTML = '<textarea class="name" rows="1">Short</textarea>' +
+            '<div class="faderwrap"><div class="track"></div></div><div class="inname">Input</div>';
+          row.appendChild(strip);
+        }
+        const strips = Array.from(row.children);
+        const label = strips[0].querySelector('.name');
+        const hardware = strips[1].querySelector('.inname');
+        const masterLabel = document.getElementById('masterName');
+        const track = strip => strip.querySelector('.track').getBoundingClientRect();
+        function check(ok, message) { if (!ok) window.labelFailures.push(message); }
+        function aligned() {
+          const first = track(strips[0]);
+          for (const strip of strips.slice(1)) {
+            const rect = track(strip);
+            check(Math.abs(rect.top - first.top) < 1 && Math.abs(rect.height - first.height) < 1,
+              'mono/stereo tracks must align when one label wraps');
+          }
+        }
+        """
+        scenarios = r"""
+        setTimeout(() => {
+          const initial = track(strips[0]).height;
+          const masterInitial = masterLabel.getBoundingClientRect().height;
+          masterLabel.value = 'Long output name';
+          masterLabel.dispatchEvent(new Event('input', {bubbles:true}));
+          check(label.readOnly, 'wrapped names must remain protected from accidental edits');
+          label.dispatchEvent(new KeyboardEvent('keydown', {key:'F2', bubbles:true}));
+          check(!label.readOnly, 'F2 must allow editing wrapped names');
+          label.blur();
+          check(label.readOnly, 'blur must protect wrapped names again');
+          label.value = 'LongUnbrokenName';
+          label.dispatchEvent(new Event('input', {bubbles:true}));
+          hardware.textContent = 'Hardware input with a long descriptive name';
+          setTimeout(() => {
+            aligned();
+            check(masterLabel.getBoundingClientRect().height > masterInitial,
+              'master label must expand for wrapped text');
+            check(masterLabel.clientHeight >= masterLabel.scrollHeight, 'master label must show all text');
+            const expanded = track(strips[0]).height;
+            check(expanded < initial, 'wrapping labels must shrink every track');
+            check(label.clientHeight >= label.scrollHeight, 'name must show all wrapped text');
+            check(hardware.clientHeight >= hardware.scrollHeight, 'hardware input must show all text');
+            row.querySelectorAll('.strip').forEach(strip => { strip.style.width = '88px'; });
+            window.dispatchEvent(new Event('resize'));
+            setTimeout(() => {
+              aligned();
+              check(track(strips[0]).height <= expanded, 'narrowing strips must reserve wrapped height');
+              label.value = 'Short'; hardware.textContent = 'Input';
+              label.dispatchEvent(new Event('input', {bubbles:true}));
+              setTimeout(() => {
+                aligned();
+                check(track(strips[0]).height > expanded, 'short labels must restore track height');
+                label.value = 'LongUnbrokenName';
+                label.dispatchEvent(new Event('input', {bubbles:true}));
+                setTimeout(() => {
+                  const before = track(strips[1]).height;
+                  strips[0].classList.add('minimized');
+                  setTimeout(() => {
+                    check(track(strips[1]).height > before, 'minimized labels must release shared space');
+                    window.labelChecksDone = true;
+                  }, 80);
+                }, 80);
+              }, 80);
+            }, 80);
+          }, 80);
+        }, 80);
+        """
+        view.page().runJavaScript(setup + (assets / 'fader-labels.js').read_text() +
+                                  (assets / 'editable-input.js').read_text() + scenarios)
+        QTimer.singleShot(1200, lambda: view.page().runJavaScript(
+            'window.labelChecksDone ? window.labelFailures : ["label checks did not complete"]', labels_checked))
 
     def loaded(ok):
         if not ok:
@@ -203,6 +287,7 @@ def browser_check(root):
     view.loadFinished.connect(loaded)
     view.setHtml('<style>' + css + '</style>'
                  '<div id="masterbox"><div id="master" class="strip master">'
+                 '<textarea id="masterName" class="mname" rows="1">Main</textarea>'
                  '<div class="faderwrap"><div class="track"></div>'
                  '<button class="peak-meter" hidden></button></div>'
                  '<input id="masterVal"><button id="masterMute"></button></div></div>')

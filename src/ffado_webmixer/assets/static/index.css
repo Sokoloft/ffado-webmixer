@@ -269,6 +269,8 @@ html { background: var(--page-background); }
   .name, .mname { flex: none; width: 100%; box-sizing: border-box; padding: 7px 4px; background: var(--input-background);
           border: 1px solid var(--border-color); border-radius: 3px; color: var(--input-text-color); font-size: 14px; text-align: center; }
   .name:focus { outline: none; border-color: var(--fader-value-color); }
+  textarea.name, textarea.mname { display: block; resize: none; overflow: hidden;
+    font-family: inherit; line-height: 1.2; white-space: pre-wrap; overflow-wrap: anywhere; }
 
   .fval { flex: none; width: 100%; box-sizing: border-box; height: 24px; padding: 0 2px;
         line-height: 24px; text-align: center; font: inherit; font-size: 13px;
@@ -303,12 +305,12 @@ html { background: var(--page-background); }
   .strip.muted .handle { background: linear-gradient(var(--muted-handle-top), var(--muted-handle-bottom)); }
 
   .inname { flex: none; text-align: center; font-size: 11px; color: var(--text-secondary);
-            white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+            white-space: pre-line; overflow-wrap: anywhere; }
   #master .inname { white-space: pre-line; overflow: visible; text-overflow: clip; overflow-wrap: break-word; }
 
   /* master (output) strip */
   .strip.master { width: 100px; border-top-color: var(--accent-color); }
-  .mname { color: var(--input-text-color); font-family: inherit; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; cursor: text; }
+  .mname { color: var(--input-text-color); font-family: inherit; cursor: text; }
   .mname:hover { border-color: var(--input-hover-border-color); }
   .mname:focus { outline: none; border-color: var(--fader-value-color); }
 

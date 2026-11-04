@@ -631,7 +631,7 @@ function buildStrip(id, data, pinned, minimized, partner) {
     '<div class="panrow"><div class="caprow"><span>PAN</span><span class="panval">0</span></div>' +
       '<input class="pan" type="range" min="-100" max="100" step="1" value="0" title="Double-click to center"></div>' +
 
-    '<input class="name" maxlength="16" spellcheck="false" title="Rename">' +
+    '<textarea class="name" rows="1" maxlength="16" spellcheck="false" title="Rename"></textarea>' +
     '<button class="btn solo">Solo</button>' +
     '<input class="fval" type="text" inputmode="decimal" autocomplete="off" spellcheck="false" aria-label="Digital mixer volume" title="Right-click or long-press to edit volume; Enter applies, Escape cancels">' +
     '<div class="faderwrap"><div class="track" title="Digital mixer volume"><div class="handle"></div></div>' +
@@ -688,7 +688,7 @@ function buildStrip(id, data, pinned, minimized, partner) {
   });
   if (window.ffadoProtectEditable) window.ffadoProtectEditable(nameEl);
   nameEl.addEventListener("keydown", function (e) {
-    if (e.key === "Enter") nameEl.blur();
+    if (e.key === "Enter") { e.preventDefault(); nameEl.blur(); }
     if (e.key === "Escape") { nameEl.value = lastName; nameEl.blur(); }
   });
 
@@ -874,6 +874,7 @@ function buildStrip(id, data, pinned, minimized, partner) {
     else if (control === "name") {
       if (stripId && stripId !== id) return;          // the right channel's own name isn't shown on a stereo strip
       if (document.activeElement !== nameEl) { nameEl.value = shortFfadoLabel(value); lastName = nameEl.value; q(".vname").textContent = vertical(nameEl.value); }
+      if (window.ffadoRefreshFaderLabels) window.ffadoRefreshFaderLabels();
     }
   };
 
@@ -1229,6 +1230,7 @@ var lastMasterName = "";
 function showMasterName(name) {
   lastMasterName = name;
   if (document.activeElement !== masterName) masterName.value = name;      // don't overwrite while typing
+  if (window.ffadoRefreshFaderLabels) window.ffadoRefreshFaderLabels();
 }
 function applyOutputName(id, name, customName = true, confirmed = true) {
   OUTPUTS.forEach(function (o) {
@@ -1272,7 +1274,7 @@ masterName.addEventListener("change", function () {
     });
 });
 masterName.addEventListener("keydown", function (e) {
-  if (e.key === "Enter") masterName.blur();
+  if (e.key === "Enter") { e.preventDefault(); masterName.blur(); }
   if (e.key === "Escape") { masterName.value = lastMasterName; masterName.blur(); }
 });
 masterName.addEventListener("focus", function () { if (masterName.dataset?.gestureEdit !== "locked") masterName.select(); });
