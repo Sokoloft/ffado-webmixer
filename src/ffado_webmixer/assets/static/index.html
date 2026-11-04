@@ -218,6 +218,7 @@
       <nav class="routing-tabs" aria-label="Hardware mixer panels">
         <button id="routingBusTab" type="button" hidden>Bus → outputs</button>
         <button id="routingMatrixTab" type="button" class="routing-active">Mixer matrix</button>
+        <button id="routingGainsTab" type="button" hidden>Bus / output gains</button>
         <button id="routingCrossbarTab" type="button">Crossbar router</button>
       </nav>
       <button id="routingRefresh" type="button" title="Reload hardware values">Refresh</button>
@@ -273,6 +274,9 @@
         <button type="button" id="routingApply">Apply</button>
         <small class="matrix-hotkey-help">Knob: 0 = unity, M = silence, ↑↓ = 0.1 dB, Shift+↑↓ = 1 dB. Double-click a cell to preview unity; Apply commits.</small>
       </div>
+    </div>
+    <div id="routingGains" class="routing-pane" hidden>
+      <div id="routingGainGroups" class="routing-gain-groups"></div>
     </div>
     <div id="routingCrossbar" class="routing-pane" hidden>
       <div id="routingDestinations" class="routing-groups"></div>

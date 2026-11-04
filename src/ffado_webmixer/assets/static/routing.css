@@ -146,3 +146,20 @@
 .routing-stereo-firewire small { flex: 0 0 100%; color: var(--text-secondary); line-height: 1.4; }
 @media (max-width: 640px) { .routing-stereo-firewire { align-items: stretch; flex-direction: column; }
   .routing-stereo-firewire > * { width: 100%; box-sizing: border-box; } }
+
+/* DICE bus and physical output gains, presented together in In / Out. */
+.routing-gain-groups { display: grid; gap: 12px; padding: 12px; }
+.routing-gain-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(155px, 1fr)); gap: 10px; }
+.routing-gain-card { display: grid; grid-template-columns: 1fr 1fr; align-items: center;
+  gap: 8px; padding: 12px; border: 1px solid var(--border-color); border-radius: 5px;
+  background: var(--control-background); font-size: 12px; }
+.routing-gain-card strong, .routing-gain-card input[type=range] { grid-column: 1 / -1; min-width: 0; width: 100%; }
+.routing-gain-card input[type=range] { accent-color: var(--accent-color); }
+.routing-gain-card input[type=number], .routing-gain-card button { min-width: 0; width: 100%; box-sizing: border-box;
+  padding: 7px; border: 1px solid var(--border-color); border-radius: 4px;
+  background: var(--button-background); color: var(--text-primary); }
+.routing-gain-card output { font-variant-numeric: tabular-nums; }
+.routing-gain-card button { cursor: pointer; }
+.routing-gain-card :disabled { opacity: .5; cursor: default; }
+.routing-gain-card :focus-visible { outline: 2px solid var(--accent-color); }
+@media(max-width:650px) { .routing-tabs { flex-wrap: wrap; } }

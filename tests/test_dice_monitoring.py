@@ -227,3 +227,24 @@ def test_api_validation_and_broadcast(mixer):
     assert mixer.helper.values[path(mixer, 'GlobalMute/State')] is True
     assert client.post('/api/dice-monitoring', json={'control': 'mute', 'value': 1}).status_code == 400
     assert client.post('/api/output', json={'out': 'dice/master', 'control': 'fader', 'value': 50}).status_code == 400
+
+
+@pytest.mark.parametrize('linked', [False, True])
+def test_line_unity_uses_its_native_scale_independently_of_bus_gain(mixer, linked):
+    if linked:
+        mixer.config.settings['stereo_outputs'] = ['line/1']
+    outputs = {out['id']: out for out in mixer.describe()['outputs']}
+    line = outputs['line/1']['gain_scale']
+    bus = outputs['bus/0']['gain_scale']
+    assert line['mode'] == 'dice_line'
+    assert (line['min_db'], line['max_db'], line['step_db']) == (-40, 0, 1)
+    assert (bus['min_db'], bus['max_db']) == (-60, 6)
+    # The UI maps 0 dB to 100% for physical attenuation, 90.909...% for buses.
+    for out, scale in [('line/1', line), ('bus/0', bus)]:
+        unity = 100 * (0 - scale['min_db']) / (scale['max_db'] - scale['min_db'])
+        mixer.write_linked_output(out, 'fader', unity)
+        actual = mixer.read_linked_output(out)['level']
+        assert scale['min_db'] + actual * (scale['max_db'] - scale['min_db']) / 100 == pytest.approx(0)
+    assert mixer.helper.values[path(mixer, 'LineOut/Volume1')] == 0
+    if linked:
+        assert mixer.helper.values[path(mixer, 'LineOut/Volume2')] == 0

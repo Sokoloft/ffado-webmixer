@@ -221,6 +221,12 @@ class Mixer(BusGainControls, DiceMonitoring, RoutingControls, OutputControls):
 
     # ---------- what the web server uses ----------
     def _fader_display_scale(self, spec, feature):
+        if (self.profile.get('family') == 'saffire_dice' and feature == 'output_level'
+                and spec.get('min') == -40 and spec.get('max') == 0):
+            # FFADO's Saffire LineVolume sliders expose integer attenuation,
+            # independently of the matrix's fixed-point -60..+6 dB gain.
+            return {'mode': 'dice_line', 'min_db': -40, 'max_db': 0,
+                    'native_max': 40, 'step_native': 1, 'step_db': 1}
         if (self.profile.get('family') == 'motu'
                 and self.profile.get('internal_model_id') in (1, 2, 3, 4, 6)
                 and enabled(self.profile, feature)

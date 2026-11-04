@@ -5,6 +5,9 @@
   const overlay = $("routingOverlay"), button = $("routingButton");
   const tabs = { bus: $("routingBusTab"), matrix: $("routingMatrixTab"), crossbar: $("routingCrossbarTab") };
   const panes = { bus: $("routingBus"), matrix: $("routingMatrix"), crossbar: $("routingCrossbar") };
+  if ($('routingGainsTab')) {
+    tabs.gains = $('routingGainsTab'); panes.gains = $('routingGains');
+  }
   let capabilities = { bus: false, matrix: false, crossbar: false }, active = "matrix", matrix = null, selection = null;
   const selectedCells = new Map();
   let cancelMatrixTouch = () => {};
@@ -13,6 +16,7 @@
   let inlineGesture = null, matrixWriteBusy = false, matrixRefreshPending = false;
   let stereoPlaybackBusy = false;
   let matrixWriteError = null, matrixWriteEpoch = 0;
+  let gainBusy = false, gainEditing = false, gainRefreshPending = false, gainEpoch = 0;
   const routeMeterStates = new Map();
   function message(s) { $("routingHint").textContent = s; }
   let editorDb = null, editorPercent = 0;
@@ -64,7 +68,8 @@
       if (inlineGesture.pointer != null) cancelMatrixGesture();
       else commitMatrixGesture();
     }
-    if (matrixWriteBusy && name !== active) return;
+    if ((matrixWriteBusy || gainBusy) && name !== active) return;
+    if (name !== active) gainEditing = false;
     active = name;
     Object.keys(tabs).forEach(key => {
       panes[key].hidden = name !== key;
@@ -93,6 +98,109 @@
     if (refreshController) refreshController.abort();
     refreshController = null;
     loading = false;
+  }
+  function gainOutputs() {
+    return (window.OUTPUTS || []).filter(out => out.controllable &&
+      (!window.canonicalOutput || window.canonicalOutput(out.id) === out.id));
+  }
+  function readGains(signal) {
+    return Promise.all(gainOutputs().map(out => request('/api/output?out=' + encodeURIComponent(out.id),
+      undefined, signal).then(state => ({out, state}))));
+  }
+  function renderGains(entries) {
+    const container = $('routingGainGroups');
+    container.replaceChildren();
+    [['Buses', true], ['Outputs', false]].forEach(([title, buses]) => {
+      const section = document.createElement('section'); section.className = 'route-group';
+      const heading = document.createElement('h3'); heading.textContent = title; section.appendChild(heading);
+      const grid = document.createElement('div'); grid.className = 'routing-gain-grid'; section.appendChild(grid);
+      entries.filter(({out}) => out.id.startsWith('bus/') === buses).forEach(({out, state}) => {
+        const card = document.createElement('div'); card.className = 'routing-gain-card';
+        const label = document.createElement('strong'); label.textContent = shortFfadoLabel(state.name || out.name);
+        card.appendChild(label);
+        const slider = document.createElement('input'); slider.type = 'range';
+        slider.min = '0'; slider.max = '100'; slider.step = '0.01';
+        slider.setAttribute('aria-label', label.textContent + ' gain');
+        const numeric = document.createElement('input'); numeric.type = 'number'; numeric.step = '0.1';
+        const gainScale = out.gainScale || window.GAIN_SCALE;
+        const db = window.hasFaderDbScale(gainScale);
+        // Work in native display units. Unity is an exact slider position,
+        // rather than a fractional percentage between two slider steps.
+        if (db) { slider.min = gainScale.min_db; slider.max = gainScale.max_db; slider.step = gainScale.step_db || '0.1'; }
+        if (gainScale?.mode === 'dice_line') numeric.step = '1';
+        numeric.min = db ? gainScale.min_db : 0; numeric.max = db ? gainScale.max_db : 100;
+        numeric.setAttribute('aria-label', label.textContent + (db ? ' gain in dB' : ' gain in percent'));
+        const value = document.createElement('output');
+        const silence = document.createElement('button'); silence.type = 'button'; silence.textContent = '−∞';
+        silence.setAttribute('aria-label', 'Silence ' + label.textContent);
+        const unity = document.createElement('button'); unity.type = 'button'; unity.textContent = db ? '0 dB' : '100%';
+        unity.setAttribute('aria-label', label.textContent + ' unity gain');
+        const controls = [slider, numeric, silence, unity];
+        function paint(level) {
+          const levelDb = db ? window.faderUiToDb(level, gainScale) : null;
+          slider.value = db ? (levelDb === null ? gainScale.min_db : levelDb) : level;
+          numeric.value = db ? (levelDb === null ? '' : levelDb.toFixed(1)) : Number(level).toFixed(1);
+          numeric.placeholder = '−∞';
+          value.textContent = state.hardware_controlled ? 'H/W' :
+            (db ? window.formatFaderDb(levelDb) : Number(level).toFixed(1) + '%') + (state.mute ? ' · Muted' : '');
+          slider.setAttribute('aria-valuetext', value.textContent);
+        }
+        function lock() { controls.forEach(control => { control.disabled = gainBusy || !!state.hardware_controlled; }); }
+        const device = window.activeFfadoDevice, epoch = gainEpoch;
+        function current() { return epoch === gainEpoch && device === window.activeFfadoDevice; }
+        async function commit(level) {
+          gainEditing = false;
+          if (gainBusy || !current() || state.hardware_controlled) return;
+          gainBusy = true; stopPendingRefresh();
+          container.querySelectorAll('input, button').forEach(control => { control.disabled = true; });
+          $('routingRefresh').disabled = true;
+          let error = null;
+          try {
+            await window.writeOutput(out.id, 'fader', level, device);
+          } catch (e) { error = e; }
+          try {
+            const readback = await window.readJson('/api/output?out=' + encodeURIComponent(out.id), device);
+            if (current()) { state = readback; paint(state.level); }
+          } catch (e) { error = error || e; }
+          if (!current()) return;
+          gainBusy = false;
+          // A full refresh also updates both legs of linked outputs and any
+          // hardware monitor mode changes that arrived during the write.
+          gainRefreshPending = false;
+          if (!overlay.hidden && active === 'gains') {
+            try { await refresh(true); } catch (e) { error = error || e; }
+          }
+          else lock();
+          if (error) message('Could not set gain: ' + error.message);
+          else message('Gain saved; current output values reloaded.');
+          if (window.loadMaster) window.loadMaster();
+          if (window.refreshMatrixStrips) window.refreshMatrixStrips();
+        }
+        function sliderLevel() { return db ? window.faderDbToUi(Number(slider.value), gainScale) : Number(slider.value); }
+        slider.addEventListener('input', () => { gainEditing = true; paint(sliderLevel()); });
+        slider.addEventListener('change', () => commit(sliderLevel()));
+        slider.addEventListener('pointercancel', () => { gainEditing = false; paint(state.level); });
+        numeric.addEventListener('input', () => { if (!numeric.readOnly) gainEditing = true; });
+        numeric.addEventListener('change', () => {
+          if (numeric.readOnly) return;
+          const entered = Number(numeric.value);
+          if (numeric.value === '' || !Number.isFinite(entered) || entered < Number(numeric.min) || entered > Number(numeric.max)) {
+            gainEditing = false; paint(state.level); message('Enter a gain between ' + numeric.min + ' and ' + numeric.max + '.'); return;
+          }
+          commit(db ? window.faderDbToUi(entered, gainScale) : entered);
+        });
+        numeric.addEventListener('keydown', e => { if (e.key === 'Enter') numeric.blur(); });
+        numeric.addEventListener('blur', () => { gainEditing = false; if (gainRefreshPending && !gainBusy) refresh(); });
+        if (window.ffadoProtectEditable) window.ffadoProtectEditable(numeric);
+        silence.addEventListener('click', () => commit(0));
+        unity.addEventListener('click', () => commit(db ? window.faderDbToUi(0, gainScale) : 100));
+        card.appendChild(slider); card.appendChild(numeric); card.appendChild(value);
+        card.appendChild(silence); card.appendChild(unity); grid.appendChild(card);
+        paint(state.level); lock();
+      });
+      if (grid.children.length) container.appendChild(section);
+    });
+    message('Adjust bus and output gains. Linked stereo pairs share one fader. Changes apply on release or entry.');
   }
   // Each crosspoint is a real rotary control. Its pointer/wheel/keyboard
   // preview stays local until release (or an idle pause), then each selected
@@ -651,6 +759,11 @@
     });
   });
   function refresh(throwOnError = false) {
+    if (active === 'gains' && (gainBusy || gainEditing)) {
+      gainRefreshPending = true;
+      return;
+    }
+    gainRefreshPending = false;
     if (active === 'matrix' && (matrixWriteBusy || inlineGesture)) {
       matrixRefreshPending = true;
       return;
@@ -664,8 +777,9 @@
     loading = true;
     $('routingRefresh').disabled = true;
     message('Reading current FFADO hardware values…');
-    return request(requestedTab === 'bus' ? '/api/bus-routing' : requestedTab === 'matrix' ? '/api/matrix' : '/api/router',
-      undefined, controller ? controller.signal : undefined)
+    const signal = controller ? controller.signal : undefined;
+    return (requestedTab === 'gains' ? readGains(signal) : request(
+      requestedTab === 'bus' ? '/api/bus-routing' : requestedTab === 'matrix' ? '/api/matrix' : '/api/router', undefined, signal))
       .then(data => {
         if (epoch !== refreshEpoch || overlay.hidden || active !== requestedTab) return;
         if (requestedTab === 'matrix' && (matrixWriteBusy || inlineGesture || readEpoch !== matrixWriteEpoch)) {
@@ -673,7 +787,9 @@
           matrixRefreshPending = true;
           return;
         }
-        if (requestedTab === 'bus') renderBusRouting(data);
+        if (requestedTab === 'gains' && (gainBusy || gainEditing)) { gainRefreshPending = true; return; }
+        if (requestedTab === 'gains') renderGains(data);
+        else if (requestedTab === 'bus') renderBusRouting(data);
         else if (requestedTab === 'matrix') { renderMatrix(data); refreshStereoFirewire(); }
         else {
           renderCrossbar(data);
@@ -690,7 +806,7 @@
         if (epoch !== refreshEpoch) return;
         loading = false;
         refreshController = null;
-        $('routingRefresh').disabled = matrixWriteBusy;
+        $('routingRefresh').disabled = matrixWriteBusy || gainBusy;
         if (matrixRefreshPending && !matrixWriteBusy && !inlineGesture && active === 'matrix') {
           matrixRefreshPending = false;
           refresh();
@@ -698,6 +814,7 @@
       });
   }
   function close() {
+    gainEditing = false;
     cancelMatrixTouch();
     if (inlineGesture) {
       if (inlineGesture.pointer != null) cancelMatrixGesture();
@@ -763,6 +880,7 @@
   tabs.bus.addEventListener("click", () => changeTab("bus"));
   tabs.matrix.addEventListener("click", () => changeTab("matrix"));
   tabs.crossbar.addEventListener("click", () => changeTab("crossbar"));
+  if (tabs.gains) tabs.gains.addEventListener('click', () => changeTab('gains'));
   $("routingRefresh").addEventListener("click", refresh);
   const knob=$('routingKnob');
   knob.addEventListener('pointerdown', e => {
@@ -848,18 +966,22 @@
     writeMatrixValue(input, output, cell, payload, targets);
   });
   window.configureRouting = function (info) {
+    gainEpoch++; gainBusy = false; gainEditing = false; gainRefreshPending = false;
+    stopPendingRefresh();
     capabilities = { bus: !!info.bus_routing,
                      // When bus destinations exist, MOTU uses the main strips to
                      // set crosspoint gains; the In/Out button is routing only.
                      matrix: !info.bus_routing && !!(info.matrix && info.matrix.available && info.fader && info.fader.writable),
-                     crossbar: !!info.router };
-    $("routerbox").hidden = !capabilities.bus && !capabilities.matrix && !capabilities.crossbar;
+                     crossbar: !!info.router,
+                     gains: !!info.software_bus_gain };
+    $("routerbox").hidden = !Object.values(capabilities).some(Boolean);
     Object.keys(tabs).forEach(key => { tabs[key].hidden = !capabilities[key]; });
-    active = capabilities.bus ? "bus" : capabilities.crossbar ? "crossbar" : "matrix";
+    active = capabilities.bus ? "bus" : capabilities.crossbar ? "crossbar" : capabilities.matrix ? "matrix" : "gains";
   };
   window.routingSyncEvent = function (ev) {
     if (overlay.hidden) return;
     if (ev.type === 'resync') return refresh(true);
+    if (active === 'gains' && ['output', 'dice-monitoring', 'name', 'bus-name', 'bus-pair-name', 'bus-stereo', 'output-stereo'].includes(ev.type)) return refresh();
     if (active === "bus" && ev.type === "destination") return refresh();
     if (active === "matrix" && (ev.type === "matrix" || ev.type === "strip" || ev.type === "routing")) return refresh();
     if (active === "crossbar" && ev.type === "routing") return refresh();

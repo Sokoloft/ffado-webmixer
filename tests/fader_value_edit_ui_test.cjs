@@ -261,3 +261,64 @@ assert.equal(changes.at(-1), 0, 'typing Off explicitly disables Dim');
 assert(src.includes('function () { return masterReady && !masterHardwareControlled; }'),
   'master value edits require a loaded output outside H/W mode');
 console.log('Fader input UI: native dB entry, MOTU endpoints/steps, output scales, validation and unity reset passed');
+
+// Run the actual right-click protection together with master-output refreshes.
+// Earlier tests exercised makeFader alone and missed applyMasterState unlocking it.
+ctx.document.querySelectorAll = () => [];
+vm.runInContext(fs.readFileSync(path.join(__dirname, '../src/ffado_webmixer/assets/static/editable-input.js'), 'utf8'), ctx);
+const originalNode = domNode;
+function editableNode() {
+  const el = originalNode();
+  Object.assign(el, {dataset:{}, type:'text', tagName:'INPUT',
+    classList:{add(){},remove(){}}, getAttribute:()=>null,
+    focus() { if (this.focused) return; this.focused=true; this.fire('focus'); },
+    blur() { this.focused=false; this.fire('blur'); }});
+  return el;
+}
+const lineScale = {mode:'dice_line',min_db:-40,max_db:0,native_max:40,step_native:1,step_db:1};
+vm.runInContext(src.slice(src.indexOf('function applyMasterState('), src.indexOf('function loadMaster(')),ctx);
+ctx.shortFfadoLabel = text => text;
+ctx.showMasterName = () => {};
+ctx.masterEl = {querySelector:()=>({}),classList:{toggle(){}}};
+ctx.document.getElementById = id => id === 'masterVal' ? ctx.masterLabel : {};
+for (const outputScale of [lineScale, ctx.GAIN_SCALE]) {
+  const track=originalNode(),handle=originalNode(),label=editableNode(),wrap=originalNode();
+  track.parentNode=wrap;
+  const fader=ctx.makeFader(track,handle,label,v=>changes.push(v),()=>true,()=>outputScale);
+  ctx.masterFader=fader;ctx.masterLabel=label;
+  const refresh = level => ctx.applyMasterState({name:'Output',level,mute:false});
+  refresh(50);assert.equal(label.readOnly,true,'hardware readback must retain the edit lock');
+  label.focus();label.fire('click');
+  assert.equal(label.readOnly,true,'left-clicking the refreshed master cannot edit');
+  const before=changes.length;
+  label.fire('keydown',{key:'Enter'});assert.equal(changes.length,before,'locked Enter never writes');
+  // Right click while already focused must still protect an in-progress entry.
+  label.fire('contextmenu');assert.equal(label.readOnly,false);
+  label.value='0';refresh(25);
+  assert.equal(label.value,'0','live refresh cannot overwrite a deliberate entry');
+  label.fire('keydown',{key:'Enter'});
+  const unity=outputScale.mode==='dice_line'?100:100*60/66;
+  approx(changes.at(-1),unity,'zero entry uses the actual output scale');
+  refresh(changes.at(-1));
+  assert.equal(label.value,'0.0 dB','zero survives write and refresh');
+  assert.equal(label.readOnly,true,'commit relocks the field');
+  ctx.applyMasterState({name:'Output',level:null,hardware_controlled:true,mute:false});
+  assert.equal(label.readOnly,true);
+  refresh(unity);assert.equal(label.readOnly,true,'leaving H/W mode must retain the lock');
+}
+for (let raw=-40;raw<=0;raw++) {
+  const transport=100*(raw+40)/40;
+  assert.equal(ctx.faderUiToDb(transport,lineScale),raw === -40 ? null : raw,'line minimum displays as silence');
+  approx(ctx.faderDbToUi(raw,lineScale),transport,'every integer line level round-trips');
+}
+assert.equal(ctx.parseFaderEntry('−∞ dB',lineScale).value,0,'infinity entry selects the minimum');
+assert.equal(ctx.parseFaderEntry('-40 dB',lineScale).value,0,'numeric minimum selects the same position');
+const minimumTrack = originalNode(); minimumTrack.parentNode = originalNode();
+const minimumLabel = editableNode();
+const lineMinimum = {label:minimumLabel,
+  fader:ctx.makeFader(minimumTrack,originalNode(),minimumLabel,()=>{},()=>true,()=>lineScale)};
+lineMinimum.fader.set(0);
+assert.equal(lineMinimum.label.value,'−∞ dB','physical output minimum shows infinity');
+lineMinimum.fader.set(2.5);
+assert.equal(lineMinimum.label.value,'-39.0 dB','the next step remains a numeric level');
+console.log('Master refresh: right-click lock, already-focused editing, bus unity and physical output scale passed');

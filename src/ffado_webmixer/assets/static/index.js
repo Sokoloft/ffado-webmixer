@@ -357,7 +357,7 @@ function faderScale() {
   return (typeof FADER_SCALE !== "undefined" && FADER_SCALE) || GAIN_SCALE;
 }
 function hasFaderDbScale(scale) {
-  return !!(scale && ["dice_db", "rme_db", "motu_db", "dice_dim"].includes(scale.mode));
+  return !!(scale && ["dice_db", "rme_db", "motu_db", "dice_dim", "dice_line"].includes(scale.mode));
 }
 function formatFaderDb(db) {
   if (db === null) return "−∞ dB";
@@ -368,6 +368,10 @@ function formatFaderDb(db) {
 }
 function faderUiToDb(ui, scale = faderScale()) {
   if (ui <= 0) return null;
+  if (scale.mode === 'dice_line') {
+    var lineStep = Math.round(ui * scale.native_max / 100);
+    return lineStep === 0 ? null : scale.min_db + lineStep;
+  }
   if (scale.mode === "motu_db" || scale.mode === 'dice_dim') {
     var native = Math.round(ui * scale.native_max / 100);
     if (native < scale.min_finite_native) return null;
@@ -377,6 +381,7 @@ function faderUiToDb(ui, scale = faderScale()) {
   return scale.min_db + ui * (scale.max_db - scale.min_db) / 100;
 }
 function faderDbToUi(db, scale = faderScale()) {
+  if (scale.mode === 'dice_line') return db === null ? 0 : 100 * Math.round(db - scale.min_db) / scale.native_max;
   if (db === null) return 0;
   if (scale.mode === "motu_db" || scale.mode === 'dice_dim') {
     var native = Math.round(scale.min_finite_native + (db - scale.min_db) *
@@ -406,6 +411,7 @@ function parseFaderEntry(text, scale = faderScale()) {
 }
 function makeFader(track, handle, label, onChange, canEdit = function () { return true; }, getScale = faderScale) {
   var value = 0, dragging = false, editing = false;
+  function isEditing() { return editing || label.dataset?.gestureEdit === 'editing'; }
   var marks = document.createElement("div"), marksScaleKey = null;
   var majorMarks = [], markStep = 6;
   marks.className = "fader-marks";
@@ -484,11 +490,11 @@ function makeFader(track, handle, label, onChange, canEdit = function () { retur
     }
     layoutMarkLabels();
   }
-  function render() {
+  function render(forceLabel = false) {
     var scale = getScale();
     renderMarks(scale);
     handle.style.top = (100 - value) + "%";
-    if (!editing) label.value = scale?.mode === 'dice_dim' && value === 0 ? 'Off' :
+    if (forceLabel || !isEditing()) label.value = scale?.mode === 'dice_dim' && value === 0 ? 'Off' :
       hasFaderDbScale(scale) ? formatFaderDb(faderUiToDb(value, scale)) :
       (value === 0 ? "−∞" : String(value));
   }
@@ -500,7 +506,7 @@ function makeFader(track, handle, label, onChange, canEdit = function () { retur
     var scale = getScale();
     var precise = hasFaderDbScale(scale);
     value = Math.min(100, Math.max(0, precise ? Math.round(v * 10000) / 10000 : Math.round(v)));
-    if (scale?.mode === "motu_db" || scale?.mode === 'dice_dim') value = 100 * Math.round(value * scale.native_max / 100) / scale.native_max;
+    if (["motu_db", 'dice_dim', 'dice_line'].includes(scale?.mode)) value = 100 * Math.round(value * scale.native_max / 100) / scale.native_max;
     render();
     onChange(value);
   }
@@ -515,6 +521,7 @@ function makeFader(track, handle, label, onChange, canEdit = function () { retur
     if (e.key === "Escape") { e.preventDefault(); editing = false; label.blur(); render(); }
     else if (e.key === "Enter") {
       e.preventDefault();
+      if (label.readOnly || label.dataset?.gestureEdit === 'locked') return;
       if (!canEdit()) { editing = false; label.blur(); render(); return; }
       var scale = getScale();
       var parsed = parseFaderEntry(label.value, scale);
@@ -529,7 +536,7 @@ function makeFader(track, handle, label, onChange, canEdit = function () { retur
     }
   });
   // Leaving the box without Enter cancels an unfinished entry.
-  label.addEventListener("blur", function () { editing = false; render(); });
+  label.addEventListener("blur", function () { editing = false; render(true); });
   if (window.ffadoProtectEditable) window.ffadoProtectEditable(label);
   handle.addEventListener("pointerdown", function (e) {
     if (!canEdit()) return;
@@ -566,12 +573,12 @@ function makeFader(track, handle, label, onChange, canEdit = function () { retur
     e.preventDefault();
     var dir = wheelDir(e, acc);
     var scale = getScale();
-    var step = scale?.mode === "motu_db" || scale?.mode === 'dice_dim' ? 100 * scale.step_native / scale.native_max :
+    var step = ["motu_db", 'dice_dim', 'dice_line'].includes(scale?.mode) ? 100 * scale.step_native / scale.native_max :
       (scale ? (e.shiftKey ? 0.15 : 0.75) : (e.shiftKey ? 1 : 2));
     if (dir) setValue(value + dir * step);
   }, { passive: false });
   return { destroy: function () { if (marksObserver) marksObserver.disconnect(); }, set: function (v) {
-    if (dragging || editing) return false;
+    if (dragging || isEditing()) return false;
     value = Math.min(100, Math.max(0, hasFaderDbScale(getScale()) ? Number(v) : Math.round(v)));
     render();
     return true;
@@ -1285,7 +1292,8 @@ function applyMasterState(o) {
   masterEl.querySelector('.faderwrap').hidden = masterHardwareControlled;
   if (masterHardwareControlled) document.getElementById('masterVal').value = 'H/W';
   else masterFader.set(o.level);
-  document.getElementById('masterVal').readOnly = masterHardwareControlled;
+  var masterValue = document.getElementById('masterVal');
+  masterValue.readOnly = masterHardwareControlled || masterValue.dataset?.gestureEdit !== 'editing';
   masterEl.classList.toggle('muted', !!o.mute);
   masterReady = true;
   document.getElementById('masterMute').disabled = false;
