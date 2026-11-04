@@ -1,4 +1,4 @@
-## Unreleased — DICE meter responsiveness
+## 1.2.3 — DICE meter responsiveness
 
 - Sample DICE hardware peaks every 50 ms (20 Hz) through the shared per-device
   stream; match the HTTP fallback delay to 50 ms.

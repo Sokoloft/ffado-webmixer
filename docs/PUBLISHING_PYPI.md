@@ -2,7 +2,7 @@
 
 This project is a Linux-focused Python package in the **src layout**. The
 published distribution name is `ffado-webmixer`, and its console command is
-`ffado-webmixer`. The package and `--version` both report `1.2.2`.
+`ffado-webmixer`. The package and `--version` both report `1.2.3`.
 Setuptools reads the version from `ffado_webmixer.__version__`.
 Check that the name is available on PyPI before your first upload.
 
@@ -27,8 +27,8 @@ python -m build
 python -m twine check dist/*
 ```
 
-`python -m build` creates `dist/ffado_webmixer-1.2.2-py3-none-any.whl`
-and `dist/ffado_webmixer-1.2.2.tar.gz`. Verify the wheel includes
+`python -m build` creates `dist/ffado_webmixer-1.2.3-py3-none-any.whl`
+and `dist/ffado_webmixer-1.2.3.tar.gz`. Verify the wheel includes
 `src` package code, all XML profiles, all static assets, and the ten
 built-in theme icons. A source checkout can also run `python main.py`.
 
