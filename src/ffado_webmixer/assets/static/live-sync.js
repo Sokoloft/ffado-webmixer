@@ -29,6 +29,41 @@ function applyLayout() {                         // order / pinned / minimized c
   }).catch(function (error) { toast('Could not sync layout: ' + error.message); });
 }
 
+// One read per panel at a time. Events during a read request one follow-up,
+// rather than aborting GETs whose hardware work still runs on the server.
+var controlRefreshes = {};
+function refreshRemoteControls(panel) {
+  var job = controlRefreshes[panel];
+  if (job) { job.again = true; return job.promise; }
+  job = controlRefreshes[panel] = {again: true};
+  job.promise = (async function () {
+    while (job.again) {
+      job.again = false;
+      var mix = currentMix, device = ACTIVE_DEVICE, out = currentOut;
+      var token = panel === 'strips' ? loadToken : masterToken;
+      var revision = controlWriteRevision;
+      var protectedWrites = Object.keys(queuedControlWrites);
+      var outputKey = (device || '') + '|' + out;
+      var outputBusy = !!pendingOutputWrites[outputKey] || ('out|' + outputKey) in pendingVals;
+      var state = await readJson(panel === 'strips' ? '/api/state?mix=' + mix :
+        '/api/output?out=' + encodeURIComponent(out), device);
+      if (device !== ACTIVE_DEVICE || (panel === 'strips' ?
+          mix !== currentMix || token !== loadToken : out !== currentOut || token !== masterToken)) continue;
+      // A snapshot started before a local edit must not overwrite that edit.
+      if (revision !== controlWriteRevision) { job.again = true; continue; }
+      if (panel === 'strips') {
+        if (!applyStripState(state, protectedWrites)) await loadMix();
+      } else if (!outputBusy && !pendingOutputWrites[outputKey] &&
+                 !(('out|' + outputKey) in pendingVals) && masterReady) {
+        applyMasterState(state);
+      }
+    }
+  })().catch(function (error) {
+    toast('Could not sync controls: ' + error.message);
+  }).finally(function () { delete controlRefreshes[panel]; });
+  return job.promise;
+}
+
 function onSyncEvent(ev) {
   if (ev.device && ACTIVE_DEVICE && ev.device !== ACTIVE_DEVICE) return;
   if (ev.type === 'resync') { requestSyncRefresh(); return; }
@@ -37,7 +72,7 @@ function onSyncEvent(ev) {
   // Always re-read the affected bus; a single crosspoint can change both.
   if (ev.type === "matrix") {
     if (ev.output === currentMix ||
-        (STEREO_BUSES.includes(currentMix) && ev.output === currentMix + 1)) loadMix();
+        (STEREO_BUSES.includes(currentMix) && ev.output === currentMix + 1)) refreshRemoteControls('strips');
     return;
   }
   if (ev.type === "routing") {
@@ -61,7 +96,7 @@ function onSyncEvent(ev) {
     // FFADO readback, especially with a linked stereo bus or linked inputs.
     // Re-derive both controls from actual coefficients rather than replaying
     // the optimistic command value as though it were hardware state.
-    if (["fader", "pan", "mute", "solo"].includes(ev.control)) { loadMix(); return; }
+    if (["fader", "pan", "mute", "solo"].includes(ev.control)) { refreshRemoteControls('strips'); return; }
     el = stripEl(ev.strip);
     if (el) el._apply(ev.control, ev.value, ev.strip);
   } else if (ev.type === "name") {
@@ -70,7 +105,7 @@ function onSyncEvent(ev) {
     if (el) el._apply("name", ev.value, ev.strip);
   } else if (ev.type === "output") {
     if (canonicalOutput(ev.out) !== canonicalOutput(currentOut)) return;
-    loadMaster();
+    refreshRemoteControls('master');
   } else if (ev.type === 'bus-name') {
     var named = MIXES.find(x => x.id === ev.mix);
     if (named) named.name = ev.name;

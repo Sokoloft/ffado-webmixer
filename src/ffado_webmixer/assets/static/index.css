@@ -271,9 +271,12 @@ html { background: var(--page-background); }
   .fval:focus { outline: none; border-color: var(--fader-value-color); }
   .fval[readonly] { cursor: default; }
 
-  .faderwrap { flex: 1; min-height: 120px; display: flex; }
+  /* Keep a permanent stereo-width meter column. Remote strip rebuilds and
+     missing peak samples must not recenter the track when a meter is hidden. */
+  .faderwrap { flex: 1; min-height: 120px; display: grid;
+               grid-template-columns: minmax(0, 1fr) 22px; }
   /* Reserve half the handle height at each end so it cannot overlap adjacent controls. */
-  .track { position: relative; width: 8px; align-self: stretch; margin: 13px auto; background: var(--control-background); border-radius: 4px; }
+  .track { position: relative; grid-column: 1; grid-row: 1; width: 8px; align-self: stretch; margin: 13px auto; background: var(--control-background); border-radius: 4px; }
   .fader-marks { position: absolute; inset: 0; z-index: 1; pointer-events: none; }
   .fader-mark { position: absolute; right: calc(100% + 2px); width: 34px; transform: translateY(-50%);
                 color: var(--text-secondary); text-align: right; white-space: nowrap; font-size: 9px; line-height: 10px; }
@@ -406,7 +409,7 @@ html.pywebview-client #fullscreenbox { display: none; }
 .device-alias-field .dlgbtn { flex:none; padding:7px 9px; margin:0; }
 /* Genuine DICE router-destination peaks beside the fader; stereo has L/R
    lanes in the user-selected order. Never display simulated post-fader levels. */
-.peak-meter { position:relative; display:flex; gap:2px; flex:none; width:12px;
+.peak-meter { position:relative; grid-column:2; grid-row:1; justify-self:end; display:flex; gap:2px; flex:none; width:12px;
   height:calc(100% - 26px); align-self:center; padding:1px; cursor:pointer;
   background:var(--control-background); border:1px solid var(--border-color);
   border-radius:3px; overflow:hidden; box-sizing:border-box; }

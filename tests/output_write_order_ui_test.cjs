@@ -14,6 +14,7 @@ function node(id) {
 }
 let faderChange, reloads = 0;
 const context = vm.createContext({window:{}, Promise, Math, Date, setTimeout, clearTimeout,
+  controlWriteRevision:0,
   ACTIVE_DEVICE:'device-a', currentOut:'line/1', OUTPUTS:[], GAIN_SCALE:null,
   document:{getElementById:node},
   makeFader(track, handle, label, change) { faderChange=change; return {}; },

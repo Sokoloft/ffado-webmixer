@@ -75,7 +75,9 @@ function throttled(key, value, fn) {
 // Serialize writes to each control: a slow first D-Bus request must not
 // overtake the latest fader position and leave the hardware at a stale level.
 var queuedControlWrites = Object.create(null);
+var controlWriteRevision = 0;
 function sendThrottled(strip, control, value, mix = currentMix, device = ACTIVE_DEVICE) {
+  controlWriteRevision++;
   var key = [device || "", mix, strip, control].join("|");
   var state = queuedControlWrites[key];
   if (!state) state = queuedControlWrites[key] = { busy: false, timer: null, next: undefined, started: 0 };
@@ -569,9 +571,10 @@ function makeFader(track, handle, label, onChange, canEdit = function () { retur
     if (dir) setValue(value + dir * step);
   }, { passive: false });
   return { destroy: function () { if (marksObserver) marksObserver.disconnect(); }, set: function (v) {
-    if (dragging) return;
+    if (dragging || editing) return false;
     value = Math.min(100, Math.max(0, hasFaderDbScale(getScale()) ? Number(v) : Math.round(v)));
     render();
+    return true;
   } };
 }
 
@@ -786,6 +789,7 @@ function buildStrip(id, data, pinned, minimized, partner) {
       .finally(() => { button.disabled = false; });
   }
   soloEl.addEventListener("click", function () { toggleHardware('solo', !el.classList.contains('soloed')); });
+  var faderValueTitle = q('.fval').title, muteTitle = q('.mute').title;
   if (data.mute_partial) {
     q(".mute").title = 'Only part of this stereo route is muted. Click to mute both channels/bus legs.';
     el.classList.add('mute-partial');
@@ -815,8 +819,39 @@ function buildStrip(id, data, pinned, minimized, partner) {
   q(".grip").addEventListener("pointerdown", function (e) { startDrag(el, e); });
   q(".vname").addEventListener("pointerdown", function (e) { startDrag(el, e); });
 
-  el._apply = function (control, value, stripId) {  // remote change: update the display only, send nothing
-    if (control === "fader") fader.set(value);
+  function applyFaderState(entry) {
+    if (!fader.set(Number.isFinite(entry.fader) ? entry.fader : 0)) return;
+    var label = q('.fval'), mismatch = stereo && !!entry.pair_mismatch;
+    label.classList.toggle('level-mismatch', mismatch);
+    label.title = faderValueTitle;
+    if (mismatch) {
+      label.value = 'MAX ' + label.value;
+      if (Array.isArray(entry.pair_faders)) {
+        var labelFor = function (v) {
+          return faderHasDbScale() ? formatFaderDb(faderUiToDb(v)) : String(Math.round(v));
+        };
+        label.title = 'Linked inputs differ: left ' + labelFor(entry.pair_faders[0]) +
+          ', right ' + labelFor(entry.pair_faders[1]) + '. The fader shows the louder input.';
+      }
+    }
+  }
+  el._apply = function (control, value, stripId, protectedWrites = []) {  // display only; never send a write
+    if (control === 'state') {
+      var prefix = [stripDevice || '', stripMix, id].join('|') + '|';
+      var busy = ['fader', 'pan'].some(function (key) {
+        return queuedControlWrites[prefix + key] || protectedWrites.includes(prefix + key);
+      });
+      if (!busy) {
+        applyFaderState(value);
+        el._apply('pan-state', value);
+      }
+      el._apply('mute', value.mute);
+      el._apply('solo', value.solo);
+      el.classList.toggle('mute-partial', !!value.mute_partial);
+      q('.mute').title = value.mute_partial ?
+        'Only part of this stereo route is muted. Click to mute both channels/bus legs.' : muteTitle;
+    }
+    else if (control === "fader") fader.set(value);
     else if (control === "mute") el.classList.toggle("muted", !!value);
     else if (control === "solo") el.classList.toggle("soloed", !!value);
     else if (control === "invert") invertEl.classList.toggle("on", !!value);
@@ -845,22 +880,7 @@ function buildStrip(id, data, pinned, minimized, partner) {
   setPinned(el, pinned);
   setMinimized(el, !!minimized);
   renderPan();
-  fader.set(Number.isFinite(data.fader) ? data.fader : 0);
-  if (stereo && data.pair_mismatch) {
-    // The label represents the louder linked input. Do not imply both
-    // crosspoint gains match when one was edited independently in the matrix.
-    var valueLabel = q(".fval");
-    valueLabel.value = "MAX " + valueLabel.value;
-    valueLabel.classList.add("level-mismatch");
-    if (Array.isArray(data.pair_faders)) {
-      var labelFor = function (v) {
-        if (!faderHasDbScale()) return String(Math.round(v));
-        return formatFaderDb(faderUiToDb(v));
-      };
-      valueLabel.title = "Linked inputs differ: left " + labelFor(data.pair_faders[0]) +
-        ", right " + labelFor(data.pair_faders[1]) + ". The fader shows the louder input.";
-    }
-  }
+  applyFaderState(data);
   return el;
 }
 
@@ -1165,15 +1185,22 @@ hideBox.addEventListener("change", function () {
 
 // ---- master (output) fader: Main, Phones or a bus ----
 function writeOutput(out, control, value, device = ACTIVE_DEVICE) {
-  return window.ffadoApi.serial('output|' + (device || '') + '|' + out, function () {
+  controlWriteRevision++;
+  var key = (device || '') + '|' + out;
+  pendingOutputWrites[key] = (pendingOutputWrites[key] || 0) + 1;
+  return window.ffadoApi.serial('output|' + key, function () {
     return postJson('/api/output', {out:out, control:control, value:value}, device);
+  }).finally(function () {
+    if (--pendingOutputWrites[key] === 0) delete pendingOutputWrites[key];
   });
 }
+var pendingOutputWrites = Object.create(null);
 var masterEl = document.getElementById("master");
 var masterToken = 0, masterReady = false, masterHardwareControlled = false;
 var masterFader = makeFader(document.getElementById("masterTrack"), document.getElementById("masterHandle"),
   document.getElementById("masterVal"), function (v) {
     if (!masterReady) return;  // Never send a stale output's displayed level.
+    controlWriteRevision++;
     var out = currentOut, device = ACTIVE_DEVICE;
     throttled("out|" + (device || '') + '|' + out, v, function (x) {
       writeOutput(out, "fader", x, device)
@@ -1246,6 +1273,17 @@ masterName.addEventListener("keydown", function (e) {
 });
 masterName.addEventListener("focus", function () { if (masterName.dataset?.gestureEdit !== "locked") masterName.select(); });
 
+function applyMasterState(o) {
+  showMasterName(o.name);
+  masterHardwareControlled = !!o.hardware_controlled;
+  masterEl.querySelector('.faderwrap').hidden = masterHardwareControlled;
+  if (masterHardwareControlled) document.getElementById('masterVal').value = 'H/W';
+  else masterFader.set(o.level);
+  document.getElementById('masterVal').readOnly = masterHardwareControlled;
+  masterEl.classList.toggle('muted', !!o.mute);
+  masterReady = true;
+  document.getElementById('masterMute').disabled = false;
+}
 function loadMaster(options) {
   currentOut = canonicalOutput(currentOut);
   var out = OUTPUTS.filter(function (o) { return o.id === currentOut; })[0];
@@ -1253,10 +1291,15 @@ function loadMaster(options) {
   masterReady = false;
   document.getElementById('masterMute').disabled = true;
   masterEl.hidden = !out || !out.controllable;
+  var partnerId = outputPartner(currentOut)?.id || '';
+  var meterChanged = masterEl.dataset.output !== currentOut ||
+    masterEl.dataset.outputPartner !== partnerId;
   masterEl.dataset.id = 'out:' + currentOut;
   masterEl.dataset.output = currentOut;
-  masterEl.dataset.outputPartner = outputPartner(currentOut)?.id || '';
-  masterEl.querySelector('.peak-meter').hidden = true;
+  masterEl.dataset.outputPartner = partnerId;
+  // A level refresh does not invalidate this output's current peak sample.
+  // Only hide old readings when the selected output or its pairing changes.
+  if (meterChanged) masterEl.querySelector('.peak-meter').hidden = true;
   document.getElementById("masterbox").hidden = masterEl.hidden;
   if (masterEl.hidden) return;
   var partner = outputPartner(currentOut);
@@ -1265,15 +1308,7 @@ function loadMaster(options) {
   return window.ffadoApi.latest('master-output', '/api/output?out=' + encodeURIComponent(currentOut),
     {device: ACTIVE_DEVICE}).then(function (o) {
     if (!o || token !== masterToken) return;
-    showMasterName(o.name);
-    masterHardwareControlled = !!o.hardware_controlled;
-    masterEl.querySelector('.faderwrap').hidden = masterHardwareControlled;
-    if (masterHardwareControlled) document.getElementById('masterVal').value = 'H/W';
-    else masterFader.set(o.level);
-    document.getElementById('masterVal').readOnly = masterHardwareControlled;
-    masterEl.classList.toggle('muted', !!o.mute);
-    masterReady = true;
-    document.getElementById('masterMute').disabled = false;
+    applyMasterState(o);
   }).catch(function (error) {
     if (token !== masterToken) return;
     masterEl.hidden = true;
@@ -1971,6 +2006,18 @@ function renderLinkButtons(state) {
   });
 }
 var loadToken = 0;
+function applyStripState(state, protectedWrites) {
+  var strips = Array.from(row.querySelectorAll(':scope > .strip'));
+  var ids = Object.keys(state).filter(function (id) { return !state[id].partner_of; });
+  // A missed link/unlink is structural: the ordinary loader must rebuild it.
+  if (lastStripMix !== currentMix || strips.length !== ids.length || strips.some(function (el) {
+    var entry = state[el.dataset.id];
+    return !entry || entry.partner_of || (entry.partner || '') !== (el.dataset.partner || '');
+  })) return false;
+  strips.forEach(function (el) { el._apply('state', state[el.dataset.id], null, protectedWrites); });
+  lastStripState = state;
+  return true;
+}
 function loadMix(options) {
   // An unfinished Left selection belongs to the bus it was clicked on.
   if (pendingStereoMix !== currentMix) {
