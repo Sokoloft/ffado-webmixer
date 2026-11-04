@@ -45,8 +45,10 @@ class OutputControls:
         states = [self.read_output(channel) for channel in pair]
         result = dict(states[0])
         if len(pair) == 2:
-            result.update(level=max(state['level'] for state in states),
+            result.update(level=(None if any(state['level'] is None for state in states)
+                                 else max(state['level'] for state in states)),
                           mute=all(state['mute'] for state in states),
+                          hardware_controlled=any(state.get('hardware_controlled') for state in states),
                           partner=pair[1])
         return result
 
@@ -65,6 +67,8 @@ class OutputControls:
         # Validate both legs before changing either one.
         for channel in pair:
             output = self._output(channel)
+            if control == 'fader' and self.dice_line_hardware_controlled(channel):
+                raise ValueError('Output level is controlled by the hardware monitor knob')
             if not output.get('spec', self.out_spec)['writable']:
                 raise ValueError('Output level is read-only')
             if channel in getattr(self, '_pending_output_recovery', set()):
@@ -109,7 +113,13 @@ class OutputControls:
 
     @serialized_output
     def read_output(self, out_id):
+        if out_id == 'dice/dim':
+            return self.read_dice_dim()
         out = self._output(out_id)
+        if self.dice_line_hardware_controlled(out_id):
+            return {'name': out['name'], 'level': None, 'hardware_controlled': True,
+                    'mute': bool(self._read_scalar(out['mute'])) if out['mute'] else False,
+                    'emulated_mute': False}
         raw = self.helper.get_value(out["fader"]["path"], out["fader"]["kind"])
         spec = out.get("spec", self.out_spec)
         lo = spec.get("min", 0)
@@ -133,6 +143,10 @@ class OutputControls:
 
     @serialized_output
     def write_output(self, out_id, control, value):
+        if out_id == 'dice/dim':
+            return self.write_dice_dim(control, value)
+        if control == 'fader' and self.dice_line_hardware_controlled(out_id):
+            raise ValueError('Output level is controlled by the hardware monitor knob')
         out = self._output(out_id)
         spec = out.get("spec", self.out_spec)
         if not spec["writable"]:

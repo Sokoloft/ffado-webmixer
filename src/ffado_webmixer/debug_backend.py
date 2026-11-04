@@ -127,6 +127,15 @@ def create_fixture(alias):
     matrix={'path':path+mat_path,'name':mat_path.rsplit('/',1)[-1],
             'rows':r,'cols':c,'row_names':row_names,'col_names':col_names}
     controls=[]
+    if family == 'saffire_dice':
+        count = int(profile['capabilities']['features']['monitor_line_volume']['count'])
+        for suffix, kind in [('GlobalDim/State', 'Boolean'), ('GlobalDim/Level', 'Discrete'),
+                             ('GlobalMute/State', 'Boolean')]:
+            controls.append({'path': path + '/EAP/Monitoring/' + suffix, 'kind': kind})
+        for number in range(1, count + 1):
+            for role, kind in [('UnActivate', 'Boolean'), ('GDim', 'Boolean'), ('GMute', 'Boolean'),
+                               ('Volume', 'Discrete'), ('Mute', 'Boolean')]:
+                controls.append({'path': path + f'/EAP/Monitoring/LineOut/{role}{number}', 'kind': kind})
     if family=='motu':
         for i in range(1,5):
             controls.extend([{'path':path+f'/Mixer/Mix{i}/Mix_{suffix}', 'kind':'Discrete', 'label':f'Mix {i} {suffix}'}
@@ -147,6 +156,11 @@ class TraceHelper:
         self.cells={}
         self.values={device['device']+'/Mixer/Info/Model':int(device['guid'][-2:],16),
                      device['device']+'/Mixer/Info/SampleRate':48000}
+        for control in device.get('controls', []):
+            if '/EAP/Monitoring/' in control['path']:
+                name = control['path'].rsplit('/', 1)[-1]
+                self.values[control['path']] = (name.startswith(('GDim', 'GMute'))
+                                                if control['kind'] == 'Boolean' else 0)
         self.routing={'Line/Out:01':'Mixer/Out:01'}
     @contextlib.contextmanager
     def transaction(self): yield
@@ -164,6 +178,12 @@ class TraceHelper:
     def set_value(self,path,kind,value):
         self._trace(path,kind,'setValue',value)
         self.values[path]=value
+    def get_selected(self, path, kind='Boolean'):
+        self._trace(path, kind, 'selected')
+        return self.values.get(path, False)
+    def select(self, path, value, kind='Boolean'):
+        self._trace(path, kind, 'select', value)
+        self.values[path] = value
     def router_call(self,path,method,*args):
         self._trace(path,'CrossbarRouter',method,*args)
         if method=='getSourceNames':return ['Mixer/Out:01','Mute:00']

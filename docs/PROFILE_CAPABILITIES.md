@@ -51,8 +51,7 @@ its scaling/axes are translated and tested.
    fader values or substitute a different matrix.
 
 Device capability declarations are returned by the existing `/api/describe`
-endpoint under `hardware_capabilities` for diagnosis. The UI remains unchanged
-in this update.
+endpoint under `hardware_capabilities` for diagnosis.
 
 ## Model-specific examples
 
@@ -61,9 +60,16 @@ in this update.
   FFADO's `hasPeakMetering`. The ProFire 2626 volume-knob settings are
   `source_only` (not falsely rendered as gain controls).
 - **Saffire Pro 14 / 24 / 26 / 40**: DICE EAP as above. The model's declared
-  monitor output count is **4 / 6 / 6 / 10** respectively. Only the documented
-  line-volume and line-mute controls are enabled; GlobalDim and GlobalMute
-  remain `source_only` until properly implemented.
+  monitor output count is **4 / 6 / 6 / 10** respectively. The Dice box above
+  Outputs selects native GlobalDim in the master fader. The bottom position is
+  Off; above it, active levels increase from −87 dB (quiet) to 0 dB (loud) as
+  the fader rises. Its Mute uses native
+  GlobalMute, with the corresponding per-line GDim/GMute memberships enabled.
+  H/W Monitor enables the model's native LineOut/UnActivate switches to bypass
+  software monitoring and hand gain control to the front-panel knob, preserving
+  line levels and mutes. While enabled, line-output gain is neither read nor
+  writable in webmixer; the master display shows H/W. These controls require
+  the declared paths and correct live D-Bus interfaces on the exact model.
 - **MOTU pre-mk3**: ConfigROM is *not* a unique model. The app first reads
   `/Mixer/Info/Model`, then selects a supported overlay such as UltraLite,
   Traveler, 8pre, 828mkII, or 896HD. On the original UltraLite, ADAT and

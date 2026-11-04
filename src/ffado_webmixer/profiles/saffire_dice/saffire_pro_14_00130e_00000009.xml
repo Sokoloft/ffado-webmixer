@@ -15,10 +15,10 @@
     <feature name="software_mute_solo" state="mapped" source="ffado-webmixer:matrix-zero-emulation" path="/EAP/MatrixMixer" />
     <feature name="stereo_bus_link" state="mapped" source="support/mixer-qt4/ffado/widgets/matrixmixer.py" path="/EAP/MatrixMixer" />
     <feature name="bus_destination" state="unmapped" />
-    <feature name="monitor_line_volume" state="mapped" source="support/mixer-qt4/ffado/mixer/saffire_dice.py" path="/EAP/Monitoring/LineOut/Volume{n}" count="4" />
+    <feature name="monitor_line_volume" state="mapped" source="support/mixer-qt4/ffado/mixer/saffire_dice.py" path="/EAP/Monitoring/LineOut/Volume{n}" count="4" extra_paths="/EAP/Monitoring/LineOut/UnActivate{n}" extra_count="4" />
     <feature name="monitor_line_mute" state="mapped" source="support/mixer-qt4/ffado/mixer/saffire_dice.py" path="/EAP/Monitoring/LineOut/Mute{n}" count="4" />
-    <feature name="monitor_global_mute" state="source_only" source="support/mixer-qt4/ffado/mixer/saffire_dice.py" path="/EAP/Monitoring/GlobalMute/State" />
-    <feature name="monitor_global_dim" state="source_only" source="support/mixer-qt4/ffado/mixer/saffire_dice.py" path="/EAP/Monitoring/GlobalDim/State" />
+    <feature name="monitor_global_mute" state="mapped" source="support/mixer-qt4/ffado/mixer/saffire_dice.py" path="/EAP/Monitoring/GlobalMute/State" extra_paths="/EAP/Monitoring/LineOut/GMute{n}" extra_count="4" />
+    <feature name="monitor_global_dim" state="mapped" source="support/mixer-qt4/ffado/mixer/saffire_dice.py" path="/EAP/Monitoring/GlobalDim/State" extra_paths="/EAP/Monitoring/GlobalDim/Level,/EAP/Monitoring/LineOut/GDim{n}" extra_count="4" />
     <feature name="output_level" state="unmapped" />
     <feature name="channel_trim" state="unmapped" />
     <feature name="channel_invert" state="unmapped" />

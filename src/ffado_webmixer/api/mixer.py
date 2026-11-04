@@ -86,6 +86,29 @@ def _validate_set_request(msg):
 
 def register(app, backend, description, config, broadcast):
     peak_streams = PeakStreamHub()
+    @app.get('/api/dice-monitoring')
+    def dice_monitoring_state():
+        if not hasattr(backend, 'read_dice_monitoring'):
+            return jsonify(error='DICE monitoring is unavailable'), 400
+        try:
+            return jsonify(backend.read_dice_monitoring())
+        except Exception as exc:
+            return jsonify(error=str(exc)), 500
+
+    @app.post('/api/dice-monitoring')
+    def dice_monitoring_change():
+        payload = request.get_json(silent=True)
+        if not isinstance(payload, dict) or not hasattr(backend, 'write_dice_monitoring'):
+            return jsonify(error='Expected a DICE monitor change'), 400
+        try:
+            result = backend.write_dice_monitoring(payload.get('control'), payload.get('value'))
+        except ValueError as exc:
+            return jsonify(error=str(exc)), 400
+        except Exception as exc:
+            return jsonify(error=str(exc)), 500
+        broadcast({'type': 'dice-monitoring'})
+        return jsonify(result)
+
     @app.get("/api/describe")
     def describe():
         # Output names (Main, Phones, buses) can be renamed in the UI; saved names win.

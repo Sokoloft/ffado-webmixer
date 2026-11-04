@@ -21,15 +21,15 @@ def test_root_keeps_only_readme_markdown():
                     if name.startswith('docs/TESTING_') and name.endswith('.md')]) >= 17
 
 
-def test_version_is_120_without_release_suffix():
+def test_version_is_122_without_release_suffix():
     from ffado_webmixer import __version__
     from ffado_webmixer.main import APP_VERSION
-    assert APP_VERSION == __version__ == '1.2.0'
+    assert APP_VERSION == __version__ == '1.2.2'
     metadata = (ROOT / 'pyproject.toml').read_text()
     assert 'version = {attr = "ffado_webmixer.__version__"}' in metadata
     result = subprocess.run([sys.executable, str(ROOT / 'main.py'), '--version'],
                             capture_output=True, text=True, check=True)
-    assert result.stdout.strip() == 'ffado-webmixer 1.2.0'
+    assert result.stdout.strip() == 'ffado-webmixer 1.2.2'
 
 
 def test_markdown_links_still_resolve_after_move():

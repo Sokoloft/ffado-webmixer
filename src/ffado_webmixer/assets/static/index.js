@@ -355,7 +355,7 @@ function faderScale() {
   return (typeof FADER_SCALE !== "undefined" && FADER_SCALE) || GAIN_SCALE;
 }
 function hasFaderDbScale(scale) {
-  return !!(scale && ["dice_db", "rme_db", "motu_db"].includes(scale.mode));
+  return !!(scale && ["dice_db", "rme_db", "motu_db", "dice_dim"].includes(scale.mode));
 }
 function formatFaderDb(db) {
   if (db === null) return "−∞ dB";
@@ -366,7 +366,7 @@ function formatFaderDb(db) {
 }
 function faderUiToDb(ui, scale = faderScale()) {
   if (ui <= 0) return null;
-  if (scale.mode === "motu_db") {
+  if (scale.mode === "motu_db" || scale.mode === 'dice_dim') {
     var native = Math.round(ui * scale.native_max / 100);
     if (native < scale.min_finite_native) return null;
     return scale.min_db + (native - scale.min_finite_native) *
@@ -376,7 +376,7 @@ function faderUiToDb(ui, scale = faderScale()) {
 }
 function faderDbToUi(db, scale = faderScale()) {
   if (db === null) return 0;
-  if (scale.mode === "motu_db") {
+  if (scale.mode === "motu_db" || scale.mode === 'dice_dim') {
     var native = Math.round(scale.min_finite_native + (db - scale.min_db) *
       (scale.native_max - scale.min_finite_native) / (scale.max_db - scale.min_db));
     return 100 * native / scale.native_max;
@@ -385,6 +385,8 @@ function faderDbToUi(db, scale = faderScale()) {
 }
 function parseFaderEntry(text, scale = faderScale()) {
   var input = String(text).trim().replace(/−/g, "-");
+  if (scale?.mode === 'dice_dim' && /^off$/i.test(input)) return {ok: true, value: 0};
+  if (scale?.mode === 'dice_dim' && /inf|∞/i.test(input)) return {ok: false};
   if (hasFaderDbScale(scale) && (/^-∞(?:\s*dB)?$/i.test(input) || /^-inf(?:inity)?(?:\s*dB)?$/i.test(input))) {
     return {ok: true, value: 0};
   }
@@ -440,8 +442,8 @@ function makeFader(track, handle, label, onChange, canEdit = function () { retur
         dbMark.className = "fader-mark " + (isDbMajor ? "major" : "minor");
         dbMark.style.top = dbPosition + "%";
         if (isDbMajor) {
-          dbMark.textContent = (db > 0 ? "+" : "") + String(db);
-          dbMark.title = (db > 0 ? "+" : "") + String(db) + " dB";
+          dbMark.textContent = (db > 0 && scale.mode !== 'dice_dim' ? "+" : "") + String(db);
+          dbMark.title = dbMark.textContent + (scale.mode === 'dice_dim' ? " dB attenuation" : " dB");
           majorMarks.push({position: dbPosition, element: dbMark, value: db, text: dbMark.textContent});
         }
         marks.appendChild(dbMark);
@@ -484,7 +486,8 @@ function makeFader(track, handle, label, onChange, canEdit = function () { retur
     var scale = getScale();
     renderMarks(scale);
     handle.style.top = (100 - value) + "%";
-    if (!editing) label.value = hasFaderDbScale(scale) ? formatFaderDb(faderUiToDb(value, scale)) :
+    if (!editing) label.value = scale?.mode === 'dice_dim' && value === 0 ? 'Off' :
+      hasFaderDbScale(scale) ? formatFaderDb(faderUiToDb(value, scale)) :
       (value === 0 ? "−∞" : String(value));
   }
   renderMarks(getScale());
@@ -495,7 +498,7 @@ function makeFader(track, handle, label, onChange, canEdit = function () { retur
     var scale = getScale();
     var precise = hasFaderDbScale(scale);
     value = Math.min(100, Math.max(0, precise ? Math.round(v * 10000) / 10000 : Math.round(v)));
-    if (scale?.mode === "motu_db") value = 100 * Math.round(value * scale.native_max / 100) / scale.native_max;
+    if (scale?.mode === "motu_db" || scale?.mode === 'dice_dim') value = 100 * Math.round(value * scale.native_max / 100) / scale.native_max;
     render();
     onChange(value);
   }
@@ -516,7 +519,8 @@ function makeFader(track, handle, label, onChange, canEdit = function () { retur
       editing = false;
       if (parsed.ok) setValue(parsed.value);
       else toast(hasFaderDbScale(scale) ?
-        "Invalid volume: enter " + scale.min_db + " to " + (scale.max_db > 0 ? "+" : "") + scale.max_db + " dB, or −∞." :
+        "Invalid volume: enter " + scale.min_db + " to " + (scale.max_db > 0 ? "+" : "") + scale.max_db +
+          (scale.mode === 'dice_dim' ? " dB, or Off." : " dB, or −∞.") :
         "Invalid volume: enter a value from 0 to 100.");
       label.blur();
       render();
@@ -546,11 +550,12 @@ function makeFader(track, handle, label, onChange, canEdit = function () { retur
   });
   // Double-clicking the handle or the fader track restores unity (0 dB),
   // *not* the silent end of the slider. Legacy percent devices have no calibrated unity.
+  // Global Dim instead resets to its separate Off position.
   track.parentNode.addEventListener("dblclick", function (e) {
     var scale = getScale();
     if (!canEdit() || !hasFaderDbScale(scale)) return;
     e.preventDefault();
-    setValue(faderDbToUi(0, scale));
+    setValue(scale.mode === 'dice_dim' ? 0 : faderDbToUi(0, scale));
   });
   // wheel over the fader: 2 per notch, 1 with Shift held
   var acc = { v: 0 };
@@ -559,7 +564,7 @@ function makeFader(track, handle, label, onChange, canEdit = function () { retur
     e.preventDefault();
     var dir = wheelDir(e, acc);
     var scale = getScale();
-    var step = scale?.mode === "motu_db" ? 100 * scale.step_native / scale.native_max :
+    var step = scale?.mode === "motu_db" || scale?.mode === 'dice_dim' ? 100 * scale.step_native / scale.native_max :
       (scale ? (e.shiftKey ? 0.15 : 0.75) : (e.shiftKey ? 1 : 2));
     if (dir) setValue(value + dir * step);
   }, { passive: false });
@@ -1165,16 +1170,19 @@ function writeOutput(out, control, value, device = ACTIVE_DEVICE) {
   });
 }
 var masterEl = document.getElementById("master");
-var masterToken = 0, masterReady = false;
+var masterToken = 0, masterReady = false, masterHardwareControlled = false;
 var masterFader = makeFader(document.getElementById("masterTrack"), document.getElementById("masterHandle"),
   document.getElementById("masterVal"), function (v) {
     if (!masterReady) return;  // Never send a stale output's displayed level.
     var out = currentOut, device = ACTIVE_DEVICE;
     throttled("out|" + (device || '') + '|' + out, v, function (x) {
       writeOutput(out, "fader", x, device)
-        .catch(function (e) { toast("Output change failed: " + e.message); });
+        .catch(function (e) {
+          toast("Output change failed: " + e.message);
+          if (out === 'dice/dim' && out === currentOut && device === ACTIVE_DEVICE) loadMaster();
+        });
     });
-  }, function () { return masterReady; }, function () {
+  }, function () { return masterReady && !masterHardwareControlled; }, function () {
     return OUTPUTS.find(function (output) { return output.id === currentOut; })?.gainScale || GAIN_SCALE;
   });
 document.getElementById("masterMute").addEventListener("click", function () {
@@ -1258,7 +1266,11 @@ function loadMaster(options) {
     {device: ACTIVE_DEVICE}).then(function (o) {
     if (!o || token !== masterToken) return;
     showMasterName(o.name);
-    masterFader.set(o.level);
+    masterHardwareControlled = !!o.hardware_controlled;
+    masterEl.querySelector('.faderwrap').hidden = masterHardwareControlled;
+    if (masterHardwareControlled) document.getElementById('masterVal').value = 'H/W';
+    else masterFader.set(o.level);
+    document.getElementById('masterVal').readOnly = masterHardwareControlled;
     masterEl.classList.toggle('muted', !!o.mute);
     masterReady = true;
     document.getElementById('masterMute').disabled = false;
@@ -1648,6 +1660,7 @@ function markOutputs() {
   var busActive = OUTPUTS.some(function (o) { return o.id === currentOut && o.mix !== null; });
   Array.prototype.forEach.call(document.querySelectorAll(".outbtn"), function (b) {
     var o = OUTPUTS.filter(function (x) { return x.id === b.dataset.id; })[0];
+    if (!o) return;  // The H/W Monitor toggle is independent of output selection.
     b.classList.toggle("active", b.dataset.id === canonicalOutput(currentOut));
     var shows = !busActive && o.mix !== null && (o.mix === currentMix || (STEREO_BUSES.includes(currentMix) && o.mix === currentMix+1));
     b.classList.toggle("shows", shows);
@@ -1692,9 +1705,10 @@ function selectOutput(o) {
 function buildOutputs() {
   var box = document.getElementById("outbox");
   box.innerHTML = "";
+  if (window.buildDiceMonitoring) window.buildDiceMonitoring(box);
   [["Outputs", function (o) { return o.mix === null; }],
    ["Buses",   function (o) { return o.mix !== null; }]].forEach(function (g) {
-    var members = OUTPUTS.filter(g[1]);
+    var members = OUTPUTS.filter(function (o) { return o.id !== 'dice/dim' && g[1](o); });
     if (!members.length) return;
     var group = document.createElement("div");
     group.className = "outgroup" + (g[0] === "Buses" ? " bus-group" : "");
@@ -1767,7 +1781,7 @@ function buildOutputs() {
     });
     box.appendChild(group);
   });
-  box.hidden = OUTPUTS.length < 2;
+  box.hidden = OUTPUTS.length < 2 && !OUTPUTS.some(function (o) { return o.id === 'dice/dim'; });
   renderBusTabs();
   scheduleBusGridLayout();
 }
@@ -2112,6 +2126,7 @@ Promise.all([
     return { id: o.id, name: shortFfadoLabel(o.name), baseName: o.base_name || o.name, mix: (o.mix === null || o.mix === undefined) ? null : o.mix, controllable: o.controllable,
              destination: !!o.destination, gainScale: o.gain_scale || null, customName: !!o.custom_name };
   });
+  if (window.configureDiceMonitoring) window.configureDiceMonitoring(info);
   document.title = info.device || "Mixer";
   window.syncNativeWindowTitle(info.device);
   accentOverrides = settings.accent_overrides && typeof settings.accent_overrides === "object" ? settings.accent_overrides : {};

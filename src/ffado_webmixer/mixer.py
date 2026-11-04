@@ -13,6 +13,7 @@ from .gain import (UNITY, has_db_scale, scale as gain_scale, raw_to_db, db_to_ra
 from copy import deepcopy
 from .soft_mute import MuteJournal
 from .mixer_outputs import OutputControls, serialized_output
+from .dice_monitoring import DiceMonitoring
 from .mixer_routing import RoutingControls
 import math
 
@@ -53,7 +54,7 @@ def load_device_info(config=None):
     return discover()
 
 
-class Mixer(RoutingControls, OutputControls):
+class Mixer(DiceMonitoring, RoutingControls, OutputControls):
     """Resolve device state and share gain/recovery guards across its controls.
 
     RoutingControls provides matrix and destination APIs; OutputControls
@@ -124,6 +125,12 @@ class Mixer(RoutingControls, OutputControls):
         self.roles = resolved["roles"]
         self.out_spec = resolved["output_spec"]
         self.outputs = resolved["outputs"]
+        monitor = self.dice_monitor_controls()
+        if 'dim' in monitor and 'mute' in monitor:
+            self.outputs['dice/dim'] = {
+                'id': 'dice/dim', 'name': 'Dim', 'mix': None, 'dest': None,
+                'fader': monitor['dim']['level'], 'mute': monitor['mute']['state'],
+                'spec': {'min': 0, 'max': 87, 'type': 'dice_dim', 'writable': True}}
         self.chan = resolved["channels"]
         self.chan_specs = resolved["channel_specs"]
         self.mute_memory = config.mute_memory
@@ -206,7 +213,10 @@ class Mixer(RoutingControls, OutputControls):
             "mixes": [{"id": i, "name": bus_name(n)} for i, n in enumerate(self.mixes)],
             "outputs": [{"id": o["id"], "name": o["name"], "mix": o["mix"], "controllable": o["fader"] is not None,
                          "destination": o["dest"] is not None and bool(self._dest_options()),
-                         "gain_scale": self._fader_display_scale(o.get('spec', self.out_spec), 'output_level')}
+                         "gain_scale": ({'mode': 'dice_dim', 'min_db': -87, 'max_db': 0,
+                                         'native_max': 88, 'min_finite_native': 1, 'step_native': 1}
+                                        if o['id'] == 'dice/dim' else
+                                        self._fader_display_scale(o.get('spec', self.out_spec), 'output_level'))}
                         for o in self.outputs.values()],
             "fader": {"writable": fader.get("writable", False)},
             "mute": {"writable": bool(self.roles.get("mute") or self._soft_mute())},
@@ -223,6 +233,7 @@ class Mixer(RoutingControls, OutputControls):
                                 self._dest_options() and
                                 any(out["dest"] is not None for out in self.outputs.values())),
             "phones_assignment": bool(resolve_phones_assignment(self.device, self.profile)),
+            "dice_monitoring": self.dice_monitor_description(),
             "features": features,
             "hardware_capabilities": self.profile.get('capabilities', {}),
             "controls": {role: spec for role, (_, spec) in self.roles.items()},

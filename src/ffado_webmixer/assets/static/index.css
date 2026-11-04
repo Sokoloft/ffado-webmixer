@@ -186,6 +186,8 @@ html { background: var(--page-background); }
   .outbtn.shows::after { content: ""; position: absolute; top: 6px; right: 6px; width: 7px; height: 7px; border-radius: 50%;
                          background: var(--accent-color); box-shadow: 0 0 5px var(--accent-color); }
   .outbtn.active { border-color: var(--accent-color); color: var(--text-primary); background: var(--selected-output-background); }
+  .dice-group .grouptitle { text-transform: none; }
+  .dice-grid .outbtn:disabled { opacity: .5; cursor: wait; }
 
   /* ---- channel strip ---- */
   .strip { position: relative; flex: none; width: 108px; box-sizing: border-box; padding: 6px 10px 8px;

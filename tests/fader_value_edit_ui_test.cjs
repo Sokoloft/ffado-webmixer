@@ -220,5 +220,44 @@ motuMaster.wrap.fire('dblclick');
 assert.equal(changes.at(-1), 100, 'master unity follows its output descriptor');
 
 assert(src.includes('sendThrottled(id, "fader", v, stripMix, stripDevice)'), 'strip writes retain bus and GUID');
-assert(src.includes('function () { return masterReady; }'), 'master value edits require loaded output');
+const dimScale = {mode: 'dice_dim', min_db: -87, max_db: 0,
+  native_max: 88, min_finite_native: 1, step_native: 1};
+const dim = harness(() => true, () => dimScale);
+const dimUnity = dim.track.children[0].children.find(mark => mark.className.includes('unity'));
+assert.equal(dimUnity.textContent, '0');
+assert.equal(dimUnity.style.top, '0%', 'Dim unity tick is at the loud top of the track');
+dim.fader.set(0);
+assert.equal(dim.label.value, 'Off', 'Dim has a separate Off position at the bottom');
+dim.wrap.fire('wheel', {deltaY: -100});
+assert.equal(dim.label.value, '-87.0 dB', 'first step above Off activates the quietest Dim level');
+dim.wrap.fire('wheel', {deltaY: -100});
+assert.equal(dim.label.value, '-86.0 dB', 'raising Dim gets louder');
+dim.label.fire('focus');
+dim.label.value = '-12 dB';
+dim.label.fire('keydown', {key: 'Enter'});
+approx(changes.at(-1), 7600 / 88, 'Dim edits map negative dB into the finite range');
+assert.equal(dim.label.value, '-12.0 dB');
+dim.fader.set(100);
+assert.equal(dim.label.value, '0.0 dB', 'top of Dim is loudest and distinct from Off');
+dim.wrap.fire('wheel', {deltaY: 100});
+assert.equal(dim.label.value, '-1.0 dB', 'lowering Dim gets quieter');
+dim.fader.set(100 / 88);
+dim.wrap.fire('wheel', {deltaY: 100});
+assert.equal(dim.label.value, 'Off', 'lowering below the quietest active level disables Dim');
+const dimWrites = changes.length;
+for (const invalid of ['-88 dB', '+1 dB', '−∞ dB']) {
+  dim.label.fire('focus'); dim.label.value = invalid;
+  dim.label.fire('keydown', {key: 'Enter'});
+}
+assert.equal(changes.length, dimWrites, 'invalid attenuation never changes the hardware');
+dim.wrap.fire('dblclick');
+assert.equal(changes.at(-1), 0, 'double-click clears Dim attenuation');
+dim.label.fire('focus'); dim.label.value = '0 dB';
+dim.label.fire('keydown', {key: 'Enter'});
+assert.equal(changes.at(-1), 100, 'typing 0 dB selects the active loudest position');
+dim.label.fire('focus'); dim.label.value = 'Off';
+dim.label.fire('keydown', {key: 'Enter'});
+assert.equal(changes.at(-1), 0, 'typing Off explicitly disables Dim');
+assert(src.includes('function () { return masterReady && !masterHardwareControlled; }'),
+  'master value edits require a loaded output outside H/W mode');
 console.log('Fader input UI: native dB entry, MOTU endpoints/steps, output scales, validation and unity reset passed');

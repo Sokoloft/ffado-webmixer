@@ -49,6 +49,10 @@ function onSyncEvent(ev) {
     return;
   }
   if (ev.origin === CLIENT_ID) return;           // our own non-matrix change coming back
+  if (ev.type === 'dice-monitoring') {
+    if (window.refreshDiceMonitoring) window.refreshDiceMonitoring().then(loadMaster);
+    return;
+  }
   var el;
   if (ev.type === "strip") {
     var shared = ev.control === "gain" || ev.control === "invert";    // belong to the channel, not to one bus
@@ -119,6 +123,7 @@ function refreshSyncState() {
     loadDevices();
     return Promise.all([
       loadMix({throwOnError: true}), loadMaster({throwOnError: true}),
+      window.refreshDiceMonitoring ? window.refreshDiceMonitoring() : null,
       window.routingSyncEvent ? window.routingSyncEvent({type: 'resync', device: device}) : null
     ]);
   });
