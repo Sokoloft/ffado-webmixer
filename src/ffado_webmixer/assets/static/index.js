@@ -1206,7 +1206,7 @@ var masterFader = makeFader(document.getElementById("masterTrack"), document.get
       writeOutput(out, "fader", x, device)
         .catch(function (e) {
           toast("Output change failed: " + e.message);
-          if (out.startsWith('dice/') && out === currentOut && device === ACTIVE_DEVICE) loadMaster();
+          if ((out.startsWith('dice/') || out.startsWith('bus/')) && out === currentOut && device === ACTIVE_DEVICE) loadMaster();
         });
     });
   }, function () { return masterReady && !masterHardwareControlled; }, function () {
@@ -1253,6 +1253,10 @@ masterName.addEventListener("change", function () {
   var out = canonicalOutput(currentOut), device = ACTIVE_DEVICE;
   var output = OUTPUTS.find(function (o) { return o.id === out; });
   if (!output) return;
+  if (window.DICE_BUS_GAIN && output.mix !== null) {
+    var left = output.mix - output.mix % 2;
+    if (STEREO_BUSES.includes(left)) return changeBusName(left, name, masterName, true);
+  }
   var saved = output._nameState || (output._nameState = {name:output.name, customName:!!output.customName});
   applyOutputName(out, name, true, false);
   window.ffadoApi.serial('name|' + (device || '') + '|out:' + out, function () {
@@ -1274,7 +1278,7 @@ masterName.addEventListener("keydown", function (e) {
 masterName.addEventListener("focus", function () { if (masterName.dataset?.gestureEdit !== "locked") masterName.select(); });
 
 function applyMasterState(o) {
-  showMasterName(o.name);
+  showMasterName(shortFfadoLabel(o.name));
   masterHardwareControlled = !!o.hardware_controlled;
   masterEl.querySelector('.faderwrap').hidden = masterHardwareControlled;
   if (masterHardwareControlled) document.getElementById('masterVal').value = 'H/W';
@@ -1303,12 +1307,22 @@ function loadMaster(options) {
   document.getElementById("masterbox").hidden = masterEl.hidden;
   if (masterEl.hidden) return;
   var partner = outputPartner(currentOut);
-  masterHardwareName.textContent = partner ? out.baseName + ' + ' + partner.baseName : out.baseName;
-  if (currentOut === 'dice/master') {
-    var lines = OUTPUTS.filter(function (output) { return output.id.startsWith('line/'); })
-      .map(function (output) { return Number(output.id.split('/')[1]); });
-    masterHardwareName.textContent = 'Line Out\n' + Math.min(...lines) + '-' + Math.max(...lines);
+  masterName.maxLength = window.DICE_BUS_GAIN && out.mix !== null && partner ? 32 : 16;
+  var hardwareLabel = shortFfadoLabel(out.baseName);
+  if (partner) {
+    var rightLabel = shortFfadoLabel(partner.baseName);
+    var leftMatch = /^(.*?)(\d+)$/.exec(hardwareLabel), rightMatch = /^(.*?)(\d+)$/.exec(rightLabel);
+    hardwareLabel = leftMatch && rightMatch && leftMatch[1] === rightMatch[1] ?
+      leftMatch[1].trimEnd() + '\n' + leftMatch[2] + ' + ' + rightMatch[2] : hardwareLabel + ' + ' + rightLabel;
   }
+  if (window.DICE_BUS_GAIN && currentOut.startsWith('bus/')) {
+    hardwareLabel = 'Bus ' + (out.mix + 1) + (partner ? '+' + (partner.mix + 1) : '');
+  }
+  // Keep stereo numbers together on their own line. Short bus labels need
+  // no hard break; other long master labels can wrap naturally as well.
+  masterHardwareName.textContent = hardwareLabel.replace(/\d+(?:\s*\+\s*\d+)+$/, function (numbers) {
+    return numbers.replace(/\s/g, '\u00a0');
+  });
   var token = ++masterToken;
   return window.ffadoApi.latest('master-output', '/api/output?out=' + encodeURIComponent(currentOut),
     {device: ACTIVE_DEVICE}).then(function (o) {
@@ -1395,7 +1409,7 @@ function chooseBusTab(id) {
 }
 function changeBusName(id, value, input, paired = false) {
   var o = busOutput(id);
-  var old = paired ? (STEREO_BUS_NAMES[id] || input.defaultValue) :
+  var old = paired ? (STEREO_BUS_NAMES[id] || (o ? outputButtonName(o) : input.defaultValue)) :
     (o ? o.name : (MIXES.find(x => x.id === Number(id)) || {}).name);
   var name = value.trim();
   if (!name || name === old) { input.value = old; return; }
@@ -1404,10 +1418,17 @@ function changeBusName(id, value, input, paired = false) {
     var left = Number(id);
     return window.ffadoApi.serial('name|' + (device || '') + '|bus-pair:' + id, () =>
       postJson('/api/bus-pair-name', {left, name}, device)).then(function () {
-        if (device === ACTIVE_DEVICE) STEREO_BUS_NAMES[id] = name;
+        if (device === ACTIVE_DEVICE) {
+          STEREO_BUS_NAMES[id] = name;
+          buildOutputs(); markOutputs();
+          if (currentOut === 'bus/' + left) loadMaster();
+        }
       }).catch(function (error) {
         toast('Could not rename linked bus: ' + error.message);
-        if (device === ACTIVE_DEVICE) input.value = old;
+        if (device === ACTIVE_DEVICE && (input !== masterName || canonicalOutput(currentOut) === 'bus/' + left)) {
+          input.value = STEREO_BUS_NAMES[id] || old;
+          if (input === masterName) loadMaster();
+        }
       });
   }
   if (!o) {
@@ -1511,6 +1532,7 @@ document.addEventListener('keydown', function (event) {
 // Unlinked buses have independent drag tiles. Only linked stereo pairs
 // move together: pinning either leg keeps the linked pair in place.
 function renderBusTabs() {
+  if (window.updateDiceBusButton) window.updateDiceBusButton();
   busTabs.hidden = !busTabsEnabled();
   document.body.classList.toggle('bus-tabs-mode', busTabsEnabled());
   if (!busTabsEnabled()) { updateBusMinCount(); return; }
@@ -1659,14 +1681,29 @@ hideBusesBox.addEventListener('change', function () {
 
 // ---- output buttons (right side): Main, Phones, then the buses ----
 function outputPartner(id) {
+  if (window.DICE_BUS_GAIN && id.startsWith('bus/')) {
+    var mix = Number(id.split('/')[1]), left = mix - mix % 2;
+    if (STEREO_BUSES.includes(left)) return OUTPUTS.find(function (out) {
+      return out.id === 'bus/' + (mix === left ? left + 1 : left);
+    });
+  }
   var pair = OUTPUT_PAIRS.find(function (pair) { return STEREO_OUTPUTS.includes(pair[0]) && pair.includes(id); });
   return pair ? OUTPUTS.find(function (out) { return out.id === (pair[0] === id ? pair[1] : pair[0]); }) : null;
 }
 function canonicalOutput(id) {
+  if (window.DICE_BUS_GAIN && id.startsWith('bus/')) {
+    var mix = Number(id.split('/')[1]), left = mix - mix % 2;
+    if (STEREO_BUSES.includes(left)) return 'bus/' + left;
+  }
   var pair = OUTPUT_PAIRS.find(function (pair) { return STEREO_OUTPUTS.includes(pair[0]) && pair.includes(id); });
   return pair ? pair[0] : id;
 }
 function outputButtonName(o) {
+  if (o.mix !== null) {
+    var leftMix = o.mix - o.mix % 2;
+    var pairName = (window.STEREO_BUS_NAMES || {})[String(leftMix)];
+    if (STEREO_BUSES.includes(leftMix) && pairName) return pairName;
+  }
   var partner = outputPartner(o.id);
   if (partner) {
     // Match input faders: a custom Left name replaces the combined name.
@@ -1708,6 +1745,7 @@ function markOutputs() {
     b.title = shows ? name + " (the channel strips are showing this bus)" : name;
   });
   if (busTabsEnabled()) renderBusTabs();
+  if (window.updateDiceBusButton) window.updateDiceBusButton();
 }
 var confirmedView = null;
 function saveViewSelection() {
@@ -1723,9 +1761,8 @@ function saveViewSelection() {
   });
 }
 function selectOutput(o) {
-  // DICE devices have monitor line outputs but no separate bus-master faders.
-  // Clicking a non-controllable bus selects its matrix without hiding the
-  // physical monitor's master fader.
+  // Devices without bus-level controls keep their physical output selection
+  // when switching the channel strips to a different mix.
   if (!o.controllable && o.mix !== null && OUTPUTS.some(function (x) { return x.mix === null && x.controllable; })) {
     var changed = currentMix !== o.mix;
     currentMix = STEREO_BUSES.includes(o.mix - o.mix % 2) ? o.mix - o.mix % 2 : o.mix;
@@ -1819,6 +1856,11 @@ function buildOutputs() {
         rendered[o.id] = true;
       }
     });
+    if (g[0] === 'Buses') {
+      var singleBus = grid.querySelectorAll('.outbtn').length === 1;
+      group.classList.toggle('single-bus-group', singleBus);
+      group.querySelector('.grouptitle').textContent = singleBus ? 'Bus' : 'Buses';
+    }
     box.appendChild(group);
   });
   box.hidden = OUTPUTS.length < 2 && !OUTPUTS.some(function (o) { return o.id === 'dice/dim'; });
@@ -2024,6 +2066,14 @@ function applyStripState(state, protectedWrites) {
   return true;
 }
 function loadMix(options) {
+  if (window.DICE_BUS_GAIN && currentOut.startsWith('bus/')) {
+    var busOut = 'bus/' + currentMix;
+    if (currentOut !== busOut || masterEl.dataset.outputPartner !== (outputPartner(busOut)?.id || '')) {
+      currentOut = busOut;
+      loadMaster();
+    }
+  }
+  if (window.updateDiceBusButton) window.updateDiceBusButton();
   // An unfinished Left selection belongs to the bus it was clicked on.
   if (pendingStereoMix !== currentMix) {
     pendingStereoLeft = null;

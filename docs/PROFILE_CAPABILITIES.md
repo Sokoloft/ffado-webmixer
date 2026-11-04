@@ -125,9 +125,14 @@ FFADO's matrix row label **must itself name** the router destination
 (e.g. `Mixer/In:01`) for a channel strip to show a meter. Source-mapped DICE
 line outputs use their corresponding `Line/Out:NN` hardware peaks from the
 same `getPeakValues()` frame, with separate Left/Right lanes when linked.
-Output metering adds no routing or matrix-gain reads and does not estimate
-levels from input peaks. Missing hardware output peaks leave that meter
-unavailable. Other destinations remain visible in In/Out → Crossbar router.
+Physical-output metering adds no routing or matrix-gain reads. Bus meters
+match the matrix's native `Mixer/Out:NN` sources to destinations currently
+carrying those sources, using the same hardware peak frame. Routing metadata
+refreshes at most every 500 ms for an unchanged destination set; local router
+edits invalidate it immediately. A linked bus pair has independent Left/Right
+lanes; an unlinked bus has one lane. Neither meter estimates levels from input
+peaks. Unrouted buses and missing hardware peaks remain unavailable. Other
+destinations remain visible in In/Out → Crossbar router.
 
 This feature does not reinterpret FireWire device model IDs, guess meter
 counts, or synthesize meter readings for unmatched control paths. The peak

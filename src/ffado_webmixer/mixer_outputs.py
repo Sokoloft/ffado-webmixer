@@ -34,6 +34,11 @@ class OutputControls:
         return pairs
 
     def linked_outputs(self, out_id):
+        if self.is_bus_gain_output(out_id):
+            mix = self.outputs[out_id]['mix']
+            left = mix - mix % 2
+            if left in self.config.settings.get('stereo_buses', []) and left + 1 < len(self.mixes):
+                return (f'bus/{left}', f'bus/{left + 1}')
         for left, right in self.output_pairs():
             if left in self.config.settings.get('stereo_outputs', []) and out_id in (left, right):
                 return (left, right)
@@ -54,10 +59,9 @@ class OutputControls:
 
     @serialized_output
     def write_linked_output(self, out_id, control, value):
-        if out_id == 'dice/master':
-            self._output(out_id)
-        pair = (self.dice_master_outputs() if out_id == 'dice/master' and control == 'fader'
-                else self.linked_outputs(out_id))
+        if self.is_bus_gain_output(out_id):
+            return self.write_bus_gain(out_id, control, value)
+        pair = self.linked_outputs(out_id)
         if control == 'mute':
             if type(value) is not bool:
                 raise ValueError('Output mute must be a boolean')
@@ -77,7 +81,7 @@ class OutputControls:
             if channel in getattr(self, '_pending_output_recovery', set()):
                 raise RuntimeError('This output has a pending mute recovery')
         if len(pair) == 1:
-            return self.write_output(pair[0], control, value)
+            return self.write_output(out_id, control, value)
         before = {channel: self.read_output(channel) for channel in pair}
         attempted = []
         try:
@@ -116,8 +120,8 @@ class OutputControls:
 
     @serialized_output
     def read_output(self, out_id):
-        if out_id == 'dice/master':
-            return self.read_dice_master()
+        if self.is_bus_gain_output(out_id):
+            return self.read_bus_gain(out_id)
         if out_id == 'dice/dim':
             return self.read_dice_dim()
         out = self._output(out_id)
@@ -130,13 +134,6 @@ class OutputControls:
         lo = spec.get("min", 0)
 
         def norm(value):
-            positions = getattr(self, '_output_fader_positions', {})
-            remembered = positions.get(out_id)
-            if remembered is not None:
-                if float(value) == remembered['raw']:
-                    return remembered['ui']
-                # A hardware or another client's change supersedes our edit.
-                positions.pop(out_id, None)
             return self._to_ui(value, spec) if spec["writable"] else 0
 
         if out["mute"]:                                            # real mute parameter (buses)
@@ -155,8 +152,8 @@ class OutputControls:
 
     @serialized_output
     def write_output(self, out_id, control, value):
-        if out_id == 'dice/master':
-            return self.write_dice_master(control, value)
+        if self.is_bus_gain_output(out_id):
+            return self.write_bus_gain(out_id, control, value, linked=False)
         if out_id == 'dice/dim':
             return self.write_dice_dim(control, value)
         if control == 'fader' and self.dice_line_hardware_controlled(out_id):
@@ -189,13 +186,6 @@ class OutputControls:
                     return
             self.helper.set_value(fader['path'], fader['kind'], raw)
             self._verify_output(out, raw)
-            if self.profile.get('family') == 'saffire_dice' and out_id.startswith('line/'):
-                # Line registers have only 41 integer positions. Preserve the
-                # precise displayed position while readback still matches its
-                # verified native value (e.g. 0 dB is 90.90909%, not 90%).
-                if not hasattr(self, '_output_fader_positions'):
-                    self._output_fader_positions = {}
-                self._output_fader_positions[out_id] = {'raw': float(raw), 'ui': float(value)}
         elif control == "mute" and not emulated:
             self._write_scalar(out["mute"], bool(value))
             if bool(self._read_scalar(out["mute"])) != bool(value):

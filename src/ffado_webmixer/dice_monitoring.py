@@ -11,37 +11,6 @@ from .mixer_outputs import serialized_output
 
 
 class DiceMonitoring:
-    def dice_master_outputs(self):
-        if self.profile.get('family') != 'saffire_dice':
-            return ()
-        return tuple(key for key, out in self.outputs.items()
-                     if key.startswith('line/') and out.get('fader'))
-
-    @serialized_output
-    def read_dice_master(self):
-        mute = self.dice_monitor_controls().get('mute')
-        lines = self.dice_master_outputs()
-        if not lines or not mute:
-            raise ValueError('Global DICE Master is unavailable')
-        states = [self.read_output(line) for line in lines]
-        hardware = any(state.get('hardware_controlled') for state in states)
-        return {'name': 'Master', 'level': None if hardware else max(s['level'] for s in states),
-                'hardware_controlled': hardware,
-                'mute': bool(self._read_scalar(mute['state'])), 'emulated_mute': False}
-
-    @serialized_output
-    def write_dice_master(self, control, value):
-        mute = self.dice_monitor_controls().get('mute')
-        if not self.dice_master_outputs() or not mute:
-            raise ValueError('Global DICE Master is unavailable')
-        if control == 'mute' and type(value) is bool:
-            self._monitor_changes([(mute['state'], value)] +
-                                  [(item, True) for item in mute['members']])
-        elif control == 'fader':
-            return self.write_linked_output('dice/master', control, value)
-        else:
-            raise ValueError('Invalid DICE Master control or value')
-
     def dice_monitor_controls(self):
         if self.profile.get('family') != 'saffire_dice':
             return {}
@@ -118,13 +87,21 @@ class DiceMonitoring:
             states = [bool(self._read_scalar(item)) for item in hardware]
             result['hw_monitor'] = all(states)
             result['hw_monitor_partial'] = any(states) and not all(states)
+        if 'mute' in controls:
+            result['mute'] = bool(self._read_scalar(controls['mute']['state']))
         return result
 
     @serialized_output
     def write_dice_monitoring(self, control, value):
-        if control != 'hw_monitor' or type(value) is not bool:
-            raise ValueError('Expected boolean hw_monitor')
+        if control not in ('hw_monitor', 'mute') or type(value) is not bool:
+            raise ValueError('Expected boolean hw_monitor or mute')
         controls = self.dice_monitor_controls().get('hw_monitor')
+        if control == 'mute':
+            mute = self.dice_monitor_controls().get('mute')
+            if not mute:
+                raise ValueError('Hardware mute is not supported on this device')
+            self._monitor_changes([(mute['state'], value)] + [(item, True) for item in mute['members']])
+            return self.read_dice_monitoring()
         if not controls:
             raise ValueError('Hardware monitoring is not supported on this device')
         # UnActivate bypasses software line monitoring so the knob controls gain.

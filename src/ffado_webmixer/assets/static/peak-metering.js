@@ -29,7 +29,8 @@
     return Number.isSafeInteger(index) ? String(index) : null;
   }
   function sampleText(item) {
-    return `${item.destination}: ${item.db === null ? '−∞' : item.db.toFixed(1)} dB`;
+    const name = item.source ? `${item.source} → ${item.destination}` : item.destination;
+    return `${name}: ${item.db === null ? '−∞' : item.db.toFixed(1)} dB`;
   }
 
   class PeakDisplay {
@@ -271,7 +272,9 @@
         meter.hidden = !any;
         if (!any) return;
         const description = output
-          ? 'FFADO hardware output peak (router destination, not calibrated dBFS)'
+          ? output.startsWith('bus/')
+            ? 'FFADO bus output peak (routed destination, not calibrated dBFS)'
+            : 'FFADO hardware output peak (router destination, not calibrated dBFS)'
           : 'FFADO router destination (not post-fader or calibrated dBFS)';
         meter.title = `${details.join(' / ')}. ${description}. Click to clear holds.`;
         meter.setAttribute('aria-label', `Clear peak holds: ${details.join('; ')}. ${description}${output ? '.' : '; not measured post-fader.'}`);

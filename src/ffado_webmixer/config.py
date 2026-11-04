@@ -1,4 +1,4 @@
-"""Persist ffado-webmixer preferences only; FFADO hardware is discovered live."""
+"""Persist preferences and per-device software bus gain baselines."""
 import json
 from copy import deepcopy
 import math
@@ -117,6 +117,38 @@ def _invalid_json_constant(value):
     raise ValueError(f'Invalid JSON number {value}')
 
 
+def _bus_gain_memory(value):
+    memory = deepcopy(_object(value, 'bus_gains'))
+    if not memory:
+        return memory
+    if (type(memory.get('schema')) is not int or memory['schema'] != 1 or
+            not isinstance(memory.get('guid'), str) or
+            not re.fullmatch(r'[0-9a-fA-F]{16}', memory['guid']) or
+            not isinstance(memory.get('matrix_path'), str) or
+            not memory['matrix_path'].startswith('/')):
+        raise ValueError('Invalid bus gain device identity')
+    columns = _list(memory.get('columns'), 'bus gain columns')
+    mixes = _list(memory.get('mixes'), 'bus gain mixes')
+    if not columns or not mixes or any(not isinstance(name, str) for name in columns + mixes):
+        raise ValueError('Invalid bus gain matrix layout')
+    states = _object(memory.get('buses'), 'bus gain states')
+    for key, state in states.items():
+        bus = _nonnegative_int(key, 'bus gain bus')
+        if str(bus) != key or bus >= len(mixes):
+            raise ValueError('Invalid bus gain bus')
+        _object(state, 'bus gain state')
+        level = state.get('level')
+        if (type(level) not in (int, float) or not 0 <= level <= 100 or
+                type(state.get('mute')) is not bool):
+            raise ValueError('Invalid saved bus gain or mute')
+        cells = _list(state.get('cells'), 'bus gain coefficients')
+        if len(cells) != len(columns) or any(
+                type(raw) not in (int, float) or not 0 <= raw <= 65535
+                for raw in cells):
+            raise ValueError('Invalid saved bus gain coefficients')
+    return memory
+
+
 def _finite_json_float(value):
     number = float(value)
     if not math.isfinite(number):
@@ -153,6 +185,7 @@ class Config:
 
         # Main / Phones fader positions remembered while they are muted (they have no mute of their own).
         self.mute_memory = {}
+        self.bus_gains = {}
 
 
     # ---------- loading and saving ----------
@@ -187,7 +220,7 @@ class Config:
         # Only publish after every collection and nested setting is validated.
         # Preserve dictionary identities held by the backend's mute recovery.
         with self._pair_lock, self._save_lock:
-            for key in ('settings', 'names', 'stereo_by_mix', 'layouts', 'mute_memory'):
+            for key in ('settings', 'names', 'stereo_by_mix', 'layouts', 'mute_memory', 'bus_gains'):
                 target = getattr(self, key)
                 target.clear()
                 target.update(state[key])
@@ -228,6 +261,7 @@ class Config:
             'bus_layout': _layout(saved.get('bus_layout', []), 'bus_layout', buses=True),
             'layout': _layout(saved.get('layout', []), 'layout'),
             'mute_memory': memory,
+            'bus_gains': _bus_gain_memory(saved.get('bus_gains', {})),
         }
 
     def _keep_bad_file(self):
@@ -263,6 +297,7 @@ class Config:
                 "layouts": self.layouts,
                 "bus_layout": self.bus_layout,
                 "mute_memory": self.mute_memory,
+                "bus_gains": self.bus_gains,
             }
             if self.legacy_layout:
                 data["layout"] = self.legacy_layout

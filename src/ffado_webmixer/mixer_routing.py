@@ -5,6 +5,7 @@ Gain writes go through the shared recovery guards on Mixer, so routing edits and
 strip edits preserve the same mute recovery and external-change behavior.
 """
 import math
+import time
 
 from .gain import has_db_scale, scale as gain_scale, raw_to_db, db_to_raw
 from .profile_loader import destination_options, resolve_phones_assignment
@@ -211,6 +212,8 @@ class RoutingControls:
             destinations = [str(x) for x in self.helper.router_call(path, "getDestinationNames")]
             selected = {d: str(self.helper.router_call(path, "getSourceForDestination", d))
                         for d in destinations}
+            self._bus_meter_routes = dict(selected)
+            self._bus_meter_routes_at = time.monotonic()
             # Opening/refreshing the Crossbar Router also synchronizes labels
             # with edits made in ffado-mixer or another controller.
             for destination, source in selected.items():
@@ -222,6 +225,7 @@ class RoutingControls:
             raise ValueError("No FFADO crossbar router exposed")
         path = self.router_path
         with self.helper.transaction():
+            self._bus_meter_routes_at = -float('inf')
             sources = [str(x) for x in self.helper.router_call(path, "getSourceNames")]
             destinations = [str(x) for x in self.helper.router_call(path, "getDestinationNames")]
             if (source and source not in sources) or destination not in destinations:

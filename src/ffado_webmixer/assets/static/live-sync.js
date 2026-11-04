@@ -113,6 +113,7 @@ function onSyncEvent(ev) {
   } else if (ev.type === 'bus-pair-name') {
     STEREO_BUS_NAMES[String(ev.left)] = ev.name;
     renderBusTabs();
+    if (window.DICE_BUS_GAIN && currentOut === 'bus/' + ev.left) showMasterName(ev.name);
   } else if (ev.type === 'bus-layout') {
     readJson('/api/bus-layout').then(function (items) {
       if (Array.isArray(items)) { busLayout = items; renderBusTabs(); }

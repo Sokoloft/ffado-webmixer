@@ -185,11 +185,16 @@ html { background: var(--page-background); }
   /* Main/Phones is the active output but the channel strips are showing this bus: a dot in the corner */
   .outbtn.shows::after { content: ""; position: absolute; top: 6px; right: 6px; width: 7px; height: 7px; border-radius: 50%;
                          background: var(--accent-color); box-shadow: 0 0 5px var(--accent-color); }
+  .single-bus-group .outbtn.shows::after { display: none; }
   .outbtn.active { border-color: var(--accent-color); color: var(--text-primary); background: var(--selected-output-background); }
-  .dice-group .grouptitle { text-transform: none; }
-  .dice-group .dice-grid { --cols: 1; }
-  #master[data-output="dice/master"] .inname { white-space: pre-line; }
+  .dice-group .dice-grid, .dice-bus-group .groupgrid { --cols: 1; }
   .dice-grid .outbtn:disabled { opacity: .5; cursor: wait; }
+  #side:not(.narrow) #outbox.dice-columns { display: grid; grid-template-columns: repeat(2, max-content); align-items: start; }
+  #side:not(.narrow) #outbox.dice-columns > .outgroup { grid-column: 1 / -1; }
+  #side:not(.narrow) #outbox.dice-columns > .dice-group,
+  #side:not(.narrow) #outbox.dice-columns > .dice-bus-group { grid-row: 1; padding-inline: var(--dice-column-padding, 8px); }
+  #side:not(.narrow) #outbox.dice-columns > .dice-group { grid-column: 2; }
+  #side:not(.narrow) #outbox.dice-columns > .dice-bus-group { grid-column: 1; align-self: end; }
 
   /* ---- channel strip ---- */
   .strip { position: relative; flex: none; width: 108px; box-sizing: border-box; padding: 6px 10px 8px;
@@ -299,6 +304,7 @@ html { background: var(--page-background); }
 
   .inname { flex: none; text-align: center; font-size: 11px; color: var(--text-secondary);
             white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  #master .inname { white-space: pre-line; overflow: visible; text-overflow: clip; overflow-wrap: break-word; }
 
   /* master (output) strip */
   .strip.master { width: 100px; border-top-color: var(--accent-color); }
@@ -352,7 +358,7 @@ html { background: var(--page-background); }
     .faderwrap { min-height: 80px; }
     .strip.minimized { padding-top: 36px; }
     .groupgrid { grid-auto-rows: 40px; }
-    #outbox { gap: 8px; padding: 8px; }
+    #outbox { gap: 8px; padding: 8px; --dice-column-padding: 6.5px; }
     #masterbox { padding: 8px; }
     .sidehead { padding: 6px 10px; }
     .outgroup { padding: 6px 14px 8px; }

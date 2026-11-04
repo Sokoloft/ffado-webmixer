@@ -1,3 +1,21 @@
+## Unreleased — DICE bus gain and hardware mute
+
+- Replace the all-line Master control with the selected bus's gain and mute.
+  Keep channel levels and routing intact while scaling matrix coefficients;
+  linked stereo buses change together. Keep the −60..+6 dB fader range and
+  reject changes that exceed the native coefficient limit.
+- Add a separate H/W Mute button below H/W Monitor. Hardware mute and Dim
+  remain independent of the selected bus.
+- Show hardware bus peaks beside the selected bus fader: one lane for a mono
+  bus and independent Left/Right lanes for linked buses. Follow actual router
+  assignments without estimating levels from input peaks or gain settings.
+- Save bus gain, mute and unscaled channel baselines per device. Keep bus gain
+  active on exit and restore it on startup without applying it twice to an
+  already scaled mix. Reapply saved gain to changed/reset live coefficients.
+- Journal incomplete writes and independent channel mute/solo for explicit
+  recovery. External edits during operation reset the affected bus's gain
+  without rewriting hardware.
+
 ## 1.2.3 — DICE meter responsiveness
 
 - Sample DICE hardware peaks every 50 ms (20 Hz) through the shared per-device

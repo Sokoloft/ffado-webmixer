@@ -135,13 +135,14 @@ def test_link_persistence_validation_and_save_rollback(mixer):
     assert len(events) == 2
 
 
-def test_output_peaks_use_shared_ffado_frame_without_gain_or_routing_reads(mixer):
+def test_output_peaks_use_shared_ffado_frame_without_gain_reads(mixer, monkeypatch):
+    monkeypatch.setattr('ffado_webmixer.peak_metering.time.monotonic', lambda: 10.)
     calls = []
     values = [('Line/Out:02', 4095), ('Mixer/In:01', 4095),
               ('Line/Out:01', 256), ('Mixer/Out:01', 1024)]
 
     def forbidden_read(*args):
-        raise AssertionError('Output metering must not read gain or routing controls')
+        raise AssertionError('Output metering must not read gain controls')
 
     def track_route(path, method, *args):
         calls.append(method)
@@ -149,6 +150,8 @@ def test_output_peaks_use_shared_ffado_frame_without_gain_or_routing_reads(mixer
             return True
         if method == 'getPeakValues':
             return values
+        if method == 'getSourceForDestination':
+            return 'Mute:00'
         return forbidden_read()
 
     mixer.helper.get_cell = forbidden_read
@@ -163,7 +166,8 @@ def test_output_peaks_use_shared_ffado_frame_without_gain_or_routing_reads(mixer
     assert right['raw'] == 4095 and first['channels']['0']['raw'] == 4095
     assert 'estimated' not in left and 'source' not in left
     assert 'line/3' not in first['outputs'] and 'bus/0' not in first['outputs']
-    assert calls == ['hasPeakMetering', 'getPeakValues']
+    assert calls[:2] == ['hasPeakMetering', 'getPeakValues']
+    assert calls.count('getSourceForDestination') == 3
     # An output can be silent while a loud input is present. A missing side
     # must not retain an old reading or copy the available side/input peak.
     values[:] = [('Mixer/In:01', 4095), ('Line/Out:02', 0)]
@@ -178,7 +182,9 @@ def test_output_peaks_use_shared_ffado_frame_without_gain_or_routing_reads(mixer
     assert third['channels'] == {} and third['outputs']['line/1']['level'] == .5
     values[:] = [('Line/Out:01', math.nan), ('Line/Out:02', 4096)]
     assert mixer.peak_snapshot()['outputs'] == {}
-    assert calls == ['hasPeakMetering'] + ['getPeakValues'] * 4
+    assert calls.count('hasPeakMetering') == 1
+    assert calls.count('getPeakValues') == 4
+    assert calls.count('getSourceForDestination') == 3, 'routing metadata is shared between frames'
 
 
 def test_output_meter_mapping_uses_declared_destination_and_ignores_aliases(mixer):

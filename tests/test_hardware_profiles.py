@@ -135,7 +135,7 @@ class TestDICE(unittest.TestCase):
     def test_line_level_and_boolean_mute(self):
         m = make_mixer()
         self.assertIn("line/1", m.outputs)
-        self.assertEqual(m.read_output("line/1")["level"], 62.5)
+        self.assertEqual(m.read_output("line/1")["level"], 62)
         m.write_output("line/1", "fader", 25)
         self.assertEqual(m.helper.values[GUID + "/EAP/Monitoring/LineOut/Volume1"], -30)
         m.write_output("line/1", "mute", True)

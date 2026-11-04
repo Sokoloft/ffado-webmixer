@@ -110,6 +110,38 @@ duration before increasing the read rate further.
    editing by right-click/long-press. Check valid/invalid input and
    double-click-to-unity only on controls with a declared dB scale.
 
+## DICE bus gain and hardware mute
+
+Run `python -m pytest tests/test_bus_gain.py tests/test_dice_monitoring.py`,
+`node tests/bus_gain_ui_test.cjs`, and `node tests/dice_monitoring_ui_test.cjs`.
+
+On a physical DICE device, select a bus and click its name in the Bus group
+between Dice and Outputs. Adjust its gain and mute; verify other buses, line-output levels,
+channel fader positions, and routing stay unchanged. Repeat with linked stereo
+buses, channel mute/solo, silence, and edits made while the bus is muted.
+Check both typed 0 dB and double-click-to-unity after switching buses.
+
+Route bus 1 and bus 2 to different measured destinations, link them, and
+confirm the bus fader displays independent Left/Right peaks. Select a mono
+bus and verify only one lane is shown. Route a bus to a different physical
+output or FireWire destination: its meter must follow that assignment,
+including edits from another controller (routing metadata refreshes about every
+500 ms). An unrouted or unmetered bus must not borrow another bus's reading
+or the input-strip peaks. Run `python -m pytest tests/test_bus_metering.py`
+and `node tests/peak_display_test.cjs` for the offline checks.
+
+Toggle H/W Mute below H/W Monitor and confirm it affects hardware outputs
+independently of bus mute and Dim. Verify button states after reconnecting a
+browser. Bus gain is implemented in software and saved with each device's
+unscaled channel baselines. Quit and reopen with mono and stereo bus gains,
+including silence and mute: the hardware mix and displayed settings should
+remain unchanged, without applying attenuation twice. Reset the device and
+verify saved gain is applied to its live channel mix. If a channel changed
+while the app was closed, unchanged routes must retain their previous levels.
+Incomplete writes and interrupted independent channel mute/solo still require
+explicit recovery. Changes made by another controller while the app is running
+reset the affected bus's gain without rewriting its hardware coefficients.
+
 ## Multiple devices and desktop integration
 
 1. With two mixers connected, choose between them using the toolbar device

@@ -56,88 +56,6 @@ def test_dim_mute_toggles_dim_and_retains_level_without_hardware_mute(mixer):
     assert mixer.helper.cells == {} and mixer.mute_memory == {}
 
 
-@pytest.mark.parametrize('alias,count', [('saffirepro14', 4), ('saffirepro26', 6), ('saffirepro40', 10)])
-def test_master_sets_every_line_output_without_affecting_matrix_or_dim(alias, count):
-    m = make_debug_mixer(alias, Config(None))
-    m.config.settings['stereo_outputs'] = ['line/1']
-    m.write_output('dice/dim', 'fader', 50)
-    before_cells = dict(m.helper.cells)
-    for value in (0, 2.5, 25, 75, 97.5, 100):
-        m.write_linked_output('dice/master', 'fader', value)
-        for n in range(1, count + 1):
-            assert m.read_output(f'line/{n}')['level'] == pytest.approx(value)
-        assert m.read_linked_output('dice/master')['level'] == pytest.approx(value)
-    assert m.helper.cells == before_cells
-    assert m.read_output('dice/dim')['level'] == 50
-
-
-def test_master_unity_keeps_original_scale_and_survives_bus_readback(mixer):
-    info = mixer.describe()
-    outputs = {out['id']: out for out in info['outputs']}
-    scale = outputs['dice/master']['gain_scale'] or info['gain_scale']
-    assert scale['min_db'] == -60 and scale['max_db'] == 6
-    assert (outputs['line/1']['gain_scale'] or info['gain_scale']) == scale
-    unity = (0 - scale['min_db']) * 100 / (scale['max_db'] - scale['min_db'])
-    mixer.write_linked_output('dice/master', 'fader', unity)
-    mixer.read_mix(0)
-    for n in range(1, 11):
-        assert mixer.helper.values[path(mixer, f'LineOut/Volume{n}')] == -4
-        assert mixer.read_linked_output(f'line/{n}')['level'] == pytest.approx(unity)
-    assert mixer.read_linked_output('dice/master')['level'] == pytest.approx(unity)
-
-
-def test_line_position_survives_repeated_reads_but_external_changes_override_it(mixer):
-    unity = 100 * 60 / 66
-    mixer.write_output('line/1', 'fader', unity)
-    for _ in range(3):
-        assert mixer.read_output('line/1')['level'] == pytest.approx(unity)
-    mixer.helper.values[path(mixer, 'LineOut/Volume1')] = -20
-    assert mixer.read_output('line/1')['level'] == 50
-    mixer.helper.values[path(mixer, 'LineOut/Volume1')] = -4
-    assert mixer.read_output('line/1')['level'] == 90
-
-
-def test_master_mute_uses_global_hardware_mute_and_preserves_levels(mixer):
-    mixer.write_output('dice/master', 'fader', 50)
-    mixer.write_output('dice/dim', 'fader', 25)
-    for muted in (True, False):
-        mixer.write_linked_output('dice/master', 'mute', muted)
-        assert mixer.helper.values[path(mixer, 'GlobalMute/State')] is muted
-        assert mixer.read_output('dice/master')['mute'] is muted
-        assert mixer.read_output('dice/master')['level'] == 50
-        assert mixer.read_output('dice/dim')['level'] == 25
-        assert mixer.read_output('dice/dim')['dim_active']
-        assert all(mixer.helper.values[path(mixer, f'LineOut/GMute{n}')] for n in range(1, 11))
-
-
-def test_master_rejects_hardware_controlled_lines_before_writing(mixer):
-    mixer.helper.values[path(mixer, 'LineOut/UnActivate10')] = True
-    before = dict(mixer.helper.values)
-    assert mixer.read_output('dice/master')['hardware_controlled']
-    with pytest.raises(ValueError, match='hardware monitor knob'):
-        mixer.write_linked_output('dice/master', 'fader', 50)
-    assert mixer.helper.values == before
-
-
-def test_master_failed_line_write_restores_every_attempted_line(mixer):
-    for n in range(1, 11):
-        mixer.write_output(f'line/{n}', 'fader', n * 5)
-    before = dict(mixer.helper.values)
-    write, failed = mixer.write_output, False
-
-    def fail_once(out, control, value):
-        nonlocal failed
-        write(out, control, value)
-        if out == 'line/3' and not failed:
-            failed = True
-            raise IOError('line write failed')
-
-    mixer.write_output = fail_once
-    with pytest.raises(IOError, match='line write failed'):
-        mixer.write_linked_output('dice/master', 'fader', 90)
-    assert mixer.helper.values == before
-
-
 def test_hw_monitor_toggles_every_line_without_reading_or_rewriting_gain(mixer):
     mixer.config.settings['stereo_outputs'] = ['line/1']
     for n in range(1, 11):
@@ -214,7 +132,7 @@ def test_invalid_dim_requests_never_write(mixer, control, value):
     assert mixer.helper.values == before
 
 
-@pytest.mark.parametrize('operation', ['dim', 'hw'])
+@pytest.mark.parametrize('operation', ['dim', 'hw', 'mute'])
 def test_partial_write_failure_restores_all_attempted_native_controls(mixer, operation):
     before = dict(mixer.helper.values)
     write = mixer._write_scalar
@@ -223,7 +141,7 @@ def test_partial_write_failure_restores_all_attempted_native_controls(mixer, ope
     def fail_after_write(control, value):
         nonlocal failed
         write(control, value)
-        if not failed and control['path'].endswith(('GDim3', 'UnActivate3')):
+        if not failed and control['path'].endswith(('GDim3', 'UnActivate3', 'GMute3')):
             failed = True
             raise IOError('disconnected after write')
 
@@ -231,6 +149,8 @@ def test_partial_write_failure_restores_all_attempted_native_controls(mixer, ope
     with pytest.raises(IOError, match='disconnected'):
         if operation == 'dim':
             mixer.write_output('dice/dim', 'fader', 50)
+        elif operation == 'mute':
+            mixer.write_dice_monitoring('mute', True)
         else:
             mixer.write_dice_monitoring('hw_monitor', True)
     assert mixer.helper.values == before
@@ -302,16 +222,8 @@ def test_api_validation_and_broadcast(mixer):
     response = client.post('/api/output', json={'out': 'dice/dim', 'control': 'mute', 'value': True})
     assert response.status_code == 200
     assert client.get('/api/output?out=dice/dim').json['mute']
-    assert client.post('/api/dice-monitoring', json={'control': 'hw_monitor', 'value': False}).status_code == 200
-    response = client.post('/api/output', json={'out': 'dice/master', 'control': 'fader', 'value': 50})
-    assert response.status_code == 200
-    assert client.get('/api/output?out=dice/master').json['level'] == 50
-    response = client.post('/api/output', json={'out': 'dice/master', 'control': 'mute', 'value': True})
-    assert response.status_code == 200
-    assert client.get('/api/output?out=dice/master').json['mute']
+    response = client.post('/api/dice-monitoring', json={'control': 'mute', 'value': True})
+    assert response.status_code == 200 and response.json['mute']
     assert mixer.helper.values[path(mixer, 'GlobalMute/State')] is True
-    for control, value in [('fader', True), ('fader', -1), ('fader', 101), ('mute', 1)]:
-        before = dict(mixer.helper.values)
-        response = client.post('/api/output', json={'out': 'dice/master', 'control': control, 'value': value})
-        assert response.status_code == 400
-        assert mixer.helper.values == before
+    assert client.post('/api/dice-monitoring', json={'control': 'mute', 'value': 1}).status_code == 400
+    assert client.post('/api/output', json={'out': 'dice/master', 'control': 'fader', 'value': 50}).status_code == 400

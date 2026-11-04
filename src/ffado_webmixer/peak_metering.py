@@ -11,11 +11,14 @@ not verified ADC/DAC clipping measurements. No hardware writes occur here.
 """
 import math
 import re
+import time
 
 # Only a genuine Mixer/In router destination named in FFADO's matrix row
 # is associated with the corresponding mixer input strip. Never fabricate
 # destination identifiers from the strip's ordinal number.
 MIXER_INPUT = re.compile(r'^Mixer/In:\d{2,3}$')
+MIXER_OUTPUT = re.compile(r'^Mixer/Out:\d{2,3}$')
+BUS_ROUTE_REFRESH_SECONDS = 0.5
 
 
 def meter_config(profile, matrix):
@@ -79,4 +82,44 @@ def output_peak_samples(mixer, destinations):
         destination = output.get('meter_destination')
         if destination in destinations:
             result[out_id] = {'destination': destination, **destinations[destination]}
+    return result
+
+
+def bus_peak_samples(mixer, destinations):
+    """Use a bus's actual routed destination peak, never sum input readings.
+
+    DICE meters router destinations. Associate native matrix output sources
+    with their currently routed destinations; unconnected/unmetered buses
+    remain unavailable. Share routing metadata between peak frames to avoid
+    a full routing read on every 20 Hz meter tick.
+    """
+    if mixer.matrix.get('mode') != 'dice_db' or not mixer.matrix.get('transposed'):
+        return {}
+    matrix = next((item for item in mixer.device.get('matrices', [])
+                   if item.get('path') == mixer.matrix['path']), {})
+    sources = {str(label).split('\n', 1)[0].strip(): f'bus/{index}'
+               for index, label in enumerate(matrix.get('col_names', []))
+               if MIXER_OUTPUT.fullmatch(str(label).split('\n', 1)[0].strip())
+               and f'bus/{index}' in mixer.outputs}
+    if not sources:
+        return {}
+    measured = [name for name in destinations if not MIXER_OUTPUT.fullmatch(name)]
+    now = time.monotonic()
+    routes = getattr(mixer, '_bus_meter_routes', {})
+    if (now - getattr(mixer, '_bus_meter_routes_at', -float('inf')) >= BUS_ROUTE_REFRESH_SECONDS or
+            any(name not in routes for name in measured)):
+        routes = {}
+        for name in measured:
+            try:
+                routes[name] = str(mixer.helper.router_call(mixer.router_path, 'getSourceForDestination', name))
+            except Exception:
+                routes[name] = None  # A failed lookup must never reuse a stale route.
+        mixer._bus_meter_routes = routes
+        mixer._bus_meter_routes_at = now
+    result = {}
+    for destination in sorted(measured):
+        source = routes.get(destination)
+        out_id = sources.get(source)
+        if out_id is not None and out_id not in result:
+            result[out_id] = {'source': source, 'destination': destination, **destinations[destination]}
     return result

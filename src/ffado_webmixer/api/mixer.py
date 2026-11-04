@@ -122,8 +122,15 @@ def register(app, backend, description, config, broadcast):
                                       if 'bus-pair:' + str(left) in config.names}
         result['mixes'] = [dict(mix, name=config.names.get('bus:' + str(mix['id']), mix['name']))
                            for mix in result.get('mixes', [])]
+
+        def output_name(output):
+            fallback = output['name']
+            if result.get('software_bus_gain') and output['mix'] is not None:
+                fallback = config.names.get('bus:' + str(output['mix']), fallback)
+            return config.names.get('out:' + output['id'], fallback)
+
         result["outputs"] = [
-            dict(output, base_name=output["name"], name=config.names.get("out:" + output["id"], output["name"]),
+            dict(output, base_name=output["name"], name=output_name(output),
                  custom_name="out:" + output["id"] in config.names)
             for output in result.get("outputs", [])
         ]
@@ -570,6 +577,9 @@ def register(app, backend, description, config, broadcast):
                 right = pair[1]
                 name = pair_name(name, config.names.get('out:' + right, backend.outputs[right]['name']))
             output["name"] = config.names.get("out:" + pair[0], name)
+            if output.get('software_bus_gain') and len(pair) == 2:
+                left = backend.outputs[pair[0]]['mix']
+                output['name'] = config.names.get('bus-pair:' + str(left), output['name'])
 
             return jsonify(output)
         except (ValueError, KeyError) as exc:

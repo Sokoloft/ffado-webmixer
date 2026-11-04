@@ -219,23 +219,6 @@ assert.equal(motuMaster.label.value, '-84.0 dB');
 motuMaster.wrap.fire('dblclick');
 assert.equal(changes.at(-1), 100, 'master unity follows its output descriptor');
 
-// DICE outputs retain the original -60..+6 dB display and fractional unity.
-const lineScale = {mode: 'dice_db', min_db: -60, max_db: 6};
-const lineMaster = harness(() => true, () => lineScale);
-lineMaster.label.fire('focus');
-lineMaster.label.value = '0 dB';
-lineMaster.label.fire('keydown', {key: 'Enter'});
-approx(changes.at(-1), 100 * 60 / 66, 'Master 0 dB keeps its fractional percentage');
-lineMaster.fader.set(changes.at(-1));
-assert.equal(lineMaster.label.value, '0.0 dB', 'unity remains exact after output readback');
-for (let db = -59; db <= 6; db++) {
-  const transport = ctx.faderDbToUi(db, lineScale);
-  lineMaster.fader.set(transport);
-  assert.equal(lineMaster.label.value, ctx.formatFaderDb(db), 'the full original output range survives a refresh');
-}
-lineMaster.wrap.fire('dblclick');
-approx(changes.at(-1), 100 * 60 / 66, 'line double-click restores exact displayed unity');
-
 assert(src.includes('sendThrottled(id, "fader", v, stripMix, stripDevice)'), 'strip writes retain bus and GUID');
 const dimScale = {mode: 'dice_dim', min_db: -87, max_db: 0,
   native_max: 88, min_finite_native: 1, step_native: 1};

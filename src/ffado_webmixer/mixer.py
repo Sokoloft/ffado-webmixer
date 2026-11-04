@@ -7,13 +7,14 @@ from .profile_loader import (load_profile, resolve_mixer, resolve_controls,
                              visible_columns, destination_options, resolve_phones_assignment, bus_name, CHANNEL_WORDS)
 from .controls import to_percent, from_percent, pan_to_ui, pan_from_ui
 from .profiles.capabilities import enabled, probe_allowed, activate_internal_model, declared_path
-from .peak_metering import meter_config, channel_destinations, normalize_peak, output_peak_samples
+from .peak_metering import meter_config, channel_destinations, normalize_peak, output_peak_samples, bus_peak_samples
 from .gain import (UNITY, has_db_scale, scale as gain_scale, raw_to_db, db_to_raw,
                    raw_to_ui, ui_to_raw, motu_display_scale)
 from copy import deepcopy
 from .soft_mute import MuteJournal
 from .mixer_outputs import OutputControls, serialized_output
 from .dice_monitoring import DiceMonitoring
+from .bus_gain import BusGainControls
 from .mixer_routing import RoutingControls
 import math
 
@@ -54,7 +55,7 @@ def load_device_info(config=None):
     return discover()
 
 
-class Mixer(DiceMonitoring, RoutingControls, OutputControls):
+class Mixer(BusGainControls, DiceMonitoring, RoutingControls, OutputControls):
     """Resolve device state and share gain/recovery guards across its controls.
 
     RoutingControls provides matrix and destination APIs; OutputControls
@@ -121,17 +122,12 @@ class Mixer(DiceMonitoring, RoutingControls, OutputControls):
         self._pending_recovery = {}
         self._mute_fault = None
         self._pending_output_recovery = set()
+        self._bus_gains = {}
         resolved = resolve_controls(self.device, self.profile, mixer["matrices"], self.columns, self.mixes)
         self.roles = resolved["roles"]
         self.out_spec = resolved["output_spec"]
         self.outputs = resolved["outputs"]
         monitor = self.dice_monitor_controls()
-        lines = self.dice_master_outputs()
-        if lines and 'mute' in monitor:
-            self.outputs['dice/master'] = {
-                'id': 'dice/master', 'name': 'Master', 'mix': None, 'dest': None,
-                'fader': self.outputs[lines[0]]['fader'], 'mute': monitor['mute']['state'],
-                'spec': self.outputs[lines[0]].get('spec', self.out_spec)}
         if 'dim' in monitor and 'mute' in monitor:
             self.outputs['dice/dim'] = {
                 'id': 'dice/dim', 'name': 'Dim', 'mix': None, 'dest': None,
@@ -149,9 +145,42 @@ class Mixer(DiceMonitoring, RoutingControls, OutputControls):
         return (col, mix) if self.matrix["transposed"] else (mix, col)
 
     def _get_cell(self, path, mix, col):
-        return self.helper.get_cell(path, *self._coordinates(mix, col))
+        actual = self.helper.get_cell(path, *self._coordinates(mix, col))
+        return self._bus_read_cell(mix, col, actual) if path == self.roles.get('fader', (None,))[0] else actual
 
     def _set_cell(self, path, mix, col, value):
+        if self._bus_gain_state(mix) is not None and path == self.roles.get('fader', (None,))[0]:
+            self._get_cell(path, mix, col)  # External edits supersede session gain.
+        state = self._bus_gain_state(mix) if path == self.roles.get('fader', (None,))[0] else None
+        if state is not None:
+            raw = self._bus_scaled(value, state)
+            old = state['cells'][col]
+            state['cells'][col] = value
+            try:
+                self._save_soft_mutes()
+            except Exception:
+                state['cells'][col] = old
+                self._save_soft_mutes()
+                raise
+            try:
+                self._set_native_cell(path, mix, col, raw)
+                self._commit_bus_gains()
+                return
+            except Exception as exc:
+                state['cells'][col] = old
+                try:
+                    self._save_soft_mutes()
+                    self._set_native_cell(path, mix, col, self._bus_scaled(old, state))
+                except Exception as rollback_exc:
+                    self._bus_gains.pop(mix, None)
+                    for column, base in state['cells'].items():
+                        self._pending_recovery[mix, column] = self._matrix_mutes.get((mix, column), base)
+                    self._save_soft_mutes()
+                    raise RuntimeError('Channel gain rollback incomplete: ' + str(rollback_exc)) from exc
+                raise
+        return self._set_native_cell(path, mix, col, value)
+
+    def _set_native_cell(self, path, mix, col, value):
         self.helper.set_cell(path, *self._coordinates(mix, col), value)
         if self.matrix["mode"] == "dice_db":
             actual = self.helper.get_cell(path, *self._coordinates(mix, col))
@@ -217,11 +246,12 @@ class Mixer(DiceMonitoring, RoutingControls, OutputControls):
             "profile": self.profile.get("device_profile"),
             "device": model.get("name") or self.profile.get("device_name") or f"FFADO device {self.device['guid']}",
             "mixes": [{"id": i, "name": bus_name(n)} for i, n in enumerate(self.mixes)],
-            "outputs": [{"id": o["id"], "name": o["name"], "mix": o["mix"], "controllable": o["fader"] is not None,
+            "outputs": [{"id": o["id"], "name": o["name"], "mix": o["mix"], "controllable": o["fader"] is not None or self.is_bus_gain_output(o['id']),
                          "destination": o["dest"] is not None and bool(self._dest_options()),
                          "gain_scale": ({'mode': 'dice_dim', 'min_db': -87, 'max_db': 0,
                                          'native_max': 88, 'min_finite_native': 1, 'step_native': 1}
                                         if o['id'] == 'dice/dim' else
+                                        gain_scale('dice_db') if self.is_bus_gain_output(o['id']) else
                                         self._fader_display_scale(o.get('spec', self.out_spec), 'output_level'))}
                         for o in self.outputs.values()],
             "fader": {"writable": fader.get("writable", False)},
@@ -240,6 +270,7 @@ class Mixer(DiceMonitoring, RoutingControls, OutputControls):
                                 any(out["dest"] is not None for out in self.outputs.values())),
             "phones_assignment": bool(resolve_phones_assignment(self.device, self.profile)),
             "dice_monitoring": self.dice_monitor_description(),
+            "software_bus_gain": self.has_bus_gain(),
             "features": features,
             "hardware_capabilities": self.profile.get('capabilities', {}),
             "controls": {role: spec for role, (_, spec) in self.roles.items()},
@@ -266,6 +297,10 @@ class Mixer(DiceMonitoring, RoutingControls, OutputControls):
         # Existing emulated Main/Phones mutes were saved by older releases.
         # Do not restore them automatically on startup: levels may be unsafe.
         self._pending_output_recovery = set(self.mute_memory)
+        try:
+            self.load_bus_gains()
+        except (OSError, ValueError, RuntimeError) as exc:
+            self._mute_fault = f'Could not load saved bus gains: {exc}'
         if self._pending_recovery:
             print(f"FFADO mixer {self.guid}: {len(self._pending_recovery)} muted "
                   "matrix levels from an interrupted session. "
@@ -371,7 +406,9 @@ class Mixer(DiceMonitoring, RoutingControls, OutputControls):
         if getattr(self, "_recovery_journal", None):
             # Include all currently suppressed cells. Write BEFORE muting so a
             # power loss during the D-Bus call leaves the restoration target.
-            self._recovery_journal.write(self._matrix_mutes)
+            self._recovery_journal.write({**self._bus_recovery_levels(), **self._matrix_mutes,
+                                          **self._pending_recovery})
+        self._save_bus_gains()
 
     def _require_recovery_resolved(self):
         if getattr(self, '_recovery_corrupt', False):
@@ -473,6 +510,7 @@ class Mixer(DiceMonitoring, RoutingControls, OutputControls):
                     self._save_mute_memory()
                 except Exception as exc:
                     print(f'FFADO: could not restore output {out_id}: {exc}')
+            self._commit_bus_gains()
 
     def _write_gain_cell(self, mix, col, raw):
         """All matrix/fader/stereo gain edits share the same recovery guard."""
@@ -777,6 +815,7 @@ class Mixer(DiceMonitoring, RoutingControls, OutputControls):
                     for index, dest in self.meter_channels.items()
                     if dest in clean_destinations}
         outputs = output_peak_samples(self, clean_destinations)
+        outputs.update(bus_peak_samples(self, clean_destinations))
         return {'available': True, 'guid': self.guid, 'meter': self.meter_spec,
                 'channels': channels, 'destination_levels': clean_destinations,
                 'destinations': raw_destinations, 'outputs': outputs}
