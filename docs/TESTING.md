@@ -1,6 +1,6 @@
 # Testing and hardware verification
 
-This is the **current** consolidated verification guide for ffado-webmixer 1.2.3.
+This is the **current** consolidated verification guide for ffado-webmixer 1.2.4.
 The former one-topic-per-change guides (46 files) are preserved unchanged in
 [`../docs_legacy.zip`](../docs_legacy.zip) under their original `docs/` paths.
 Those older instructions reflect the interface *at the time of each change*;

@@ -1,4 +1,4 @@
-## Unreleased — DICE bus gain and hardware mute
+## 1.2.4 — DICE bus gain and hardware mute
 
 - Replace the all-line Master control with the selected bus's gain and mute.
   Keep channel levels and routing intact while scaling matrix coefficients;
@@ -15,6 +15,11 @@
 - Journal incomplete writes and independent channel mute/solo for explicit
   recovery. External edits during operation reset the affected bus's gain
   without rewriting hardware.
+- Add a Bus/Output Gains overview and preserve right-click editing locks on
+  output faders. Wrap fader labels and align bus track heights.
+- Show Dim as On/Off on its button and in the gains overview. Color its fader
+  red while Dim is On and clear the color while Off.
+- Remove the macOS shortcut reference from the Linux mixer matrix help.
 
 ## 1.2.3 — DICE meter responsiveness
 

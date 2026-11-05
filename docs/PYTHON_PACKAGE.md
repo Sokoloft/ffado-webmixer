@@ -34,7 +34,7 @@ Device identity and available D-Bus controls are discovered at runtime. XML prof
 
 ## Python package marker
 
-`src/ffado_webmixer/__init__.py` defines `__version__`, currently `1.2.3`.
+`src/ffado_webmixer/__init__.py` defines `__version__`, currently `1.2.4`.
 Setuptools reads this value for distribution metadata, and the application uses
 it for CLI and About versions. Keep this module free of runtime dependency
 imports so packaging and `--version` work without Flask, Qt or D-Bus.
