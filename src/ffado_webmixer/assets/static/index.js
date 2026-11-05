@@ -1224,7 +1224,8 @@ document.getElementById("masterMute").addEventListener("click", function () {
   var button = document.getElementById("masterMute");
   if (button.disabled) return;
   button.disabled = true;
-  var want = !masterEl.classList.contains("muted");
+  var active = masterEl.classList.contains("muted");
+  var want = currentOut === 'dice/dim' ? active : !active;
   writeOutput(currentOut, "mute", want, ACTIVE_DEVICE)
     .then(loadMaster)  // Main/Phones soft mute moves the fader; hardware readback is authoritative.
     .catch(e => { toast('Output mute write failed: ' + e.message); loadMaster(); loadMuteRecovery(); })
@@ -1294,9 +1295,13 @@ function applyMasterState(o) {
   else masterFader.set(o.level);
   var masterValue = document.getElementById('masterVal');
   masterValue.readOnly = masterHardwareControlled || masterValue.dataset?.gestureEdit !== 'editing';
-  masterEl.classList.toggle('muted', !!o.mute);
+  var masterMute = document.getElementById('masterMute');
+  var isDim = currentOut === 'dice/dim';
+  masterEl.classList.toggle('muted', isDim ? !!o.dim_active : !!o.mute);
+  masterMute.textContent = isDim ? (o.dim_active ? 'On' : 'Off') : 'Mute';
+  masterMute.setAttribute('aria-pressed', String(isDim ? !!o.dim_active : !!o.mute));
   masterReady = true;
-  document.getElementById('masterMute').disabled = false;
+  masterMute.disabled = false;
 }
 function loadMaster(options) {
   currentOut = canonicalOutput(currentOut);

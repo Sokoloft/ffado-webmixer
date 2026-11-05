@@ -142,7 +142,8 @@
           numeric.value = db ? (levelDb === null ? '' : levelDb.toFixed(1)) : Number(level).toFixed(1);
           numeric.placeholder = '−∞';
           value.textContent = state.hardware_controlled ? 'H/W' :
-            (db ? window.formatFaderDb(levelDb) : Number(level).toFixed(1) + '%') + (state.mute ? ' · Muted' : '');
+            (db ? window.formatFaderDb(levelDb) : Number(level).toFixed(1) + '%') +
+            (out.id === 'dice/dim' ? (state.dim_active ? ' · On' : ' · Off') : (state.mute ? ' · Muted' : ''));
           slider.setAttribute('aria-valuetext', value.textContent);
         }
         function lock() { controls.forEach(control => { control.disabled = gainBusy || !!state.hardware_controlled; }); }
@@ -572,7 +573,7 @@
       selectMatrixCell(previous.input, previous.output, cell);
       if (previous.focused) cell.focus();
     }
-    message(matrixWriteError || "Drag a matrix knob to adjust, scroll or use arrow keys; changes write on release/pause. Ctrl-click (⌘-click on Mac) or long press to select multiple entries. Click for precise editing and presets.");
+    message(matrixWriteError || "Drag a matrix knob to adjust, scroll or use arrow keys; changes write on release/pause. Ctrl-click or long press to select multiple entries. Click for precise editing and presets.");
   }
   // The MOTU Mk1/Mk2 has four per-bus Discrete Mix_dest selectors. Those
   // choose one hardware output per bus and never alter crosspoint gain. This

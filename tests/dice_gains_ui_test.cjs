@@ -158,5 +158,15 @@ Element.prototype.querySelectorAll = function(q) {
   assert.equal(writes.at(-1).device,'a');assert.equal(cards()[0],newCard);assert.equal(reloads,before);
   root.configureRouting({matrix:{available:true},fader:{writable:true}});
   assert.equal(elements.routingGainsTab.hidden,true,'other devices do not show DICE gains');
+  // Dim retains its attenuation level while its independent switch is Off.
+  outputs.push({id:'dice/dim', name:'Dim', controllable:true,
+    gainScale:{mode:'dice_dim', min_db:-87, max_db:0, native_max:88, min_finite_native:1, step_native:1}});
+  states['dice/dim'] = {name:'Dim', level:50, mute:true, dim_active:false};
+  root.configureRouting({software_bus_gain:true});
+  elements.routingGainsTab.click();await flush();
+  assert.equal(cards().at(-1).children[3].textContent,'-44.0 dB · Off');
+  states['dice/dim'].mute=false;states['dice/dim'].dim_active=true;
+  elements.routingRefresh.click();await flush();
+  assert.equal(cards().at(-1).children[3].textContent,'-44.0 dB · On');
   console.log('DICE gains UI: overview, links, preview, isolated writes, readback, failures and device scoping passed');
 })().catch(error => {console.error(error);process.exitCode=1;});

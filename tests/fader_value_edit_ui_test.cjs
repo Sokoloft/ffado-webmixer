@@ -280,7 +280,8 @@ vm.runInContext(src.slice(src.indexOf('function applyMasterState('), src.indexOf
 ctx.shortFfadoLabel = text => text;
 ctx.showMasterName = () => {};
 ctx.masterEl = {querySelector:()=>({}),classList:{toggle(){}}};
-ctx.document.getElementById = id => id === 'masterVal' ? ctx.masterLabel : {};
+ctx.currentOut = 'line/1';
+ctx.document.getElementById = id => id === 'masterVal' ? ctx.masterLabel : {setAttribute(){}};
 for (const outputScale of [lineScale, ctx.GAIN_SCALE]) {
   const track=originalNode(),handle=originalNode(),label=editableNode(),wrap=originalNode();
   track.parentNode=wrap;

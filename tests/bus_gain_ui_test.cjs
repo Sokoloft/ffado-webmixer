@@ -13,6 +13,7 @@ function node(id) {
     nodes.set(id, {dataset: {}, events: {}, value: '', hidden: false,
       classList: {toggle: (key, on) => on ? classes.add(key) : classes.delete(key), contains: key => classes.has(key)},
       addEventListener(type, fn) { this.events[type] = fn; },
+      setAttribute(key, value) { this[key] = value; },
       querySelector: child => node(id + child),
     });
   }
@@ -83,11 +84,22 @@ const flush = async () => { for (let i = 0; i < 20; i++) await Promise.resolve()
   assert.equal(node('masterName').maxLength, 16);
   context.selectOutput(context.OUTPUTS[3]); await flush();
   assert.equal(context.currentOut, 'dice/dim', 'Dim remains independently selectable');
-  assert(writes.every(write => write.out.startsWith('bus/')), 'bus controls never write hardware outputs');
+  for (const active of [false, true, false]) {
+    context.applyMasterState({name: 'Dim', level: 50, mute: !active, dim_active: active});
+    assert.equal(node('masterMute').textContent, active ? 'On' : 'Off');
+    assert.equal(node('masterMute')['aria-pressed'], String(active));
+    assert.equal(node('master').classList.contains('muted'), active, 'Dim is red only when On');
+    node('masterMute').events.click(); await flush();
+    assert.equal(writes.at(-1).out, 'dice/dim');
+    assert.equal(writes.at(-1).control, 'mute');
+    assert.equal(writes.at(-1).value, active, 'Dim toggle sends the inverse active state as mute');
+  }
+  assert(writes.every(write => write.out.startsWith('bus/') || write.out === 'dice/dim'), 'controls write only the selected bus or Dim');
   context.OUTPUTS.push({id: 'line/2', mix: null, name: 'Line Out 2', baseName: 'Line Out 2', controllable: true});
   context.OUTPUT_PAIRS = [['line/1', 'line/2']];
   context.STEREO_OUTPUTS = ['line/1'];
   context.selectOutput(context.OUTPUTS[2]); await flush();
+  assert.equal(node('masterMute').textContent, 'Mute', 'other outputs retain their mute button');
   assert.equal(node('hardwareName').textContent, 'Line Out\n1\u00a0+\u00a02',
     'stereo hardware labels use one shared prefix and keep numbers together for wrapping');
   context.DICE_BUS_GAIN = false;
