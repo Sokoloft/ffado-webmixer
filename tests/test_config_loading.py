@@ -20,6 +20,9 @@ from ffado_webmixer.config import Config, DEFAULT_SETTINGS
     {'layout': None}, {'layout': [{'id': ''}]},
     {'mute_memory': []}, {'mute_memory': {'main': 'loud'}},
     {'mute_memory': {'main': True}},
+    {'bus_mutes': []}, {'bus_mutes': {'bus/0': 1}},
+    {'bus_mutes': {'main': True}}, {'bus_mutes': {'bus/01': False}},
+    {'channel_mutes': []}, {'channel_mutes': {'schema': 1}},
 ])
 def test_malformed_saved_structure_is_preserved_and_replaced_with_defaults(tmp_path, saved):
     path = tmp_path / 'config.json'

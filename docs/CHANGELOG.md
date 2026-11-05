@@ -1,3 +1,12 @@
+## 1.2.5 — Dim control and mute recall
+
+- Keep Dim's on/off state independent of fader adjustments. Only the bottom
+  button toggles Dim; the fader edits attenuation from −87 to 0 dB.
+- Restore channel and native bus mute preferences after restart, with
+  per-device settings, hardware readback and rollback on save failures.
+- Add the ADAT as SPDIF switch for supported Saffire Pro 40 models and
+  refresh routing after an optical format change.
+
 ## 1.2.4 — DICE bus gain and hardware mute
 
 - Replace the all-line Master control with the selected bus's gain and mute.

@@ -110,6 +110,19 @@ class OutputControls:
     def _save_mute_memory(self):
         self.config.save()
 
+    @serialized_output
+    def load_bus_mutes(self):
+        """Recall native bus mutes after the GUID-specific config is attached."""
+        for out_id, muted in self.config.bus_mutes.items():
+            out = self.outputs.get(out_id)
+            if (out is None or not out.get('fader') or not out.get('mute')
+                    or self.is_bus_gain_output(out_id)):
+                continue
+            if bool(self._read_scalar(out['mute'])) != muted:
+                self._write_scalar(out['mute'], muted)
+                if bool(self._read_scalar(out['mute'])) != muted:
+                    raise IOError('FFADO did not acknowledge saved bus mute')
+
     def _verify_output(self, out, expected):
         fader = out['fader']
         actual = self.helper.get_value(fader['path'], fader['kind'])
@@ -187,9 +200,23 @@ class OutputControls:
             self.helper.set_value(fader['path'], fader['kind'], raw)
             self._verify_output(out, raw)
         elif control == "mute" and not emulated:
+            previous = bool(self._read_scalar(out['mute']))
             self._write_scalar(out["mute"], bool(value))
             if bool(self._read_scalar(out["mute"])) != bool(value):
                 raise IOError('FFADO did not acknowledge output mute change')
+            if out_id.startswith('bus/'):
+                with self.config._save_lock:
+                    saved = dict(self.config.bus_mutes)
+                    self.config.bus_mutes[out_id] = bool(value)
+                    try:
+                        self.config.save()
+                    except Exception:
+                        self.config.bus_mutes.clear()
+                        self.config.bus_mutes.update(saved)
+                        self._write_scalar(out['mute'], previous)
+                        if bool(self._read_scalar(out['mute'])) != previous:
+                            raise RuntimeError('Saving bus mute failed; hardware rollback incomplete')
+                        raise
         elif control == "mute":
             muted = out_id in self.mute_memory
             if value and not muted:

@@ -26,6 +26,7 @@ if "dbus" not in sys.modules:
         sys.modules["dbus"] = dbus
 
 from ffado_webmixer.mixer import Mixer
+from ffado_webmixer.config import Config
 from ffado_webmixer.profiles.resolver import resolve_mixer, resolve_controls
 from ffado_webmixer.profiles.capabilities import parse_capabilities
 from xml.etree import ElementTree as ET
@@ -100,7 +101,8 @@ def make_mixer():
     mixer.out_spec = ctrl["output_spec"]
     mixer.outputs = ctrl["outputs"]
     mixer._matrix_mutes = {}
-    mixer.config = types.SimpleNamespace(save=lambda: None)
+    mixer.config = Config()
+    mixer.guid = d['guid']
     mixer.mute_memory = {}
     return mixer
 

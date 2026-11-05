@@ -52,6 +52,9 @@ class DeviceManager:
                     config.bus_layout = deepcopy(settings.bus_layout)
                     config.legacy_layout = deepcopy(settings.legacy_layout)
                     config.mute_memory = deepcopy(settings.mute_memory)
+                    config.bus_mutes = deepcopy(settings.bus_mutes)
+                    if settings.channel_mutes.get('guid') == guid:
+                        config.channel_mutes = deepcopy(settings.channel_mutes)
                     if settings.bus_gains.get('guid') == guid:
                         config.bus_gains = deepcopy(settings.bus_gains)
                 config.save()

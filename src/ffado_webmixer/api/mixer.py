@@ -107,6 +107,9 @@ def register(app, backend, description, config, broadcast):
         except Exception as exc:
             return jsonify(error=str(exc)), 500
         broadcast({'type': 'dice-monitoring'})
+        if payload.get('control') == 'adat_spdif':
+            # Optical format changes the device's native router configuration.
+            broadcast({'type': 'resync'})
         return jsonify(result)
 
     @app.get("/api/describe")

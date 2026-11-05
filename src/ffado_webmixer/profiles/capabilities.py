@@ -17,6 +17,8 @@ FEATURES = frozenset({
     'device_settings', 'hardware_nickname', 'scalar_volume', 'scalar_selector',
 })
 STATES = frozenset({'mapped', 'optional', 'source_only', 'unmapped'})
+# Extensions need only be declared by the models which implement them.
+EXTENSION_FEATURES = frozenset({'monitor_adat_spdif'})
 STATUSES = frozenset({'mapped', 'identity_only', 'requires_internal_model'})
 
 
@@ -28,7 +30,7 @@ def parse_capabilities(device_node):
               'note':tag.get('note', ''), 'features':{}}
     for entry in tag.findall('feature'):
         name, state = entry.get('name'), entry.get('state')
-        if name not in FEATURES or name in result['features'] or state not in STATES:
+        if name not in FEATURES | EXTENSION_FEATURES or name in result['features'] or state not in STATES:
             raise ValueError(f"{device_node.get('name')}: invalid/duplicate capability {name!r}")
         data = dict(entry.attrib)
         if state in ('mapped','optional','source_only'):

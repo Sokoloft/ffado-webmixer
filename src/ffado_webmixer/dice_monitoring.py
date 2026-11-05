@@ -6,7 +6,7 @@ DimLevel's 0..-87 range follows Saffire_Pro*_monitoring.ui.
 """
 import math
 
-from .profiles.capabilities import enabled
+from .profiles.capabilities import enabled, declared_path
 from .mixer_outputs import serialized_output
 
 
@@ -41,6 +41,12 @@ class DiceMonitoring:
         hardware = lines('monitor_line_volume', 'UnActivate')
         if hardware:
             result['hw_monitor'] = hardware
+        if enabled(self.profile, 'monitor_adat_spdif'):
+            # FFADO saffire_dice.py: Pro 40 checked means optical SPDIF.
+            suffix = declared_path(self.profile, 'monitor_adat_spdif')
+            optical = controls.get(self.device['device'] + suffix)
+            if optical and optical['kind'] == 'Boolean':
+                result['adat_spdif'] = optical
         return result
 
     def dice_monitor_description(self):
@@ -89,12 +95,20 @@ class DiceMonitoring:
             result['hw_monitor_partial'] = any(states) and not all(states)
         if 'mute' in controls:
             result['mute'] = bool(self._read_scalar(controls['mute']['state']))
+        if 'adat_spdif' in controls:
+            result['adat_spdif'] = bool(self._read_scalar(controls['adat_spdif']))
         return result
 
     @serialized_output
     def write_dice_monitoring(self, control, value):
-        if control not in ('hw_monitor', 'mute') or type(value) is not bool:
-            raise ValueError('Expected boolean hw_monitor or mute')
+        if control not in ('hw_monitor', 'mute', 'adat_spdif') or type(value) is not bool:
+            raise ValueError('Expected boolean hw_monitor, mute or adat_spdif')
+        if control == 'adat_spdif':
+            optical = self.dice_monitor_controls().get('adat_spdif')
+            if not optical:
+                raise ValueError('ADAT as SPDIF is not supported on this device')
+            self._monitor_changes([(optical, value)])
+            return self.read_dice_monitoring()
         controls = self.dice_monitor_controls().get('hw_monitor')
         if control == 'mute':
             mute = self.dice_monitor_controls().get('mute')
@@ -119,7 +133,7 @@ class DiceMonitoring:
         raw = self._read_scalar(dim['level'])
         if not math.isfinite(float(raw)) or not -87 <= raw <= 0:
             raise IOError('Invalid DICE Dim level')
-        # Reserve position zero for Off. Positions 1..88 run from -87 to 0 dB.
+        # Positions 1..88 run from -87 to 0 dB, independently of the switch.
         return {'name': 'Dim', 'level': (float(raw) + 88) * 100 / 88,
                 'mute': not active,
                 'dim_active': active, 'emulated_mute': False}
@@ -134,13 +148,8 @@ class DiceMonitoring:
             changes = [(dim['state'], not value)] + [(item, True) for item in dim['members']]
         elif (control == 'fader' and not isinstance(value, bool) and isinstance(value, (int, float))
               and math.isfinite(value) and 0 <= value <= 100):
-            active = value > 0
-            raw = max(1, round(value * 88 / 100)) - 88 if active else 0
-            # Disable first when returning to Off; enable only after setting
-            # the requested finite level when leaving Off.
-            changes = ([(dim['level'], raw), (dim['state'], True)] if active else
-                       [(dim['state'], False), (dim['level'], 0)])
-            changes += [(item, True) for item in dim['members']]
+            raw = max(1, round(value * 88 / 100)) - 88
+            changes = [(dim['level'], raw)]
         else:
             raise ValueError('Invalid DICE Dim control or value')
         self._monitor_changes(changes)

@@ -367,6 +367,7 @@ function formatFaderDb(db) {
   return (rounded > 0 ? "+" : "") + rounded.toFixed(1) + " dB";
 }
 function faderUiToDb(ui, scale = faderScale()) {
+  if (scale.mode === 'dice_dim') ui = Math.max(100 * scale.min_finite_native / scale.native_max, ui);
   if (ui <= 0) return null;
   if (scale.mode === 'dice_line') {
     var lineStep = Math.round(ui * scale.native_max / 100);
@@ -392,8 +393,7 @@ function faderDbToUi(db, scale = faderScale()) {
 }
 function parseFaderEntry(text, scale = faderScale()) {
   var input = String(text).trim().replace(/−/g, "-");
-  if (scale?.mode === 'dice_dim' && /^off$/i.test(input)) return {ok: true, value: 0};
-  if (scale?.mode === 'dice_dim' && /inf|∞/i.test(input)) return {ok: false};
+  if (scale?.mode === 'dice_dim' && /off|inf|∞/i.test(input)) return {ok: false};
   if (hasFaderDbScale(scale) && (/^-∞(?:\s*dB)?$/i.test(input) || /^-inf(?:inity)?(?:\s*dB)?$/i.test(input))) {
     return {ok: true, value: 0};
   }
@@ -494,8 +494,7 @@ function makeFader(track, handle, label, onChange, canEdit = function () { retur
     var scale = getScale();
     renderMarks(scale);
     handle.style.top = (100 - value) + "%";
-    if (forceLabel || !isEditing()) label.value = scale?.mode === 'dice_dim' && value === 0 ? 'Off' :
-      hasFaderDbScale(scale) ? formatFaderDb(faderUiToDb(value, scale)) :
+    if (forceLabel || !isEditing()) label.value = hasFaderDbScale(scale) ? formatFaderDb(faderUiToDb(value, scale)) :
       (value === 0 ? "−∞" : String(value));
   }
   renderMarks(getScale());
@@ -507,6 +506,7 @@ function makeFader(track, handle, label, onChange, canEdit = function () { retur
     var precise = hasFaderDbScale(scale);
     value = Math.min(100, Math.max(0, precise ? Math.round(v * 10000) / 10000 : Math.round(v)));
     if (["motu_db", 'dice_dim', 'dice_line'].includes(scale?.mode)) value = 100 * Math.round(value * scale.native_max / 100) / scale.native_max;
+    if (scale?.mode === 'dice_dim') value = Math.max(100 * scale.min_finite_native / scale.native_max, value);
     render();
     onChange(value);
   }
@@ -529,7 +529,7 @@ function makeFader(track, handle, label, onChange, canEdit = function () { retur
       if (parsed.ok) setValue(parsed.value);
       else toast(hasFaderDbScale(scale) ?
         "Invalid volume: enter " + scale.min_db + " to " + (scale.max_db > 0 ? "+" : "") + scale.max_db +
-          (scale.mode === 'dice_dim' ? " dB, or Off." : " dB, or −∞.") :
+          (scale.mode === 'dice_dim' ? " dB." : " dB, or −∞.") :
         "Invalid volume: enter a value from 0 to 100.");
       label.blur();
       render();
@@ -559,12 +559,11 @@ function makeFader(track, handle, label, onChange, canEdit = function () { retur
   });
   // Double-clicking the handle or the fader track restores unity (0 dB),
   // *not* the silent end of the slider. Legacy percent devices have no calibrated unity.
-  // Global Dim instead resets to its separate Off position.
   track.parentNode.addEventListener("dblclick", function (e) {
     var scale = getScale();
     if (!canEdit() || !hasFaderDbScale(scale)) return;
     e.preventDefault();
-    setValue(scale.mode === 'dice_dim' ? 0 : faderDbToUi(0, scale));
+    setValue(faderDbToUi(0, scale));
   });
   // wheel over the fader: 2 per notch, 1 with Shift held
   var acc = { v: 0 };

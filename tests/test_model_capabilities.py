@@ -10,7 +10,7 @@ from xml.etree import ElementTree as ET
 from unittest.mock import patch
 
 from ffado_webmixer.profiles.capabilities import (
-    FEATURES, activate_internal_model, declared_mixer_hint, enabled,
+    FEATURES, EXTENSION_FEATURES, activate_internal_model, declared_mixer_hint, enabled,
     parse_capabilities, probe_allowed,
 )
 from ffado_webmixer.profiles.loader import _common, load_profile
@@ -32,7 +32,8 @@ class ModelCapabilityContract(unittest.TestCase):
             with self.subTest(profile=str(path.relative_to(ROOT))):
                 node = ET.parse(path).getroot()
                 cap = parse_capabilities(node)
-                self.assertEqual(set(cap['features']), FEATURES)
+                self.assertTrue(FEATURES <= cap['features'].keys())
+                self.assertTrue(cap['features'].keys() <= FEATURES | EXTENSION_FEATURES)
                 self.assertTrue(cap['source'])
                 if cap['status'] == 'mapped':
                     self.assertEqual(cap['features']['matrix_gain']['state'], 'mapped')

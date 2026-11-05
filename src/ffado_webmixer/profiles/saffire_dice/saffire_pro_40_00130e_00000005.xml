@@ -19,6 +19,7 @@
     <feature name="monitor_line_mute" state="mapped" source="support/mixer-qt4/ffado/mixer/saffire_dice.py" path="/EAP/Monitoring/LineOut/Mute{n}" count="10" />
     <feature name="monitor_global_mute" state="mapped" source="support/mixer-qt4/ffado/mixer/saffire_dice.py" path="/EAP/Monitoring/GlobalMute/State" extra_paths="/EAP/Monitoring/LineOut/GMute{n}" extra_count="10" />
     <feature name="monitor_global_dim" state="mapped" source="support/mixer-qt4/ffado/mixer/saffire_dice.py" path="/EAP/Monitoring/GlobalDim/State" extra_paths="/EAP/Monitoring/GlobalDim/Level,/EAP/Monitoring/LineOut/GDim{n}" extra_count="10" />
+    <feature name="monitor_adat_spdif" state="mapped" source="support/mixer-qt4/ffado/mixer/saffire_dice.py" path="/EAP/Monitoring/AdatSpdif/State" />
     <feature name="output_level" state="unmapped" />
     <feature name="channel_trim" state="unmapped" />
     <feature name="channel_invert" state="unmapped" />

@@ -24,7 +24,7 @@ class Elements(HTMLParser):
 def test_version_is_full_semver_string():
     from ffado_webmixer import __version__
     from ffado_webmixer.main import APP_VERSION
-    assert APP_VERSION == __version__ == '1.2.4'
+    assert APP_VERSION == __version__ == '1.2.5'
 
 
 def test_about_has_qr_button_and_replacement_dialog():

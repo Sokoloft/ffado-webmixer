@@ -17,7 +17,7 @@ class Element {
 const box = new Element();
 function descendants(element) { return [element, ...element.children.flatMap(descendants)]; }
 let state = {hw_monitor: false, mute: false}, reject = false, deferWrite;
-let output, loads = 0;
+let output, loads = 0, resyncs = 0;
 const writes = [], messages = [];
 const context = vm.createContext({
   document: {createElement: () => new Element(),
@@ -30,6 +30,7 @@ const context = vm.createContext({
   outputButtonName: output => output.name,
   selectOutput: selected => { output = selected; },
   loadMaster: () => { loads++; }, toast: message => messages.push(message),
+  requestSyncRefresh: async () => { resyncs++; },
   ffadoApi: {
     latest: async () => ({...state}), cancel() {},
     serial: (key, task) => Promise.resolve().then(task),
@@ -46,11 +47,11 @@ const base = path.join(__dirname, '../src/ffado_webmixer/assets/static');
 vm.runInContext(fs.readFileSync(path.join(base, 'dice-monitoring.js'), 'utf8'), context);
 const flush = async () => { for (let i = 0; i < 25; i++) await Promise.resolve(); };
 (async () => {
-  context.configureDiceMonitoring({software_bus_gain: true, dice_monitoring: {dim: true, mute: true, hw_monitor: true}});
+  context.configureDiceMonitoring({software_bus_gain: true, dice_monitoring: {dim: true, mute: true, hw_monitor: true, adat_spdif: true}});
   context.buildDiceMonitoring(box);
   const group = box.children[0], grid = group.children[1];
   assert.equal(group.children[0].textContent, 'Dice');
-  const [dim, hardware, hardwareMute] = grid.children;
+  const [dim, hardware, hardwareMute, optical] = grid.children;
   const buses = box.children[1];
   assert.equal(buses.children[0].textContent, 'Bus');
   assert.equal(buses.children[1].children.length, 1);
@@ -108,6 +109,14 @@ const flush = async () => { for (let i = 0; i < 25; i++) await Promise.resolve()
   assert.equal(hardware.attributes['aria-pressed'], 'true', 'hardware mute does not change monitor mode');
   hardwareMute.click(); await flush();
   assert.equal(hardwareMute.attributes['aria-pressed'], 'false');
+  assert(optical.innerHTML.includes('ADAT as<br>SPDIF'));
+  optical.click(); optical.click(); await flush();
+  assert.equal(writes.at(-1).body.control, 'adat_spdif');
+  assert.equal(writes.at(-1).body.value, true);
+  assert.equal(optical.attributes['aria-pressed'], 'true');
+  assert.equal(resyncs, 1, 'optical format changes refresh routing and strips');
+  optical.click(); await flush();
+  assert.equal(optical.attributes['aria-pressed'], 'false');
   deferWrite = true;
   hardware.click(); await flush();
   context.ACTIVE_DEVICE = 'device-b';

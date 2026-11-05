@@ -15,6 +15,7 @@ from .soft_mute import MuteJournal
 from .mixer_outputs import OutputControls, serialized_output
 from .dice_monitoring import DiceMonitoring
 from .bus_gain import BusGainControls
+from .channel_mute import ChannelMuteControls
 from .mixer_routing import RoutingControls
 import math
 
@@ -55,7 +56,7 @@ def load_device_info(config=None):
     return discover()
 
 
-class Mixer(BusGainControls, DiceMonitoring, RoutingControls, OutputControls):
+class Mixer(ChannelMuteControls, BusGainControls, DiceMonitoring, RoutingControls, OutputControls):
     """Resolve device state and share gain/recovery guards across its controls.
 
     RoutingControls provides matrix and destination APIs; OutputControls
@@ -117,6 +118,7 @@ class Mixer(BusGainControls, DiceMonitoring, RoutingControls, OutputControls):
         self._matrix_mutes = {}  # (bus, channel) -> original coefficient, for soft mute
         self._stereo_level_memory = {}  # (linked bus, channel) -> last explicit fader routing
         self._user_mutes = set()
+        self._native_channel_mutes = {}
         self._solos = {}  # mix -> set of soloed channel indices
         self._recovery_journal = None
         self._pending_recovery = {}
@@ -307,6 +309,14 @@ class Mixer(BusGainControls, DiceMonitoring, RoutingControls, OutputControls):
             self.load_bus_gains()
         except (OSError, ValueError, RuntimeError) as exc:
             self._mute_fault = f'Could not load saved bus gains: {exc}'
+        try:
+            self.load_bus_mutes()
+        except (OSError, ValueError, RuntimeError) as exc:
+            self._mute_fault = f'Could not load saved bus mutes: {exc}'
+        try:
+            self.load_channel_mutes()
+        except (OSError, ValueError, RuntimeError) as exc:
+            self._mute_fault = f'Could not load saved channel mutes: {exc}'
         if self._pending_recovery:
             print(f"FFADO mixer {self.guid}: {len(self._pending_recovery)} muted "
                   "matrix levels from an interrupted session. "
@@ -449,6 +459,7 @@ class Mixer(BusGainControls, DiceMonitoring, RoutingControls, OutputControls):
                     if other_key in self._matrix_mutes and other_key not in self._user_mutes:
                         self._restore_cell(mix, other)
             self._save_soft_mutes()
+            self._save_channel_mutes()
             self._mute_fault = f'External mixer change detected at bus {mix + 1}, input {col + 1}; mute/solo cancelled for that channel.'
             return True
         return False
@@ -1036,6 +1047,7 @@ class Mixer(BusGainControls, DiceMonitoring, RoutingControls, OutputControls):
                     # this route, it must remain in the recovery journal.
                     if key in self._matrix_mutes and not self._silenced(*key):
                         raise IOError(f'FFADO did not restore bus {key[0]+1}, input {key[1]+1}')
+                self._save_channel_mutes()
                 self._mute_fault = None
             except Exception as exc:
                 self._user_mutes = before_mutes
@@ -1096,6 +1108,9 @@ class Mixer(BusGainControls, DiceMonitoring, RoutingControls, OutputControls):
 
         if self._soft_mute() and control in ("mute", "solo") and "fader" in self.roles:
             self._write_group_mute_solo((mix,), (col,), control, value)
+            return
+        if control == 'mute' and 'mute' in self.roles:
+            self.write_native_channel_mute(mix, col, value)
             return
         if control not in ("fader", "pan", "mute", "solo") or control not in self.roles:
             raise ValueError(f"{control} is not controllable on this device")

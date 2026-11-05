@@ -32,13 +32,17 @@ def test_disabled_dim_displays_retained_level_without_overwriting_hardware(mixer
     assert output['controllable'] and output['gain_scale']['mode'] == 'dice_dim'
 
 
-def test_dim_automatically_activates_and_clears_with_verified_native_level(mixer):
-    for position, raw in [(1, -87), (12, -76), (44, -44), (87, -1), (88, 0), (0, 0)]:
+@pytest.mark.parametrize('active', [False, True])
+def test_dim_fader_preserves_switch_and_line_membership(mixer, active):
+    mixer.helper.values[path(mixer, 'GlobalDim/State')] = active
+    before = dict(mixer.helper.values)
+    for position, raw in [(1, -87), (12, -76), (44, -44), (87, -1), (88, 0), (0, -87)]:
         mixer.write_linked_output('dice/dim', 'fader', position * 100 / 88)
         assert mixer.helper.values[path(mixer, 'GlobalDim/Level')] == raw
-        assert mixer.helper.values[path(mixer, 'GlobalDim/State')] is (position > 0)
-        assert mixer.read_output('dice/dim')['level'] == pytest.approx((position or 88) * 100 / 88)
-        assert all(mixer.helper.values[path(mixer, f'LineOut/GDim{n}')] for n in range(1, 11))
+        result = mixer.read_output('dice/dim')
+        assert result['dim_active'] is active
+        assert result['level'] == pytest.approx((position or 1) * 100 / 88)
+        assert mixer.helper.values == {**before, path(mixer, 'GlobalDim/Level'): raw}
     assert mixer.helper.cells == {} and mixer.mute_memory == {}
 
 
@@ -100,8 +104,8 @@ def test_existing_hardware_switch_state_is_read_without_inversion(mixer):
     assert mixer.helper.values == before
 
 
-def test_dim_disables_before_clearing_native_attenuation(mixer):
-    mixer.write_output('dice/dim', 'fader', 100 / 88)
+def test_dim_fader_writes_only_level_even_at_bottom(mixer):
+    mixer.write_output('dice/dim', 'mute', False)
     write = mixer._write_scalar
     changes = []
 
@@ -111,8 +115,8 @@ def test_dim_disables_before_clearing_native_attenuation(mixer):
 
     mixer._write_scalar = record
     mixer.write_output('dice/dim', 'fader', 0)
-    assert changes[:2] == [(path(mixer, 'GlobalDim/State'), False),
-                           (path(mixer, 'GlobalDim/Level'), 0)]
+    assert changes == [(path(mixer, 'GlobalDim/Level'), -87)]
+    assert mixer.read_output('dice/dim')['dim_active']
 
 
 @pytest.mark.parametrize('control,value', [('hw_monitor', 1), ('bad', True)])
@@ -148,7 +152,7 @@ def test_partial_write_failure_restores_all_attempted_native_controls(mixer, ope
     mixer._write_scalar = fail_after_write
     with pytest.raises(IOError, match='disconnected'):
         if operation == 'dim':
-            mixer.write_output('dice/dim', 'fader', 50)
+            mixer.write_output('dice/dim', 'mute', False)
         elif operation == 'mute':
             mixer.write_dice_monitoring('mute', True)
         else:
@@ -205,7 +209,56 @@ def test_discovery_probes_all_declared_native_monitor_endpoints(mixer, monkeypat
     monkeypatch.setattr(interrogate, 'try_call', lambda *args, **kwargs: kwargs.get('default'))
     interrogate.inventory_profile(object(), device, mixer.profile)
     mixer.device = device
-    assert mixer.dice_monitor_description() == {'dim': True, 'mute': True, 'hw_monitor': True}
+    assert mixer.dice_monitor_description() == {'dim': True, 'mute': True, 'hw_monitor': True,
+                                                 'adat_spdif': True}
+
+
+def test_adat_spdif_reads_and_writes_only_the_native_boolean(mixer):
+    endpoint = path(mixer, 'AdatSpdif/State')
+    assert mixer.describe()['dice_monitoring']['adat_spdif']
+    before = dict(mixer.helper.values)
+    for value in (True, False):
+        result = mixer.write_dice_monitoring('adat_spdif', value)
+        assert result['adat_spdif'] is value
+        assert mixer.helper.values == {**before, endpoint: value}
+    assert mixer.helper.cells == {}
+    with pytest.raises(ValueError):
+        mixer.write_dice_monitoring('adat_spdif', 1)
+
+
+def test_adat_spdif_rejects_missing_or_wrong_interface(mixer):
+    for item in mixer.device['controls']:
+        if item['path'] == path(mixer, 'AdatSpdif/State'):
+            item['kind'] = 'Discrete'
+    assert 'adat_spdif' not in mixer.dice_monitor_description()
+    with pytest.raises(ValueError, match='not supported'):
+        mixer.write_dice_monitoring('adat_spdif', True)
+
+
+@pytest.mark.parametrize('alias', ['saffirepro14', 'saffirepro24', 'saffirepro26'])
+def test_adat_spdif_is_pro40_specific(alias):
+    m = make_debug_mixer(alias, Config(None))
+    assert 'adat_spdif' not in m.dice_monitor_description()
+    with pytest.raises(ValueError, match='not supported'):
+        m.write_dice_monitoring('adat_spdif', True)
+
+
+def test_adat_spdif_rejected_hardware_write_restores_state(mixer):
+    before = dict(mixer.helper.values)
+    mixer.helper.select = lambda *args: None
+    with pytest.raises(IOError, match='acknowledge'):
+        mixer.write_dice_monitoring('adat_spdif', True)
+    assert mixer.helper.values == before
+
+
+def test_adat_spdif_api_refreshes_other_clients(mixer):
+    app = Flask(__name__)
+    events = []
+    mixer_routes.register(app, mixer, mixer.describe(), mixer.config, events.append)
+    response = app.test_client().post('/api/dice-monitoring',
+                                    json={'control': 'adat_spdif', 'value': True})
+    assert response.status_code == 200 and response.json['adat_spdif']
+    assert events == [{'type': 'dice-monitoring'}, {'type': 'resync'}]
 
 
 def test_api_validation_and_broadcast(mixer):

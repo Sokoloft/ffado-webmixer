@@ -156,6 +156,32 @@ def _finite_json_float(value):
     return number
 
 
+def _channel_mute_memory(value):
+    memory = deepcopy(_object(value, 'channel_mutes'))
+    if not memory:
+        return memory
+    if (memory.get('schema') != 1 or type(memory.get('schema')) is not int
+            or not isinstance(memory.get('guid'), str)
+            or not re.fullmatch(r'[0-9a-fA-F]{16}', memory['guid'])
+            or not isinstance(memory.get('matrix_path'), str)
+            or not memory['matrix_path'].startswith('/')):
+        raise ValueError('Invalid channel mute device identity')
+    for key in ('columns', 'mixes'):
+        names = _list(memory.get(key), key)
+        if not names or any(not isinstance(name, str) for name in names):
+            raise ValueError('Invalid channel mute layout')
+    seen = set()
+    for item in _list(memory.get('states'), 'channel mute states'):
+        _object(item, 'channel mute state')
+        bus, col = item.get('mix'), item.get('column')
+        if (type(bus) is not int or not 0 <= bus < len(memory['mixes'])
+                or type(col) is not int or not 0 <= col < len(memory['columns'])
+                or type(item.get('mute')) is not bool or (bus, col) in seen):
+            raise ValueError('Invalid channel mute state')
+        seen.add((bus, col))
+    return memory
+
+
 class Config:
     def __init__(self, path=None):
         # With no path (demo mode) nothing is read or written.
@@ -186,6 +212,8 @@ class Config:
         # Main / Phones fader positions remembered while they are muted (they have no mute of their own).
         self.mute_memory = {}
         self.bus_gains = {}
+        self.bus_mutes = {}  # native bus output mute states, keyed by output id
+        self.channel_mutes = {}
 
 
     # ---------- loading and saving ----------
@@ -220,7 +248,7 @@ class Config:
         # Only publish after every collection and nested setting is validated.
         # Preserve dictionary identities held by the backend's mute recovery.
         with self._pair_lock, self._save_lock:
-            for key in ('settings', 'names', 'stereo_by_mix', 'layouts', 'mute_memory', 'bus_gains'):
+            for key in ('settings', 'names', 'stereo_by_mix', 'layouts', 'mute_memory', 'bus_gains', 'bus_mutes', 'channel_mutes'):
                 target = getattr(self, key)
                 target.clear()
                 target.update(state[key])
@@ -251,6 +279,10 @@ class Config:
                or (isinstance(value, float) and not math.isfinite(value))
                for value in memory.values()):
             raise ValueError('mute_memory must contain finite numbers')
+        bus_mutes = _object(saved.get('bus_mutes', {}), 'bus_mutes')
+        if any(not re.fullmatch(r'bus/(0|[1-9][0-9]*)', key) or type(value) is not bool
+               for key, value in bus_mutes.items()):
+            raise ValueError('bus_mutes must contain bus output ids and booleans')
         return {
             'settings': _settings(saved.get('settings', {})),
             'names': names,
@@ -262,6 +294,8 @@ class Config:
             'layout': _layout(saved.get('layout', []), 'layout'),
             'mute_memory': memory,
             'bus_gains': _bus_gain_memory(saved.get('bus_gains', {})),
+            'bus_mutes': bus_mutes,
+            'channel_mutes': _channel_mute_memory(saved.get('channel_mutes', {})),
         }
 
     def _keep_bad_file(self):
@@ -298,6 +332,8 @@ class Config:
                 "bus_layout": self.bus_layout,
                 "mute_memory": self.mute_memory,
                 "bus_gains": self.bus_gains,
+                "bus_mutes": self.bus_mutes,
+                "channel_mutes": self.channel_mutes,
             }
             if self.legacy_layout:
                 data["layout"] = self.legacy_layout

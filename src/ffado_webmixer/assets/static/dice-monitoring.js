@@ -4,7 +4,8 @@
   var supported = {}, state = null, busy = false;
 
   function renderHardwareButtons() {
-    [['diceHardwareMonitor', 'hw_monitor'], ['diceHardwareMute', 'mute']].forEach(function (item) {
+    [['diceHardwareMonitor', 'hw_monitor'], ['diceHardwareMute', 'mute'],
+     ['diceAdatSpdif', 'adat_spdif']].forEach(function (item) {
       var button = document.getElementById(item[0]), control = item[1];
       if (!button) return;
       button.disabled = busy || !state;
@@ -23,8 +24,11 @@
       return root.postJson('/api/dice-monitoring', {control: control, value: value}, device);
     }).then(function (data) {
       if (device === root.ACTIVE_DEVICE) state = data;
+      if (device === root.ACTIVE_DEVICE && control === 'adat_spdif')
+        return root.requestSyncRefresh();
     }).catch(function (error) {
-      root.toast('Hardware ' + (control === 'mute' ? 'mute' : 'monitor') + ' change failed: ' + error.message);
+      root.toast((control === 'adat_spdif' ? 'ADAT as SPDIF' :
+        'Hardware ' + (control === 'mute' ? 'mute' : 'monitor')) + ' change failed: ' + error.message);
       if (device === root.ACTIVE_DEVICE) return root.refreshDiceMonitoring();
     }).finally(function () {
       busy = false;
@@ -34,7 +38,7 @@
   }
 
   root.refreshDiceMonitoring = function () {
-    if (!supported.hw_monitor && !supported.mute) return Promise.resolve();
+    if (!supported.hw_monitor && !supported.mute && !supported.adat_spdif) return Promise.resolve();
     var device = root.ACTIVE_DEVICE;
     return root.ffadoApi.latest('dice-monitoring', '/api/dice-monitoring', {device: device})
       .then(function (data) {
@@ -73,8 +77,8 @@
 
   root.buildDiceMonitoring = function (box) {
     var dim = root.OUTPUTS.find(function (out) { return out.id === 'dice/dim'; });
-    box.classList.toggle('dice-columns', !!(root.DICE_BUS_GAIN && (dim || supported.hw_monitor || supported.mute)));
-    if (!root.DICE_BUS_GAIN && !dim && !supported.hw_monitor && !supported.mute) return;
+    box.classList.toggle('dice-columns', !!(root.DICE_BUS_GAIN && (dim || supported.hw_monitor || supported.mute || supported.adat_spdif)));
+    if (!root.DICE_BUS_GAIN && !dim && !supported.hw_monitor && !supported.mute && !supported.adat_spdif) return;
     var group = document.createElement('div');
     group.className = 'outgroup dice-group';
     var title = document.createElement('div');
@@ -87,12 +91,13 @@
       var button = document.createElement('button');
       button.type = 'button'; button.className = 'outbtn'; button.dataset.id = dim.id;
       button.textContent = 'Dim';
-      button.title = 'Global Dim: Off at the bottom, then −87 to 0 dB from quiet to loud.';
+      button.title = 'Global Dim: −87 to 0 dB from quiet to loud. Use the bottom button to turn Dim on or off.';
       button.addEventListener('click', function () { root.selectOutput(dim); });
       grid.appendChild(button);
     }
     [['hw_monitor', 'diceHardwareMonitor', 'H/W<br>Monitor', 'Use the front-panel monitor knob.'],
-     ['mute', 'diceHardwareMute', 'H/W<br>Mute', 'Mute the hardware line outputs.']].forEach(function (item) {
+     ['mute', 'diceHardwareMute', 'H/W<br>Mute', 'Mute the hardware line outputs.'],
+     ['adat_spdif', 'diceAdatSpdif', 'ADAT as<br>SPDIF', 'Use the optical ADAT port as SPDIF.']].forEach(function (item) {
       if (!supported[item[0]]) return;
       var button = document.createElement('button');
       button.type = 'button'; button.className = 'outbtn'; button.id = item[1];

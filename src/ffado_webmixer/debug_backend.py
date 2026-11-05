@@ -127,6 +127,9 @@ def create_fixture(alias):
     matrix={'path':path+mat_path,'name':mat_path.rsplit('/',1)[-1],
             'rows':r,'cols':c,'row_names':row_names,'col_names':col_names}
     controls=[]
+    if enabled(profile, 'monitor_adat_spdif'):
+        controls.append({'path': path + profile['capabilities']['features']['monitor_adat_spdif']['path'],
+                         'kind': 'Boolean'})
     if family == 'saffire_dice':
         count = int(profile['capabilities']['features']['monitor_line_volume']['count'])
         for suffix, kind in [('GlobalDim/State', 'Boolean'), ('GlobalDim/Level', 'Discrete'),
