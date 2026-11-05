@@ -89,7 +89,7 @@ ffado-webmixer --remove-desktop
 
 Select a connected interface from the device dropdown when more than one is available. Use the three-dot menus on buses and faders to link, pin, or minimize them. Right-click a name or numeric field to edit it, or long-press on a touchscreen.
 
-In the mixer matrix, Ctrl-click (⌘-click on Mac) or long-press an entry for half a second to add or remove it from a group selection. Drag, scroll, or use arrow keys on a selected entry to adjust the group together, preserving level differences within the available range. The precise editor's Apply button sets all selected entries to the displayed level. Clicking an unselected entry starts a new selection.
+In the mixer matrix, Ctrl-click or long-press an entry for half a second to add or remove it from a group selection. Drag, scroll, or use arrow keys on a selected entry to adjust the group together, preserving level differences within the available range. The precise editor's Apply button sets all selected entries to the displayed level. Clicking an unselected entry starts a new selection.
 
 On the Saffire Pro 40 and other DICE/RME matrix mixers, pan controls appear only on linked stereo buses. Every mixer input can then be panned independently; input channels do not need to be linked. Raise a silent channel's fader first, and its pan control becomes available automatically. Use the bus three-dot menu to link adjacent output buses; linking alone leaves the existing audio routes and levels unchanged.
 
